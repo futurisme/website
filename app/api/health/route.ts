@@ -7,6 +7,7 @@ import { getSafeDatabaseRuntimeMeta, resolveDatabaseConfigs } from '@/lib/env';
 
 export async function GET() {
   const timestamp = new Date().toISOString();
+  const strictCheck = process.env.HEALTHCHECK_STRICT_DB === 'true';
 
   try {
     const meta = getSafeDatabaseRuntimeMeta();
@@ -34,6 +35,21 @@ export async function GET() {
   } catch (error) {
     const payload = toErrorPayload(error);
     console.error('GET /api/health failed:', error);
+
+    if (!strictCheck) {
+      return NextResponse.json(
+        {
+          ok: true,
+          service: 'templatedatabases',
+          database: 'unavailable',
+          warning: payload.message,
+          timestamp
+        },
+        {
+          headers: { 'Cache-Control': 'no-store' }
+        }
+      );
+    }
 
     return NextResponse.json(
       {
