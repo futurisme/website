@@ -255,3 +255,49 @@ See [SYNTAX.md](./SYNTAX.md) for the complete grouped namespace reference, flat 
   GPU-safe motion helpers that only mutate `transform` and `opacity`.
 
 All functions are dependency-free ESM exports and can be imported independently.
+
+
+## SEO Utilities (New)
+
+`fadhilweblib` now includes technical SEO helpers for metadata generation and audit scoring:
+
+```ts
+import { auditSeoMetadata, createSeoMetadata } from '@/lib/fadhilweblib';
+
+const seo = createSeoMetadata({
+  siteName: 'Template Databases',
+  siteUrl: 'https://templatedatabases.vercel.app',
+  pagePath: '/portfolio',
+  title: 'Fadhil Portfolio – Template Databases',
+  description: 'Portfolio page built with fadhilweblib and strict syntax.',
+  keywords: ['portfolio', 'template', 'fadhilweblib'],
+  image: { url: 'https://templatedatabases.vercel.app/public/images/WebWorlds.jpg' },
+});
+
+const audit = auditSeoMetadata({
+  siteName: 'Template Databases',
+  siteUrl: 'https://templatedatabases.vercel.app',
+  title: seo.openGraph.title as string,
+  description: seo.openGraph.description as string,
+  image: { url: 'https://templatedatabases.vercel.app/public/images/WebWorlds.jpg' },
+});
+```
+
+These helpers do not guarantee rankings, but they standardize high-impact technical SEO defaults (canonical, robots, OG/Twitter metadata quality checks).
+
+## Flat Escape Prefixes (New)
+
+To keep syntax strict while allowing fast one-off overrides, flat syntax now supports dotted escape prefixes:
+
+- `css.<property>:<value>`
+- `attrs.<name>:<value>` or `attr.<name>:<value>`
+- `aria.<name>:<value>`
+- `data.<name>:<value>`
+- `vars.<name>:<value>` or `var.<name>:<value>`
+
+Example:
+
+```tsx
+defineSyntax('css.scrollbar-gutter:stable both-edges; attrs.id:hero; data.track:landing;');
+```
+

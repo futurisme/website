@@ -14,6 +14,8 @@ export const parsedStringSyntaxCache = new Map<string, FadhilWebFlatSyntaxObject
 export const resolvedStringSyntaxCache = new Map<string, ResolvedSyntax>();
 export const parsedObjectSyntaxCache = new WeakMap<object, FadhilWebFlatSyntaxObject>();
 export const resolvedObjectSyntaxCache = new WeakMap<object, ResolvedSyntax>();
+export const compiledStringSyntaxCache = new Map<string, FadhilWebCompiledSyntax>();
+export const compiledObjectSyntaxCache = new WeakMap<object, FadhilWebCompiledSyntax>();
 
 export const EMPTY_PARSED_SYNTAX = Object.freeze({}) as FadhilWebFlatSyntaxObject;
 export const EMPTY_STYLE = Object.freeze({}) as React.CSSProperties;

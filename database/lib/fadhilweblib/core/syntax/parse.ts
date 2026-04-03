@@ -2,6 +2,8 @@ import {
   BOOLEAN_FALSE,
   BOOLEAN_TRUE,
   EMPTY_PARSED_SYNTAX,
+  compiledObjectSyntaxCache,
+  compiledStringSyntaxCache,
   isCompiledSyntax,
   isKnownGroupKey,
   normalizeGroupName,
@@ -272,6 +274,51 @@ function setSpecialEntry(
   };
 }
 
+
+function applyDottedEscapeEntry(
+  result: FadhilWebFlatSyntaxObject,
+  rawKey: string,
+  rawValue: SyntaxScalar,
+) {
+  const separatorIndex = rawKey.indexOf('.');
+  if (separatorIndex <= 0) {
+    return false;
+  }
+
+  const namespace = rawKey.slice(0, separatorIndex).trim().toLowerCase();
+  const key = rawKey.slice(separatorIndex + 1).trim();
+  if (!key) {
+    return false;
+  }
+
+  if (namespace === 'css') {
+    setSpecialEntry(result, 'css', key, rawValue);
+    return true;
+  }
+
+  if (namespace === 'attr' || namespace === 'attrs') {
+    setSpecialEntry(result, 'attrs', key, rawValue);
+    return true;
+  }
+
+  if (namespace === 'aria') {
+    setSpecialEntry(result, 'aria', key, rawValue);
+    return true;
+  }
+
+  if (namespace === 'data') {
+    setSpecialEntry(result, 'data', key, rawValue);
+    return true;
+  }
+
+  if (namespace === 'var' || namespace === 'vars') {
+    setSpecialEntry(result, 'vars', key, rawValue);
+    return true;
+  }
+
+  return false;
+}
+
 function setFlatEntry(
   result: FadhilWebFlatSyntaxObject,
   rawKey: string,
@@ -296,6 +343,10 @@ function setFlatEntry(
 
   if (trimmedKey.startsWith('data-')) {
     setSpecialEntry(result, 'data', trimmedKey, rawValue);
+    return;
+  }
+
+  if (applyDottedEscapeEntry(result, trimmedKey, rawValue)) {
     return;
   }
 
@@ -729,6 +780,40 @@ export function composeSyntax(...inputs: Array<FadhilWebSyntax | undefined>) {
 }
 
 export function compileSyntax(input?: FadhilWebSyntax) {
+  if (typeof input === 'string') {
+    const cached = compiledStringSyntaxCache.get(input);
+    if (cached) {
+      return cached;
+    }
+
+    const parsed = parseSyntaxInput(input);
+    const resolved = resolveSyntax(parsed);
+    const compiled = Object.freeze({
+      __fwlbType: 'compiled-syntax' as const,
+      input: parsed,
+      resolved,
+    });
+    rememberCache(compiledStringSyntaxCache, input, compiled);
+    return compiled;
+  }
+
+  if (input && typeof input === 'object' && !isCompiledSyntax(input)) {
+    const cached = compiledObjectSyntaxCache.get(input);
+    if (cached) {
+      return cached;
+    }
+
+    const parsed = parseSyntaxInput(input);
+    const resolved = resolveSyntax(parsed);
+    const compiled = Object.freeze({
+      __fwlbType: 'compiled-syntax' as const,
+      input: parsed,
+      resolved,
+    });
+    compiledObjectSyntaxCache.set(input, compiled);
+    return compiled;
+  }
+
   const parsed = parseSyntaxInput(input);
   const resolved = resolveSyntax(parsed);
 

@@ -246,3 +246,24 @@ test('parseSyntaxInput throws on unknown keys and invalid group usage', () => {
   expectSyntaxError(() => parseSyntaxInput({ sticky: { top: 0 } } as never), /does not accept nested objects/);
   expectSyntaxError(() => parseSyntaxInput({ css: { mask: { alpha: true } } } as never), /Syntax group "css" expects scalar values/);
 });
+
+test('parseSyntaxInput supports dotted escape namespaces for css/attrs/data/aria/vars', () => {
+  const parsed = parseSyntaxInput('css.scrollbar-gutter:stable both-edges; attrs.id:hero; data.track:portfolio; aria.label:Portfolio card; vars.brand-halo:rgba(34,211,238,0.25);');
+
+  assert.equal(parsed.css?.['scrollbar-gutter'], 'stable both-edges');
+  assert.equal(parsed.attrs?.id, 'hero');
+  assert.equal(parsed.data?.['data-track'], 'portfolio');
+  assert.equal(parsed.aria?.['aria-label'], 'Portfolio card');
+  assert.equal(parsed.vars?.['--brand-halo'], 'rgba(34,211,238,0.25)');
+});
+
+test('compileSyntax caches repeated string and object inputs for speed', () => {
+  const sameStringA = compileSyntax('tone:brand; px:12; py:10;');
+  const sameStringB = compileSyntax('tone:brand; px:12; py:10;');
+  assert.equal(sameStringA, sameStringB);
+
+  const syntaxObject = { tone: 'brand', px: 12, py: 10 } as const;
+  const sameObjectA = compileSyntax(syntaxObject);
+  const sameObjectB = compileSyntax(syntaxObject);
+  assert.equal(sameObjectA, sameObjectB);
+});
