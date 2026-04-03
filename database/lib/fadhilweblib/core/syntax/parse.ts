@@ -624,7 +624,7 @@ function applyGroupStringSyntax(
     if (separatorIndex < 1) {
       const normalizedBooleanKey = normalizeKey(entry.trim());
       if (normalizedBooleanKey && BOOLEAN_SHORTHAND_KEYS.has(normalizedBooleanKey)) {
-        setFlatEntry(result, entry.trim(), 'true', `syntax group "${rawGroup}"`, group);
+        setFlatEntry(result, entry.trim(), 'true', `syntax group "${rawGroup}"`, group as StructuredGroupName);
         continue;
       }
 
@@ -642,7 +642,7 @@ function applyGroupStringSyntax(
       continue;
     }
 
-    setFlatEntry(result, rawKey, value, `syntax group "${rawGroup}"`, group);
+    setFlatEntry(result, rawKey, value, `syntax group "${rawGroup}"`, group as StructuredGroupName);
   }
 }
 

@@ -2,7 +2,7 @@ export type * from './core/types';
 
 export { defineRecipe, mergeRecipes } from './core/recipe';
 export { composeStateSyntax, createStateStyleVariables, defineStateSyntax, resolveStateSyntax } from './core/state-syntax';
-export { FadhilWebSyntaxError, compileSyntax, composeSyntax, defineSyntax, mergeSyntax, parseSyntaxInput, resolveSyntax } from './core/syntax';
+export { FadhilWebSyntaxError, analyzeNextGenSyntax, benchmarkNextGenSyntax, compileSyntax, composeSyntax, createNextGenSyntaxEngine, defineSyntax, mergeSyntax, parseSyntaxInput, precompileUltraShortSyntax, resolveSyntax } from './core/syntax';
 
 export { ActionGroup } from './components/ActionGroup';
 export { HeaderShell } from './components/HeaderShell';

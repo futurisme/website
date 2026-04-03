@@ -35,6 +35,27 @@ Canonical sizing keys now include:
 - `minInlineSize` (`minInline`), `maxInlineSize` (`maxInline`)
 - `minBlockSize` (`minBlock`), `maxBlockSize` (`maxBlock`)
 
+## Next-Gen Syntax Engine (2026)
+
+`fadhilweblib` now exposes a dedicated runtime-light Next-Gen engine for teams that need dual-layer syntax (verbose + ultra-short), optional defaults, and benchmarking in one place.
+
+```tsx
+import { createNextGenSyntaxEngine } from '@/lib/fadhilweblib';
+
+const nextGen = createNextGenSyntaxEngine({
+  contextualDefaults: 'surface(tone:neutral, radius:16); spacing(px:12);',
+});
+
+const card = nextGen.precompile('surface(tone:brand); spacing(py:10);');
+```
+
+New helpers:
+
+- `createNextGenSyntaxEngine(...)` for plug-and-play defaults and precompilation.
+- `precompileUltraShortSyntax(...)` for standalone shorthand precompilation.
+- `analyzeNextGenSyntax(...)` for static alias/namespace diagnostics.
+- `benchmarkNextGenSyntax(...)` for payload/core byte estimation.
+
 ## Core Principle
 
 Use semantic primitives first. Use syntax only when you need instance-level control without building a one-off component.
