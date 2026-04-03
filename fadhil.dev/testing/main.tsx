@@ -132,7 +132,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
   return (
     <Surface
       tone="neutral"
-      style={{ width: '100%', maxWidth: '100%', display: 'grid', gap: '0.12rem', gridTemplateRows: 'auto minmax(0, 1fr) auto', alignContent: 'start' }}
+      style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', display: 'grid', gap: '0.12rem', gridTemplateRows: 'auto minmax(0, 1fr) auto', alignContent: 'start' }}
       data-project-card
     >
       <StatusChip
@@ -146,7 +146,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
         tone="neutral"
         density="compact"
         bleed
-        style={{ width: '98%', maxWidth: '98%', marginInline: 'auto', padding: '0', borderRadius: '8px', overflow: 'hidden', lineHeight: 0, aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{ width: '98%', maxWidth: '98%', boxSizing: 'border-box', marginInline: 'auto', padding: '0', borderRadius: '8px', overflow: 'hidden', lineHeight: 0, aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         <img
           data-src={resolvedImage}
@@ -165,7 +165,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
 }
 
 const projectGrid = (mediaProfile: SmartMediaProfile | null, keyPrefix = '') => (
-  <Grid minItemWidth="240" gap="xs" itemJustify="stretch" style={{ width: '100%' }}>
+  <Grid minItemWidth="min(240px, 100%)" gap="xs" itemJustify="stretch" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
     {projects.map(([title, url, image, stack]) => (
       <ProjectCard key={`${keyPrefix}${title}`} title={title} url={url} image={image} stack={stack} mediaProfile={mediaProfile} />
     ))}
