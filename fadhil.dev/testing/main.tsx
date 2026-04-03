@@ -132,7 +132,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
   return (
     <Surface
       tone="neutral"
-      style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', display: 'grid', gap: '0.065rem', gridTemplateRows: 'auto minmax(0, 1fr) auto', alignContent: 'start' }}
+      style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', display: 'grid', gap: '0.01rem', gridTemplateRows: 'auto minmax(0, 1fr) auto', alignContent: 'start' }}
       data-project-card
     >
       <StatusChip
@@ -146,7 +146,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
         tone="neutral"
         density="compact"
         bleed
-        style={{ width: 'calc(100% - 0.045rem)', maxWidth: 'calc(100% - 0.045rem)', boxSizing: 'border-box', marginInline: 'auto', marginBlock: '0.01rem', padding: '0', borderRadius: '8px', overflow: 'hidden', lineHeight: 0, aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        style={{ width: 'calc(100% + 0.12rem)', maxWidth: 'calc(100% + 0.12rem)', boxSizing: 'border-box', marginInline: '-0.06rem', marginBlock: '0', padding: '0', borderRadius: '9px', overflow: 'hidden', lineHeight: 0, aspectRatio: '16 / 9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         <img
           data-src={resolvedImage}
@@ -156,7 +156,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
           decoding="async"
           width={1920}
           height={1080}
-          style={{ display: 'block', width: '100.12%', height: '100.12%', inlineSize: '100.12%', maxWidth: 'none', borderRadius: '8px', aspectRatio: '16 / 9', objectFit: 'cover', objectPosition: 'center', background: 'rgba(2, 6, 23, 0.65)', border: '0.33px solid color-mix(in oklab, var(--fwlb-border-soft) 75%, transparent)' }}
+          style={{ display: 'block', width: '100.65%', height: '100.65%', inlineSize: '100.65%', maxWidth: 'none', borderRadius: '9px', aspectRatio: '16 / 9', objectFit: 'cover', objectPosition: '50% 50%', background: 'rgba(2, 6, 23, 0.74)', border: '0.15px solid color-mix(in oklab, var(--fwlb-border-soft) 92%, transparent)' }}
         />
       </Surface>
       <Button as="a" href={url} target="_blank" rel="noopener noreferrer" tone="brand" size="sm">Open {title}</Button>
@@ -165,7 +165,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
 }
 
 const projectGrid = (mediaProfile: SmartMediaProfile | null, keyPrefix = '') => (
-  <Grid minItemWidth="min(252px, 100%)" gap="xs" itemJustify="stretch" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', gap: '0.18rem' }}>
+  <Grid minItemWidth="min(252px, 100%)" gap="xs" itemJustify="stretch" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', gap: '0.045rem' }}>
     {projects.map(([title, url, image, stack]) => (
       <ProjectCard key={`${keyPrefix}${title}`} title={title} url={url} image={image} stack={stack} mediaProfile={mediaProfile} />
     ))}
