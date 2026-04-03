@@ -16,8 +16,8 @@
       }
     },
     {
-      "src": "/(.*)",
-      "dest": "database/$1"
+      "src": "/((?!database/).*)",
+      "dest": "/database/$1"
     }
   ]
 }
