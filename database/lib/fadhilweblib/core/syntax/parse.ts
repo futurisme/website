@@ -23,6 +23,33 @@ import { resolveSyntax } from './style';
 type StructuredGroupName = 'layout' | 'spacing' | 'surface' | 'text' | 'fx' | 'logic';
 type SpecialGroupName = 'aria' | 'data' | 'vars' | 'css' | 'attrs';
 
+const BOOLEAN_SHORTHAND_KEYS = new Set([
+  'compact',
+  'full',
+  'truncate',
+  'inert',
+  'loading',
+  'disabled',
+  'open',
+  'hidden',
+  'current',
+  'interactive',
+  'focusable',
+  'visuallyHidden',
+  'wrap',
+  'sticky',
+  'pin',
+]);
+
+function findEntrySeparator(input: string) {
+  const colonIndex = findTopLevelSeparator(input, ':');
+  if (colonIndex !== -1) {
+    return colonIndex;
+  }
+
+  return findTopLevelSeparator(input, '=');
+}
+
 export class FadhilWebSyntaxError extends Error {
   constructor(message: string) {
     super(message);
@@ -593,9 +620,15 @@ function applyGroupStringSyntax(
   }
 
   for (const entry of entries) {
-    const separatorIndex = findTopLevelSeparator(entry, ':');
+    const separatorIndex = findEntrySeparator(entry);
     if (separatorIndex < 1) {
-      throw createSyntaxError(`Malformed syntax entry "${entry}" inside group "${rawGroup}". Expected key:value.`);
+      const normalizedBooleanKey = normalizeKey(entry.trim());
+      if (normalizedBooleanKey && BOOLEAN_SHORTHAND_KEYS.has(normalizedBooleanKey)) {
+        setFlatEntry(result, entry.trim(), 'true', `syntax group "${rawGroup}"`, group);
+        continue;
+      }
+
+      throw createSyntaxError(`Malformed syntax entry "${entry}" inside group "${rawGroup}". Expected key:value, key=value, or boolean shorthand.`);
     }
 
     const rawKey = entry.slice(0, separatorIndex).trim();
@@ -658,7 +691,7 @@ function parseStringSyntax(input: string) {
       continue;
     }
 
-    const separatorIndex = findTopLevelSeparator(trimmed, ':');
+    const separatorIndex = findEntrySeparator(trimmed);
     if (separatorIndex === -1) {
       const groupStartIndex = trimmed.indexOf('(');
       if (groupStartIndex > 0 && trimmed.endsWith(')')) {
@@ -668,7 +701,13 @@ function parseStringSyntax(input: string) {
         continue;
       }
 
-      throw createSyntaxError(`Malformed syntax segment "${trimmed}". Expected key:value or group(...).`);
+      const normalizedBooleanKey = normalizeKey(trimmed);
+      if (normalizedBooleanKey && BOOLEAN_SHORTHAND_KEYS.has(normalizedBooleanKey)) {
+        setFlatEntry(result, trimmed, 'true', `syntax segment "${trimmed}"`);
+        continue;
+      }
+
+      throw createSyntaxError(`Malformed syntax segment "${trimmed}". Expected key:value, key=value, boolean shorthand, or group(...).`);
     }
 
     const rawKey = trimmed.slice(0, separatorIndex).trim();

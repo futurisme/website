@@ -301,3 +301,22 @@ Example:
 defineSyntax('css.scrollbar-gutter:stable both-edges; attrs.id:hero; data.track:landing;');
 ```
 
+
+
+## Ultra-Compact Syntax Mode (New)
+
+To reduce external project code lines further, syntax now accepts compact authoring forms:
+
+- `key=value` as an alternative to `key:value`
+- boolean shorthand by writing the key alone (`interactive; focusable; sticky;`)
+- short group aliases: `l`, `sp`, `sf`, `tx`, `mv`, `lg`, `ar`, `dt`, `vr`, `cs`, `at`
+- extra key abbreviations such as `d` (display), `fd` (direction), `ai` (align), `jc` (justify), `fz` (fontSize), `dur` (duration)
+
+Example:
+
+```tsx
+defineSyntax('l(d:flex, fd:column, ai:center, jc:between); tx(fz=18, lhx=1.4); lg(interactive, focusable);');
+```
+
+All of these are optional. Existing full syntax continues to work unchanged.
+

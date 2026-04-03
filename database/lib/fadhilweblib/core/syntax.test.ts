@@ -267,3 +267,27 @@ test('compileSyntax caches repeated string and object inputs for speed', () => {
   const sameObjectB = compileSyntax(syntaxObject);
   assert.equal(sameObjectA, sameObjectB);
 });
+
+test('parseSyntaxInput supports equals separator and boolean shorthand in flat syntax', () => {
+  const parsed = parseSyntaxInput('d=grid; cols=2; interactive; focusable; sticky;');
+
+  assert.equal(parsed.display, 'grid');
+  assert.equal(parsed.cols, '2');
+  assert.equal(parsed.interactive, 'true');
+  assert.equal(parsed.focusable, 'true');
+  assert.equal(parsed.sticky, 'true');
+});
+
+test('parseSyntaxInput supports short group aliases and key abbreviations', () => {
+  const parsed = parseSyntaxInput('l(d:flex, fd:column, ai:center, jc:between); tx(fz:18, lhx:1.4); mv(dur:160); lg(interactive, focusable);');
+
+  assert.equal(parsed.display, 'flex');
+  assert.equal(parsed.direction, 'column');
+  assert.equal(parsed.align, 'center');
+  assert.equal(parsed.justify, 'between');
+  assert.equal(parsed.fontSize, '18');
+  assert.equal(parsed.lineHeight, '1.4');
+  assert.equal(parsed.duration, '160');
+  assert.equal(parsed.interactive, 'true');
+  assert.equal(parsed.focusable, 'true');
+});
