@@ -1,23 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "builds": [
+  "framework": "nextjs",
+  "installCommand": "cd database && npm ci",
+  "buildCommand": "cd database && npm run build",
+  "devCommand": "cd database && npm run dev",
+  "outputDirectory": "database/.next",
+  "redirects": [
     {
-      "src": "database/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/Portfolio",
-      "status": 308,
-      "headers": {
-        "Location": "/portfolio"
-      }
-    },
-    {
-      "src": "/((?!database/).*)",
-      "dest": "/database/$1"
+      "source": "/Portfolio",
+      "destination": "/portfolio",
+      "permanent": true
     }
   ]
 }
