@@ -130,18 +130,34 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
   );
 
   return (
-    <Surface tone="neutral" style={{ display: 'grid', gap: '0.6rem' }} data-project-card>
-      <StatusChip label="Stack" value={stack} tone="info" />
-      <img
-        data-src={resolvedImage}
-        data-placeholder-color="#0f172a"
-        alt={`${title} preview`}
-        loading="lazy"
-        decoding="async"
-        width={1600}
-        height={900}
-        style={{ width: '100%', borderRadius: '12px', aspectRatio: '16/9', objectFit: 'cover', border: '1px solid var(--fwlb-border-soft)' }}
+    <Surface
+      tone="neutral"
+      style={{ display: 'grid', gap: '0.6rem', gridTemplateRows: 'auto auto minmax(0, auto)' }}
+      data-project-card
+    >
+      <StatusChip
+        label="Stack"
+        value={stack}
+        tone="info"
+        syntax="spacing(px:10, py:6); text(fs:11, lh:1.15); surface(radius:10, borderWidth:1);"
+        style={{ width: 'fit-content', maxWidth: '100%' }}
       />
+      <Surface
+        tone="neutral"
+        density="compact"
+        style={{ padding: '0.2rem', borderRadius: '12px', overflow: 'hidden', lineHeight: 0 }}
+      >
+        <img
+          data-src={resolvedImage}
+          data-placeholder-color="#0f172a"
+          alt={`${title} preview`}
+          loading="lazy"
+          decoding="async"
+          width={1600}
+          height={900}
+          style={{ display: 'block', width: '100%', maxWidth: '100%', borderRadius: '10px', aspectRatio: '16/9', objectFit: 'cover', border: '1px solid var(--fwlb-border-soft)' }}
+        />
+      </Surface>
       <Button as="a" href={url} target="_blank" rel="noopener noreferrer" tone="brand" size="sm">Open {title}</Button>
     </Surface>
   );
