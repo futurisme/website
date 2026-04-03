@@ -132,7 +132,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
   return (
     <Surface
       tone="neutral"
-      style={{ display: 'grid', gap: '0.6rem', gridTemplateRows: 'auto auto minmax(0, auto)' }}
+      style={{ display: 'grid', gap: '0.5rem', gridTemplateRows: 'auto auto minmax(0, auto)' }}
       data-project-card
     >
       <StatusChip
@@ -145,7 +145,7 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
       <Surface
         tone="neutral"
         density="compact"
-        style={{ padding: '0.2rem', borderRadius: '12px', overflow: 'hidden', lineHeight: 0 }}
+        style={{ padding: '0.1rem', borderRadius: '12px', overflow: 'hidden', lineHeight: 0, aspectRatio: '16 / 9', maxHeight: 'min(56vw, 13.5rem)', display: 'grid', alignItems: 'center' }}
       >
         <img
           data-src={resolvedImage}
@@ -153,9 +153,9 @@ function ProjectCard({ title, url, image, stack, mediaProfile }: { title: string
           alt={`${title} preview`}
           loading="lazy"
           decoding="async"
-          width={1600}
-          height={900}
-          style={{ display: 'block', width: '100%', maxWidth: '100%', borderRadius: '10px', aspectRatio: '16/9', objectFit: 'cover', border: '1px solid var(--fwlb-border-soft)' }}
+          width={1920}
+          height={1080}
+          style={{ display: 'block', width: '100%', height: '100%', maxWidth: '100%', borderRadius: '10px', aspectRatio: '16 / 9', objectFit: 'contain', background: 'rgba(2, 6, 23, 0.65)', border: '1px solid var(--fwlb-border-soft)' }}
         />
       </Surface>
       <Button as="a" href={url} target="_blank" rel="noopener noreferrer" tone="brand" size="sm">Open {title}</Button>
