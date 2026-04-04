@@ -198,7 +198,7 @@
   width: 1.85rem;
   height: 1.85rem;
   border: 1px solid var(--fwlb-border-soft);
-  border-radius: var(--fwlb-radius-pill, 999px);
+  border-radius: var(--fwlb-radius-pill);
   background: var(--fwlb-surface-muted);
   font-size: 0.95rem;
   line-height: 1;

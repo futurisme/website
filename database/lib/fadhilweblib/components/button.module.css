@@ -316,7 +316,7 @@
   height: 0.95em;
   border: 2px solid currentColor;
   border-right-color: transparent;
-  border-radius: var(--fwlb-radius-icon-button, var(--fwlb-radius-pill, 999px));
+  border-radius: var(--fwlb-radius-icon-button, var(--fwlb-radius-pill));
   animation: spin 700ms linear infinite;
 }
 
