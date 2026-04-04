@@ -13,6 +13,9 @@ export type { SpeculativeNavigationOptions } from './speculative-navigation';
 export { applyZeroJankMotion, createMotionStyle } from './zero-jank-motion';
 export type { MotionConfig, MotionKeyframe } from './zero-jank-motion';
 
+export { applyRenderBudgetHints, createFreedomStyleScope, createScopedTokenStyles, queueFreedomTask } from './freedom-runtime';
+export type { FreedomScopeStyleInput, FreedomStyleScope, FreedomTaskOptions, FreedomTaskPriority, RenderBudgetHintOptions } from './freedom-runtime';
+
 export {
   composeGradient,
   createCinematicBandGradient,
