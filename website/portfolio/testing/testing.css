@@ -31,7 +31,7 @@
       color-mix(in oklab, #5f0f3f 40%, #ffffff) 95%,
       #ffffff 100%
     ) !important;
-  background-attachment:fixed,fixed,fixed,scroll;
+  background-attachment:scroll;
   background-size:100% 100%,100% 100%,100% 100%,100% 100%;
   background-repeat:no-repeat;
 }
