@@ -35,3 +35,4 @@ export { ProgressBar } from './components/feedback/ProgressBar';
 export { Skeleton } from './components/feedback/Skeleton';
 
 export * from './core/performance';
+export * from './core/compiler';
