@@ -1,4 +1,8 @@
 export type GradientKind = 'linear' | 'radial' | 'conic';
+export type GradientBand = {
+  color: string;
+  weight?: number;
+};
 
 export type GradientLayer = {
   kind?: GradientKind;
@@ -50,6 +54,52 @@ export function composeGradient(layers: GradientLayer[]) {
   return layers.map(createGradientLayer).join(', ');
 }
 
+function normalizeBands(bands: GradientBand[]) {
+  const valid = bands.filter((band) => band.color.trim().length > 0);
+  if (valid.length === 0) return [{ color: '#000000', weight: 1 }];
+
+  const totalWeight = valid.reduce((acc, band) => acc + Math.max(0.01, band.weight ?? 1), 0);
+  let cursor = 0;
+
+  return valid.map((band, index) => {
+    const weight = Math.max(0.01, band.weight ?? 1);
+    const start = cursor;
+    cursor += weight / totalWeight;
+    const end = index === valid.length - 1 ? 1 : cursor;
+    return { color: band.color, start, end };
+  });
+}
+
+export function createCinematicBandGradient(
+  bands: GradientBand[],
+  options: {
+    angle?: number | string;
+    feather?: number;
+  } = {},
+) {
+  const angle = normalizeAngle(options.angle, '180deg');
+  const feather = Math.min(0.04, Math.max(0.002, options.feather ?? 0.012));
+  const normalizedBands = normalizeBands(bands);
+
+  const stops = normalizedBands.flatMap((band, index) => {
+    const start = Math.max(0, band.start - feather);
+    const end = Math.min(1, band.end + feather);
+    const startPct = `${(start * 100).toFixed(2)}%`;
+    const endPct = `${(end * 100).toFixed(2)}%`;
+    const base = [`${band.color} ${startPct}`, `${band.color} ${endPct}`];
+
+    if (index < normalizedBands.length - 1) {
+      const next = normalizedBands[index + 1];
+      const pivot = `${(band.end * 100).toFixed(2)}%`;
+      base.push(`color-mix(in oklab, ${band.color} 56%, ${next.color}) ${pivot}`);
+    }
+
+    return base;
+  });
+
+  return `linear-gradient(${angle}, ${stops.join(', ')})`;
+}
+
 export function createElegantSurfaceGradient(accent = '#7c1d3b') {
   return composeGradient([
     {
@@ -68,4 +118,35 @@ export function createElegantSurfaceGradient(accent = '#7c1d3b') {
       stops: ['#3a414d 0%', '#102447 56%', '#d8dfeb 165%'],
     },
   ]);
+}
+
+export function createPortfolioRibbonGradient() {
+  return [
+    createGradientLayer({
+      kind: 'radial',
+      position: '14% 7%',
+      stops: ['rgba(255,255,255,0.20) 0%', 'transparent 44%'],
+    }),
+    createGradientLayer({
+      kind: 'radial',
+      position: '88% 28%',
+      stops: ['rgba(148,163,184,0.24) 0%', 'transparent 43%'],
+    }),
+    createGradientLayer({
+      kind: 'radial',
+      position: '70% 96%',
+      stops: ['rgba(255,255,255,0.22) 0%', 'transparent 35%'],
+    }),
+    createCinematicBandGradient(
+      [
+        { color: '#5f0f3f', weight: 1.2 },
+        { color: '#8f96a3', weight: 0.95 },
+        { color: '#f8fafc', weight: 1.1 },
+        { color: '#0f2a55', weight: 1.25 },
+        { color: '#5f0f3f', weight: 1 },
+        { color: '#ffffff', weight: 1.05 },
+      ],
+      { feather: 0.016 },
+    ),
+  ].join(', ');
 }
