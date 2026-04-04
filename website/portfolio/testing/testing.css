@@ -12,23 +12,36 @@
 
 /* Portfolio gradient upgrade: maroon → grey → white → dark blue → maroon → white */
 [data-slot="theme-scope"][data-fwlb-theme="game"]{
-  background-color:#12071a !important;
+  background-color:#15091f !important;
+  --fwlb-text-strong:#ffffff !important;
+  --fwlb-text-soft:#f2fbff !important;
+  --fwlb-text-muted:#ddf2ff !important;
+  --fwlb-text-accent:#7fe8ff !important;
+  --fwlb-tone-neutral-border:rgba(232,245,255,.96) !important;
+  --fwlb-tone-brand-bg:linear-gradient(135deg, rgba(57, 124, 255, .98), rgba(0, 212, 255, .95)) !important;
+  --fwlb-tone-brand-fg:#ffffff !important;
+  --fwlb-tone-brand-border:rgba(208, 238, 255, .98) !important;
+  --fwlb-tone-info-bg:linear-gradient(135deg, rgba(28, 130, 255, .97), rgba(93, 224, 255, .95)) !important;
+  --fwlb-tone-info-fg:#ffffff !important;
+  --fwlb-tone-info-border:rgba(203, 241, 255, .98) !important;
+  --fwlb-border-soft:rgba(198, 234, 255, .64) !important;
+  --fwlb-border-strong:rgba(221, 244, 255, .9) !important;
   background-image:
-    radial-gradient(125% 64% at 12% 6%, rgba(255,255,255,.2) 0%, transparent 46%),
-    radial-gradient(90% 42% at 86% 28%, rgba(148,163,184,.23) 0%, transparent 58%),
-    radial-gradient(70% 46% at 72% 95%, rgba(255,255,255,.2) 0%, transparent 56%),
+    radial-gradient(130% 68% at 12% 6%, rgba(255,255,255,.22) 0%, transparent 52%),
+    radial-gradient(96% 48% at 86% 28%, rgba(170,180,194,.25) 0%, transparent 62%),
+    radial-gradient(72% 48% at 72% 95%, rgba(255,255,255,.23) 0%, transparent 60%),
     linear-gradient(
       180deg,
-      #5f0f3f 0%,
-      color-mix(in oklab, #5f0f3f 52%, #8f96a3) 14.5%,
-      #8f96a3 24%,
-      color-mix(in oklab, #8f96a3 58%, #f8fafc) 39%,
-      #f8fafc 48%,
-      color-mix(in oklab, #f8fafc 38%, #0f2a55) 57%,
-      #0f2a55 69%,
-      color-mix(in oklab, #0f2a55 56%, #5f0f3f) 80%,
-      #5f0f3f 88%,
-      color-mix(in oklab, #5f0f3f 40%, #ffffff) 95%,
+      #6f1248 0%,
+      color-mix(in oklab, #6f1248 70%, #aab4c2) 12%,
+      #aab4c2 24%,
+      color-mix(in oklab, #aab4c2 68%, #ffffff) 39%,
+      #ffffff 50%,
+      color-mix(in oklab, #ffffff 65%, #1f7dff) 58%,
+      #1f7dff 70%,
+      color-mix(in oklab, #1f7dff 68%, #7a1b52) 81%,
+      #7a1b52 90%,
+      color-mix(in oklab, #7a1b52 54%, #ffffff) 96%,
       #ffffff 100%
     ) !important;
   background-attachment:scroll;
@@ -36,8 +49,13 @@
   background-repeat:no-repeat;
 }
 
+[data-slot="theme-scope"][data-fwlb-theme="game"] :is(h1,h2,h3,h4,h5,h6,p,li,a,span,strong,small,label,[data-slot]){
+  color:color-mix(in oklab, var(--fwlb-text-strong) 88%, #ffffff) !important;
+  text-shadow:0 1px 1px rgba(9, 22, 48, .52), 0 0 .7px rgba(7, 16, 38, .55);
+}
+
 @media (prefers-reduced-transparency: reduce){
   [data-slot="theme-scope"][data-fwlb-theme="game"]{
-    background-image:linear-gradient(180deg,#5f0f3f 0%,#8f96a3 23%,#f8fafc 48%,#0f2a55 70%,#5f0f3f 88%,#ffffff 100%) !important;
+    background-image:linear-gradient(180deg,#6f1248 0%,#aab4c2 24%,#ffffff 50%,#1f7dff 70%,#7a1b52 90%,#ffffff 100%) !important;
   }
 }
