@@ -1,3 +1,6 @@
+export { transpileSinglePassAotDsl } from './aot-transpiler';
+export type { AotCompileOptions, AotCompileResult, AotCompileStats } from './aot-transpiler';
+
 export { createHyperReactivityGraph, estimateAverageFanOut } from './sovereign-graph';
 export type { HyperReactivityConfig } from './sovereign-graph';
 
