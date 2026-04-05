@@ -28,6 +28,27 @@
       "dest": "/website/portfolio/testing/$1"
     },
     {
+      "src": "/$",
+      "status": 308,
+      "headers": {
+        "Location": "/mindmapmaker"
+      }
+    },
+    {
+      "src": "/(workspace|archive-lab|game-ideas|game|BotMaker|EngineTest|TestEngine|fadhilweblib|FadhilAI-Focused-To-Generate-visual-War-Strategy)$",
+      "status": 308,
+      "headers": {
+        "Location": "/mindmapmaker/$1"
+      }
+    },
+    {
+      "src": "/(editor|view)/(.*)",
+      "status": 308,
+      "headers": {
+        "Location": "/mindmapmaker/$1/$2"
+      }
+    },
+    {
       "src": "/mindmapmaker/public/(.*)",
       "dest": "/$1"
     },
@@ -37,10 +58,6 @@
     },
     {
       "src": "/mindmapmaker/(.*)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/(.*)",
       "dest": "/$1"
     }
   ]
