@@ -1,16 +1,46 @@
 {
   "version": 2,
   "builds": [
-    { "src": "mindmapmaker/package.json", "use": "@vercel/next" },
-    { "src": "website/portfolio/**/*.html", "use": "@vercel/static" },
-    { "src": "website/portfolio/testing/**", "use": "@vercel/static" }
+    {
+      "src": "mindmapmaker/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "website/portfolio/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/portfolio/testing/**",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/portfolio", "dest": "/website/portfolio/index.html" },
-    { "src": "/portfolio/", "dest": "/website/portfolio/index.html" },
-    { "src": "/portfolio/testing/(.*)", "dest": "/website/portfolio/testing/$1" },
-    { "src": "/mindmapmaker", "dest": "/" },
-    { "src": "/mindmapmaker/(.*)", "dest": "/$1" },
-    { "handle": "filesystem" }
+    {
+      "src": "/portfolio",
+      "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/portfolio/",
+      "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/portfolio/testing/(.*)",
+      "dest": "/website/portfolio/testing/$1"
+    },
+    {
+      "src": "/mindmapmaker/public/(.*)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/mindmapmaker",
+      "dest": "/"
+    },
+    {
+      "src": "/mindmapmaker/(.*)",
+      "dest": "/$1"
+    },
+    {
+      "handle": "filesystem"
+    }
   ]
 }
