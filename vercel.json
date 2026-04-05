@@ -5,6 +5,8 @@
     { "source": "/portfolio/testing/:path*", "destination": "/website/portfolio/testing/:path*" },
     { "source": "/mindmapmaker", "destination": "/mindmapmaker/index.html" },
     { "source": "/mindmapmaker/", "destination": "/mindmapmaker/index.html" },
-    { "source": "/mindmapmaker/:path*", "destination": "/mindmapmaker/:path*" }
+    { "source": "/mindmapmaker/app.css", "destination": "/mindmapmaker/app.css" },
+    { "source": "/mindmapmaker/app.js", "destination": "/mindmapmaker/app.js" },
+    { "source": "/mindmapmaker/:path*", "destination": "/mindmapmaker/index.html" }
   ]
 }
