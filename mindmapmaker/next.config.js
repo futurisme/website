@@ -18,11 +18,15 @@ const cspHeader = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  basePath: '/mindmapmaker',
   swcMinify: true,
   // Keep gzip enabled in-app as fallback; serve Brotli at CDN/reverse-proxy when available.
   compress: true,
   experimental: {
     optimizePackageImports: ['reactflow'],
+  },
+  env: {
+    NEXT_PUBLIC_BASE_PATH: '/mindmapmaker',
   },
 
   async redirects() {

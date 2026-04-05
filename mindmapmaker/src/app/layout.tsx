@@ -3,22 +3,22 @@ import './globals.css';
 import '@/lib/fadhilweblib/styles/theme.css';
 import { GlobalRuntime } from '@/components/global-runtime';
 
-const siteUrl = 'https://mindmapper.qzz.io';
-const siteName = 'MindMapper Workspace';
-const defaultTitle = 'MindMapper Workspace | Cybernetic Concept Mapping';
+const siteUrl = 'https://fadhilwebsite.vercel.app/mindmapmaker';
+const siteName = 'Mindmapmaker Workspace';
+const defaultTitle = 'Mindmapmaker Workspace | Cybernetic Concept Mapping';
 const defaultDescription =
-  'Build futuristic concept maps in MindMapper Workspace with real-time collaboration, fast editing, and immersive cybernetic visuals.';
+  'Build futuristic concept maps in Mindmapmaker Workspace with real-time collaboration, fast editing, and immersive cybernetic visuals.';
 const socialImage = `${siteUrl}/social-preview-whatsapp.jpg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: defaultTitle,
-    template: '%s | MindMapper Workspace',
+    template: '%s | Mindmapmaker Workspace',
   },
   description: defaultDescription,
   alternates: {
-    canonical: '/',
+    canonical: '/mindmapmaker',
   },
   applicationName: siteName,
   openGraph: {
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         type: 'image/jpeg',
-        alt: 'MindMapper Workspace futuristic landing preview',
+        alt: 'Mindmapmaker Workspace futuristic landing preview',
       },
     ],
   },
