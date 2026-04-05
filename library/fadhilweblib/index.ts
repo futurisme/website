@@ -36,4 +36,4 @@ export { Skeleton } from './components/feedback/Skeleton';
 
 export * from './core/performance';
 export * from './core/compiler';
-export * from './fadhilai';
+export * from './fadhilailib';

@@ -1,0 +1,35 @@
+name: qualitytest
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  qualitytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run fadhilailib qualitytest (one execution)
+        run: |
+          npx -y tsx -e "import { runQualityTest } from './library/fadhilweblib/fadhilailib/qualitytest.ts'; const report = runQualityTest({ scope: 'push' }); console.log(JSON.stringify(report, null, 2)); if (!report.passed) { process.exit(1); }"
+
+      - name: Run compiler and AI tests
+        run: |
+          npx -y tsx --test \
+            library/fadhilweblib/fadhilailib/fadhilailib.test.ts \
+            library/fadhilweblib/fadhilailib/qualitytest.test.ts \
+            library/fadhilweblib/core/compiler/aot-transpiler.test.ts \
+            library/fadhilweblib/core/compiler/performance-analysis.test.ts \
+            library/fadhilweblib/core/compiler/zig-rust-core.test.ts

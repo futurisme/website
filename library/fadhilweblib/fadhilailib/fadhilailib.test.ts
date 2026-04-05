@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import { runDebugSession } from './debug-agent';
 
-test('runDebugSession creates incident repair plan for high-risk signals', () => {
+test('runDebugSession creates incident repair plan for high-risk signals in fadhilailib', () => {
   const report = runDebugSession({
     signals: [
       { key: 'latency', value: 0.9, weight: 2 },
