@@ -6,7 +6,7 @@ This document maps the **original** Mindmapmaker frontend structure so deploymen
 
 - Root landing route: `src/app/page.tsx`
   - Futuristic landing hero, staged title animation, and CTA.
-  - CTA points to `/workspace` (resolved with base path in Next config).
+  - CTA points to `/workspace` and is exposed publicly via `/mindmapmaker/workspace` route mapping.
 - Global layout + metadata: `src/app/layout.tsx`
   - Canonical URL, OpenGraph/Twitter metadata, shared runtime wrapper.
 - Core editor/workspace route: `src/app/workspace/page.tsx`
