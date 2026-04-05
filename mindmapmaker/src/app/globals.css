@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+  overscroll-behavior: none;
+}
+
+#__next {
+  width: 100%;
+  height: 100%;
+}
+
+/* Smooth transitions */
+@layer components {
+  .smooth-transition {
+    @apply transition-all duration-250 ease-in-out;
+  }
+}
+
+::view-transition-old(panel-content),
+::view-transition-new(panel-content) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(panel-content),
+  ::view-transition-new(panel-content) {
+    animation-duration: 1ms;
+  }
+}

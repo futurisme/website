@@ -1,0 +1,43 @@
+{
+  "ci": {
+    "collect": {
+      "numberOfRuns": 1,
+      "startServerCommand": "npm run start",
+      "startServerReadyPattern": "Ready in|started server on|Local:",
+      "startServerReadyTimeout": 180000,
+      "url": [
+        "http://localhost:3000/",
+        "http://localhost:3000/editor/0001",
+        "http://localhost:3000/view/0001",
+        "http://localhost:3000/game",
+        "http://localhost:3000/workspace"
+      ],
+      "settings": {
+        "preset": "perf",
+        "budgets": [
+          {
+            "path": "/*",
+            "resourceSizes": [
+              {
+                "resourceType": "script",
+                "budget": 280
+              }
+            ],
+            "timings": [
+              {
+                "metric": "total-blocking-time",
+                "budget": 200
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.95 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 200 }]
+      }
+    }
+  }
+}

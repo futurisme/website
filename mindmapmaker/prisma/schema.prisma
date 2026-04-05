@@ -1,0 +1,67 @@
+// prisma/.env.local - create this in your local environment
+// DATABASE_URL="postgresql://user:password@localhost:5432/chartmaker?schema=public"
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Map {
+  id        Int      @id @default(autoincrement())
+  title     String
+  snapshot  Json     // Serialized Yjs doc update as base64
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
+}
+
+
+model PerfMetric {
+  id             Int      @id @default(autoincrement())
+  metricName     String
+  metricId       String?
+  value          Float
+  rating         String?
+  navigationType String?
+  route          String
+  routeType      String
+  pageUrl        String?
+  metadata       Json
+  recordedAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  @@index([recordedAt])
+  @@index([routeType, metricName, recordedAt])
+}
+
+
+model AiTrainingRun {
+  id                    Int      @id @default(autoincrement())
+  runId                 String   @unique
+  strategy              String
+  battlegroundVersion   String
+  trainingModelVersion  String
+  datasetSize           Int
+  epochs                Int
+  learningRate          Float
+  trainingLoss          Float
+  validationLoss        Float
+  qualityScore          Float
+  modelAWeights         Json
+  modelBWeights         Json
+  logs                  Json
+  compressedResults     String
+  status                String   @default("accepted")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@index([battlegroundVersion, trainingModelVersion, createdAt])
+}

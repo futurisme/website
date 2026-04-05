@@ -2,6 +2,9 @@
   "rewrites": [
     { "source": "/portfolio", "destination": "/website/portfolio/index.html" },
     { "source": "/portfolio/", "destination": "/website/portfolio/index.html" },
-    { "source": "/portfolio/testing/:path*", "destination": "/website/portfolio/testing/:path*" }
+    { "source": "/portfolio/testing/:path*", "destination": "/website/portfolio/testing/:path*" },
+    { "source": "/mindmapmaker", "destination": "/mindmapmaker/public/index.html" },
+    { "source": "/mindmapmaker/", "destination": "/mindmapmaker/public/index.html" },
+    { "source": "/mindmapmaker/:path*", "destination": "/mindmapmaker/:path*" }
   ]
 }

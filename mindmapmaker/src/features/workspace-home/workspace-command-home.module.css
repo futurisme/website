@@ -1,0 +1,216 @@
+.shell {
+  position: relative;
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  padding:
+    max(0.42rem, env(safe-area-inset-top))
+    0.55rem
+    calc(env(safe-area-inset-bottom) + 0.55rem);
+  background:
+    radial-gradient(circle at 18% 6%, rgba(34, 211, 238, 0.14), transparent 18rem),
+    radial-gradient(circle at 82% 10%, rgba(129, 140, 248, 0.12), transparent 18rem),
+    linear-gradient(180deg, #030816 0%, #020617 52%, #04101d 100%);
+}
+
+.shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+  background-size: 4.4rem 4.4rem;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.26), transparent 82%);
+  pointer-events: none;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.pageStack {
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: 0.1rem;
+}
+
+.heroSection,
+.formPanel,
+.searchSection,
+.resumePanel,
+.utilityTile,
+.collapsiblePanel {
+  position: relative;
+  overflow: hidden;
+}
+
+.heroSection::after {
+  content: '';
+  position: absolute;
+  right: -5.5rem;
+  bottom: -6rem;
+  width: 10.5rem;
+  height: 10.5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.14), transparent 70%);
+  pointer-events: none;
+}
+
+.laneSwitch,
+.heroStatusRow,
+.signalGrid {
+  position: relative;
+  z-index: 1;
+}
+
+.signalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.signalCard {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+  padding: 0.62rem 0.58rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(8, 15, 28, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.signalLabel {
+  color: var(--fwlb-text-muted);
+  font-size: 0.62rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+}
+
+.signalValue {
+  min-width: 0;
+  color: var(--fwlb-text-strong);
+  font-size: 0.88rem;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signalHint {
+  color: var(--fwlb-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.15;
+}
+
+.formPanel,
+.searchSection,
+.resumePanel,
+.utilityTile,
+.collapsiblePanel {
+  border-radius: 18px;
+}
+
+.routesStack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.drawerStack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.primaryActions,
+.secondaryActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.inlineMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.42rem 0.56rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  color: var(--fwlb-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.resultStack {
+  display: grid;
+  gap: 0.4rem;
+  max-height: min(43dvh, 16rem);
+  overflow: auto;
+  padding-right: 0.12rem;
+  overscroll-behavior: contain;
+}
+
+.resultStack::-webkit-scrollbar {
+  width: 0.34rem;
+}
+
+.resultStack::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.28);
+  border-radius: 999px;
+}
+
+.resultButton {
+  width: 100%;
+  min-height: 2.9rem;
+  text-align: left;
+}
+
+.resultLabel {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.resultTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.resultMeta {
+  color: var(--fwlb-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.15;
+}
+
+.utilityTile {
+  min-height: 100%;
+}
+
+@media (max-width: 360px) {
+  .signalGrid,
+  .primaryActions,
+  .secondaryActions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 400px) {
+  .shell {
+    padding-inline: 0.72rem;
+  }
+
+  .pageStack {
+    gap: 0.65rem;
+  }
+}

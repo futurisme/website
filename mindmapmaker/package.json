@@ -1,0 +1,39 @@
+{
+  "name": "chartmaker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:signaling": "npm --prefix signaling-server run start",
+    "install:signaling": "npm --prefix signaling-server install",
+    "build": "npx prisma generate && node -e \"const candidates=[process.env.DATABASE_PUBLIC_URL,process.env.DATABASE_URL_PUBLIC,process.env.POSTGRES_PRISMA_URL,process.env.POSTGRES_URL_NON_POOLING,process.env.POSTGRES_URL,process.env.DATABASE_URL].filter(Boolean);const selected=candidates.find((value)=>!value.includes('railway.internal'))||candidates[0];if(selected){process.env.DATABASE_URL=selected;try{require('child_process').execSync('npx prisma migrate deploy',{stdio:'inherit',env:process.env})}catch(error){console.warn('Prisma migrate deploy failed during build, continuing without blocking deployment.');console.warn(error.message)}}else{console.log('Skipping prisma migrate deploy because no database env var is set')}\" && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:unit": "tsx --test src/features/flow/*.test.ts src/lib/fadhilweblib/core/*.test.ts",
+    "scan:fadhilai": "tsx scripts/fadhilai-scan.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "next": "^14.0.0",
+    "postcss": "^8.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactflow": "^11.9.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0",
+    "web-vitals": "^5.1.0",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.0"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6",
+    "eslint": "^8.48.0",
+    "eslint-config-next": "14.0.0",
+    "prisma": "^5.7.0",
+    "tsx": "^4.20.3"
+  }
+}
