@@ -44,8 +44,8 @@ Primary route files discovered under `src/app`:
 ## 5) Deployment Mapping
 
 - Next app package root: `/mindmapmaker/package.json`
-- Base path configured in `mindmapmaker/next.config.js` as `/mindmapmaker`.
-- Vercel should build the Next app from `/mindmapmaker` and route `/mindmapmaker*` into that build output.
+- App runs with root routing in Next.js config (no `basePath`) to avoid Vercel `builds` conflict.
+- Vercel routes map `/mindmapmaker*` to the original Next app routes so all original pages (`game-ideas`, `workspace`, `editor/[mapId]`, etc.) are preserved without remakes.
 
 ## 6) What Was Reverted
 
