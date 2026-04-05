@@ -1,4 +1,4 @@
-import { transpileSinglePassAotDsl, type AotCompileOptions } from './aot-transpiler';
+import { transpileSinglePassAotDsl, type AotCompileOptions } from './aot-transpiler.ts';
 
 export type CompilerBenchmarkSample = {
   name: string;
@@ -37,12 +37,13 @@ function median(sortedValues: number[]) {
 }
 
 export function runCompilerBenchmark(sample: CompilerBenchmarkSample): CompilerBenchmarkResult {
+  const runs = Number.isFinite(sample.runs) ? Math.max(1, Math.floor(sample.runs)) : 1;
   const timings: number[] = [];
   const throughput: number[] = [];
   const scanRatios: number[] = [];
   const outputBytes: number[] = [];
 
-  for (let index = 0; index < sample.runs; index += 1) {
+  for (let index = 0; index < runs; index += 1) {
     const result = transpileSinglePassAotDsl(sample.source, sample.options);
     timings.push(result.stats.transpileDurationMs);
     throughput.push(result.stats.charsPerMs);
@@ -57,7 +58,7 @@ export function runCompilerBenchmark(sample: CompilerBenchmarkSample): CompilerB
 
   return {
     name: sample.name,
-    runs: sample.runs,
+    runs,
     sourceBytes: sample.source.length,
     medianMs: Number(median(sortedTimings).toFixed(4)),
     p95Ms: Number(percentile(sortedTimings, 95).toFixed(4)),

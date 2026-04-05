@@ -1,5 +1,5 @@
-import { runDebugSession, type DebugSessionReport } from './debug-agent';
-import { runCompilerBenchmark, type CompilerBenchmarkResult } from '../core/compiler/performance-analysis';
+import { runDebugSession, type DebugSessionReport } from './debug-agent.ts';
+import { runCompilerBenchmark, type CompilerBenchmarkResult } from '../core/compiler/performance-analysis.ts';
 
 export type QualityTestInput = {
   scope: 'push' | 'major-change';
@@ -39,9 +39,18 @@ function createDefaultSample() {
   return 'main.shell{header.hero{h1 "{{title}}";p "{{subtitle}}"};section.panel{button.primary@click=save "Save";button.secondary@click=reset "Reset"}}';
 }
 
+function resolveSource(samples: string[] | undefined) {
+  if (!samples || samples.length === 0) {
+    return createDefaultSample();
+  }
+
+  const filtered = samples.map((sample) => sample.trim()).filter((sample) => sample.length > 0);
+  return filtered.length > 0 ? filtered.join(';') : createDefaultSample();
+}
+
 export function runQualityTest(input: QualityTestInput): QualityTestReport {
   const startedAt = Date.now();
-  const source = input.dslSamples?.join(';') || createDefaultSample();
+  const source = resolveSource(input.dslSamples);
 
   const benchmark = runCompilerBenchmark({
     name: `qualitytest-${input.scope}`,
