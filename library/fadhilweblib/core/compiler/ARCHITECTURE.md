@@ -1,31 +1,32 @@
-# fadhilweblib Compiler Core (April 4, 2026)
+# fadhilweblib Compiler Core (April 5, 2026)
 
-This subsystem defines a **strictly headless**, **renderer/runtime/protocol agnostic** architecture for the fadhilweblib evolution track.
+This subsystem defines a **strictly headless**, **renderer/runtime/protocol agnostic** architecture for the `fadhilweblib` evolution track.
 
 ## Core principles
 
-- **Single-Pass AOT Transpiler**: a hand-written pointer scanner compiles the DSL into zero-runtime native ESM with direct DOM API instructions.
-- **Zig/Rust compiler core contract**: the runtime-facing API models a Rust primary backend with a Zig bridge layer and a hard `zeroRuntimeOverhead: true` invariant.
-- **Hyper-Granular Reactivity**: dependency graph construction with deterministic topological ordering and cycle protection.
-- **AI-optimized tree shaking**: symbol-level removal pipeline with side-effect safeguards and an adaptive priority score.
-- **Sub-5ms HMR planning**: profile-based latency estimation with strategy selection (`parallel-diff`, `graph-prune`, `cache-replay`).
-- **Edge-Native Hydration**: deterministic partitioning into immediate, streamed, and deferred hydration lanes.
-
-## Integration point
-
-Use `runCompilerOverhaul(...)` to generate one report that captures backend posture, sovereignty flags, reactivity telemetry, tree-shaking footprint, HMR budget, and hydration plan.
-
-## Notes
-
-This release introduces a portable planning and orchestration layer. Actual low-level compiler execution can be bound later by wiring this API to native Rust/Zig binaries or WASI modules while keeping the TypeScript contract stable.
-
+- **Single-Pass AOT Transpiler**: a hand-written pointer scanner compiles DSL syntax directly to zero-runtime native ESM using direct DOM APIs.
+- **Access hardening mode**: generated variable identifiers can be emitted in compact, hardened form (`accessMode: "hardened"`) to reduce readability and accidental mutation surfaces.
+- **Zig/Rust compiler core contract**: the runtime-facing API models a Rust primary backend with a Zig bridge and a `zeroRuntimeOverhead: true` invariant.
+- **Hyper-Granular Reactivity**: deterministic dependency graphing and selective `ctx.observe` bindings for interpolation updates.
+- **AI-optimized tree shaking**: symbol-level pruning with side-effect-aware retention logic.
+- **Sub-5ms HMR planning**: profile-driven strategy selection (`parallel-diff`, `graph-prune`, `cache-replay`).
+- **Edge-Native Hydration**: deterministic partitioning into immediate, streamed, and deferred lanes.
 
 ## AOT DSL quick example
 
 Input DSL:
 
 ```txt
-div#app.shell "{{count}}"; button.primary@click=increment "Increment"
+section#app.shell[data-kind="hero"]{h1 "Welcome {{name}}";button.primary@click=increment "Increment"}
 ```
 
-Compiles to native ESM `mount(...)` code that uses `document.createElement`, `textContent`, and `addEventListener` directly with optional `ctx.observe` hooks for fine-grained reactivity.
+Compiled output is native ESM with direct `document.createElement`, `setAttribute`, `textContent`, and `addEventListener` calls. Reactive text tokens are rewritten into direct state reads and optional `ctx.observe` subscriptions.
+
+## Performance and analysis model
+
+- `runCompilerBenchmark(...)` and `runCompilerBenchmarks(...)` provide run-based metrics (`median`, `p95`, throughput, scanner-step/char ratio).
+- Calculations are executed from real transpilation runs and surfaced as numbers suitable for release gates.
+
+## Notes
+
+This release keeps the API stable while leaving room to swap code generation and optimization passes into native Zig/Rust binaries or WASI modules without changing external TypeScript contracts.

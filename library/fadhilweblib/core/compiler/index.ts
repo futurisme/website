@@ -1,3 +1,6 @@
+export { runCompilerBenchmark, runCompilerBenchmarks } from './performance-analysis';
+export type { CompilerBenchmarkResult, CompilerBenchmarkSample } from './performance-analysis';
+
 export { transpileSinglePassAotDsl } from './aot-transpiler';
 export type { AotCompileOptions, AotCompileResult, AotCompileStats } from './aot-transpiler';
 
