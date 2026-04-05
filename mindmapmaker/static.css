@@ -1,0 +1,32 @@
+:root {
+  --bg: #050814;
+  --panel: rgba(5, 10, 24, 0.8);
+  --line: rgba(56, 189, 248, 0.2);
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --accent: #22d3ee;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, system-ui, -apple-system, sans-serif; color: var(--text); background: var(--bg); }
+.main { min-height: 100vh; position: relative; overflow: hidden; display: grid; place-items: center; padding: 24px; }
+.futuristicImage { position: absolute; inset: 0; background: radial-gradient(circle at 20% 20%, #082f49, transparent 35%), radial-gradient(circle at 80% 25%, #1e1b4b, transparent 35%), radial-gradient(circle at 50% 80%, #083344, transparent 40%); }
+.grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 46px 46px; opacity: .28; }
+.glow { position: absolute; width: 45vw; height: 45vw; filter: blur(90px); opacity: .45; border-radius: 50%; }
+.glowTop { top: -15vw; left: -12vw; background: #0e7490; }
+.glowBottom { bottom: -20vw; right: -10vw; background: #4f46e5; }
+.panel { position: relative; z-index: 2; width: min(980px, 100%); border: 1px solid var(--line); border-radius: 22px; backdrop-filter: blur(10px); background: var(--panel); padding: 28px; }
+.quote { margin: 0 0 18px; color: var(--muted); }
+.quoteAuthor { color: var(--accent); }
+.content { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: end; }
+.tag { letter-spacing: .16em; font-size: .78rem; color: var(--accent); margin: 0 0 6px; }
+.title { margin: 0; display: grid; }
+.titlePrimary { font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; }
+.titleSecondary { font-size: clamp(1.2rem, 3vw, 2.1rem); color: #93c5fd; }
+.description { max-width: 68ch; color: #cbd5e1; line-height: 1.55; }
+.button { display: inline-block; margin-top: 8px; text-decoration: none; background: linear-gradient(120deg, #06b6d4, #2563eb); color: white; padding: 11px 18px; border-radius: 999px; font-weight: 700; }
+.creditText { margin: 0; color: var(--muted); }
+.workspaceShell { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top right, #082f49, #020617 60%); }
+.workspaceCard { width: min(760px, 100%); border: 1px solid var(--line); border-radius: 16px; padding: 24px; background: rgba(2, 6, 23, .8); }
+.workspaceCard code { color: #7dd3fc; }
+.actions { margin-top: 16px; }
+@media (max-width: 800px) { .content { grid-template-columns: 1fr; } }

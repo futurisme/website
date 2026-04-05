@@ -3,7 +3,11 @@
     { "source": "/portfolio", "destination": "/website/portfolio/index.html" },
     { "source": "/portfolio/", "destination": "/website/portfolio/index.html" },
     { "source": "/portfolio/testing/:path*", "destination": "/website/portfolio/testing/:path*" },
-    { "source": "/mindmapmaker", "destination": "/mindmapmaker" },
-    { "source": "/mindmapmaker/:path*", "destination": "/mindmapmaker/:path*" }
+    { "source": "/mindmapmaker", "destination": "/mindmapmaker/index.html" },
+    { "source": "/mindmapmaker/", "destination": "/mindmapmaker/index.html" },
+    { "source": "/mindmapmaker/workspace", "destination": "/mindmapmaker/workspace/index.html" },
+    { "source": "/mindmapmaker/static.css", "destination": "/mindmapmaker/static.css" },
+    { "source": "/mindmapmaker/public/:path*", "destination": "/mindmapmaker/public/:path*" },
+    { "source": "/mindmapmaker/:path*", "destination": "/mindmapmaker/index.html" }
   ]
 }
