@@ -1,4 +1,4 @@
-import type { DiagnosticReport } from './diagnostics';
+import type { DiagnosticReport } from './diagnostics.ts';
 
 export type RepairStep = {
   id: string;

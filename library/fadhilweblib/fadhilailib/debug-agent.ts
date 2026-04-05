@@ -1,5 +1,5 @@
-import { createRepairPlan, type RepairPlan } from './repair-planner';
-import { diagnoseSystemHealth, type DiagnosticReport, type DiagnosticSignal } from './diagnostics';
+import { createRepairPlan, type RepairPlan } from './repair-planner.ts';
+import { diagnoseSystemHealth, type DiagnosticReport, type DiagnosticSignal } from './diagnostics.ts';
 
 export type DebugSessionInput = {
   signals: DiagnosticSignal[];

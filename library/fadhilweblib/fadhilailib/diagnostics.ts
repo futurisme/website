@@ -21,6 +21,14 @@ function normalize(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
+function normalizeWeight(value: number | undefined) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return 1;
+  }
+
+  return Math.max(0.1, value);
+}
+
 export function diagnoseSystemHealth(signals: DiagnosticSignal[]): DiagnosticReport {
   if (signals.length === 0) {
     return {
@@ -35,7 +43,7 @@ export function diagnoseSystemHealth(signals: DiagnosticSignal[]): DiagnosticRep
   let weightTotal = 0;
 
   for (const signal of signals) {
-    const weight = Math.max(0.1, signal.weight ?? 1);
+    const weight = normalizeWeight(signal.weight);
     weightedSum += normalize(signal.value) * weight;
     weightTotal += weight;
   }

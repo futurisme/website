@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { runDebugSession } from './debug-agent';
+import { diagnoseSystemHealth } from './diagnostics.ts';
+import { runDebugSession } from './debug-agent.ts';
 
 test('runDebugSession creates incident repair plan for high-risk signals in fadhilailib', () => {
   const report = runDebugSession({
@@ -21,4 +22,14 @@ test('runDebugSession creates incident repair plan for high-risk signals in fadh
   assert.equal(report.repairPlan.profile, 'incident');
   assert.ok(report.repairPlan.totalMinutes > 0);
   assert.ok(report.repairPlan.steps.some((step) => step.id === 'incident-repair'));
+});
+
+test('diagnoseSystemHealth ignores non-finite weights and keeps stable score math', () => {
+  const report = diagnoseSystemHealth([
+    { key: 'latency', value: 0.25, weight: Number.NaN },
+    { key: 'errors', value: 0.25, weight: Number.POSITIVE_INFINITY },
+  ]);
+
+  assert.equal(report.score, 0.25);
+  assert.equal(report.riskBand, 'stable');
 });

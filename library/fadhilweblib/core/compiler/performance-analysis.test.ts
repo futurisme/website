@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { runCompilerBenchmark } from './performance-analysis';
+import { runCompilerBenchmark } from './performance-analysis.ts';
 
 test('runCompilerBenchmark returns deterministic shape and sane ratios', () => {
   const result = runCompilerBenchmark({
@@ -18,4 +18,15 @@ test('runCompilerBenchmark returns deterministic shape and sane ratios', () => {
   assert.ok(result.averageCharsPerMs > 0);
   assert.ok(result.averageScannerStepsPerChar > 0);
   assert.ok(result.outputBytesMedian > 0);
+});
+
+test('runCompilerBenchmark normalizes invalid run counts to a safe minimum', () => {
+  const result = runCompilerBenchmark({
+    name: 'normalized-runs',
+    source: 'main.shell{p "Safe"}',
+    runs: 0,
+  });
+
+  assert.equal(result.runs, 1);
+  assert.ok(result.medianMs > 0);
 });
