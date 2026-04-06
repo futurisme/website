@@ -248,6 +248,9 @@ loadInput.addEventListener('change', async () => {
         const preferredViewport = extractViewport(decoded) ?? extractViewport(normalized);
         if (preferredViewport) {
           applyCameraViewport(preferredViewport);
+          if (!hasVisibleNodeInViewport(transformed.nodes)) {
+            centerCameraOnContent(transformed.nodes);
+          }
         } else {
           centerCameraOnContent(transformed.nodes);
         }
@@ -561,15 +564,34 @@ function extractViewport(input) {
   if (!input || typeof input !== 'object' || !input.viewport || typeof input.viewport !== 'object') {
     return null;
   }
-  const { x, y, zoom } = input.viewport;
-  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(zoom)) {
+  const { x, y, zoom, scale } = input.viewport;
+  const finalZoom = Number.isFinite(zoom) ? Number(zoom) : Number(scale);
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(finalZoom)) {
     return null;
   }
-  return { x: Number(x), y: Number(y), zoom: Number(zoom) };
+  return { x: Number(x), y: Number(y), zoom: finalZoom };
 }
 
 function applyCameraViewport(viewportState) {
   camera.scale = clampScale(viewportState.zoom);
   camera.x = viewportState.x;
   camera.y = viewportState.y;
+}
+
+function hasVisibleNodeInViewport(nodes) {
+  const width = viewport.clientWidth || 1;
+  const height = viewport.clientHeight || 1;
+  for (const node of nodes) {
+    const x = Number(node.x);
+    const y = Number(node.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    const sx = x * camera.scale + camera.x;
+    const sy = y * camera.scale + camera.y;
+    const sw = NODE_BOX.width * camera.scale;
+    const sh = NODE_BOX.height * camera.scale;
+    if (sx + sw >= 0 && sy + sh >= 0 && sx <= width && sy <= height) {
+      return true;
+    }
+  }
+  return false;
 }
