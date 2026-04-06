@@ -23,8 +23,7 @@ const loadBtn = document.getElementById('load-map');
 const loadInput = document.getElementById('load-input');
 
 const mapIdMatch = window.location.pathname.match(/\/(mindmapmaker\/)?editor\/(\d+)/);
-const mapId = mapIdMatch ? Number(mapIdMatch[2]) : 1;
-const safeMapId = Number.isInteger(mapId) && mapId > 0 ? mapId : 1;
+const safeMapId = Number.isInteger(Number(mapIdMatch?.[2])) && Number(mapIdMatch[2]) > 0 ? Number(mapIdMatch[2]) : 1;
 mapIdEl.textContent = String(safeMapId);
 
 const persisted = loadSnapshot(safeMapId);
@@ -32,12 +31,13 @@ const engine = persisted ? FadhilMindmapLite.fromSnapshot(persisted) : new Fadhi
 const camera = createViewportState();
 
 let selectedId = engine.getSnapshot().nodes[0]?.id ?? 1;
-let mode = 'idle';
-let dragTargetId = null;
 let connectSourceId = null;
+let dragMode = 'idle';
+let activePointerId = null;
 let startPointer = { x: 0, y: 0 };
 let startNode = { x: 0, y: 0 };
 let startCamera = { x: 0, y: 0 };
+let dragTargetId = null;
 
 function render() {
   const snapshot = engine.getSnapshot();
@@ -52,7 +52,7 @@ function render() {
       const to = byId.get(edge.to);
       if (!from || !to) return '';
       const klass = edge.kind === 'link' ? 'edge-path edge-link' : 'edge-path';
-      return `<path class="${klass}" d="${buildEdgePath({ x: from.x + 85, y: from.y + 26 }, { x: to.x + 8, y: to.y + 26 })}"></path>`;
+      return `<path class="${klass}" d="${buildEdgePath({ x: from.x + 85, y: from.y + 24 }, { x: to.x + 8, y: to.y + 24 })}"></path>`;
     })
     .join('');
 
@@ -70,66 +70,72 @@ function render() {
   connectBtn.textContent = engine.hasConnectionFrom(selectedId) ? 'Unconnect' : 'Connect';
 }
 
-function pointerPosition(event) {
-  if (event.touches?.[0]) return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-  return { x: event.clientX, y: event.clientY };
+function setStatus(text) {
+  statusEl.textContent = text;
 }
 
-function onPointerDown(event) {
-  const targetNode = event.target.closest('.node');
-  const pos = pointerPosition(event);
-  startPointer = pos;
+function save() {
+  saveSnapshot(safeMapId, engine.getSnapshot());
+}
 
-  if (targetNode) {
-    const targetId = Number(targetNode.dataset.id);
+function pointerStart(event) {
+  if (activePointerId !== null) return;
+  activePointerId = event.pointerId;
+  viewport.setPointerCapture(event.pointerId);
 
-    if (connectSourceId !== null && connectSourceId !== targetId) {
-      engine.connect(connectSourceId, targetId);
+  const nodeEl = event.target.closest('.node');
+  startPointer = { x: event.clientX, y: event.clientY };
+
+  if (nodeEl) {
+    const nodeId = Number(nodeEl.dataset.id);
+    if (connectSourceId !== null && connectSourceId !== nodeId) {
+      engine.connect(connectSourceId, nodeId);
       connectSourceId = null;
-      setStatus(`Connected node ${selectedId} -> ${targetId}`);
+      setStatus(`Connected ${selectedId} -> ${nodeId}`);
       save();
       render();
+      pointerEnd(event);
       return;
     }
 
-    selectedId = targetId;
-    dragTargetId = selectedId;
-    const snap = engine.getSnapshot();
-    const node = snap.nodes.find((n) => n.id === dragTargetId);
+    selectedId = nodeId;
+    dragTargetId = nodeId;
+    const node = engine.getSnapshot().nodes.find((n) => n.id === nodeId);
     if (node) {
       startNode = { x: node.x, y: node.y };
-      mode = 'drag-node';
+      dragMode = 'node';
     }
   } else {
-    mode = 'pan';
+    dragMode = 'pan';
     startCamera = { x: camera.x, y: camera.y };
   }
   render();
 }
 
-function onPointerMove(event) {
-  if (mode === 'idle') return;
+function pointerMove(event) {
+  if (event.pointerId !== activePointerId) return;
+  if (dragMode === 'idle') return;
   event.preventDefault();
 
-  const pos = pointerPosition(event);
-  const dx = (pos.x - startPointer.x) / camera.scale;
-  const dy = (pos.y - startPointer.y) / camera.scale;
+  const dx = (event.clientX - startPointer.x) / camera.scale;
+  const dy = (event.clientY - startPointer.y) / camera.scale;
 
-  if (mode === 'drag-node' && dragTargetId !== null) {
+  if (dragMode === 'node' && dragTargetId !== null) {
     engine.updateNode(dragTargetId, { x: startNode.x + dx, y: startNode.y + dy });
-    render();
-    return;
+  } else if (dragMode === 'pan') {
+    camera.x = startCamera.x + (event.clientX - startPointer.x);
+    camera.y = startCamera.y + (event.clientY - startPointer.y);
   }
 
-  if (mode === 'pan') {
-    camera.x = startCamera.x + (pos.x - startPointer.x);
-    camera.y = startCamera.y + (pos.y - startPointer.y);
-    render();
-  }
+  render();
 }
 
-function onPointerUp() {
-  mode = 'idle';
+function pointerEnd(event) {
+  if (activePointerId !== null && event.pointerId === activePointerId) {
+    viewport.releasePointerCapture(event.pointerId);
+  }
+  activePointerId = null;
+  dragMode = 'idle';
   dragTargetId = null;
   save();
 }
@@ -138,14 +144,6 @@ function onWheel(event) {
   event.preventDefault();
   camera.scale = clampScale(camera.scale + (event.deltaY > 0 ? -0.05 : 0.05));
   render();
-}
-
-function save() {
-  saveSnapshot(safeMapId, engine.getSnapshot());
-}
-
-function setStatus(text) {
-  statusEl.textContent = text;
 }
 
 function download(filename, content, mime) {
@@ -160,8 +158,8 @@ function download(filename, content, mime) {
 
 addNodeBtn.addEventListener('click', () => {
   engine.addNode(selectedId, `Node ${Date.now().toString().slice(-4)}`);
-  save();
   render();
+  save();
   setStatus('Node added.');
 });
 
@@ -169,8 +167,8 @@ removeNodeBtn.addEventListener('click', () => {
   const removed = engine.removeNode(selectedId);
   if (removed) {
     selectedId = 1;
-    save();
     render();
+    save();
     setStatus('Node removed.');
   } else {
     setStatus('Root node cannot be removed.');
@@ -180,24 +178,25 @@ removeNodeBtn.addEventListener('click', () => {
 connectBtn.addEventListener('click', () => {
   if (engine.hasConnectionFrom(selectedId)) {
     engine.unconnectFrom(selectedId);
-    save();
+    connectSourceId = null;
     render();
-    setStatus('Connections removed from selected node.');
+    save();
+    setStatus('Connection removed from selected node.');
     return;
   }
   connectSourceId = selectedId;
-  setStatus('Connect mode: tap target node to create connection.');
+  setStatus('Connect mode active. Tap target node.');
 });
 
 saveCsvBtn.addEventListener('click', () => {
   download(`mindmap-${safeMapId}.csv`, engine.toCsv(), 'text/csv;charset=utf-8');
-  setStatus('CSV exported.');
+  setStatus('CSV saved.');
 });
 
 saveFdhlBtn.addEventListener('click', async () => {
   const encoded = await encodeFdhl(engine.getSnapshot());
   download(`mindmap-${safeMapId}.fdhl`, encoded, 'text/plain;charset=utf-8');
-  setStatus('.fdhl exported with repository archive format.');
+  setStatus('FDHL saved.');
 });
 
 loadBtn.addEventListener('click', () => loadInput.click());
@@ -211,36 +210,31 @@ loadInput.addEventListener('change', async () => {
       engine.fromCsv(text);
       setStatus('CSV loaded.');
     } else {
-      const payload = await decodeFdhl(text);
-      const restored = FadhilMindmapLite.fromSnapshot(payload);
-      Object.assign(engine, restored);
-      setStatus('.fdhl loaded.');
+      Object.assign(engine, FadhilMindmapLite.fromSnapshot(await decodeFdhl(text)));
+      setStatus('FDHL loaded.');
     }
-
-    save();
+    selectedId = engine.getSnapshot().nodes[0]?.id ?? 1;
+    connectSourceId = null;
     render();
+    save();
   } catch (error) {
     console.error(error);
-    setStatus('Failed to load file.');
+    setStatus('Load failed.');
   }
+  loadInput.value = '';
 });
 
-viewport.addEventListener('mousedown', onPointerDown);
-viewport.addEventListener('mousemove', onPointerMove);
-window.addEventListener('mouseup', onPointerUp);
-viewport.addEventListener('touchstart', onPointerDown, { passive: false });
-viewport.addEventListener('touchmove', onPointerMove, { passive: false });
-window.addEventListener('touchend', onPointerUp, { passive: false });
+viewport.addEventListener('pointerdown', pointerStart);
+viewport.addEventListener('pointermove', pointerMove, { passive: false });
+viewport.addEventListener('pointerup', pointerEnd);
+viewport.addEventListener('pointercancel', pointerEnd);
 viewport.addEventListener('wheel', onWheel, { passive: false });
 window.addEventListener('beforeunload', save);
+
+document.addEventListener('gesturestart', (e) => e.preventDefault());
 
 render();
 
 function escapeHtml(input) {
-  return input
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  return input.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
