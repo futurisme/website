@@ -35,9 +35,9 @@ function EditorWorkspaceSkeleton() {
   );
 }
 
-function EditorHeaderSkeleton() {
+function EditorBottomHeaderSkeleton() {
   return (
-    <header className="editor-shell-header border-b border-cyan-500/25 bg-slate-950/95 px-2 py-0.5 shadow-[0_3px_10px_rgba(6,182,212,0.12)] backdrop-blur sm:px-2">
+    <footer className="editor-shell-bottom-header border-t border-cyan-500/25 bg-slate-950/95 px-2 py-0.5 shadow-[0_-3px_10px_rgba(6,182,212,0.12)] backdrop-blur sm:px-2">
       <div className="flex items-start justify-between gap-1 sm:items-center">
         <div className="min-w-0 space-y-1">
           <div className="h-4 w-44 rounded bg-cyan-200/30" />
@@ -45,7 +45,7 @@ function EditorHeaderSkeleton() {
         </div>
         <div className="h-6 w-20 rounded bg-cyan-200/20" />
       </div>
-    </header>
+    </footer>
   );
 }
 
@@ -61,7 +61,21 @@ function EditorShell({ mapId, title, userId, displayName, showMobileToolsPanel, 
 }) {
   return (
     <RealtimeProvider mapId={mapId} userId={userId} displayName={displayName} mode={canEdit ? 'edit' : 'view'}>
-      <header className="editor-shell-header border-b border-cyan-500/25 bg-slate-950/95 px-2 py-0.5 shadow-[0_3px_10px_rgba(6,182,212,0.12)] backdrop-blur sm:px-2">
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <div className="flex h-full min-h-0 flex-col overflow-hidden">
+          <FlowWorkspace
+            isReadOnly={!canEdit}
+            showDesktopControlsPanel={canEdit}
+            showDesktopStatusPanel
+            showMobileToolsPanel={canEdit && showMobileToolsPanel}
+            onSelectNode={onSelectNode}
+            snapEnabled
+            inviteRequestToken={0}
+          />
+        </div>
+      </div>
+
+      <footer className="editor-shell-bottom-header border-t border-cyan-500/25 bg-slate-950/95 px-2 py-0.5 shadow-[0_-3px_10px_rgba(6,182,212,0.12)] backdrop-blur sm:px-2">
         <div className="flex items-start gap-1.5">
           <BroadcastRefreshSettings canEdit={canEdit} onEditAccessChange={onEditAccessChange} />
           <div className="min-w-0 flex-1">
@@ -78,21 +92,7 @@ function EditorShell({ mapId, title, userId, displayName, showMobileToolsPanel, 
             />
           </div>
         </div>
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-hidden">
-        <div className="flex h-full min-h-0 flex-col overflow-hidden">
-          <FlowWorkspace
-            isReadOnly={!canEdit}
-            showDesktopControlsPanel={canEdit}
-            showDesktopStatusPanel
-            showMobileToolsPanel={canEdit && showMobileToolsPanel}
-            onSelectNode={onSelectNode}
-            snapEnabled
-            inviteRequestToken={0}
-          />
-        </div>
-      </div>
+      </footer>
     </RealtimeProvider>
   );
 }
@@ -184,8 +184,8 @@ function EditorContent() {
     <div className="flex h-[100dvh] flex-col overflow-hidden">
       {loading || !displayName ? (
         <>
-          <EditorHeaderSkeleton />
           <EditorWorkspaceSkeleton />
+          <EditorBottomHeaderSkeleton />
         </>
       ) : (
         <EditorShell

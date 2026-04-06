@@ -15,24 +15,6 @@
   </head>
   <body>
     <main class="editor-shell" data-fwlb-theme="game" data-slot="theme-scope">
-      <header class="topbar panel">
-        <div>
-          <p class="eyebrow">100% fadhilmindmaplib workspace</p>
-          <h1>Mindmap Workspace</h1>
-          <p class="copy">Map ID: <strong id="map-id">--</strong></p>
-        </div>
-        <div class="actions">
-          <button id="add-node" class="btn" type="button">Add</button>
-          <button id="remove-node" class="btn secondary" type="button">Remove</button>
-          <button id="connect-node" class="btn secondary" type="button">Connect</button>
-          <button id="save-csv" class="btn secondary" type="button">Save .csv</button>
-          <button id="save-fdhl" class="btn secondary" type="button">Save .fAdHiL</button>
-          <button id="load-map" class="btn secondary" type="button">Load</button>
-          <a class="btn secondary" href="/mindmapmaker">Menu</a>
-          <input id="load-input" type="file" accept=".csv,.fdhl,.fadhil,.fAdHiL,.cws" hidden />
-        </div>
-      </header>
-
       <section class="workspace panel">
         <div class="help" id="status">Pan canvas: drag empty area. Select node: tap/click. Drag node: drag selected node.</div>
         <div id="viewport" class="viewport" aria-label="Mindmap canvas">
@@ -40,6 +22,30 @@
           <div id="nodes" class="nodes"></div>
         </div>
       </section>
+
+      <footer class="bottombar panel">
+        <div class="meta">
+          <button class="setting-chip" type="button" aria-label="Setting panel">Setting</button>
+          <p class="eyebrow">Map <strong id="map-id">--</strong></p>
+          <div class="mode-chip">mode <strong>Edit</strong></div>
+          <div class="presence-chip">
+            <strong id="network-state">Offline</strong>
+            <span>1 Active</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="add-node" class="btn tone-add" type="button">Add</button>
+          <button id="connect-node" class="btn tone-connect" type="button">Connect</button>
+          <button id="save-csv" class="btn tone-warning" type="button">Export .csv</button>
+          <button id="save-fdhl" class="btn tone-export" type="button">Export</button>
+          <button id="undo-node" class="btn secondary" type="button" disabled>Undo</button>
+          <button id="redo-node" class="btn secondary" type="button" disabled>Redo</button>
+          <button id="load-map" class="btn tone-import" type="button">Import</button>
+          <a class="btn tone-connect" href="/mindmapmaker">Menu</a>
+          <button id="remove-node" class="btn tone-delete" type="button">Delete</button>
+          <input id="load-input" type="file" accept=".csv,.fdhl,.fadhil,.fAdHiL,.cws" hidden />
+        </div>
+      </footer>
     </main>
 
     <script type="module" src="/mindmapmaker/editor/editor.js"></script>

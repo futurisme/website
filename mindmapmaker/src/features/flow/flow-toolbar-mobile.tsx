@@ -77,8 +77,8 @@ export function FlowToolbarMobile({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-cyan-400/20 bg-slate-950/90 p-1 pb-[max(env(safe-area-inset-bottom),0.35rem)] shadow-[0_-8px_24px_rgba(34,211,238,0.12)] backdrop-blur lg:hidden">
-      <div className="mb-1 flex items-center justify-between rounded-md border border-cyan-500/20 bg-slate-900/70 px-1.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-cyan-100/90">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-cyan-400/20 bg-slate-950/90 px-1 py-1 pb-[max(env(safe-area-inset-bottom),0.35rem)] shadow-[0_-8px_24px_rgba(34,211,238,0.12)] backdrop-blur lg:hidden">
+      <div className="mb-1 flex items-center justify-between rounded-md border border-cyan-500/20 bg-slate-900/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-cyan-100/90">
         <span>{isConnected ? 'Online' : 'Offline'}</span>
         <span>
           {isConnectArmed

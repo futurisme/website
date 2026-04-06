@@ -1931,7 +1931,7 @@ export function FlowWorkspace({
             onImportWorkspace={handleImportWorkspace}
           />
           <FlowToolbarMobile
-            isOpen={showMobileToolsPanel}
+            isOpen={isMobileViewport && (showMobileToolsPanel || !selectedNodeId || !isReadOnly)}
             selectedNodeId={selectedNodeId}
             canUndo={canUndo}
             canRedo={canRedo}
@@ -1971,7 +1971,7 @@ export function FlowWorkspace({
       )}
 
       {!isReadOnly && selectedNodeId && (
-        <div className="pointer-events-none absolute right-1.5 top-1.5 z-40 flex w-[min(62vw,210px)] flex-col gap-1 rounded-lg border border-cyan-400/25 bg-slate-950/92 p-1 shadow-[0_10px_20px_rgba(34,211,238,0.14)] backdrop-blur sm:right-2 sm:top-2 sm:w-[min(76vw,280px)]">
+        <div className="pointer-events-none absolute bottom-[calc(env(safe-area-inset-bottom)+4.75rem)] right-1.5 z-40 flex w-[min(62vw,210px)] flex-col gap-1 rounded-lg border border-cyan-400/25 bg-slate-950/92 p-1 shadow-[0_10px_20px_rgba(34,211,238,0.14)] backdrop-blur sm:right-2 sm:w-[min(76vw,280px)] lg:bottom-auto lg:top-2">
           <div className="pointer-events-auto flex items-center justify-between gap-1 text-[8px] font-semibold uppercase tracking-[0.08em] text-cyan-100">
             <span>{isDatabaseConnected ? 'DB OK' : 'DB OFF'}</span>
             <span className="truncate text-cyan-200/85">{connectSourceNodeId ? 'Connect' : unconnectSourceNodeId ? 'Unconnect' : `Color: ${selectedNodeLabel ?? selectedNodeId}`}</span>
@@ -2031,7 +2031,7 @@ export function FlowWorkspace({
 
       <div
         ref={reactFlowWrapperRef}
-        className={`relative min-h-0 flex-1 overflow-hidden ${!isReadOnly && showMobileToolsPanel ? 'pb-20 lg:pb-0' : 'pb-0'}`}
+        className={`relative min-h-0 flex-1 overflow-hidden ${!isReadOnly && isMobileViewport ? 'pb-24 lg:pb-0' : 'pb-0'}`}
       >
         <NodeActionContext.Provider value={nodeActionContextValue}>
           <ReactFlow
