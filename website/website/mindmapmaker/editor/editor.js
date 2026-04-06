@@ -27,8 +27,11 @@ const safeMapId = Number.isInteger(Number(mapIdMatch?.[2])) && Number(mapIdMatch
 mapIdEl.textContent = String(safeMapId);
 
 const persisted = loadSnapshot(safeMapId);
-const engine = persisted ? FadhilMindmapLite.fromSnapshot(persisted) : new FadhilMindmapLite();
+let engine = persisted ? FadhilMindmapLite.fromSnapshot(persisted) : new FadhilMindmapLite();
 const camera = createViewportState();
+const IS_TOUCH_PRIMARY = matchMedia('(pointer: coarse)').matches;
+const NODE_BOX = { width: 180, height: 56 };
+const PAN_SENSITIVITY = IS_TOUCH_PRIMARY ? 0.78 : 1;
 
 let selectedId = engine.getSnapshot().nodes[0]?.id ?? 1;
 let connectSourceId = null;
@@ -38,12 +41,21 @@ let startPointer = { x: 0, y: 0 };
 let startNode = { x: 0, y: 0 };
 let startCamera = { x: 0, y: 0 };
 let dragTargetId = null;
+let renderQueued = false;
+let fullRenderRequired = true;
+
+centerCameraOnContent(engine.getSnapshot().nodes);
 
 function render() {
-  const snapshot = engine.getSnapshot();
+  renderQueued = false;
   const transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
   edgesLayer.style.transform = transform;
   nodesLayer.style.transform = transform;
+  if (!fullRenderRequired) {
+    return;
+  }
+  fullRenderRequired = false;
+  const snapshot = engine.getSnapshot();
 
   const byId = new Map(snapshot.nodes.map((n) => [n.id, n]));
   edgesLayer.innerHTML = snapshot.edges
@@ -52,7 +64,15 @@ function render() {
       const to = byId.get(edge.to);
       if (!from || !to) return '';
       const klass = edge.kind === 'link' ? 'edge-path edge-link' : 'edge-path';
-      return `<path class="${klass}" d="${buildEdgePath({ x: from.x + 85, y: from.y + 24 }, { x: to.x + 8, y: to.y + 24 })}"></path>`;
+      const fromAnchor = edge.kind === 'link'
+        ? { x: from.x + NODE_BOX.width / 2, y: from.y + NODE_BOX.height / 2 }
+        : { x: from.x + NODE_BOX.width - 4, y: from.y + NODE_BOX.height / 2 };
+      const toAnchor = edge.kind === 'link'
+        ? { x: to.x + NODE_BOX.width / 2, y: to.y + NODE_BOX.height / 2 }
+        : { x: to.x + 4, y: to.y + NODE_BOX.height / 2 };
+      const path = buildEdgePath(fromAnchor, toAnchor);
+      if (!path) return '';
+      return `<path class="${klass}" d="${path}"></path>`;
     })
     .join('');
 
@@ -68,6 +88,15 @@ function render() {
     .join('');
 
   connectBtn.textContent = engine.hasConnectionFrom(selectedId) ? 'Unconnect' : 'Connect';
+}
+
+function requestRender({ full = false } = {}) {
+  if (full) {
+    fullRenderRequired = true;
+  }
+  if (renderQueued) return;
+  renderQueued = true;
+  requestAnimationFrame(render);
 }
 
 function setStatus(text) {
@@ -93,14 +122,14 @@ function pointerStart(event) {
       connectSourceId = null;
       setStatus(`Connected ${selectedId} -> ${nodeId}`);
       save();
-      render();
+      requestRender({ full: true });
       pointerEnd(event);
       return;
     }
 
     selectedId = nodeId;
     dragTargetId = nodeId;
-    const node = engine.getSnapshot().nodes.find((n) => n.id === nodeId);
+    const node = engine.getNode(nodeId);
     if (node) {
       startNode = { x: node.x, y: node.y };
       dragMode = 'node';
@@ -109,7 +138,7 @@ function pointerStart(event) {
     dragMode = 'pan';
     startCamera = { x: camera.x, y: camera.y };
   }
-  render();
+  requestRender({ full: true });
 }
 
 function pointerMove(event) {
@@ -123,11 +152,11 @@ function pointerMove(event) {
   if (dragMode === 'node' && dragTargetId !== null) {
     engine.updateNode(dragTargetId, { x: startNode.x + dx, y: startNode.y + dy });
   } else if (dragMode === 'pan') {
-    camera.x = startCamera.x + (event.clientX - startPointer.x);
-    camera.y = startCamera.y + (event.clientY - startPointer.y);
+    camera.x = startCamera.x + (event.clientX - startPointer.x) * PAN_SENSITIVITY;
+    camera.y = startCamera.y + (event.clientY - startPointer.y) * PAN_SENSITIVITY;
   }
 
-  render();
+  requestRender({ full: dragMode !== 'pan' });
 }
 
 function pointerEnd(event) {
@@ -143,7 +172,7 @@ function pointerEnd(event) {
 function onWheel(event) {
   event.preventDefault();
   camera.scale = clampScale(camera.scale + (event.deltaY > 0 ? -0.05 : 0.05));
-  render();
+  requestRender();
 }
 
 function download(filename, content, mime) {
@@ -158,7 +187,7 @@ function download(filename, content, mime) {
 
 addNodeBtn.addEventListener('click', () => {
   engine.addNode(selectedId, `Node ${Date.now().toString().slice(-4)}`);
-  render();
+  requestRender({ full: true });
   save();
   setStatus('Node added.');
 });
@@ -167,7 +196,7 @@ removeNodeBtn.addEventListener('click', () => {
   const removed = engine.removeNode(selectedId);
   if (removed) {
     selectedId = 1;
-    render();
+    requestRender({ full: true });
     save();
     setStatus('Node removed.');
   } else {
@@ -179,7 +208,7 @@ connectBtn.addEventListener('click', () => {
   if (engine.hasConnectionFrom(selectedId)) {
     engine.unconnectFrom(selectedId);
     connectSourceId = null;
-    render();
+    requestRender({ full: true });
     save();
     setStatus('Connection removed from selected node.');
     return;
@@ -195,8 +224,8 @@ saveCsvBtn.addEventListener('click', () => {
 
 saveFdhlBtn.addEventListener('click', async () => {
   const encoded = await encodeFdhl(engine.getSnapshot());
-  download(`mindmap-${safeMapId}.fdhl`, encoded, 'text/plain;charset=utf-8');
-  setStatus('FDHL saved.');
+  download(`mindmap-${safeMapId}.fAdHiL`, encoded, 'application/x-fadhil-archive');
+  setStatus('.fAdHiL saved.');
 });
 
 loadBtn.addEventListener('click', () => loadInput.click());
@@ -206,20 +235,29 @@ loadInput.addEventListener('change', async () => {
   const text = await file.text();
 
   try {
-    if (file.name.endsWith('.csv')) {
+    const lowerName = file.name.toLowerCase();
+    if (lowerName.endsWith('.csv')) {
       engine.fromCsv(text);
       setStatus('CSV loaded.');
     } else {
-      Object.assign(engine, FadhilMindmapLite.fromSnapshot(await decodeFdhl(text)));
-      setStatus('FDHL loaded.');
+      const decoded = lowerName.endsWith('.cws') ? decodeLegacyCws(text) : await decodeFdhl(text);
+      const normalized = normalizeLiteSnapshot(decoded) ?? normalizeLiteSnapshotFromWorkspaceArchive(decoded);
+      if (normalized) {
+        const transformed = transformLegacySnapshot(normalized);
+        engine = FadhilMindmapLite.fromSnapshot(transformed);
+        centerCameraOnContent(transformed.nodes);
+        setStatus(lowerName.endsWith('.cws') ? '.cws loaded.' : '.fAdHiL loaded.');
+      } else {
+        throw new Error('Payload file tidak dikenali. Gunakan .fAdHiL/.fdhl/.cws yang berisi snapshot lite.');
+      }
     }
     selectedId = engine.getSnapshot().nodes[0]?.id ?? 1;
     connectSourceId = null;
-    render();
+    requestRender({ full: true });
     save();
   } catch (error) {
     console.error(error);
-    setStatus('Load failed.');
+    setStatus(`Load failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
   loadInput.value = '';
 });
@@ -233,8 +271,235 @@ window.addEventListener('beforeunload', save);
 
 document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-render();
+requestRender({ full: true });
 
 function escapeHtml(input) {
   return input.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+
+function normalizeLiteSnapshot(input) {
+  if (!input || typeof input !== 'object') {
+    return null;
+  }
+  if (Array.isArray(input.nodes)) {
+    return input;
+  }
+  if (input.payload && typeof input.payload === 'object' && Array.isArray(input.payload.nodes)) {
+    return input.payload;
+  }
+  if (
+    input.payload
+    && typeof input.payload === 'object'
+    && input.payload.payload
+    && typeof input.payload.payload === 'object'
+    && Array.isArray(input.payload.payload.nodes)
+  ) {
+    return input.payload.payload;
+  }
+  return null;
+}
+
+function normalizeLiteSnapshotFromWorkspaceArchive(input) {
+  if (!input || typeof input !== 'object' || typeof input.snapshot !== 'string') {
+    return null;
+  }
+  return parseSnapshotString(input.snapshot);
+}
+
+function transformLegacySnapshot(snapshot) {
+  const sourceNodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const idSet = new Set();
+  const nodes = sourceNodes.map((raw, index) => {
+    const parsedId = Number(raw?.id);
+    const fallbackId = index + 1;
+    const id = Number.isFinite(parsedId) && parsedId > 0 && !idSet.has(parsedId) ? parsedId : fallbackId;
+    idSet.add(id);
+
+    const parsedParent = Number(raw?.parentId);
+    const parentId = Number.isFinite(parsedParent) && parsedParent > 0 ? parsedParent : null;
+    return {
+      id,
+      title: typeof raw?.title === 'string' && raw.title.trim() ? raw.title : `Node ${id}`,
+      parentId,
+      depth: Number.isFinite(raw?.depth) ? Math.max(0, Number(raw.depth)) : 0,
+      weight: Number.isFinite(raw?.weight) ? Math.max(0.05, Number(raw.weight)) : 1,
+      x: Number(raw?.x),
+      y: Number(raw?.y),
+    };
+  });
+
+  if (nodes.length === 0) {
+    return new FadhilMindmapLite().getSnapshot();
+  }
+
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const root = nodes.find((node) => node.parentId === null || !byId.has(node.parentId)) ?? nodes[0];
+  root.parentId = null;
+
+  const childrenByParent = new Map();
+  for (const node of nodes) {
+    if (node.id === root.id) continue;
+    if (node.parentId === null || !byId.has(node.parentId)) {
+      node.parentId = root.id;
+    }
+    let list = childrenByParent.get(node.parentId);
+    if (!list) {
+      list = [];
+      childrenByParent.set(node.parentId, list);
+    }
+    list.push(node.id);
+  }
+
+  // Recompute depth deterministically from parent links.
+  const depthQueue = [root.id];
+  root.depth = 0;
+  while (depthQueue.length > 0) {
+    const current = depthQueue.shift();
+    if (!current) break;
+    const parentNode = byId.get(current);
+    const children = childrenByParent.get(current) ?? [];
+    for (const childId of children) {
+      const child = byId.get(childId);
+      if (!child || !parentNode) continue;
+      child.depth = parentNode.depth + 1;
+      depthQueue.push(childId);
+    }
+  }
+
+  const hasValidCoordinates = nodes.some((node) => Number.isFinite(node.x) && Number.isFinite(node.y) && (Math.abs(node.x) > 1 || Math.abs(node.y) > 1));
+  if (!hasValidCoordinates) {
+    applyFallbackLayout(root.id, byId, childrenByParent);
+  } else {
+    for (const node of nodes) {
+      if (!Number.isFinite(node.x) || !Number.isFinite(node.y)) {
+        const parent = node.parentId !== null ? byId.get(node.parentId) : null;
+        node.x = parent ? parent.x + 220 : 0;
+        node.y = parent ? parent.y : 0;
+      }
+    }
+  }
+
+  const links = (Array.isArray(snapshot?.links) ? snapshot.links : [])
+    .map((link) => ({ from: Number(link?.from), to: Number(link?.to) }))
+    .filter((link) => Number.isFinite(link.from) && Number.isFinite(link.to) && byId.has(link.from) && byId.has(link.to) && link.from !== link.to);
+
+  return {
+    version: Number.isFinite(snapshot?.version) ? Math.max(1, Number(snapshot.version)) : 1,
+    nodes,
+    links,
+    edges: [],
+  };
+}
+
+function applyFallbackLayout(rootId, byId, childrenByParent) {
+  let row = 0;
+  const walk = (id, depth) => {
+    const node = byId.get(id);
+    if (!node) return;
+    const children = childrenByParent.get(id) ?? [];
+    if (children.length === 0) {
+      node.x = depth * 220;
+      node.y = row * 90;
+      row += 1;
+      return;
+    }
+    for (const childId of children) {
+      walk(childId, depth + 1);
+    }
+    const first = byId.get(children[0]);
+    const last = byId.get(children[children.length - 1]);
+    node.x = depth * 220;
+    node.y = first && last ? (first.y + last.y) / 2 : row * 90;
+  };
+  walk(rootId, 0);
+}
+
+function decodeLegacyCws(text) {
+  const parsed = tryParseJson(text);
+  if (parsed) {
+    return parsed;
+  }
+
+  const trimmed = text.trim();
+  if (trimmed.startsWith('cws::')) {
+    const payload = decodeBase64Utf8(trimmed.slice(5));
+    const parsedCws = tryParseJson(payload);
+    if (parsedCws) {
+      return parsedCws;
+    }
+  }
+
+  const maybeB64 = decodeBase64Utf8(trimmed);
+  const parsedB64 = tryParseJson(maybeB64);
+  if (parsedB64) {
+    return parsedB64;
+  }
+
+  throw new Error('Format .cws lama tidak dikenali.');
+}
+
+function parseSnapshotString(snapshot) {
+  const parsedInline = tryParseJson(snapshot);
+  if (parsedInline) {
+    return normalizeLiteSnapshot(parsedInline);
+  }
+  const decoded = decodeBase64Utf8(snapshot);
+  const parsedBase64 = tryParseJson(decoded);
+  if (parsedBase64) {
+    return normalizeLiteSnapshot(parsedBase64);
+  }
+  return null;
+}
+
+function tryParseJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function decodeBase64Utf8(text) {
+  const clean = text.trim().replace(/^data:.*?;base64,/, '').replaceAll('-', '+').replaceAll('_', '/');
+  if (!clean) return '';
+  try {
+    const pad = '='.repeat((4 - (clean.length % 4)) % 4);
+    const binary = atob(clean + pad);
+    const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  } catch {
+    return '';
+  }
+}
+
+function centerCameraOnContent(nodes) {
+  if (!Array.isArray(nodes) || nodes.length === 0) {
+    return;
+  }
+  const viewportWidth = viewport.clientWidth || 1;
+  const viewportHeight = viewport.clientHeight || 1;
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const node of nodes) {
+    const x = Number(node.x);
+    const y = Number(node.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + NODE_BOX.width);
+    maxY = Math.max(maxY, y + NODE_BOX.height);
+  }
+  if (!Number.isFinite(minX) || !Number.isFinite(minY)) return;
+
+  const contentWidth = Math.max(1, maxX - minX);
+  const contentHeight = Math.max(1, maxY - minY);
+  const fitScale = clampScale(Math.min(viewportWidth / (contentWidth + 96), viewportHeight / (contentHeight + 96)));
+  camera.scale = fitScale;
+
+  const centerX = minX + contentWidth / 2;
+  const centerY = minY + contentHeight / 2;
+  camera.x = viewportWidth / 2 - centerX * fitScale;
+  camera.y = viewportHeight / 2 - centerY * fitScale;
 }

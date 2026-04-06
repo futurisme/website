@@ -4,6 +4,12 @@ const ALIEN_BLOCK_START = 0x3400;
 const ALIEN_BASE = 8192;
 const PASSPHRASE_V2 = 'FadhilAkbar.ChartWorkspace.FeatureLib.v2';
 const SALT_V2 = 'ChartWorkspace::fAdHiL::Alien::2026';
+const PASSPHRASE_V1 = 'FadhilAkbar.ChartWorkspace.FeatureLib.v1';
+const SALT_V1 = 'ChartWorkspace::fAdHiL::2026';
+const MAGIC = 'chartworkspace/fadhil-archive';
+const CURRENT_VERSION = 2;
+const CURRENT_ALGO = 'aes-gcm+deflate+alien-b8192';
+const LEGACY_ALGO = 'aes-gcm+gzip+base64url';
 
 export class FadhilMindmapLite {
   constructor() {
@@ -11,6 +17,11 @@ export class FadhilMindmapLite {
     this.nextId = 2;
     this.nodes = [{ id: 1, title: 'Main Topic', parentId: null, x: 0, y: 0, depth: 0, weight: 1 }];
     this.links = [];
+    this.nodeIndexById = new Map([[1, 0]]);
+    this.childIdsByParent = new Map();
+    this.outgoingLinkCount = new Map();
+    this.cachedSnapshot = null;
+    this.dirtySnapshot = true;
   }
 
   static fromSnapshot(snapshot) {
@@ -20,24 +31,36 @@ export class FadhilMindmapLite {
       engine.links = Array.isArray(snapshot.links) ? snapshot.links.map((l) => ({ ...l })) : [];
       engine.nextId = Math.max(...engine.nodes.map((n) => n.id), 1) + 1;
       engine.version = snapshot.version || 1;
+      engine.rebuildIndexes();
     }
     return engine;
   }
 
   getSnapshot() {
+    if (!this.dirtySnapshot && this.cachedSnapshot) {
+      return this.cachedSnapshot;
+    }
     const treeEdges = this.nodes.filter((n) => n.parentId !== null).map((n) => ({ from: n.parentId, to: n.id, kind: 'tree' }));
     const linkEdges = this.links.map((l) => ({ ...l, kind: 'link' }));
-    return {
+    this.cachedSnapshot = {
       version: this.version,
       nodes: this.nodes.map((n) => ({ ...n })),
       links: this.links.map((l) => ({ ...l })),
       edges: [...treeEdges, ...linkEdges],
     };
+    this.dirtySnapshot = false;
+    return this.cachedSnapshot;
+  }
+
+  getNode(id) {
+    const index = this.nodeIndexById.get(id);
+    if (index === undefined) return undefined;
+    return this.nodes[index];
   }
 
   addNode(parentId, title = 'New Node') {
-    const parent = this.nodes.find((n) => n.id === parentId) || this.nodes[0];
-    const siblings = this.nodes.filter((n) => n.parentId === parent.id);
+    const parent = this.getNode(parentId) || this.nodes[0];
+    const siblings = this.childIdsByParent.get(parent.id) || [];
     const id = this.nextId++;
     const node = {
       id,
@@ -48,14 +71,14 @@ export class FadhilMindmapLite {
       depth: (parent.depth ?? 0) + 1,
       weight: 1,
     };
-    this.nodes.push(node);
-    this.version += 1;
+    this.pushNode(node);
+    this.bumpVersion();
     return node;
   }
 
   removeNode(id) {
     if (id === 1) return false;
-    const target = this.nodes.find((n) => n.id === id);
+    const target = this.getNode(id);
     if (!target) return false;
 
     const parentId = target.parentId ?? 1;
@@ -64,40 +87,46 @@ export class FadhilMindmapLite {
       .map((n) => (n.parentId === id ? { ...n, parentId } : n));
 
     this.links = this.links.filter((link) => link.from !== id && link.to !== id);
-    this.version += 1;
+    this.rebuildIndexes();
+    this.bumpVersion();
     return true;
   }
 
   updateNode(id, patch) {
-    const node = this.nodes.find((n) => n.id === id);
+    const node = this.getNode(id);
     if (!node) return;
+    const prevTitle = node.title;
+    const prevX = node.x;
+    const prevY = node.y;
     if (patch.title !== undefined) node.title = patch.title;
     if (patch.x !== undefined) node.x = patch.x;
     if (patch.y !== undefined) node.y = patch.y;
-    this.version += 1;
+    if (node.title !== prevTitle || node.x !== prevX || node.y !== prevY) {
+      this.bumpVersion();
+    }
   }
 
   connect(from, to) {
     if (from === to) return false;
-    if (!this.nodes.some((n) => n.id === from) || !this.nodes.some((n) => n.id === to)) return false;
+    if (!this.nodeIndexById.has(from) || !this.nodeIndexById.has(to)) return false;
     if (this.links.some((l) => l.from === from && l.to === to)) return false;
     this.links.push({ from, to });
-    this.version += 1;
+    this.outgoingLinkCount.set(from, (this.outgoingLinkCount.get(from) || 0) + 1);
+    this.bumpVersion();
     return true;
   }
 
   unconnectFrom(from) {
-    const before = this.links.length;
+    const count = this.outgoingLinkCount.get(from) || 0;
+    if (count === 0) return false;
     this.links = this.links.filter((l) => l.from !== from);
-    if (this.links.length !== before) {
-      this.version += 1;
-      return true;
-    }
-    return false;
+    this.outgoingLinkCount.set(from, 0);
+    this.bumpVersion();
+    return true;
   }
 
   hasConnectionFrom(id) {
-    return this.links.some((l) => l.from === id);
+    return (this.outgoingLinkCount.get(id) || 0) > 0;
   }
 
   toCsv() {
@@ -127,14 +156,71 @@ export class FadhilMindmapLite {
     this.nodes = parsed;
     this.links = [];
     this.nextId = Math.max(...this.nodes.map((n) => n.id), 1) + 1;
-    this.version += 1;
+    this.rebuildIndexes();
+    this.bumpVersion();
     return true;
+  }
+
+  pushNode(node) {
+    const index = this.nodes.length;
+    this.nodes.push(node);
+    this.nodeIndexById.set(node.id, index);
+    if (node.parentId !== null) {
+      let children = this.childIdsByParent.get(node.parentId);
+      if (!children) {
+        children = [];
+        this.childIdsByParent.set(node.parentId, children);
+      }
+      children.push(node.id);
+    }
+  }
+
+  rebuildIndexes() {
+    this.nodeIndexById = new Map();
+    this.childIdsByParent = new Map();
+    this.outgoingLinkCount = new Map();
+    for (let i = 0; i < this.nodes.length; i += 1) {
+      const node = this.nodes[i];
+      this.nodeIndexById.set(node.id, i);
+      if (node.parentId !== null) {
+        let children = this.childIdsByParent.get(node.parentId);
+        if (!children) {
+          children = [];
+          this.childIdsByParent.set(node.parentId, children);
+        }
+        children.push(node.id);
+      }
+    }
+    for (const link of this.links) {
+      this.outgoingLinkCount.set(link.from, (this.outgoingLinkCount.get(link.from) || 0) + 1);
+    }
+    this.dirtySnapshot = true;
+    this.cachedSnapshot = null;
+  }
+
+  bumpVersion() {
+    this.version += 1;
+    this.dirtySnapshot = true;
+    this.cachedSnapshot = null;
   }
 }
 
 export function buildEdgePath(from, to) {
-  const midX = (from.x + to.x) / 2;
-  return `M ${from.x} ${from.y} C ${midX} ${from.y}, ${midX} ${to.y}, ${to.x} ${to.y}`;
+  if (!Number.isFinite(from?.x) || !Number.isFinite(from?.y) || !Number.isFinite(to?.x) || !Number.isFinite(to?.y)) {
+    return '';
+  }
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const distance = Math.hypot(dx, dy);
+  const control = Math.max(28, Math.min(220, distance * 0.35));
+  const adaptiveX = dx >= 0 ? control : Math.max(44, control * 1.4);
+  const c1x = from.x + adaptiveX;
+  const c2x = to.x - adaptiveX;
+  return `M ${round3(from.x)} ${round3(from.y)} C ${round3(c1x)} ${round3(from.y)}, ${round3(c2x)} ${round3(to.y)}, ${round3(to.x)} ${round3(to.y)}`;
+}
+
+function round3(value) {
+  return Math.round(value * 1000) / 1000;
 }
 
 export function defaultStorageKey(mapId) {
@@ -163,36 +249,92 @@ export function clampScale(scale) {
   return Math.min(2, Math.max(0.45, scale));
 }
 
-export async function encodeFdhl(payload) {
+export async function encodeFdhl(payload, contentType = 'workspace-archive') {
   const text = JSON.stringify(payload);
   const bytes = new TextEncoder().encode(text);
-  const compressed = await maybeDeflate(bytes);
+  const packed = await maybeDeflate(bytes);
 
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await getKey();
-  const cipher = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, compressed));
-  return `${ARCHIVE_PREFIX}§workspace-archive§1§${encodeAlienFramed(iv)}§${encodeAlienFramed(cipher)}§${new Date().toISOString()}`;
+  const key = await getKey('current');
+  const cipher = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: toArrayBuffer(iv) }, key, toArrayBuffer(packed.bytes)));
+  return `${ARCHIVE_PREFIX}§${contentType}§${packed.compressed ? '1' : '0'}§${encodeAlienFramed(iv)}§${encodeAlienFramed(cipher)}§${new Date().toISOString()}`;
 }
 
 export async function decodeFdhl(raw) {
-  const parts = raw.split('§');
-  if (!raw.startsWith(`${ARCHIVE_PREFIX}§`) || parts.length < 6) {
-    throw new Error('Invalid .fdhl format');
+  const text = String(raw ?? '').trim();
+  if (!text) {
+    throw new Error('Empty .fAdHiL/.fdhl content');
   }
-  const iv = decodeAlienFramed(parts[3]);
-  const cipher = decodeAlienFramed(parts[4]);
 
-  const key = await getKey();
-  const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipher));
-  const inflated = await maybeInflate(plain);
-  return JSON.parse(new TextDecoder().decode(inflated));
+  if (text.startsWith('{')) {
+    const maybeJson = JSON.parse(text);
+    if (Array.isArray(maybeJson?.nodes)) {
+      return maybeJson;
+    }
+    return decodeFromJsonEnvelope(maybeJson);
+  }
+
+  const parsed = parseV2(text);
+  if (!parsed) {
+    throw new Error('Invalid .fAdHiL/.fdhl string format');
+  }
+  return decodeFromV2(parsed);
 }
 
-async function getKey() {
+async function decodeFromJsonEnvelope(parsed) {
+  const isLegacy = parsed?.magic === MAGIC && parsed?.version === 1 && parsed?.algo === LEGACY_ALGO;
+  const isCurrent = parsed?.magic === MAGIC && parsed?.version === CURRENT_VERSION && parsed?.algo === CURRENT_ALGO;
+  if (!isLegacy && !isCurrent) {
+    throw new Error('Format file .fAdHiL tidak valid.');
+  }
+  if (typeof parsed?.iv !== 'string' || typeof parsed?.data !== 'string') {
+    throw new Error('Metadata file .fAdHiL tidak lengkap.');
+  }
+
+  if (isLegacy) {
+    const key = await getKey('legacy');
+    const iv = fromBase64Url(parsed.iv);
+    const cipher = fromBase64Url(parsed.data);
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: toArrayBuffer(iv) }, key, toArrayBuffer(cipher)));
+    const unpacked = await maybeInflate(plain, 'gzip', Boolean(parsed.compressed));
+    return JSON.parse(new TextDecoder().decode(unpacked));
+  }
+
+  return decodeFromV2(parsed);
+}
+
+async function decodeFromV2(parsed) {
+  const key = await getKey('current');
+  const ivCandidates = decodeAlienFramedCandidates(parsed.iv, 12);
+  const cipherCandidates = decodeAlienFramedCandidates(parsed.data);
+  let lastError = null;
+
+  for (const iv of ivCandidates) {
+    for (const cipher of cipherCandidates) {
+      try {
+        const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: toArrayBuffer(iv) }, key, toArrayBuffer(cipher)));
+        const unpacked = await maybeInflate(plain, 'deflate-raw', Boolean(parsed.compressed));
+        return JSON.parse(new TextDecoder().decode(unpacked));
+      } catch (error) {
+        lastError = error;
+      }
+    }
+  }
+
+  const message = lastError instanceof Error ? lastError.message : String(lastError ?? 'unknown');
+  throw new Error(`Dekripsi .fAdHiL gagal: ${message}`);
+}
+
+async function getKey(mode) {
   const encoder = new TextEncoder();
-  const base = await crypto.subtle.importKey('raw', encoder.encode(PASSPHRASE_V2), { name: 'PBKDF2' }, false, ['deriveKey']);
+  const base = await crypto.subtle.importKey('raw', encoder.encode(mode === 'legacy' ? PASSPHRASE_V1 : PASSPHRASE_V2), { name: 'PBKDF2' }, false, ['deriveKey']);
   return crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: encoder.encode(SALT_V2), iterations: 150000, hash: 'SHA-256' },
+    {
+      name: 'PBKDF2',
+      salt: encoder.encode(mode === 'legacy' ? SALT_V1 : SALT_V2),
+      iterations: mode === 'legacy' ? 120000 : 150000,
+      hash: 'SHA-256',
+    },
     base,
     { name: 'AES-GCM', length: 256 },
     false,
@@ -201,19 +343,25 @@ async function getKey() {
 }
 
 async function maybeDeflate(bytes) {
-  if (typeof CompressionStream === 'undefined') return bytes;
-  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+  if (typeof CompressionStream === 'undefined') return { bytes, compressed: false };
+  const stream = new Blob([toArrayBuffer(bytes)]).stream().pipeThrough(new CompressionStream('deflate-raw'));
   const result = new Uint8Array(await new Response(stream).arrayBuffer());
-  return result.length < bytes.length ? result : bytes;
+  if (result.length >= bytes.length) {
+    return { bytes, compressed: false };
+  }
+  return { bytes: result, compressed: true };
 }
 
-async function maybeInflate(bytes) {
-  if (typeof DecompressionStream === 'undefined') return bytes;
+async function maybeInflate(bytes, format = 'deflate-raw', compressed = true) {
+  if (!compressed) return bytes;
+  if (typeof DecompressionStream === 'undefined') {
+    throw new Error('Browser tidak mendukung dekompresi untuk file .fAdHiL terkompresi.');
+  }
   try {
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
     return new Uint8Array(await new Response(stream).arrayBuffer());
-  } catch {
-    return bytes;
+  } catch (error) {
+    throw new Error(`Dekompresi gagal: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -221,11 +369,32 @@ function encodeAlienFramed(bytes) {
   return `${bytes.length.toString(36)}~${encodeAlienSymbols(bytes)}`;
 }
 
-function decodeAlienFramed(text) {
+function decodeAlienFramedCandidates(text, expectedLength) {
   const sep = text.indexOf('~');
-  const expected = Number.parseInt(text.slice(0, sep), 36);
-  const decoded = decodeAlienSymbols(text.slice(sep + 1));
-  return decoded.slice(0, expected);
+  if (sep > 0) {
+    const expected = Number.parseInt(text.slice(0, sep), 36);
+    if (!Number.isFinite(expected) || expected < 0) {
+      throw new Error('Header panjang simbol alien .fAdHiL tidak valid.');
+    }
+    const decoded = decodeAlienSymbols(text.slice(sep + 1));
+    if (decoded.length < expected) {
+      throw new Error('Data simbol alien .fAdHiL terpotong.');
+    }
+    return [decoded.slice(0, expected)];
+  }
+
+  const decoded = decodeAlienSymbols(text);
+  const candidates = [decoded];
+  if (decoded.length > 0) {
+    candidates.push(decoded.slice(0, decoded.length - 1));
+  }
+  if (typeof expectedLength === 'number') {
+    const exact = candidates.find((bytes) => bytes.length === expectedLength);
+    if (exact) {
+      return [exact];
+    }
+  }
+  return candidates;
 }
 
 function encodeAlienSymbols(bytes) {
@@ -296,6 +465,42 @@ function splitCsv(line) {
   }
   out.push(current);
   return out;
+}
+
+function parseV2(raw) {
+  if (!raw.startsWith(`${ARCHIVE_PREFIX}§`)) {
+    return null;
+  }
+  const parts = raw.split('§');
+  if (parts.length !== 6) {
+    throw new Error('Format string .fAdHiL futuristik tidak valid.');
+  }
+  const [, contentType, compressedFlag, iv, data, exportedAt] = parts;
+  return {
+    magic: MAGIC,
+    version: CURRENT_VERSION,
+    algo: CURRENT_ALGO,
+    contentType,
+    compressed: compressedFlag === '1',
+    iv,
+    data,
+    exportedAt,
+  };
+}
+
+function toArrayBuffer(bytes) {
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+}
+
+function fromBase64Url(value) {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = normalized + '='.repeat((4 - (normalized.length % 4)) % 4);
+  const binary = atob(padded);
+  const output = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    output[i] = binary.charCodeAt(i);
+  }
+  return output;
 }
 
 export function parentIdOf(node) {

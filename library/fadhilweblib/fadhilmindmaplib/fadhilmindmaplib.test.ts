@@ -77,9 +77,13 @@ test('postgres adapter + railway config resolve', async () => {
 test('browser-lite runtime supports lightweight node operations', () => {
   const lite = new FadhilMindmapLite();
   const child = lite.addNode(1, 'Mobile Node');
+  assert.equal(lite.getNode(child.id)?.title, 'Mobile Node');
   lite.updateNode(child.id, { x: 120, y: 80 });
   lite.connect(1, child.id);
   assert.equal(lite.hasConnectionFrom(1), true);
+  const before = lite.getSnapshot();
+  const after = lite.getSnapshot();
+  assert.equal(before, after, 'snapshot should be cached when unchanged');
   lite.unconnectFrom(1);
   const csv = lite.toCsv();
   assert.match(csv, /id,title,parentId,x,y,depth,weight/);
