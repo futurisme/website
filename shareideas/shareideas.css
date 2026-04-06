@@ -1,5 +1,13 @@
 :root {
   color-scheme: dark;
+  --bg: #03070f;
+  --panel: #130015;
+  --panel-2: #1a031f;
+  --cyan: #27e7ff;
+  --cyan-soft: #27e7ff40;
+  --text: #eaf8ff;
+  --muted: #89a5bf;
+  --orange: #ffa34c;
 }
 
 * {
@@ -9,49 +17,209 @@
 html,
 body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
-  background: #040711;
-  color: #c9f6ff;
+  background: radial-gradient(circle at 20% 10%, #0b2340, var(--bg) 45%);
+  color: var(--text);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
 .shell {
+  min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr;
-  width: 100%;
-  height: 100%;
+  grid-template-rows: auto auto 1fr auto;
 }
 
 .topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid #0dcde433;
-  background: linear-gradient(90deg, #03151f, #050914);
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cyan-soft);
+  background: #040a16d9;
+}
+
+.credit,
+.status,
+.topbar h1 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.credit,
+.status {
+  font-size: 12px;
+  color: #9ceeff;
 }
 
 .topbar h1 {
-  margin: 0;
   font-size: 14px;
-  letter-spacing: 0.12em;
-  color: #42e8ff;
+  letter-spacing: 0.15em;
+  color: var(--cyan);
 }
 
-.open-link {
-  color: #88f0ff;
-  border: 1px solid #0dcde455;
-  padding: 6px 10px;
-  text-decoration: none;
-  font-size: 12px;
+.tabs,
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+}
+
+.bottom-nav {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: #03070feb;
+  border-top: 1px solid var(--cyan-soft);
+}
+
+.tab-btn,
+.nav-btn,
+.folder-toggle,
+.detail-toggle {
+  appearance: none;
+  border: 1px solid #1fdfff70;
+  background: #051126;
+  color: #d8f8ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tab-btn[aria-current='true'],
+.nav-btn[aria-current='true'] {
+  background: linear-gradient(90deg, #12383f, #061227);
+  color: var(--cyan);
+}
+
+.board {
+  overflow: auto;
+  padding: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+.folder {
+  border: 1px solid #ff32554a;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #300015d0, var(--panel));
+  box-shadow: inset 0 0 0 1px #ff1f411a;
+  padding: 12px;
+}
+
+.folder-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.folder-title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.folder-count {
+  font-size: 13px;
+  color: #ffc6d4;
+  border: 1px solid #ff4b6a59;
   border-radius: 8px;
+  padding: 2px 8px;
 }
 
-.frame {
+.folder-toggle {
   width: 100%;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.folder-content {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.folder[data-collapsed='true'] .folder-content {
+  display: none;
+}
+
+.idea-item {
+  border-radius: 10px;
+  border: 1px solid #10deff8e;
+  background: linear-gradient(180deg, #130015, var(--panel-2));
+  padding: 10px;
+}
+
+.idea-topline {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.idea-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.detail-toggle {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.idea-description {
+  margin: 10px 0;
+  color: var(--orange);
+  line-height: 1.5;
+}
+
+.idea-item[data-collapsed='true'] .idea-description,
+.idea-item[data-collapsed='true'] .progress-row,
+.idea-item[data-collapsed='true'] .progress-track {
+  display: none;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+}
+
+.progress-text {
+  color: var(--cyan);
+}
+
+.progress-track {
+  margin-top: 8px;
+  width: 100%;
+  height: 8px;
+  border-radius: 99px;
+  background: #071428;
+  border: 1px solid #22e3ff40;
+}
+
+.progress-fill {
   height: 100%;
-  border: 0;
-  background: #000;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #11c7e8, #3ffcff);
+}
+
+@media (max-width: 700px) {
+  .folder-title {
+    font-size: 22px;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .topbar h1 {
+    grid-column: 1 / -1;
+  }
 }
