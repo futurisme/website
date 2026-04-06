@@ -58,4 +58,5 @@ Forward proven lightweight/runtime patterns from `fadhilweblib` into `fadhilmind
 - Compatibility bridge added for `.cws`/workspace payloads that embed JSON/base64 JSON lite snapshots so older exports can be restored when snapshot data is directly available as JSON form.
 - Added transformer stage for legacy payload normalization (ID sanitization, parent repair, depth recomputation, fallback layout synthesis for missing coordinates).
 - Camera auto-fit now recenters viewport to loaded content bounds so successful load never appears as blank canvas due to off-screen coordinates.
+- Added compatibility transform for ReactFlow-like legacy schema (`nodes[].position`, `label`, `edges[].source/target`, `viewport`) so old map payloads are lifted into lite runtime format while preserving usable camera context.
 - Important compatibility note: main editor `workspace-archive` payloads that store only binary Yjs updates still require a Yjs translator layer for full fidelity conversion.

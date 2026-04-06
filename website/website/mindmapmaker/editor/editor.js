@@ -245,7 +245,12 @@ loadInput.addEventListener('change', async () => {
       if (normalized) {
         const transformed = transformLegacySnapshot(normalized);
         engine = FadhilMindmapLite.fromSnapshot(transformed);
-        centerCameraOnContent(transformed.nodes);
+        const preferredViewport = extractViewport(decoded) ?? extractViewport(normalized);
+        if (preferredViewport) {
+          applyCameraViewport(preferredViewport);
+        } else {
+          centerCameraOnContent(transformed.nodes);
+        }
         setStatus(lowerName.endsWith('.cws') ? '.cws loaded.' : '.fAdHiL loaded.');
       } else {
         throw new Error('Payload file tidak dikenali. Gunakan .fAdHiL/.fdhl/.cws yang berisi snapshot lite.');
@@ -308,23 +313,31 @@ function normalizeLiteSnapshotFromWorkspaceArchive(input) {
 
 function transformLegacySnapshot(snapshot) {
   const sourceNodes = Array.isArray(snapshot?.nodes) ? snapshot.nodes : [];
+  const sourceEdges = extractEdgePairs(snapshot);
   const idSet = new Set();
+  const idAlias = new Map();
+  let nextId = 1;
   const nodes = sourceNodes.map((raw, index) => {
-    const parsedId = Number(raw?.id);
+    const sourceId = raw?.id ?? `node-${index + 1}`;
+    const parsedId = Number(sourceId);
     const fallbackId = index + 1;
-    const id = Number.isFinite(parsedId) && parsedId > 0 && !idSet.has(parsedId) ? parsedId : fallbackId;
+    const id = Number.isFinite(parsedId) && parsedId > 0 && !idSet.has(parsedId) ? parsedId : Math.max(fallbackId, nextId++);
     idSet.add(id);
+    idAlias.set(String(sourceId), id);
 
     const parsedParent = Number(raw?.parentId);
+    const position = raw?.position && typeof raw.position === 'object' ? raw.position : null;
     const parentId = Number.isFinite(parsedParent) && parsedParent > 0 ? parsedParent : null;
     return {
       id,
-      title: typeof raw?.title === 'string' && raw.title.trim() ? raw.title : `Node ${id}`,
+      title: typeof raw?.title === 'string' && raw.title.trim()
+        ? raw.title
+        : (typeof raw?.label === 'string' && raw.label.trim() ? raw.label : `Node ${id}`),
       parentId,
       depth: Number.isFinite(raw?.depth) ? Math.max(0, Number(raw.depth)) : 0,
       weight: Number.isFinite(raw?.weight) ? Math.max(0.05, Number(raw.weight)) : 1,
-      x: Number(raw?.x),
-      y: Number(raw?.y),
+      x: Number(position?.x ?? raw?.x),
+      y: Number(position?.y ?? raw?.y),
     };
   });
 
@@ -337,6 +350,18 @@ function transformLegacySnapshot(snapshot) {
   root.parentId = null;
 
   const childrenByParent = new Map();
+  const seenParentByNode = new Set();
+  for (const edge of sourceEdges) {
+    const sourceId = idAlias.get(String(edge.from));
+    const targetId = idAlias.get(String(edge.to));
+    if (!sourceId || !targetId || sourceId === targetId) continue;
+    const target = byId.get(targetId);
+    if (!target) continue;
+    if (!seenParentByNode.has(targetId)) {
+      target.parentId = sourceId;
+      seenParentByNode.add(targetId);
+    }
+  }
   for (const node of nodes) {
     if (node.id === root.id) continue;
     if (node.parentId === null || !byId.has(node.parentId)) {
@@ -379,9 +404,16 @@ function transformLegacySnapshot(snapshot) {
     }
   }
 
-  const links = (Array.isArray(snapshot?.links) ? snapshot.links : [])
-    .map((link) => ({ from: Number(link?.from), to: Number(link?.to) }))
-    .filter((link) => Number.isFinite(link.from) && Number.isFinite(link.to) && byId.has(link.from) && byId.has(link.to) && link.from !== link.to);
+  const dedupLink = new Set();
+  const links = sourceEdges
+    .map((edge) => ({ from: idAlias.get(String(edge.from)), to: idAlias.get(String(edge.to)) }))
+    .filter((link) => Number.isFinite(link.from) && Number.isFinite(link.to) && byId.has(link.from) && byId.has(link.to) && link.from !== link.to)
+    .filter((link) => {
+      const key = `${link.from}->${link.to}`;
+      if (dedupLink.has(key)) return false;
+      dedupLink.add(key);
+      return true;
+    });
 
   return {
     version: Number.isFinite(snapshot?.version) ? Math.max(1, Number(snapshot.version)) : 1,
@@ -389,6 +421,27 @@ function transformLegacySnapshot(snapshot) {
     links,
     edges: [],
   };
+}
+
+function extractEdgePairs(snapshot) {
+  const links = Array.isArray(snapshot?.links) ? snapshot.links : [];
+  const edges = Array.isArray(snapshot?.edges) ? snapshot.edges : [];
+  const pairs = [];
+  for (const link of links) {
+    if (link && link.from !== undefined && link.to !== undefined) {
+      pairs.push({ from: link.from, to: link.to });
+    }
+  }
+  for (const edge of edges) {
+    if (edge && edge.from !== undefined && edge.to !== undefined) {
+      pairs.push({ from: edge.from, to: edge.to });
+      continue;
+    }
+    if (edge && edge.source !== undefined && edge.target !== undefined) {
+      pairs.push({ from: edge.source, to: edge.target });
+    }
+  }
+  return pairs;
 }
 
 function applyFallbackLayout(rootId, byId, childrenByParent) {
@@ -502,4 +555,21 @@ function centerCameraOnContent(nodes) {
   const centerY = minY + contentHeight / 2;
   camera.x = viewportWidth / 2 - centerX * fitScale;
   camera.y = viewportHeight / 2 - centerY * fitScale;
+}
+
+function extractViewport(input) {
+  if (!input || typeof input !== 'object' || !input.viewport || typeof input.viewport !== 'object') {
+    return null;
+  }
+  const { x, y, zoom } = input.viewport;
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(zoom)) {
+    return null;
+  }
+  return { x: Number(x), y: Number(y), zoom: Number(zoom) };
+}
+
+function applyCameraViewport(viewportState) {
+  camera.scale = clampScale(viewportState.zoom);
+  camera.x = viewportState.x;
+  camera.y = viewportState.y;
 }
