@@ -1,14 +1,14 @@
 # fadhilwebideaslib
 
-Sub-library di bawah `fadhilweblib` untuk integrasi fitur **root** `/shareideas`.
+Sub-library di bawah `fadhilweblib` untuk remake UI/logic **Share Ideas**.
 
 ## Fokus
 
-- Menjaga `fadhilwebideaslib` tetap berada sebagai child dari `fadhilweblib`.
-- Menyediakan komponen bridge ringan untuk menampilkan `/shareideas` dari root repository.
-- Tidak bergantung ke route internal `game-ideas`.
+- Menjaga `fadhilwebideaslib` sebagai child dari `fadhilweblib`.
+- Menyediakan komponen remake mandiri tanpa iframe eksternal.
+- Memakai komponen `fadhilweblib` sebagai pondasi visual dan state UI.
 
 ## Isi
 
-- `ShareIdeasReplicaPage.tsx`: wrapper iframe ke endpoint `/shareideas`.
+- `ShareIdeasReplicaPage.tsx`: implementasi ulang tampilan Share Ideas dengan tab, folder collapse, detail collapse, dan progress.
 - `index.ts`: export publik.

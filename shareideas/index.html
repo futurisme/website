@@ -9,18 +9,46 @@
   <body>
     <main class="shell" aria-label="Share Ideas">
       <header class="topbar">
+        <p class="credit">Created by Fadhil Akbar</p>
+        <p class="status">READY</p>
         <h1>SHARE IDEAS</h1>
-        <a class="open-link" href="https://mindmapper.qzz.io/game-ideas" target="_blank" rel="noreferrer">Open original</a>
       </header>
 
-      <iframe
-        class="frame"
-        src="https://mindmapper.qzz.io/game-ideas"
-        title="mindmapper game ideas"
-        loading="eager"
-        referrerpolicy="no-referrer"
-        allow="clipboard-read; clipboard-write"
-      ></iframe>
+      <section class="tabs" id="tabs"></section>
+
+      <section class="board" id="board" aria-live="polite"></section>
+
+      <nav class="bottom-nav" id="bottom-nav"></nav>
     </main>
+
+    <template id="folder-template">
+      <article class="folder">
+        <header class="folder-header">
+          <h2 class="folder-title"></h2>
+          <span class="folder-count"></span>
+        </header>
+        <button class="folder-toggle" type="button"></button>
+        <div class="folder-content"></div>
+      </article>
+    </template>
+
+    <template id="item-template">
+      <article class="idea-item">
+        <div class="idea-topline">
+          <h3 class="idea-title"></h3>
+          <button class="detail-toggle" type="button"></button>
+        </div>
+        <p class="idea-description"></p>
+        <div class="progress-row">
+          <span>Progress</span>
+          <strong class="progress-text"></strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/shareideas/shareideas.js" type="module"></script>
   </body>
 </html>
