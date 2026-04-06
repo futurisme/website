@@ -241,11 +241,17 @@ loadInput.addEventListener('change', async () => {
       setStatus('CSV loaded.');
     } else {
       const decoded = lowerName.endsWith('.cws') ? decodeLegacyCws(text) : await decodeFdhl(text);
-      const normalized = normalizeLiteSnapshot(decoded) ?? normalizeLiteSnapshotFromWorkspaceArchive(decoded);
+      const apiDecoded = (!decoded || typeof decoded !== 'object' || !Array.isArray(decoded.nodes))
+        ? await decodeViaArchiveLabApi(text)
+        : null;
+      const normalized = normalizeLiteSnapshot(decoded)
+        ?? normalizeLiteSnapshotFromWorkspaceArchive(decoded)
+        ?? normalizeLiteSnapshot(apiDecoded)
+        ?? normalizeLiteSnapshotFromWorkspaceArchive(apiDecoded);
       if (normalized) {
         const transformed = transformLegacySnapshot(normalized);
         engine = FadhilMindmapLite.fromSnapshot(transformed);
-        const preferredViewport = extractViewport(decoded) ?? extractViewport(normalized);
+        const preferredViewport = extractViewport(apiDecoded) ?? extractViewport(decoded) ?? extractViewport(normalized);
         if (preferredViewport) {
           applyCameraViewport(preferredViewport);
           if (!hasVisibleNodeInViewport(transformed.nodes)) {
@@ -312,6 +318,26 @@ function normalizeLiteSnapshotFromWorkspaceArchive(input) {
     return null;
   }
   return parseSnapshotString(input.snapshot);
+}
+
+async function decodeViaArchiveLabApi(raw) {
+  try {
+    const response = await fetch('/api/archive/decode-lite', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ raw }),
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const payload = await response.json();
+    if (!payload?.ok || !payload.workspace) {
+      return null;
+    }
+    return payload.workspace;
+  } catch {
+    return null;
+  }
 }
 
 function transformLegacySnapshot(snapshot) {

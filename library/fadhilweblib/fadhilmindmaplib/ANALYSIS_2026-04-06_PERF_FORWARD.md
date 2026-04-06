@@ -60,4 +60,5 @@ Forward proven lightweight/runtime patterns from `fadhilweblib` into `fadhilmind
 - Camera auto-fit now recenters viewport to loaded content bounds so successful load never appears as blank canvas due to off-screen coordinates.
 - Added compatibility transform for ReactFlow-like legacy schema (`nodes[].position`, `label`, `edges[].source/target`, `viewport`) so old map payloads are lifted into lite runtime format while preserving usable camera context.
 - Viewport restoration now includes a safety fallback: if restored viewport does not place any node on-screen, runtime auto-centers content to prevent blank-canvas false positives.
+- Added bridge API fallback (`/api/archive/decode-lite`) that reuses original `decodeFadhilArchive + applyYjsSnapshot` flow (same mechanism as archive-lab) to convert legacy workspace archives into editable JSON before lite transformation.
 - Important compatibility note: main editor `workspace-archive` payloads that store only binary Yjs updates still require a Yjs translator layer for full fidelity conversion.
