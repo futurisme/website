@@ -21,6 +21,8 @@ const saveCsvBtn = document.getElementById('save-csv');
 const saveFdhlBtn = document.getElementById('save-fdhl');
 const loadBtn = document.getElementById('load-map');
 const loadInput = document.getElementById('load-input');
+const undoBtn = document.getElementById('undo-node');
+const redoBtn = document.getElementById('redo-node');
 
 const mapIdMatch = window.location.pathname.match(/\/(mindmapmaker\/)?editor\/(\d+)/);
 const safeMapId = Number.isInteger(Number(mapIdMatch?.[2])) && Number(mapIdMatch[2]) > 0 ? Number(mapIdMatch[2]) : 1;
@@ -58,18 +60,14 @@ function render() {
   const snapshot = engine.getSnapshot();
 
   const byId = new Map(snapshot.nodes.map((n) => [n.id, n]));
-  edgesLayer.innerHTML = snapshot.edges
+  edgesLayer.innerHTML = snapshot.links
     .map((edge) => {
       const from = byId.get(edge.from);
       const to = byId.get(edge.to);
       if (!from || !to) return '';
-      const klass = edge.kind === 'link' ? 'edge-path edge-link' : 'edge-path';
-      const fromAnchor = edge.kind === 'link'
-        ? { x: from.x + NODE_BOX.width / 2, y: from.y + NODE_BOX.height / 2 }
-        : { x: from.x + NODE_BOX.width - 4, y: from.y + NODE_BOX.height / 2 };
-      const toAnchor = edge.kind === 'link'
-        ? { x: to.x + NODE_BOX.width / 2, y: to.y + NODE_BOX.height / 2 }
-        : { x: to.x + 4, y: to.y + NODE_BOX.height / 2 };
+      const klass = 'edge-path edge-link';
+      const fromAnchor = { x: from.x + NODE_BOX.width / 2, y: from.y + NODE_BOX.height / 2 };
+      const toAnchor = { x: to.x + NODE_BOX.width / 2, y: to.y + NODE_BOX.height / 2 };
       const path = buildEdgePath(fromAnchor, toAnchor);
       if (!path) return '';
       return `<path class="${klass}" d="${path}"></path>`;
@@ -88,6 +86,7 @@ function render() {
     .join('');
 
   connectBtn.textContent = engine.hasConnectionFrom(selectedId) ? 'Unconnect' : 'Connect';
+  syncToolbarButtons();
 }
 
 function requestRender({ full = false } = {}) {
@@ -101,6 +100,15 @@ function requestRender({ full = false } = {}) {
 
 function setStatus(text) {
   statusEl.textContent = text;
+}
+
+function syncToolbarButtons() {
+  if (undoBtn) {
+    undoBtn.disabled = !engine.canUndo();
+  }
+  if (redoBtn) {
+    redoBtn.disabled = !engine.canRedo();
+  }
 }
 
 function save() {
@@ -215,6 +223,32 @@ connectBtn.addEventListener('click', () => {
   }
   connectSourceId = selectedId;
   setStatus('Connect mode active. Tap target node.');
+});
+
+undoBtn?.addEventListener('click', () => {
+  const didUndo = engine.undo();
+  if (!didUndo) {
+    setStatus('No actions to undo.');
+    return;
+  }
+  selectedId = engine.getNode(selectedId)?.id ?? engine.getSnapshot().nodes[0]?.id ?? 1;
+  connectSourceId = null;
+  requestRender({ full: true });
+  save();
+  setStatus('Undo complete.');
+});
+
+redoBtn?.addEventListener('click', () => {
+  const didRedo = engine.redo();
+  if (!didRedo) {
+    setStatus('No actions to redo.');
+    return;
+  }
+  selectedId = engine.getNode(selectedId)?.id ?? engine.getSnapshot().nodes[0]?.id ?? 1;
+  connectSourceId = null;
+  requestRender({ full: true });
+  save();
+  setStatus('Redo complete.');
 });
 
 saveCsvBtn.addEventListener('click', () => {

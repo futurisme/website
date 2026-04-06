@@ -21,8 +21,8 @@ body {
   margin: 0;
   display: grid;
   grid-template-rows: 1fr auto;
-  gap: .25rem;
-  padding: .25rem;
+  gap: .16rem;
+  padding: .16rem;
 }
 .panel {
   background: color-mix(in oklab, var(--fwlb-surface-elevated, #0f172a) 94%, transparent);
@@ -33,8 +33,8 @@ body {
 .bottombar {
   display: grid;
   grid-template-columns: minmax(0,1fr);
-  gap: .24rem;
-  padding: .26rem .36rem calc(.26rem + env(safe-area-inset-bottom));
+  gap: .18rem;
+  padding: .2rem .3rem calc(.2rem + env(safe-area-inset-bottom));
 }
 .meta {
   display: grid;
@@ -47,12 +47,12 @@ body {
 .presence-chip {
   border: 1px solid var(--fwlb-border-strong);
   border-radius: 999px;
-  min-height: 1.34rem;
+  min-height: 1.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 .56rem;
-  font-size: .67rem;
+  padding: 0 .44rem;
+  font-size: .62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .04em;
@@ -64,13 +64,13 @@ body {
 .actions {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: .28rem;
+  gap: .18rem;
 }
 .btn {
   text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
-  min-height: 1.72rem; padding: .14rem .42rem; border-radius: .52rem;
+  min-height: 1.54rem; padding: .1rem .3rem; border-radius: .48rem;
   border: 1px solid var(--fwlb-tone-brand-border); background: var(--fwlb-tone-brand-bg);
-  color: var(--fwlb-tone-brand-fg, #04111f); font-weight: 700; font-size: .68rem;
+  color: var(--fwlb-tone-brand-fg, #04111f); font-weight: 700; font-size: .62rem;
 }
 .btn.secondary { border-color: var(--fwlb-border-strong); color: var(--fwlb-text-strong); background: color-mix(in oklab, var(--fwlb-surface-base, #1e293b) 92%, transparent); }
 .btn:disabled { opacity: .48; }
@@ -129,11 +129,13 @@ body {
 .node small { display: block; color: var(--fwlb-text-muted); font-size: .62rem; margin-top: .15rem; }
 
 @media (max-width: 760px) {
-  .editor-shell { gap: .18rem; padding: .16rem; }
+  .editor-shell { gap: .1rem; padding: 0; }
+  .workspace { border-radius: .55rem; }
+  .bottombar { border-radius: .55rem; }
   .meta { grid-template-columns: auto 1fr; }
   .mode-chip,
   .presence-chip { justify-content: flex-start; }
   .eyebrow { font-size: .58rem; }
-  .actions { gap: .22rem; }
-  .btn { min-height: 1.58rem; font-size: .66rem; }
+  .actions { gap: .14rem; }
+  .btn { min-height: 1.42rem; font-size: .58rem; }
 }

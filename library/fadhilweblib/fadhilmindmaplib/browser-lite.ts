@@ -26,6 +26,12 @@ export class FadhilMindmapLite {
   private outgoingLinkCount = new Map<number, number>();
   private cachedSnapshot: LiteSnapshot | null = null;
   private dirtySnapshot = true;
+  private history: LiteSnapshot[] = [];
+  private historyIndex = -1;
+
+  constructor() {
+    this.recordHistory();
+  }
 
   static fromSnapshot(snapshot: LiteSnapshot): FadhilMindmapLite {
     const engine = new FadhilMindmapLite();
@@ -35,6 +41,9 @@ export class FadhilMindmapLite {
       engine.nextId = Math.max(...engine.nodes.map((n) => n.id), 1) + 1;
       engine.version = snapshot.version || 1;
       engine.rebuildIndexes();
+      engine.history = [];
+      engine.historyIndex = -1;
+      engine.recordHistory();
     }
     return engine;
   }
@@ -79,6 +88,7 @@ export class FadhilMindmapLite {
     };
     this.pushNode(node);
     this.bumpVersion();
+    this.recordHistory();
     return node;
   }
 
@@ -92,6 +102,7 @@ export class FadhilMindmapLite {
     this.links = this.links.filter((l) => l.from !== id && l.to !== id);
     this.rebuildIndexes();
     this.bumpVersion();
+    this.recordHistory();
     return true;
   }
 
@@ -102,6 +113,7 @@ export class FadhilMindmapLite {
     this.links.push({ from, to });
     this.outgoingLinkCount.set(from, (this.outgoingLinkCount.get(from) ?? 0) + 1);
     this.bumpVersion();
+    this.recordHistory();
     return true;
   }
 
@@ -115,6 +127,7 @@ export class FadhilMindmapLite {
     this.links = this.links.filter((l) => l.from !== id);
     this.outgoingLinkCount.set(id, 0);
     this.bumpVersion();
+    this.recordHistory();
     return true;
   }
 
@@ -127,7 +140,34 @@ export class FadhilMindmapLite {
     Object.assign(node, patch);
     if (node.title !== prevTitle || node.x !== prevX || node.y !== prevY) {
       this.bumpVersion();
+      this.recordHistory();
     }
+  }
+
+  canUndo(): boolean {
+    return this.historyIndex > 0;
+  }
+
+  canRedo(): boolean {
+    return this.historyIndex >= 0 && this.historyIndex < this.history.length - 1;
+  }
+
+  undo(): boolean {
+    if (!this.canUndo()) {
+      return false;
+    }
+    this.historyIndex -= 1;
+    this.applyHistorySnapshot(this.history[this.historyIndex]);
+    return true;
+  }
+
+  redo(): boolean {
+    if (!this.canRedo()) {
+      return false;
+    }
+    this.historyIndex += 1;
+    this.applyHistorySnapshot(this.history[this.historyIndex]);
+    return true;
   }
 
   toCsv(): string {
@@ -177,6 +217,35 @@ export class FadhilMindmapLite {
     this.version += 1;
     this.dirtySnapshot = true;
     this.cachedSnapshot = null;
+  }
+
+  private recordHistory(): void {
+    const snapshot = this.cloneSnapshot(this.getSnapshot());
+    if (this.historyIndex < this.history.length - 1) {
+      this.history = this.history.slice(0, this.historyIndex + 1);
+    }
+    this.history.push(snapshot);
+    if (this.history.length > 120) {
+      this.history.shift();
+    }
+    this.historyIndex = this.history.length - 1;
+  }
+
+  private applyHistorySnapshot(snapshot: LiteSnapshot): void {
+    this.nodes = snapshot.nodes.map((node) => ({ ...node }));
+    this.links = snapshot.links.map((link) => ({ ...link }));
+    this.version = snapshot.version;
+    this.nextId = Math.max(...this.nodes.map((node) => node.id), 1) + 1;
+    this.rebuildIndexes();
+  }
+
+  private cloneSnapshot(snapshot: LiteSnapshot): LiteSnapshot {
+    return {
+      version: snapshot.version,
+      nodes: snapshot.nodes.map((node) => ({ ...node })),
+      links: snapshot.links.map((link) => ({ ...link })),
+      edges: snapshot.edges.map((edge) => ({ ...edge })),
+    };
   }
 }
 
