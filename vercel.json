@@ -16,6 +16,10 @@
     {
       "src": "website/website/mindmapmaker/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": "shareideas/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -72,6 +76,18 @@
     {
       "src": "/editor/([0-9]+)",
       "dest": "/website/website/mindmapmaker/editor/index.html"
+    },
+    {
+      "src": "/shareideas",
+      "dest": "/shareideas/index.html"
+    },
+    {
+      "src": "/shareideas/",
+      "dest": "/shareideas/index.html"
+    },
+    {
+      "src": "/shareideas/(.*)",
+      "dest": "/shareideas/$1"
     },
     {
       "src": "/mindmapmaker/(.*)",

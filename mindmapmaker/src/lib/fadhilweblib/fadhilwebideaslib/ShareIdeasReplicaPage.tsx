@@ -1,14 +1,19 @@
 'use client';
 
 import { memo } from 'react';
-import { ShareIdeasPage } from '@/shareideas';
 
-/**
- * Runtime utama untuk fitur /shareideas.
- * Tidak lagi bergantung pada route /game-ideas agar replikasi berdiri mandiri.
- */
+const SHAREIDEAS_URL = '/shareideas';
+
 function ShareIdeasReplicaPageBase() {
-  return <ShareIdeasPage />;
+  return (
+    <iframe
+      title="shareideas"
+      src={SHAREIDEAS_URL}
+      style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
+      loading="eager"
+      referrerPolicy="no-referrer"
+    />
+  );
 }
 
 const ShareIdeasReplicaPage = memo(ShareIdeasReplicaPageBase);
