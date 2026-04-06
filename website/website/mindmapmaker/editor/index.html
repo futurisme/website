@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Mindmapmaker Workspace</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #020617; color: #e2f8ff; }
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+    <link rel="preload" href="/mindmapmaker/theme.css" as="style" />
+    <link rel="preload" href="/mindmapmaker/editor/editor.css" as="style" />
+    <link rel="stylesheet" href="/mindmapmaker/theme.css" />
+    <link rel="stylesheet" href="/mindmapmaker/editor/editor.css" />
+  </head>
+  <body>
+    <main class="editor-shell" data-fwlb-theme="game" data-slot="theme-scope">
+      <header class="topbar panel">
+        <div>
+          <p class="eyebrow">100% fadhilmindmaplib workspace</p>
+          <h1>Mindmap Workspace</h1>
+          <p class="copy">Map ID: <strong id="map-id">--</strong></p>
+        </div>
+        <div class="actions">
+          <button id="add-node" class="btn" type="button">Add</button>
+          <button id="remove-node" class="btn secondary" type="button">Remove</button>
+          <button id="connect-node" class="btn secondary" type="button">Connect</button>
+          <button id="save-csv" class="btn secondary" type="button">Save .csv</button>
+          <button id="save-fdhl" class="btn secondary" type="button">Save .fdhl</button>
+          <button id="load-map" class="btn secondary" type="button">Load</button>
+          <a class="btn secondary" href="/mindmapmaker">Menu</a>
+          <input id="load-input" type="file" accept=".csv,.fdhl,.fadhil" hidden />
+        </div>
+      </header>
+
+      <section class="workspace panel">
+        <div class="help" id="status">Pan canvas: drag empty area. Select node: tap/click. Drag node: drag selected node.</div>
+        <div id="viewport" class="viewport" aria-label="Mindmap canvas">
+          <svg id="edges" class="edges" aria-hidden="true"></svg>
+          <div id="nodes" class="nodes"></div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/mindmapmaker/editor/editor.js"></script>
+  </body>
+</html>
