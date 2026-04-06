@@ -1,33 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Share Ideas</title>
+    <title>Share Ideas Creator</title>
     <link rel="stylesheet" href="/shareideas/shareideas.css" />
   </head>
   <body>
-    <main class="shell" aria-label="Share Ideas">
+    <main class="shell" aria-label="Share Ideas Creator">
       <header class="topbar">
         <p class="credit">Created by Fadhil Akbar</p>
-        <p class="status">READY</p>
-        <h1>SHARE IDEAS</h1>
+        <p class="status" id="sync-status">READY</p>
+        <h1>SHARE IDEAS CREATOR</h1>
       </header>
-
-      <section class="tabs" id="tabs"></section>
 
       <section class="board" id="board" aria-live="polite"></section>
 
-      <nav class="bottom-nav" id="bottom-nav"></nav>
+      <div class="bottom-header">
+        <button class="add-btn" type="button" id="open-add">Add</button>
+      </div>
     </main>
 
     <template id="folder-template">
       <article class="folder">
         <header class="folder-header">
           <h2 class="folder-title"></h2>
-          <span class="folder-count"></span>
+          <div class="folder-tools">
+            <span class="folder-count"></span>
+            <button class="ghost-btn folder-edit" type="button">Edit</button>
+            <button class="ghost-btn folder-toggle" type="button">▲ Collapse folder</button>
+          </div>
         </header>
-        <button class="folder-toggle" type="button"></button>
         <div class="folder-content"></div>
       </article>
     </template>
@@ -36,18 +39,18 @@
       <article class="idea-item">
         <div class="idea-topline">
           <h3 class="idea-title"></h3>
-          <button class="detail-toggle" type="button"></button>
+          <div class="item-tools">
+            <button class="ghost-btn item-edit" type="button">Edit</button>
+            <button class="ghost-btn detail-toggle" type="button">▲ Collapse detail</button>
+          </div>
         </div>
         <p class="idea-description"></p>
-        <div class="progress-row">
-          <span>Progress</span>
-          <strong class="progress-text"></strong>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill"></div>
-        </div>
       </article>
     </template>
+
+    <div class="modal-layer is-hidden" id="modal-layer" aria-hidden="true">
+      <div class="modal" id="modal"></div>
+    </div>
 
     <script src="/shareideas/shareideas.js" type="module"></script>
   </body>
