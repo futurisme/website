@@ -130,7 +130,7 @@ function renderBoard() {
     title.textContent = folder.name;
     count.textContent = `${folder.cards.length} ITEMCARDS`;
     root.dataset.collapsed = String(folderCollapsed);
-    toggleBtn.textContent = folderCollapsed ? '▼ Expand folder' : '▲ Collapse folder';
+    toggleBtn.textContent = folderCollapsed ? '▼ Expand' : '▲ Collapse';
 
     toggleBtn.addEventListener('click', () => {
       state.collapsedFolders[folder.id] = !state.collapsedFolders[folder.id];
@@ -153,7 +153,7 @@ function renderBoard() {
       cardRoot.dataset.collapsed = String(itemCollapsed);
       cardTitle.textContent = card.title;
       cardDesc.textContent = card.description || 'Belum ada deskripsi.';
-      cardToggle.textContent = itemCollapsed ? '▼ Expand detail' : '▲ Collapse detail';
+      cardToggle.textContent = itemCollapsed ? '▼ Expand' : '▲ Collapse';
 
       cardToggle.addEventListener('click', () => {
         state.collapsedItems[card.id] = !state.collapsedItems[card.id];
