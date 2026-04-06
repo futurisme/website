@@ -2,6 +2,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 const cspHeader = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -25,8 +27,10 @@ const nextConfig = {
     optimizePackageImports: ['reactflow'],
   },
   env: {
-    NEXT_PUBLIC_BASE_PATH: '',
+    NEXT_PUBLIC_BASE_PATH: basePath,
   },
+  basePath,
+  assetPrefix: basePath || undefined,
 
   async redirects() {
     return [

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import './game-ideas.css';
 import '@/lib/fadhilweblib/styles/theme.css';
 import { GlobalRuntime } from '@/components/global-runtime';
 
