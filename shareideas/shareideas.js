@@ -778,18 +778,44 @@ function switchCategory(direction) {
 }
 
 function onBoardPointerDown(event) {
-  if (event.target.closest('.folder, .idea-item, button, input, textarea, select')) return;
-  state.pendingSwipe = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+  if (modalLayer.getAttribute('aria-hidden') === 'false') return;
+  if (event.target.closest('button, input, textarea, select')) return;
+  state.pendingSwipe = {
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    resolved: false,
+    startedAt: Date.now(),
+  };
+}
+
+function clearPendingHold(pointerId) {
+  const pending = state.pendingHold;
+  if (pending && pending.pointerId === pointerId) {
+    clearTimeout(pending.timerId);
+    state.pendingHold = null;
+  }
+}
+
+function onBoardPointerMove(event) {
+  const pending = state.pendingSwipe;
+  if (!pending || pending.pointerId !== event.pointerId) return;
+  if (pending.resolved) return;
+  const dx = event.clientX - pending.startX;
+  const dy = event.clientY - pending.startY;
+  const elapsed = Date.now() - pending.startedAt;
+  if (elapsed > 360) return;
+  if (Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  pending.resolved = true;
+  state.pendingSwipe = null;
+  clearPendingHold(event.pointerId);
+  switchCategory(dx > 0 ? 1 : -1);
 }
 
 function onBoardPointerUp(event) {
   const pending = state.pendingSwipe;
   if (!pending || pending.pointerId !== event.pointerId) return;
   state.pendingSwipe = null;
-  const dx = event.clientX - pending.startX;
-  const dy = event.clientY - pending.startY;
-  if (Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
-  switchCategory(dx > 0 ? 1 : -1);
 }
 
 openAddBtn.addEventListener('click', openAddChooser);
@@ -797,7 +823,9 @@ modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) event.preventDefault();
 });
 boardEl.addEventListener('pointerdown', onBoardPointerDown, { passive: true });
+boardEl.addEventListener('pointermove', onBoardPointerMove, { passive: true });
 boardEl.addEventListener('pointerup', onBoardPointerUp, { passive: true });
+boardEl.addEventListener('pointercancel', onBoardPointerUp, { passive: true });
 
 document.addEventListener('pointermove', onPointerMove, { passive: false });
 document.addEventListener('pointermove', onDragPointerMove, { passive: false });
