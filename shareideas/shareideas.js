@@ -124,17 +124,20 @@ function renderEmpty() {
   boardEl.append(empty);
 }
 
-function dragShiftClass(index, kind, folderId) {
+function dragShiftOffset(index, kind, folderId) {
   const active = state.drag;
-  if (!active || active.kind !== kind) return '';
-  if (kind === 'card' && active.folderId !== folderId) return '';
-  if (active.fromIndex === active.overIndex || index === active.fromIndex) return '';
+  if (!active || active.kind !== kind) return 0;
+  if (kind === 'card' && active.folderId !== folderId) return 0;
+  if (active.fromIndex === active.overIndex || index === active.fromIndex) return 0;
 
-  const low = Math.min(active.fromIndex, active.overIndex);
-  const high = Math.max(active.fromIndex, active.overIndex);
-  if (index < low || index > high) return '';
+  const draggedHeight = active.slots?.[active.fromIndex]?.height ?? 0;
+  if (!draggedHeight) return 0;
 
-  return active.fromIndex < active.overIndex ? 'drag-shift-up' : 'drag-shift-down';
+  if (active.fromIndex < active.overIndex) {
+    return index > active.fromIndex && index <= active.overIndex ? -draggedHeight : 0;
+  }
+
+  return index >= active.overIndex && index < active.fromIndex ? draggedHeight : 0;
 }
 
 function dragStyle(kind, index, folderId) {
@@ -171,6 +174,7 @@ function beginHoldDrag(payload) {
       return {
         top: rect.top,
         middle: rect.top + (rect.height / 2),
+        height: rect.height,
       };
     });
 
@@ -310,11 +314,12 @@ function renderBoard() {
     const content = fragment.querySelector('.folder-content');
 
     const folderCollapsed = Boolean(state.collapsedFolders[folder.id]);
-    const folderShift = dragShiftClass(folderIndex, 'folder');
+    const folderShiftOffset = dragShiftOffset(folderIndex, 'folder');
     const folderDragStyle = dragStyle('folder', folderIndex);
 
-    root.className = `folder${folderShift ? ` ${folderShift}` : ''}${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-dragging' : ''}`;
-    if (folderDragStyle) root.style.cssText = folderDragStyle;
+    root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-dragging' : ''}`;
+    if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
+    if (folderDragStyle) root.style.cssText = `${root.style.cssText};${folderDragStyle}`;
     root.dataset.dragKind = 'folder';
     root.dataset.dragIndex = String(folderIndex);
     root.dataset.slotActive = String(Boolean(state.drag?.kind === 'folder' && state.drag.overIndex === folderIndex));
@@ -346,11 +351,12 @@ function renderBoard() {
       const cardToggle = cardFrag.querySelector('.detail-toggle');
 
       const itemCollapsed = Boolean(state.collapsedItems[card.id]);
-      const cardShift = dragShiftClass(cardIndex, 'card', folder.id);
+      const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
       const cardDragStyle = dragStyle('card', cardIndex, folder.id);
 
-      cardRoot.className = `idea-item${cardShift ? ` ${cardShift}` : ''}${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-dragging' : ''}`;
-      if (cardDragStyle) cardRoot.style.cssText = cardDragStyle;
+      cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-dragging' : ''}`;
+      if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
+      if (cardDragStyle) cardRoot.style.cssText = `${cardRoot.style.cssText};${cardDragStyle}`;
       cardRoot.dataset.dragKind = 'card';
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);

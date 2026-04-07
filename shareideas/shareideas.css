@@ -217,22 +217,15 @@ body {
 .idea-item {
   touch-action: none;
   transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease, outline-color 150ms ease;
+  transform: translate3d(0, var(--slot-shift-y, 0), 0);
 }
 
 .is-dragging {
   opacity: 0.97;
-  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) scale(1.02);
+  transform: translate3d(var(--drag-x, 0), calc(var(--drag-y, 0) + var(--slot-shift-y, 0)), 0) scale(1.02);
   box-shadow: 0 16px 40px #00000082;
   z-index: 40;
   pointer-events: none;
-}
-
-.drag-shift-up {
-  transform: translateY(-6px);
-}
-
-.drag-shift-down {
-  transform: translateY(6px);
 }
 
 .folder[data-slot-active='true'],
