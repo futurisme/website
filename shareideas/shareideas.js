@@ -1,6 +1,6 @@
 const API_URL = '/api/shareideas';
 const HOLD_DRAG_MS = 260;
-const HOLD_MOVE_CANCEL_PX = 26;
+const HOLD_MOVE_CANCEL_PX = 64;
 
 const state = {
   db: { folders: [] },
@@ -195,6 +195,24 @@ function pointerDownForDrag(payload, event) {
   };
 }
 
+
+function resolveOverIndexBySlot(kind, folderId, pointerY) {
+  const candidates = [...document.querySelectorAll(`[data-drag-kind="${kind}"]`)];
+  const scoped = kind === 'card' ? candidates.filter((node) => node.dataset.folderId === folderId) : candidates;
+  if (!scoped.length) return 0;
+
+  let slot = scoped.length - 1;
+  for (let i = 0; i < scoped.length; i += 1) {
+    const rect = scoped[i].getBoundingClientRect();
+    const mid = rect.top + rect.height / 2;
+    if (pointerY < mid) {
+      slot = i;
+      break;
+    }
+  }
+  return slot;
+}
+
 function onDragPointerMove(event) {
   const active = state.drag;
   if (!active || event.pointerId !== active.pointerId) return;
@@ -209,24 +227,7 @@ function onDragPointerMove(event) {
     draggingEl.style.setProperty('--drag-y', `${active.currentY - active.startY}px`);
   }
 
-  const point = document.elementFromPoint(event.clientX, event.clientY);
-  if (!point) return;
-
-  let nextIndex = active.overIndex;
-
-  if (active.kind === 'folder') {
-    const hovered = point.closest('[data-drag-kind="folder"]');
-    if (hovered) {
-      const parsed = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
-      if (Number.isFinite(parsed) && parsed >= 0) nextIndex = parsed;
-    }
-  } else {
-    const hovered = point.closest('[data-drag-kind="card"]');
-    if (hovered && hovered.dataset.folderId === active.folderId) {
-      const parsed = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
-      if (Number.isFinite(parsed) && parsed >= 0) nextIndex = parsed;
-    }
-  }
+  const nextIndex = resolveOverIndexBySlot(active.kind, active.folderId, event.clientY);
 
   if (nextIndex !== active.overIndex) {
     active.overIndex = nextIndex;
