@@ -426,7 +426,7 @@ function renderBoard() {
     const folderCollapsed = state.collapsedFolders[folder.id] !== false;
     const folderShiftOffset = dragShiftOffset(folderIndex, 'folder');
     root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-drag-source' : ''}`;
-    if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
+    if (folderShiftOffset) root.style.setProperty('--folder-shift-y', `${folderShiftOffset}px`);
     root.dataset.dragKind = 'folder';
     root.dataset.folderId = folder.id;
     root.dataset.dragIndex = String(folderIndex);
@@ -469,7 +469,7 @@ function renderBoard() {
       const itemCollapsed = state.collapsedItems[card.id] !== false;
       const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
       cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.sourceFolderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-drag-source' : ''}`;
-      if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
+      if (cardShiftOffset) cardRoot.style.setProperty('--card-shift-y', `${cardShiftOffset}px`);
       cardRoot.dataset.dragKind = 'card';
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);
@@ -597,6 +597,7 @@ function openEditFolder(folderId) {
     <label>Nama folder<input id="edit-folder-name" type="text" value="${folder.name.replaceAll('"', '&quot;')}" /></label>
     <div class="actions">
       <button type="button" id="save-folder-edit">Simpan</button>
+      <button type="button" id="delete-folder">Delete</button>
       <button type="button" id="close-modal">Batal</button>
     </div>
   `);
@@ -605,6 +606,21 @@ function openEditFolder(folderId) {
     const nextName = document.getElementById('edit-folder-name').value.trim().slice(0, 80);
     if (!nextName) return;
     folder.name = nextName;
+    closeModal();
+    render();
+    saveToServer();
+  });
+
+  document.getElementById('delete-folder').addEventListener('click', () => {
+    const folderIndex = state.db.folders.findIndex((entry) => entry.id === folderId);
+    if (folderIndex < 0) return;
+    const [removed] = state.db.folders.splice(folderIndex, 1);
+    if (removed) {
+      delete state.collapsedFolders[removed.id];
+      removed.cards.forEach((card) => {
+        delete state.collapsedItems[card.id];
+      });
+    }
     closeModal();
     render();
     saveToServer();
@@ -624,6 +640,7 @@ function openEditCard(folderId, cardId) {
     <label>Deskripsi card<textarea id="edit-card-description" rows="8">${card.description}</textarea></label>
     <div class="actions">
       <button type="button" id="save-card-edit">Simpan</button>
+      <button type="button" id="delete-card">Delete</button>
       <button type="button" id="close-modal">Batal</button>
     </div>
   `);
@@ -635,6 +652,16 @@ function openEditCard(folderId, cardId) {
     card.title = nextTitle;
     card.description = document.getElementById('edit-card-description').value.trim().slice(0, 6000);
 
+    closeModal();
+    render();
+    saveToServer();
+  });
+
+  document.getElementById('delete-card').addEventListener('click', () => {
+    const cardIndex = folder.cards.findIndex((entry) => entry.id === cardId);
+    if (cardIndex < 0) return;
+    const [removed] = folder.cards.splice(cardIndex, 1);
+    if (removed) delete state.collapsedItems[removed.id];
     closeModal();
     render();
     saveToServer();
@@ -666,7 +693,7 @@ async function loadFromServer() {
 
 openAddBtn.addEventListener('click', openAddChooser);
 modalLayer.addEventListener('click', (event) => {
-  if (event.target === modalLayer) closeModal();
+  if (event.target === modalLayer) event.preventDefault();
 });
 
 document.addEventListener('pointermove', onPointerMove, { passive: false });

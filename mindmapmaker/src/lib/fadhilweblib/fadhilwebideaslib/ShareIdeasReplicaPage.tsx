@@ -204,6 +204,22 @@ function ShareIdeasReplicaPageBase() {
     setEditFolder(null);
   }, [editFolder]);
 
+  const deleteEditFolder = useCallback(() => {
+    if (!editFolder) return;
+    const targetFolderId = editFolder.folderId;
+    setDb((prev) => ({
+      ...prev,
+      folders: prev.folders.filter((folder) => folder.id !== targetFolderId),
+    }));
+    setExpandedFolderId((prev) => (prev === targetFolderId ? null : prev));
+    setExpandedCardId((prev) => {
+      const targetFolder = dbRef.current.folders.find((folder) => folder.id === targetFolderId);
+      if (!targetFolder || !prev) return prev;
+      return targetFolder.cards.some((card) => card.id === prev) ? null : prev;
+    });
+    setEditFolder(null);
+  }, [editFolder]);
+
   const saveEditCard = useCallback(() => {
     if (!editCard) return;
     const title = editCard.title.trim().slice(0, 120);
@@ -228,6 +244,19 @@ function ShareIdeasReplicaPageBase() {
       }),
     }));
 
+    setEditCard(null);
+  }, [editCard]);
+
+  const deleteEditCard = useCallback(() => {
+    if (!editCard) return;
+    const { folderId, cardId } = editCard;
+    setDb((prev) => ({
+      ...prev,
+      folders: prev.folders.map((folder) => (
+        folder.id === folderId ? { ...folder, cards: folder.cards.filter((card) => card.id !== cardId) } : folder
+      )),
+    }));
+    setExpandedCardId((prev) => (prev === cardId ? null : prev));
     setEditCard(null);
   }, [editCard]);
 
@@ -398,6 +427,7 @@ function ShareIdeasReplicaPageBase() {
               </Field>
               <ActionGroup>
                 <Button tone="accent" onClick={saveEditFolder}>Simpan</Button>
+                <Button tone="danger" onClick={deleteEditFolder}>Delete</Button>
                 <Button tone="neutral" onClick={() => setEditFolder(null)}>Batal</Button>
               </ActionGroup>
             </Stack>
@@ -418,6 +448,7 @@ function ShareIdeasReplicaPageBase() {
               </Field>
               <ActionGroup>
                 <Button tone="accent" onClick={saveEditCard}>Simpan</Button>
+                <Button tone="danger" onClick={deleteEditCard}>Delete</Button>
                 <Button tone="neutral" onClick={() => setEditCard(null)}>Batal</Button>
               </ActionGroup>
             </Stack>

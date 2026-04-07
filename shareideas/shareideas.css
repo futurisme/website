@@ -226,7 +226,14 @@ body {
 .idea-item {
   touch-action: none;
   transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease, outline-color 150ms ease;
-  transform: translate3d(0, var(--slot-shift-y, 0), 0);
+}
+
+.folder {
+  transform: translate3d(0, var(--folder-shift-y, 0), 0);
+}
+
+.idea-item {
+  transform: translate3d(0, var(--card-shift-y, 0), 0);
 }
 
 .is-drag-source {
