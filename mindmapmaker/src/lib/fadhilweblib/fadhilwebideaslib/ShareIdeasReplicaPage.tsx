@@ -11,6 +11,9 @@ import {
 } from '@/features/shareideas/shared/schema';
 
 const SAVE_DEBOUNCE_MS = 180;
+const FOLDER_OUTLINE_HACK = '#39ff1466';
+const CARD_OUTLINE_AZURE = '#24e8ff66';
+const CARD_FILL_MAROON_DARK = 'linear-gradient(180deg, #1a0010, #100009)';
 
 type AddMode = 'choose' | 'folder' | 'card';
 
@@ -260,7 +263,7 @@ function ShareIdeasReplicaPageBase() {
         const folderHasExpandedCard = expandedCardId ? folder.cards.some((card) => card.id === expandedCardId) : false;
         const isFolderExpanded = expandedFolderId === folder.id || folderHasExpandedCard;
         return (
-        <Panel key={folder.id} style={{ borderColor: '#fb4e6f66', borderWidth: 1, borderStyle: 'solid', background: '#210114' }}>
+        <Panel key={folder.id} style={{ borderColor: FOLDER_OUTLINE_HACK, borderWidth: 1, borderStyle: 'solid', background: '#210114' }}>
           <Stack gap="sm" style={{ padding: 12 }}>
             <ActionGroup justify="between">
               <h2 style={{ margin: 0 }}>{folder.name}</h2>
@@ -284,7 +287,7 @@ function ShareIdeasReplicaPageBase() {
             {isFolderExpanded ? folder.cards.map((card) => {
               const isOpen = expandedCardId === card.id;
               return (
-                <Panel key={card.id} style={{ padding: 12, border: '1px solid #24e8ff66', background: '#120119' }}>
+                <Panel key={card.id} style={{ padding: 12, border: `1px solid ${CARD_OUTLINE_AZURE}`, background: CARD_FILL_MAROON_DARK }}>
                   <Stack gap="sm">
                     <ActionGroup justify="between">
                       <h3 style={{ margin: 0 }}>{card.title}</h3>
