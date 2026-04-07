@@ -5,6 +5,7 @@ const state = {
   collapsedFolders: {},
   collapsedItems: {},
   version: null,
+  online: false,
 };
 
 const boardEl = document.getElementById('board');
@@ -53,8 +54,9 @@ function sanitizeDb(input) {
   return { folders };
 }
 
-function setStatus(text) {
-  statusEl.textContent = text;
+function setOnlineStatus(online) {
+  state.online = online;
+  statusEl.textContent = online ? "ONLINE" : "OFFLINE";
 }
 
 function showModal(html) {
@@ -74,7 +76,7 @@ function saveToServer() {
 
   saveTimer = setTimeout(async () => {
     try {
-      setStatus('SAVING');
+
       const response = await fetch(API_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -86,7 +88,7 @@ function saveToServer() {
         state.db = sanitizeDb(payload.data);
         state.version = typeof payload.version === 'number' ? payload.version : state.version;
         render();
-        setStatus('CONFLICT');
+        setOnlineStatus(true);
         return;
       }
 
@@ -94,11 +96,11 @@ function saveToServer() {
 
       const payload = await response.json().catch(() => ({}));
       state.version = typeof payload.version === 'number' ? payload.version : state.version;
-      setStatus('SAVED');
+      setOnlineStatus(true);
     } catch {
-      setStatus('OFFLINE');
+      setOnlineStatus(false);
     }
-  }, 180);
+  }, 120);
 }
 
 function renderEmpty() {
@@ -308,18 +310,17 @@ function openEditCard(folderId, cardId) {
 
 async function loadFromServer() {
   try {
-    setStatus('LOADING');
     const response = await fetch(API_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error('load gagal');
 
     const payload = await response.json().catch(() => ({}));
     state.db = sanitizeDb(payload.data);
     state.version = typeof payload.version === 'number' ? payload.version : null;
-    setStatus('READY');
+    setOnlineStatus(true);
   } catch {
     state.db = { folders: [] };
     state.version = null;
-    setStatus('OFFLINE');
+    setOnlineStatus(false);
   }
 
   render();

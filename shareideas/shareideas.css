@@ -40,7 +40,7 @@ body {
 .status { font-size: 10px; color: #9ceeff; }
 .topbar h1 { grid-column: 1 / -1; font-size: 13px; letter-spacing: 0.12em; color: var(--cyan); }
 
-.board { overflow: auto; padding: 8px 8px 70px; display: grid; gap: 8px; }
+.board { overflow: auto; padding: 8px 8px 70px; display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
 
 .empty {
   border: 1px solid #24e8ff66;
@@ -97,7 +97,8 @@ body {
 
 .folder-content {
   margin-top: 6px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
 
@@ -133,8 +134,7 @@ body {
 }
 
 .ghost-btn,
-.add-btn,
-.modal button {
+.add-btn {
   appearance: none;
   border: 1px solid #1fdfff70;
   background: #051126;
@@ -173,29 +173,42 @@ body {
 .modal-layer.is-hidden { display: none; }
 
 .modal {
-  width: min(560px, 100%);
+  width: min(720px, 100%);
   border: 1px solid #24e8ff88;
-  border-radius: 10px;
+  border-radius: 14px;
   background: #0e1526;
-  padding: 10px;
+  padding: 16px;
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .modal h3,
 .modal p { margin: 0; }
+.modal h3 { font-size: 22px; }
 
-.modal label { display: grid; gap: 5px; font-size: 12px; }
+.modal label { display: grid; gap: 8px; font-size: 15px; }
 .modal input,
 .modal select,
 .modal textarea {
   width: 100%;
   border: 1px solid #1fdfff70;
   border-radius: 8px;
-  padding: 7px;
+  padding: 12px;
   background: #041020;
   color: #eaf8ff;
-  font-size: 13px;
+  font-size: 16px;
 }
 
-.modal .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.modal .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal button {
+  appearance: none;
+  border: 1px solid #1fdfff80;
+  background: #08203a;
+  color: #d8f8ff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.1;
+  min-height: 46px;
+}
