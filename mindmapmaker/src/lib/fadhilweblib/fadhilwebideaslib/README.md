@@ -13,7 +13,7 @@ Sub-library di bawah `fadhilweblib` untuk fitur **Share Ideas Creator**.
 - `ShareIdeasReplicaPage.tsx`:
   - UI creator berbasis komponen `fadhilweblib` original.
   - Bisa add folder, add card di folder, edit deskripsi card.
-  - Mendukung pola single-expanded (hanya 1 folder/card expanded dalam satu waktu) agar interaksi tetap ringan.
+  - Mendukung single-expanded terpisah: maksimal 1 folder expanded antar-folder, dan maksimal 1 card detail expanded antar-card.
   - Auto-save debounce ringan ke endpoint server.
 - `index.ts`: export publik komponen halaman.
 - `@/features/shareideas/shared/schema.ts`:

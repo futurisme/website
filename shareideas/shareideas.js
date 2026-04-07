@@ -125,27 +125,44 @@ function renderEmpty() {
   boardEl.append(empty);
 }
 
-function collapseAllExpanded() {
+function collapseAllFolders() {
   const nextFolders = {};
-  const nextCards = {};
   state.db.folders.forEach((folder) => {
     nextFolders[folder.id] = true;
+  });
+  state.collapsedFolders = nextFolders;
+}
+
+function collapseAllCards() {
+  const nextCards = {};
+  state.db.folders.forEach((folder) => {
     folder.cards.forEach((card) => {
       nextCards[card.id] = true;
     });
   });
-  state.collapsedFolders = nextFolders;
   state.collapsedItems = nextCards;
 }
 
-function expandOnlyFolder(folderId) {
-  collapseAllExpanded();
-  if (folderId) state.collapsedFolders[folderId] = false;
+function initCollapsedState() {
+  collapseAllFolders();
+  collapseAllCards();
 }
 
-function expandOnlyCard(cardId) {
-  collapseAllExpanded();
+function expandOnlyFolder(folderId) {
+  collapseAllFolders();
+  if (folderId) state.collapsedFolders[folderId] = false;
+
+  const expandedCardId = Object.keys(state.collapsedItems).find((cardId) => state.collapsedItems[cardId] === false);
+  if (!expandedCardId) return;
+  const cardStillVisible = state.db.folders.some((folder) => folder.id === folderId && folder.cards.some((card) => card.id === expandedCardId));
+  if (!cardStillVisible) collapseAllCards();
+}
+
+function expandOnlyCard(folderId, cardId) {
+  collapseAllCards();
   if (cardId) state.collapsedItems[cardId] = false;
+  collapseAllFolders();
+  if (folderId) state.collapsedFolders[folderId] = false;
 }
 
 function dragShiftOffset(index, kind, folderId) {
@@ -430,6 +447,9 @@ function renderBoard() {
         expandOnlyFolder(folder.id);
       } else {
         state.collapsedFolders[folder.id] = true;
+        folder.cards.forEach((card) => {
+          if (state.collapsedItems[card.id] === false) state.collapsedItems[card.id] = true;
+        });
       }
       renderBoard();
     });
@@ -466,7 +486,7 @@ function renderBoard() {
 
       cardToggle.addEventListener('click', () => {
         if (itemCollapsed) {
-          expandOnlyCard(card.id);
+          expandOnlyCard(folder.id, card.id);
         } else {
           state.collapsedItems[card.id] = true;
         }
@@ -631,7 +651,7 @@ async function loadFromServer() {
     const payload = await response.json().catch(() => ({}));
     state.db = sanitizeDb(payload.data);
     state.version = typeof payload.version === 'number' ? payload.version : null;
-    collapseAllExpanded();
+    initCollapsedState();
     setOnlineStatus(true);
   } catch {
     state.db = { folders: [] };
