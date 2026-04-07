@@ -212,3 +212,24 @@ body {
   line-height: 1.1;
   min-height: 46px;
 }
+
+.folder,
+.idea-item {
+  touch-action: manipulation;
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.is-dragging {
+  opacity: 0.95;
+  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) scale(1.01);
+  box-shadow: 0 14px 34px #00000075;
+  z-index: 10;
+}
+
+.drag-shift-up {
+  transform: translateY(-6px);
+}
+
+.drag-shift-down {
+  transform: translateY(6px);
+}
