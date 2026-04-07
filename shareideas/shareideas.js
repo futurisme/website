@@ -11,6 +11,7 @@ const state = {
   drag: null,
   pendingHold: null,
   dragCaptureEl: null,
+  dragGhostEl: null,
 };
 
 const boardEl = document.getElementById('board');
@@ -140,16 +141,16 @@ function dragShiftOffset(index, kind, folderId) {
   return index >= active.overIndex && index < active.fromIndex ? draggedHeight : 0;
 }
 
-function dragVector(kind, index, folderId) {
-  const active = state.drag;
-  if (!active || active.kind !== kind) return null;
-  if (kind === 'card' && active.folderId !== folderId) return null;
-  if (index !== active.fromIndex) return null;
+function removeDragGhost() {
+  if (state.dragGhostEl?.parentNode) state.dragGhostEl.parentNode.removeChild(state.dragGhostEl);
+  state.dragGhostEl = null;
+}
 
-  return {
-    dx: active.currentX - active.startX,
-    dy: active.currentY - active.startY,
-  };
+function updateDragGhostPosition(active) {
+  const ghost = state.dragGhostEl;
+  if (!ghost || !active) return;
+  ghost.style.left = `${active.currentX - active.grabOffsetX}px`;
+  ghost.style.top = `${active.currentY - active.grabOffsetY}px`;
 }
 
 function onPointerMove(event) {
@@ -181,9 +182,25 @@ function beginHoldDrag(payload) {
     currentX: payload.startX,
     currentY: payload.startY,
     slots,
+    grabOffsetX: 0,
+    grabOffsetY: 0,
   };
   state.pendingHold = null;
   state.dragCaptureEl = payload.captureEl ?? null;
+
+  removeDragGhost();
+  if (payload.captureEl) {
+    const rect = payload.captureEl.getBoundingClientRect();
+    const ghost = payload.captureEl.cloneNode(true);
+    ghost.classList.remove('is-drag-source');
+    ghost.classList.add('drag-ghost');
+    ghost.style.width = `${rect.width}px`;
+    state.drag.grabOffsetX = payload.startX - rect.left;
+    state.drag.grabOffsetY = payload.startY - rect.top;
+    state.dragGhostEl = ghost;
+    document.body.append(ghost);
+    updateDragGhostPosition(state.drag);
+  }
 
   if (state.dragCaptureEl && typeof state.dragCaptureEl.setPointerCapture === "function") {
     try { state.dragCaptureEl.setPointerCapture(payload.pointerId); } catch {}
@@ -235,12 +252,7 @@ function onDragPointerMove(event) {
   event.preventDefault();
   active.currentX = event.clientX;
   active.currentY = event.clientY;
-
-  const draggingEl = document.querySelector('.is-dragging');
-  if (draggingEl) {
-    draggingEl.style.setProperty('--drag-x', `${active.currentX - active.startX}px`);
-    draggingEl.style.setProperty('--drag-y', `${active.currentY - active.startY}px`);
-  }
+  updateDragGhostPosition(active);
 
   const nextIndex = resolveOverIndexBySlot(active.kind, active.folderId, event.clientY);
 
@@ -281,6 +293,7 @@ function finishDrag(event, commit = true) {
 
   state.dragCaptureEl = null;
   state.drag = null;
+  removeDragGhost();
   document.body.classList.remove("drag-active");
   renderBoard();
 }
@@ -304,14 +317,8 @@ function renderBoard() {
 
     const folderCollapsed = Boolean(state.collapsedFolders[folder.id]);
     const folderShiftOffset = dragShiftOffset(folderIndex, 'folder');
-    const folderDragVector = dragVector('folder', folderIndex);
-
-    root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-dragging' : ''}`;
+    root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-drag-source' : ''}`;
     if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
-    if (folderDragVector) {
-      root.style.setProperty('--drag-x', `${folderDragVector.dx}px`);
-      root.style.setProperty('--drag-y', `${folderDragVector.dy}px`);
-    }
     root.dataset.dragKind = 'folder';
     root.dataset.dragIndex = String(folderIndex);
     root.dataset.slotActive = String(Boolean(state.drag?.kind === 'folder' && state.drag.overIndex === folderIndex));
@@ -344,14 +351,8 @@ function renderBoard() {
 
       const itemCollapsed = Boolean(state.collapsedItems[card.id]);
       const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
-      const cardDragVector = dragVector('card', cardIndex, folder.id);
-
-      cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-dragging' : ''}`;
+      cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-drag-source' : ''}`;
       if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
-      if (cardDragVector) {
-        cardRoot.style.setProperty('--drag-x', `${cardDragVector.dx}px`);
-        cardRoot.style.setProperty('--drag-y', `${cardDragVector.dy}px`);
-      }
       cardRoot.dataset.dragKind = 'card';
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);
