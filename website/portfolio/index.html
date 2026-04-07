@@ -31,12 +31,13 @@
       property="twitter:description"
       content="Portofolio komponen UI dan arsitektur website modern berbasis Fadhil WebLib."
     />
+    <link rel="stylesheet" href="/portfolio/testing/testing.css" />
+    <link rel="modulepreload" href="/portfolio/testing/testing.js" fetchpriority="low" />
     <style>
       html, body, #app { margin: 0; min-height: 100%; }
       body { background: #090f1f; }
     </style>
-    <script type="module" src="/portfolio/testing/testing.js"></script>
-    <link rel="stylesheet" href="/portfolio/testing/testing.css" />
+    <script type="module" src="/portfolio/testing/boot.js"></script>
   </head>
   <body>
     <main id="app" aria-label="Testing Portfolio">
