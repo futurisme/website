@@ -151,20 +151,35 @@ function dragStyle(kind, index, folderId) {
 function onPointerMove(event) {
   const pending = state.pendingHold;
   if (!pending || event.pointerId !== pending.pointerId) return;
+  event.preventDefault();
 
   const moved = Math.hypot(event.clientX - pending.startX, event.clientY - pending.startY);
   if (moved > HOLD_MOVE_CANCEL_PX) {
     clearTimeout(pending.timerId);
+    if (pending.captureEl && typeof pending.captureEl.releasePointerCapture === 'function') {
+      try { pending.captureEl.releasePointerCapture(event.pointerId); } catch {}
+    }
     state.pendingHold = null;
   }
 }
 
 function beginHoldDrag(payload) {
+  const slots = [...document.querySelectorAll(`[data-drag-kind="${payload.kind}"]`)]
+    .filter((node) => payload.kind !== 'card' || node.dataset.folderId === payload.folderId)
+    .map((node) => {
+      const rect = node.getBoundingClientRect();
+      return {
+        top: rect.top,
+        middle: rect.top + (rect.height / 2),
+      };
+    });
+
   state.drag = {
     ...payload,
     overIndex: payload.fromIndex,
     currentX: payload.startX,
     currentY: payload.startY,
+    slots,
   };
   state.pendingHold = null;
   state.dragCaptureEl = payload.captureEl ?? null;
@@ -178,6 +193,7 @@ function beginHoldDrag(payload) {
 }
 
 function pointerDownForDrag(payload, event) {
+  if (state.drag || state.pendingHold) return;
   if (event.target.closest('button')) return;
 
   if (state.pendingHold?.timerId) {
@@ -192,20 +208,23 @@ function pointerDownForDrag(payload, event) {
     startX: event.clientX,
     startY: event.clientY,
     timerId,
+    captureEl: event.currentTarget,
   };
+
+  if (event.currentTarget && typeof event.currentTarget.setPointerCapture === 'function') {
+    try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
+  }
 }
 
 
 function resolveOverIndexBySlot(kind, folderId, pointerY) {
-  const candidates = [...document.querySelectorAll(`[data-drag-kind="${kind}"]`)];
-  const scoped = kind === 'card' ? candidates.filter((node) => node.dataset.folderId === folderId) : candidates;
-  if (!scoped.length) return 0;
+  const active = state.drag;
+  const slots = active?.slots ?? [];
+  if (!slots.length) return 0;
 
-  let slot = scoped.length - 1;
-  for (let i = 0; i < scoped.length; i += 1) {
-    const rect = scoped[i].getBoundingClientRect();
-    const mid = rect.top + rect.height / 2;
-    if (pointerY < mid) {
+  let slot = slots.length - 1;
+  for (let i = 0; i < slots.length; i += 1) {
+    if (pointerY < slots[i].middle) {
       slot = i;
       break;
     }
@@ -239,6 +258,9 @@ function finishDrag(event, commit = true) {
   const pending = state.pendingHold;
   if (pending && event.pointerId === pending.pointerId) {
     clearTimeout(pending.timerId);
+    if (pending.captureEl && typeof pending.captureEl.releasePointerCapture === 'function') {
+      try { pending.captureEl.releasePointerCapture(event.pointerId); } catch {}
+    }
     state.pendingHold = null;
   }
 
@@ -295,6 +317,7 @@ function renderBoard() {
     if (folderDragStyle) root.style.cssText = folderDragStyle;
     root.dataset.dragKind = 'folder';
     root.dataset.dragIndex = String(folderIndex);
+    root.dataset.slotActive = String(Boolean(state.drag?.kind === 'folder' && state.drag.overIndex === folderIndex));
 
     title.textContent = folder.name;
     count.textContent = `${folder.cards.length} ITEMCARDS`;
@@ -332,6 +355,7 @@ function renderBoard() {
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);
       cardRoot.dataset.collapsed = String(itemCollapsed);
+      cardRoot.dataset.slotActive = String(Boolean(state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.overIndex === cardIndex));
 
       cardRoot.addEventListener('pointerdown', (event) => {
         pointerDownForDrag({ kind: 'card', folderId: folder.id, pointerId: event.pointerId, fromIndex: cardIndex, startX: event.clientX, startY: event.clientY, captureEl: event.currentTarget }, event);
@@ -515,7 +539,7 @@ modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) closeModal();
 });
 
-document.addEventListener('pointermove', onPointerMove, { passive: true });
+document.addEventListener('pointermove', onPointerMove, { passive: false });
 document.addEventListener('pointermove', onDragPointerMove, { passive: false });
 document.addEventListener('pointerup', (event) => finishDrag(event, true), { passive: true });
 document.addEventListener('pointercancel', (event) => finishDrag(event, false), { passive: true });

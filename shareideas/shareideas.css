@@ -215,15 +215,15 @@ body {
 
 .folder,
 .idea-item {
-  touch-action: manipulation;
-  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+  touch-action: none;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease, outline-color 150ms ease;
 }
 
 .is-dragging {
-  opacity: 0.95;
-  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) scale(1.01);
-  box-shadow: 0 14px 34px #00000075;
-  z-index: 10;
+  opacity: 0.97;
+  transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) scale(1.02);
+  box-shadow: 0 16px 40px #00000082;
+  z-index: 40;
   pointer-events: none;
 }
 
@@ -235,6 +235,12 @@ body {
   transform: translateY(6px);
 }
 
+.folder[data-slot-active='true'],
+.idea-item[data-slot-active='true'] {
+  outline: 2px dashed #1fdfff;
+  outline-offset: 3px;
+}
+
 body.drag-active {
   user-select: none;
   -webkit-user-select: none;
@@ -243,4 +249,12 @@ body.drag-active {
 body.drag-active .folder,
 body.drag-active .idea-item {
   touch-action: none;
+}
+
+body.drag-active button,
+body.drag-active a,
+body.drag-active input,
+body.drag-active textarea,
+body.drag-active select {
+  pointer-events: none;
 }
