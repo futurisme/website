@@ -128,11 +128,32 @@ function renderEmpty() {
 function dragShiftOffset(index, kind, folderId) {
   const active = state.drag;
   if (!active || active.kind !== kind) return 0;
-  if (kind === 'card' && active.folderId !== folderId) return 0;
-  if (active.fromIndex === active.overIndex || index === active.fromIndex) return 0;
+  if (kind === 'card') {
+    const sourceFolderId = active.sourceFolderId ?? active.folderId;
+    const overFolderId = active.overFolderId ?? active.folderId;
+    if (folderId !== sourceFolderId && folderId !== overFolderId) return 0;
+  }
+  if (index === active.fromIndex) return 0;
 
   const draggedHeight = active.slots?.[active.fromIndex]?.height ?? 0;
   if (!draggedHeight) return 0;
+
+  if (kind === 'card') {
+    const sourceFolderId = active.sourceFolderId ?? active.folderId;
+    const overFolderId = active.overFolderId ?? active.folderId;
+
+    if (sourceFolderId !== overFolderId) {
+      if (folderId === sourceFolderId) {
+        return index > active.fromIndex ? -draggedHeight : 0;
+      }
+      if (folderId === overFolderId) {
+        return index >= active.overIndex ? draggedHeight : 0;
+      }
+      return 0;
+    }
+  }
+
+  if (active.fromIndex === active.overIndex) return 0;
 
   if (active.fromIndex < active.overIndex) {
     return index > active.fromIndex && index <= active.overIndex ? -draggedHeight : 0;
@@ -184,6 +205,8 @@ function beginHoldDrag(payload) {
     slots,
     grabOffsetX: 0,
     grabOffsetY: 0,
+    sourceFolderId: payload.folderId ?? null,
+    overFolderId: payload.folderId ?? null,
   };
   state.pendingHold = null;
   state.dragCaptureEl = payload.captureEl ?? null;
@@ -245,6 +268,25 @@ function resolveOverIndexBySlot(kind, folderId, pointerY) {
   return slot;
 }
 
+function resolveCardFolderTarget(pointerX, pointerY, fallbackFolderId) {
+  const hovered = document.elementFromPoint(pointerX, pointerY);
+  const folderEl = hovered?.closest?.('.folder');
+  return folderEl?.dataset?.folderId || fallbackFolderId;
+}
+
+function collectCardSlots(folderId) {
+  return [...document.querySelectorAll('[data-drag-kind="card"]')]
+    .filter((node) => node.dataset.folderId === folderId)
+    .map((node) => {
+      const rect = node.getBoundingClientRect();
+      return {
+        top: rect.top,
+        middle: rect.top + (rect.height / 2),
+        height: rect.height,
+      };
+    });
+}
+
 function onDragPointerMove(event) {
   const active = state.drag;
   if (!active || event.pointerId !== active.pointerId) return;
@@ -254,7 +296,17 @@ function onDragPointerMove(event) {
   active.currentY = event.clientY;
   updateDragGhostPosition(active);
 
-  const nextIndex = resolveOverIndexBySlot(active.kind, active.folderId, event.clientY);
+  if (active.kind === 'card') {
+    const fallbackFolderId = active.overFolderId ?? active.sourceFolderId ?? active.folderId;
+    const nextFolderId = resolveCardFolderTarget(event.clientX, event.clientY, fallbackFolderId);
+    if (nextFolderId && nextFolderId !== active.overFolderId) {
+      active.overFolderId = nextFolderId;
+      active.slots = collectCardSlots(nextFolderId);
+    }
+  }
+
+  const slotFolderId = active.kind === 'card' ? active.overFolderId : active.folderId;
+  const nextIndex = resolveOverIndexBySlot(active.kind, slotFolderId, event.clientY);
 
   if (nextIndex !== active.overIndex) {
     active.overIndex = nextIndex;
@@ -279,10 +331,24 @@ function finishDrag(event, commit = true) {
         saveToServer();
       }
     } else if (active.kind === 'card') {
-      const folder = state.db.folders.find((entry) => entry.id === active.folderId);
-      if (folder && active.fromIndex !== active.overIndex) {
-        folder.cards = reorderArray(folder.cards, active.fromIndex, active.overIndex);
-        saveToServer();
+      const sourceFolderId = active.sourceFolderId ?? active.folderId;
+      const targetFolderId = active.overFolderId ?? active.folderId;
+      const sourceFolder = state.db.folders.find((entry) => entry.id === sourceFolderId);
+      const targetFolder = state.db.folders.find((entry) => entry.id === targetFolderId);
+      if (sourceFolder && targetFolder) {
+        if (sourceFolderId === targetFolderId) {
+          if (active.fromIndex !== active.overIndex) {
+            sourceFolder.cards = reorderArray(sourceFolder.cards, active.fromIndex, active.overIndex);
+            saveToServer();
+          }
+        } else if (active.fromIndex >= 0 && active.fromIndex < sourceFolder.cards.length) {
+          const [movedCard] = sourceFolder.cards.splice(active.fromIndex, 1);
+          if (movedCard) {
+            const insertIndex = Math.max(0, Math.min(active.overIndex, targetFolder.cards.length));
+            targetFolder.cards.splice(insertIndex, 0, movedCard);
+            saveToServer();
+          }
+        }
       }
     }
   }
@@ -320,8 +386,10 @@ function renderBoard() {
     root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-drag-source' : ''}`;
     if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
     root.dataset.dragKind = 'folder';
+    root.dataset.folderId = folder.id;
     root.dataset.dragIndex = String(folderIndex);
     root.dataset.slotActive = String(Boolean(state.drag?.kind === 'folder' && state.drag.overIndex === folderIndex));
+    root.dataset.dropTarget = String(Boolean(state.drag?.kind === 'card' && state.drag.overFolderId === folder.id));
 
     title.textContent = folder.name;
     count.textContent = `${folder.cards.length} ITEMCARDS`;
@@ -351,13 +419,13 @@ function renderBoard() {
 
       const itemCollapsed = Boolean(state.collapsedItems[card.id]);
       const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
-      cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-drag-source' : ''}`;
+      cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.sourceFolderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-drag-source' : ''}`;
       if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
       cardRoot.dataset.dragKind = 'card';
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);
       cardRoot.dataset.collapsed = String(itemCollapsed);
-      cardRoot.dataset.slotActive = String(Boolean(state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.overIndex === cardIndex));
+      cardRoot.dataset.slotActive = String(Boolean(state.drag?.kind === 'card' && state.drag.overFolderId === folder.id && state.drag.overIndex === cardIndex));
 
       cardRoot.addEventListener('pointerdown', (event) => {
         pointerDownForDrag({ kind: 'card', folderId: folder.id, pointerId: event.pointerId, fromIndex: cardIndex, startX: event.clientX, startY: event.clientY, captureEl: event.currentTarget }, event);

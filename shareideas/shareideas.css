@@ -242,6 +242,11 @@ body {
   outline-offset: 3px;
 }
 
+.folder[data-drop-target='true'] {
+  outline: 2px dashed #1fdfff;
+  outline-offset: 4px;
+}
+
 body.drag-active {
   user-select: none;
   -webkit-user-select: none;
