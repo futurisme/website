@@ -3,7 +3,7 @@ const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
 
 const state = {
-  db: { folders: [] },
+  db: { categories: [] },
   collapsedFolders: {},
   collapsedItems: {},
   version: null,
@@ -12,6 +12,8 @@ const state = {
   pendingHold: null,
   dragCaptureEl: null,
   dragGhostEl: null,
+  activeCategoryId: null,
+  pendingSwipe: null,
 };
 
 const boardEl = document.getElementById('board');
@@ -40,9 +42,10 @@ function reorderArray(values, fromIndex, toIndex) {
 
 function sanitizeDb(input) {
   const root = input && typeof input === 'object' ? input : {};
-  const rawFolders = Array.isArray(root.folders) ? root.folders : [];
+  const rawCategories = Array.isArray(root.categories) ? root.categories : null;
+  const fallbackFolders = Array.isArray(root.folders) ? root.folders : [];
 
-  const folders = rawFolders
+  const sanitizeFolders = (rawFolders) => rawFolders
     .map((folder, folderIndex) => {
       if (!folder || typeof folder !== 'object') return null;
       const name = typeof folder.name === 'string' ? folder.name.trim().slice(0, 80) : '';
@@ -67,7 +70,28 @@ function sanitizeDb(input) {
     })
     .filter(Boolean);
 
-  return { folders };
+  const categories = (rawCategories && rawCategories.length ? rawCategories : [{ id: 'category-1', name: 'Kategori 1', folders: fallbackFolders }])
+    .map((category, categoryIndex) => {
+      if (!category || typeof category !== 'object') return null;
+      const id = typeof category.id === 'string' && category.id.trim() ? category.id.trim().slice(0, 96) : `category-${categoryIndex + 1}`;
+      const name = typeof category.name === 'string' && category.name.trim() ? category.name.trim().slice(0, 80) : `Kategori ${categoryIndex + 1}`;
+      const folders = sanitizeFolders(Array.isArray(category.folders) ? category.folders : []);
+      return { id, name, folders };
+    })
+    .filter(Boolean);
+
+  return { categories: categories.length ? categories : [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
+}
+
+function getActiveCategory() {
+  const categories = state.db.categories;
+  if (!categories.length) return null;
+  const found = categories.find((entry) => entry.id === state.activeCategoryId);
+  return found || categories[0];
+}
+
+function getActiveFolders() {
+  return getActiveCategory()?.folders ?? [];
 }
 
 function setOnlineStatus(online) {
@@ -101,6 +125,8 @@ function saveToServer() {
       if (response.status === 409) {
         const payload = await response.json().catch(() => ({}));
         state.db = sanitizeDb(payload.data);
+        state.activeCategoryId = getActiveCategory()?.id ?? state.activeCategoryId;
+        initCollapsedState();
         state.version = typeof payload.version === 'number' ? payload.version : state.version;
         render();
         setOnlineStatus(true);
@@ -127,7 +153,7 @@ function renderEmpty() {
 
 function collapseAllFolders() {
   const nextFolders = {};
-  state.db.folders.forEach((folder) => {
+  getActiveFolders().forEach((folder) => {
     nextFolders[folder.id] = true;
   });
   state.collapsedFolders = nextFolders;
@@ -135,7 +161,7 @@ function collapseAllFolders() {
 
 function collapseAllCards() {
   const nextCards = {};
-  state.db.folders.forEach((folder) => {
+  getActiveFolders().forEach((folder) => {
     folder.cards.forEach((card) => {
       nextCards[card.id] = true;
     });
@@ -154,7 +180,7 @@ function expandOnlyFolder(folderId) {
 
   const expandedCardId = Object.keys(state.collapsedItems).find((cardId) => state.collapsedItems[cardId] === false);
   if (!expandedCardId) return;
-  const cardStillVisible = state.db.folders.some((folder) => folder.id === folderId && folder.cards.some((card) => card.id === expandedCardId));
+  const cardStillVisible = getActiveFolders().some((folder) => folder.id === folderId && folder.cards.some((card) => card.id === expandedCardId));
   if (!cardStillVisible) collapseAllCards();
 }
 
@@ -365,16 +391,18 @@ function finishDrag(event, commit = true) {
   if (!active || event.pointerId !== active.pointerId) return;
 
   if (commit) {
+    const activeFolders = getActiveFolders();
     if (active.kind === 'folder') {
       if (active.fromIndex !== active.overIndex) {
-        state.db.folders = reorderArray(state.db.folders, active.fromIndex, active.overIndex);
+        const category = getActiveCategory();
+        if (category) category.folders = reorderArray(activeFolders, active.fromIndex, active.overIndex);
         saveToServer();
       }
     } else if (active.kind === 'card') {
       const sourceFolderId = active.sourceFolderId ?? active.folderId;
       const targetFolderId = active.overFolderId ?? active.folderId;
-      const sourceFolder = state.db.folders.find((entry) => entry.id === sourceFolderId);
-      const targetFolder = state.db.folders.find((entry) => entry.id === targetFolderId);
+      const sourceFolder = activeFolders.find((entry) => entry.id === sourceFolderId);
+      const targetFolder = activeFolders.find((entry) => entry.id === targetFolderId);
       if (sourceFolder && targetFolder) {
         if (sourceFolderId === targetFolderId) {
           if (active.fromIndex !== active.overIndex) {
@@ -408,7 +436,14 @@ function finishDrag(event, commit = true) {
 
 function renderBoard() {
   boardEl.textContent = '';
-  const folders = state.db.folders;
+  const activeCategory = getActiveCategory();
+  if (activeCategory) {
+    const meta = document.createElement('article');
+    meta.className = 'empty';
+    meta.textContent = `Kategori aktif: ${activeCategory.name}`;
+    boardEl.append(meta);
+  }
+  const folders = getActiveFolders();
   if (!folders.length) {
     renderEmpty();
     return;
@@ -539,7 +574,9 @@ function openAddFolderModal() {
     if (!name) return;
 
     const folderId = randomId('folder');
-    state.db.folders.push({ id: folderId, name, cards: [] });
+    const activeCategory = getActiveCategory();
+    if (!activeCategory) return;
+    activeCategory.folders.push({ id: folderId, name, cards: [] });
     state.collapsedFolders[folderId] = true;
     closeModal();
     render();
@@ -550,16 +587,17 @@ function openAddFolderModal() {
 }
 
 function openAddCardModal() {
-  const options = state.db.folders
+  const folders = getActiveFolders();
+  const options = folders
     .map((folder) => `<option value="${folder.id}">${folder.name}</option>`)
     .join('');
 
   showModal(`
     <h3>Add Card</h3>
-    ${state.db.folders.length ? `<label>Folder tujuan<select id="new-card-folder">${options}</select></label>` : '<p>Buat folder dulu sebelum menambah card.</p>'}
+    ${folders.length ? `<label>Folder tujuan<select id="new-card-folder">${options}</select></label>` : '<p>Buat folder dulu sebelum menambah card.</p>'}
     <label>Judul card<input id="new-card-title" type="text" placeholder="Contoh: Sistem Diplomasi" /></label>
     <div class="actions">
-      <button type="button" id="save-new-card" ${state.db.folders.length ? '' : 'disabled'}>Simpan</button>
+      <button type="button" id="save-new-card" ${folders.length ? '' : 'disabled'}>Simpan</button>
       <button type="button" id="back-to-chooser">Kembali</button>
       <button type="button" id="close-modal">Tutup</button>
     </div>
@@ -568,11 +606,12 @@ function openAddCardModal() {
   const saveBtn = document.getElementById('save-new-card');
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
-      const folderId = document.getElementById('new-card-folder')?.value || state.db.folders[0]?.id;
+      const activeFolders = getActiveFolders();
+      const folderId = document.getElementById('new-card-folder')?.value || activeFolders[0]?.id;
       const title = document.getElementById('new-card-title').value.trim().slice(0, 120);
       if (!folderId || !title) return;
 
-      const folder = state.db.folders.find((entry) => entry.id === folderId);
+      const folder = activeFolders.find((entry) => entry.id === folderId);
       if (!folder) return;
 
       const cardId = randomId('card');
@@ -589,7 +628,7 @@ function openAddCardModal() {
 }
 
 function openEditFolder(folderId) {
-  const folder = state.db.folders.find((entry) => entry.id === folderId);
+  const folder = getActiveFolders().find((entry) => entry.id === folderId);
   if (!folder) return;
 
   showModal(`
@@ -612,9 +651,10 @@ function openEditFolder(folderId) {
   });
 
   document.getElementById('delete-folder').addEventListener('click', () => {
-    const folderIndex = state.db.folders.findIndex((entry) => entry.id === folderId);
+    const activeFolders = getActiveFolders();
+    const folderIndex = activeFolders.findIndex((entry) => entry.id === folderId);
     if (folderIndex < 0) return;
-    const [removed] = state.db.folders.splice(folderIndex, 1);
+    const [removed] = activeFolders.splice(folderIndex, 1);
     if (removed) {
       delete state.collapsedFolders[removed.id];
       removed.cards.forEach((card) => {
@@ -630,7 +670,7 @@ function openEditFolder(folderId) {
 }
 
 function openEditCard(folderId, cardId) {
-  const folder = state.db.folders.find((entry) => entry.id === folderId);
+  const folder = getActiveFolders().find((entry) => entry.id === folderId);
   const card = folder?.cards.find((entry) => entry.id === cardId);
   if (!folder || !card) return;
 
@@ -677,11 +717,13 @@ async function loadFromServer() {
 
     const payload = await response.json().catch(() => ({}));
     state.db = sanitizeDb(payload.data);
+    state.activeCategoryId = getActiveCategory()?.id ?? null;
     state.version = typeof payload.version === 'number' ? payload.version : null;
     initCollapsedState();
     setOnlineStatus(true);
   } catch {
-    state.db = { folders: [] };
+    state.db = { categories: [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
+    state.activeCategoryId = 'category-1';
     state.version = null;
     state.collapsedFolders = {};
     state.collapsedItems = {};
@@ -691,10 +733,71 @@ async function loadFromServer() {
   render();
 }
 
+function createCategory() {
+  const index = state.db.categories.length + 1;
+  const category = { id: randomId('category'), name: `Kategori ${index}`, folders: [] };
+  state.db.categories.push(category);
+  state.activeCategoryId = category.id;
+  initCollapsedState();
+  render();
+  saveToServer();
+}
+
+function switchCategory(direction) {
+  const categories = state.db.categories;
+  if (!categories.length) return;
+  const currentIndex = Math.max(0, categories.findIndex((entry) => entry.id === getActiveCategory()?.id));
+
+  if (direction > 0) {
+    if (currentIndex < categories.length - 1) {
+      state.activeCategoryId = categories[currentIndex + 1].id;
+      initCollapsedState();
+      render();
+      return;
+    }
+    showModal(`
+      <h3>Ingin membuat kategori baru?</h3>
+      <div class="actions">
+        <button type="button" id="confirm-new-category">Confirm</button>
+        <button type="button" id="close-modal">Cancel</button>
+      </div>
+    `);
+    document.getElementById('confirm-new-category').addEventListener('click', () => {
+      closeModal();
+      createCategory();
+    });
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+    return;
+  }
+
+  if (currentIndex > 0) {
+    state.activeCategoryId = categories[currentIndex - 1].id;
+    initCollapsedState();
+    render();
+  }
+}
+
+function onBoardPointerDown(event) {
+  if (event.target.closest('.folder, .idea-item, button, input, textarea, select')) return;
+  state.pendingSwipe = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+}
+
+function onBoardPointerUp(event) {
+  const pending = state.pendingSwipe;
+  if (!pending || pending.pointerId !== event.pointerId) return;
+  state.pendingSwipe = null;
+  const dx = event.clientX - pending.startX;
+  const dy = event.clientY - pending.startY;
+  if (Math.abs(dx) < 72 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  switchCategory(dx > 0 ? 1 : -1);
+}
+
 openAddBtn.addEventListener('click', openAddChooser);
 modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) event.preventDefault();
 });
+boardEl.addEventListener('pointerdown', onBoardPointerDown, { passive: true });
+boardEl.addEventListener('pointerup', onBoardPointerUp, { passive: true });
 
 document.addEventListener('pointermove', onPointerMove, { passive: false });
 document.addEventListener('pointermove', onDragPointerMove, { passive: false });
