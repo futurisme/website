@@ -140,15 +140,16 @@ function dragShiftOffset(index, kind, folderId) {
   return index >= active.overIndex && index < active.fromIndex ? draggedHeight : 0;
 }
 
-function dragStyle(kind, index, folderId) {
+function dragVector(kind, index, folderId) {
   const active = state.drag;
-  if (!active || active.kind !== kind) return '';
-  if (kind === 'card' && active.folderId !== folderId) return '';
-  if (index !== active.fromIndex) return '';
+  if (!active || active.kind !== kind) return null;
+  if (kind === 'card' && active.folderId !== folderId) return null;
+  if (index !== active.fromIndex) return null;
 
-  const dx = active.currentX - active.startX;
-  const dy = active.currentY - active.startY;
-  return `--drag-x:${dx}px;--drag-y:${dy}px;`;
+  return {
+    dx: active.currentX - active.startX,
+    dy: active.currentY - active.startY,
+  };
 }
 
 function onPointerMove(event) {
@@ -303,11 +304,14 @@ function renderBoard() {
 
     const folderCollapsed = Boolean(state.collapsedFolders[folder.id]);
     const folderShiftOffset = dragShiftOffset(folderIndex, 'folder');
-    const folderDragStyle = dragStyle('folder', folderIndex);
+    const folderDragVector = dragVector('folder', folderIndex);
 
     root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-dragging' : ''}`;
     if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
-    if (folderDragStyle) root.style.cssText = `${root.style.cssText};${folderDragStyle}`;
+    if (folderDragVector) {
+      root.style.setProperty('--drag-x', `${folderDragVector.dx}px`);
+      root.style.setProperty('--drag-y', `${folderDragVector.dy}px`);
+    }
     root.dataset.dragKind = 'folder';
     root.dataset.dragIndex = String(folderIndex);
     root.dataset.slotActive = String(Boolean(state.drag?.kind === 'folder' && state.drag.overIndex === folderIndex));
@@ -340,11 +344,14 @@ function renderBoard() {
 
       const itemCollapsed = Boolean(state.collapsedItems[card.id]);
       const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
-      const cardDragStyle = dragStyle('card', cardIndex, folder.id);
+      const cardDragVector = dragVector('card', cardIndex, folder.id);
 
       cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.folderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-dragging' : ''}`;
       if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
-      if (cardDragStyle) cardRoot.style.cssText = `${cardRoot.style.cssText};${cardDragStyle}`;
+      if (cardDragVector) {
+        cardRoot.style.setProperty('--drag-x', `${cardDragVector.dx}px`);
+        cardRoot.style.setProperty('--drag-y', `${cardDragVector.dy}px`);
+      }
       cardRoot.dataset.dragKind = 'card';
       cardRoot.dataset.folderId = folder.id;
       cardRoot.dataset.dragIndex = String(cardIndex);
