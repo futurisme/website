@@ -224,6 +224,7 @@ body {
   transform: translate3d(var(--drag-x, 0), var(--drag-y, 0), 0) scale(1.01);
   box-shadow: 0 14px 34px #00000075;
   z-index: 10;
+  pointer-events: none;
 }
 
 .drag-shift-up {

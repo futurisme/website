@@ -235,7 +235,7 @@ function onDragPointerMove(event) {
   }
 }
 
-function finishDrag(event) {
+function finishDrag(event, commit = true) {
   const pending = state.pendingHold;
   if (pending && event.pointerId === pending.pointerId) {
     clearTimeout(pending.timerId);
@@ -245,16 +245,18 @@ function finishDrag(event) {
   const active = state.drag;
   if (!active || event.pointerId !== active.pointerId) return;
 
-  if (active.kind === 'folder') {
-    if (active.fromIndex !== active.overIndex) {
-      state.db.folders = reorderArray(state.db.folders, active.fromIndex, active.overIndex);
-      saveToServer();
-    }
-  } else if (active.kind === 'card') {
-    const folder = state.db.folders.find((entry) => entry.id === active.folderId);
-    if (folder && active.fromIndex !== active.overIndex) {
-      folder.cards = reorderArray(folder.cards, active.fromIndex, active.overIndex);
-      saveToServer();
+  if (commit) {
+    if (active.kind === 'folder') {
+      if (active.fromIndex !== active.overIndex) {
+        state.db.folders = reorderArray(state.db.folders, active.fromIndex, active.overIndex);
+        saveToServer();
+      }
+    } else if (active.kind === 'card') {
+      const folder = state.db.folders.find((entry) => entry.id === active.folderId);
+      if (folder && active.fromIndex !== active.overIndex) {
+        folder.cards = reorderArray(folder.cards, active.fromIndex, active.overIndex);
+        saveToServer();
+      }
     }
   }
 
@@ -515,7 +517,7 @@ modalLayer.addEventListener('click', (event) => {
 
 document.addEventListener('pointermove', onPointerMove, { passive: true });
 document.addEventListener('pointermove', onDragPointerMove, { passive: false });
-document.addEventListener('pointerup', finishDrag, { passive: true });
-document.addEventListener('pointercancel', finishDrag, { passive: true });
+document.addEventListener('pointerup', (event) => finishDrag(event, true), { passive: true });
+document.addEventListener('pointercancel', (event) => finishDrag(event, false), { passive: true });
 
 void loadFromServer();
