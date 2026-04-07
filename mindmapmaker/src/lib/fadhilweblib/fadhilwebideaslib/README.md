@@ -14,7 +14,7 @@ Sub-library di bawah `fadhilweblib` untuk fitur **Share Ideas Creator**.
   - UI creator berbasis komponen `fadhilweblib` original.
   - Bisa add folder, add card di folder, edit deskripsi card.
   - Mendukung single-expanded terpisah: maksimal 1 folder expanded antar-folder, dan maksimal 1 card detail expanded antar-card.
-  - Skema visual futuristik ringan: outline folder ultra-neon hack green, outline card ultra-neon azure, dan fill card marun gelap bergradasi.
+  - Skema visual futuristik ringan: outline folder ultra-neon electric hack green + glow tipis, outline card ultra-neon light-blue electric + glow tipis, dan fill card marun gelap bergradasi.
   - Auto-save debounce ringan ke endpoint server.
 - `index.ts`: export publik komponen halaman.
 - `@/features/shareideas/shared/schema.ts`:

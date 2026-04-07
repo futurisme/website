@@ -8,7 +8,10 @@
   --text: #eaf8ff;
   --orange: #ffa34c;
   --hack-green: #39ff14;
-  --hack-green-soft: #39ff1455;
+  --hack-green-line: #71ff3d;
+  --hack-green-soft: #39ff1488;
+  --electric-azure: #57e9ff;
+  --electric-azure-soft: #57e9ff9e;
 }
 
 * { box-sizing: border-box; }
@@ -54,10 +57,13 @@ body {
 }
 
 .folder {
-  border: 1px solid var(--hack-green-soft);
+  border: 1px solid var(--hack-green-line);
   border-radius: 10px;
   background: linear-gradient(180deg, #300015d0, var(--panel));
-  box-shadow: inset 0 0 0 1px #39ff141f;
+  box-shadow:
+    inset 0 0 0 1px #39ff1438,
+    0 0 10px #39ff1440,
+    0 0 18px #39ff1426;
   padding: 8px;
 }
 
@@ -114,8 +120,9 @@ body {
 
 .idea-item {
   border-radius: 8px;
-  border: 1px solid #10deff8e;
+  border: 1px solid var(--electric-azure);
   background: linear-gradient(180deg, #1a0010, #100009);
+  box-shadow: 0 0 8px #57e9ff36;
   padding: 7px;
 }
 
