@@ -154,14 +154,10 @@ function dragStyle(kind, index, folderId) {
 function onPointerMove(event) {
   const pending = state.pendingHold;
   if (!pending || event.pointerId !== pending.pointerId) return;
-  event.preventDefault();
 
   const moved = Math.hypot(event.clientX - pending.startX, event.clientY - pending.startY);
   if (moved > HOLD_MOVE_CANCEL_PX) {
     clearTimeout(pending.timerId);
-    if (pending.captureEl && typeof pending.captureEl.releasePointerCapture === 'function') {
-      try { pending.captureEl.releasePointerCapture(event.pointerId); } catch {}
-    }
     state.pendingHold = null;
   }
 }
@@ -212,12 +208,7 @@ function pointerDownForDrag(payload, event) {
     startX: event.clientX,
     startY: event.clientY,
     timerId,
-    captureEl: event.currentTarget,
   };
-
-  if (event.currentTarget && typeof event.currentTarget.setPointerCapture === 'function') {
-    try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
-  }
 }
 
 
@@ -262,9 +253,6 @@ function finishDrag(event, commit = true) {
   const pending = state.pendingHold;
   if (pending && event.pointerId === pending.pointerId) {
     clearTimeout(pending.timerId);
-    if (pending.captureEl && typeof pending.captureEl.releasePointerCapture === 'function') {
-      try { pending.captureEl.releasePointerCapture(event.pointerId); } catch {}
-    }
     state.pendingHold = null;
   }
 
