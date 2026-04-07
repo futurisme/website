@@ -10,12 +10,18 @@ export interface ShareIdeasFolder {
   cards: ShareIdeasCard[];
 }
 
-export interface ShareIdeasDatabase {
+export interface ShareIdeasCategory {
+  id: string;
+  name: string;
   folders: ShareIdeasFolder[];
 }
 
+export interface ShareIdeasDatabase {
+  categories: ShareIdeasCategory[];
+}
+
 export const DEFAULT_SHARE_IDEAS_DATA: ShareIdeasDatabase = {
-  folders: [],
+  categories: [{ id: 'category-1', name: 'Kategori 1', folders: [] }],
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -66,12 +72,23 @@ function sanitizeFolder(value: unknown, fallbackId: string): ShareIdeasFolder | 
 
 export function sanitizeShareIdeasDatabase(input: unknown): ShareIdeasDatabase {
   const root = isRecord(input) ? input : {};
-  const rawFolders = Array.isArray(root.folders) ? root.folders : [];
+  const rawCategories = Array.isArray(root.categories) ? root.categories : [];
+  const fallbackFolders = Array.isArray(root.folders) ? root.folders : [];
 
-  const folders = rawFolders
-    .map((folder, index) => sanitizeFolder(folder, `folder-${index + 1}`))
-    .filter((folder): folder is ShareIdeasFolder => Boolean(folder))
-    .slice(0, 300);
+  const categories = (rawCategories.length ? rawCategories : [{ id: 'category-1', name: 'Kategori 1', folders: fallbackFolders }])
+    .map((category, categoryIndex) => {
+      if (!isRecord(category)) return null;
+      const id = sanitizeId(category.id, `category-${categoryIndex + 1}`);
+      const name = typeof category.name === 'string' && category.name.trim() ? category.name.trim().slice(0, 80) : `Kategori ${categoryIndex + 1}`;
+      const rawFolders = Array.isArray(category.folders) ? category.folders : [];
+      const folders = rawFolders
+        .map((folder, index) => sanitizeFolder(folder, `folder-${id}-${index + 1}`))
+        .filter((folder): folder is ShareIdeasFolder => Boolean(folder))
+        .slice(0, 300);
+      return { id, name, folders };
+    })
+    .filter((category): category is ShareIdeasCategory => Boolean(category))
+    .slice(0, 64);
 
-  return { folders };
+  return { categories: categories.length ? categories : DEFAULT_SHARE_IDEAS_DATA.categories };
 }

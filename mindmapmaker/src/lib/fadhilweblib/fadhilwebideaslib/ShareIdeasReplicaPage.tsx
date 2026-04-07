@@ -49,13 +49,16 @@ function ShareIdeasReplicaPageBase() {
   const [editCard, setEditCard] = useState<EditCardState>(null);
   const [expandedFolderId, setExpandedFolderId] = useState<string | null>(null);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 
   const dbRef = useRef(db);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hydratedRef = useRef(false);
   const serverVersionRef = useRef<number | null>(null);
 
-  const totalCards = useMemo(() => db.folders.reduce((sum, folder) => sum + folder.cards.length, 0), [db.folders]);
+  const activeCategory = useMemo(() => db.categories.find((entry) => entry.id === activeCategoryId) ?? db.categories[0] ?? null, [db.categories, activeCategoryId]);
+  const activeFolders = useMemo(() => activeCategory?.folders ?? [], [activeCategory]);
+  const totalCards = useMemo(() => activeFolders.reduce((sum, folder) => sum + folder.cards.length, 0), [activeFolders]);
 
   useEffect(() => {
     dbRef.current = db;
@@ -77,6 +80,7 @@ function ShareIdeasReplicaPageBase() {
         const safe = sanitizeShareIdeasDatabase(payload.data);
         serverVersionRef.current = typeof payload.version === 'number' ? payload.version : null;
         setDb(safe);
+        setActiveCategoryId(safe.categories[0]?.id ?? null);
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setError(err instanceof Error ? err.message : 'Gagal memuat creator.');
@@ -160,16 +164,20 @@ function ShareIdeasReplicaPageBase() {
 
     setDb((prev) => ({
       ...prev,
-      folders: [...prev.folders, { id: randomId('folder'), name, cards: [] }],
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? { ...category, folders: [...category.folders, { id: randomId('folder'), name, cards: [] }] }
+          : category
+      )),
     }));
 
     setNewFolderName('');
     setShowAddModal(false);
     setAddMode('choose');
-  }, [newFolderName]);
+  }, [activeCategoryId, newFolderName]);
 
   const saveAddCard = useCallback(() => {
-    const folderId = newCardFolderId || db.folders[0]?.id;
+    const folderId = newCardFolderId || activeFolders[0]?.id;
     const title = newCardTitle.trim().slice(0, 120);
     if (!folderId || !title) return;
 
@@ -181,8 +189,15 @@ function ShareIdeasReplicaPageBase() {
 
     setDb((prev) => ({
       ...prev,
-      folders: prev.folders.map((folder) => (
-        folder.id === folderId ? { ...folder, cards: [...folder.cards, newCard] } : folder
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? {
+              ...category,
+              folders: category.folders.map((folder) => (
+                folder.id === folderId ? { ...folder, cards: [...folder.cards, newCard] } : folder
+              )),
+            }
+          : category
       )),
     }));
 
@@ -190,7 +205,7 @@ function ShareIdeasReplicaPageBase() {
     setNewCardFolderId('');
     setShowAddModal(false);
     setAddMode('choose');
-  }, [db.folders, newCardFolderId, newCardTitle]);
+  }, [activeCategoryId, activeFolders, newCardFolderId, newCardTitle]);
 
   const saveEditFolder = useCallback(() => {
     if (!editFolder) return;
@@ -199,26 +214,35 @@ function ShareIdeasReplicaPageBase() {
 
     setDb((prev) => ({
       ...prev,
-      folders: prev.folders.map((folder) => (folder.id === editFolder.folderId ? { ...folder, name } : folder)),
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? { ...category, folders: category.folders.map((folder) => (folder.id === editFolder.folderId ? { ...folder, name } : folder)) }
+          : category
+      )),
     }));
     setEditFolder(null);
-  }, [editFolder]);
+  }, [activeCategoryId, editFolder]);
 
   const deleteEditFolder = useCallback(() => {
     if (!editFolder) return;
     const targetFolderId = editFolder.folderId;
     setDb((prev) => ({
       ...prev,
-      folders: prev.folders.filter((folder) => folder.id !== targetFolderId),
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? { ...category, folders: category.folders.filter((folder) => folder.id !== targetFolderId) }
+          : category
+      )),
     }));
     setExpandedFolderId((prev) => (prev === targetFolderId ? null : prev));
     setExpandedCardId((prev) => {
-      const targetFolder = dbRef.current.folders.find((folder) => folder.id === targetFolderId);
+      const targetCategory = dbRef.current.categories.find((entry) => entry.id === (activeCategoryId ?? dbRef.current.categories[0]?.id));
+      const targetFolder = targetCategory?.folders.find((folder) => folder.id === targetFolderId);
       if (!targetFolder || !prev) return prev;
       return targetFolder.cards.some((card) => card.id === prev) ? null : prev;
     });
     setEditFolder(null);
-  }, [editFolder]);
+  }, [activeCategoryId, editFolder]);
 
   const saveEditCard = useCallback(() => {
     if (!editCard) return;
@@ -227,38 +251,47 @@ function ShareIdeasReplicaPageBase() {
 
     setDb((prev) => ({
       ...prev,
-      folders: prev.folders.map((folder) => {
-        if (folder.id !== editCard.folderId) return folder;
-        return {
-          ...folder,
-          cards: folder.cards.map((card) => (
-            card.id === editCard.cardId
-              ? {
-                  ...card,
-                  title,
-                  description: editCard.description.trim().slice(0, 6000),
-                }
-              : card
-          )),
-        };
-      }),
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? {
+              ...category,
+              folders: category.folders.map((folder) => {
+                if (folder.id !== editCard.folderId) return folder;
+                return {
+                  ...folder,
+                  cards: folder.cards.map((card) => (
+                    card.id === editCard.cardId
+                      ? {
+                          ...card,
+                          title,
+                          description: editCard.description.trim().slice(0, 6000),
+                        }
+                      : card
+                  )),
+                };
+              }),
+            }
+          : category
+      )),
     }));
 
     setEditCard(null);
-  }, [editCard]);
+  }, [activeCategoryId, editCard]);
 
   const deleteEditCard = useCallback(() => {
     if (!editCard) return;
     const { folderId, cardId } = editCard;
     setDb((prev) => ({
       ...prev,
-      folders: prev.folders.map((folder) => (
-        folder.id === folderId ? { ...folder, cards: folder.cards.filter((card) => card.id !== cardId) } : folder
+      categories: prev.categories.map((category) => (
+        category.id === (activeCategoryId ?? prev.categories[0]?.id)
+          ? { ...category, folders: category.folders.map((folder) => (folder.id === folderId ? { ...folder, cards: folder.cards.filter((card) => card.id !== cardId) } : folder)) }
+          : category
       )),
     }));
     setExpandedCardId((prev) => (prev === cardId ? null : prev));
     setEditCard(null);
-  }, [editCard]);
+  }, [activeCategoryId, editCard]);
 
   if (loading) {
     return (
@@ -271,7 +304,7 @@ function ShareIdeasReplicaPageBase() {
   return (
     <Stack gap="md" style={{ minHeight: '100%', background: '#03070f', padding: '12px 12px 92px' }}>
       <ActionGroup justify="between">
-        <StatusChip label="FOLDERS" value={String(db.folders.length)} tone="neutral" />
+        <StatusChip label="FOLDERS" value={String(activeFolders.length)} tone="neutral" />
         <StatusChip label="CARDS" value={String(totalCards)} tone="neutral" />
         <StatusChip label="SYNC" value={saveState.toUpperCase()} tone={saveState === 'error' ? 'danger' : 'accent'} />
       </ActionGroup>
@@ -282,13 +315,13 @@ function ShareIdeasReplicaPageBase() {
         </Panel>
       ) : null}
 
-      {db.folders.length === 0 ? (
+      {activeFolders.length === 0 ? (
         <Panel style={{ borderColor: '#24e8ff66', borderWidth: 1, borderStyle: 'solid', background: '#120119', padding: 12 }}>
           <p style={{ margin: 0, color: '#9edcff' }}>Workspace masih kosong. Tekan tombol <strong>Add</strong> di bottom header.</p>
         </Panel>
       ) : null}
 
-      {db.folders.map((folder) => {
+      {activeFolders.map((folder) => {
         const folderHasExpandedCard = expandedCardId ? folder.cards.some((card) => card.id === expandedCardId) : false;
         const isFolderExpanded = expandedFolderId === folder.id || folderHasExpandedCard;
         return (
@@ -392,8 +425,8 @@ function ShareIdeasReplicaPageBase() {
               {addMode === 'card' ? (
                 <>
                   <Field label="Folder tujuan">
-                    <Select value={newCardFolderId || db.folders[0]?.id || ''} onChange={(event) => setNewCardFolderId(event.target.value)}>
-                      {db.folders.map((folder) => (
+                    <Select value={newCardFolderId || activeFolders[0]?.id || ''} onChange={(event) => setNewCardFolderId(event.target.value)}>
+                      {activeFolders.map((folder) => (
                         <option key={folder.id} value={folder.id}>{folder.name}</option>
                       ))}
                     </Select>
@@ -402,10 +435,10 @@ function ShareIdeasReplicaPageBase() {
                     <Input value={newCardTitle} onChange={(event) => setNewCardTitle(event.target.value)} placeholder="Contoh: Sistem Diplomasi" />
                   </Field>
                   <ActionGroup>
-                    <Button tone="accent" onClick={saveAddCard} disabled={db.folders.length === 0}>Simpan card</Button>
+                    <Button tone="accent" onClick={saveAddCard} disabled={activeFolders.length === 0}>Simpan card</Button>
                     <Button tone="neutral" onClick={() => setAddMode('choose')}>Kembali</Button>
                   </ActionGroup>
-                  {db.folders.length === 0 ? <p style={{ margin: 0 }}>Buat folder dulu sebelum menambah card.</p> : null}
+                  {activeFolders.length === 0 ? <p style={{ margin: 0 }}>Buat folder dulu sebelum menambah card.</p> : null}
                 </>
               ) : null}
 
