@@ -778,6 +778,7 @@ function switchCategory(direction) {
 }
 
 function onBoardPointerDown(event) {
+  if (!event.target.closest('.shell')) return;
   if (modalLayer.getAttribute('aria-hidden') === 'false') return;
   if (event.target.closest('button, input, textarea, select')) return;
   state.pendingSwipe = {
@@ -822,10 +823,10 @@ openAddBtn.addEventListener('click', openAddChooser);
 modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) event.preventDefault();
 });
-boardEl.addEventListener('pointerdown', onBoardPointerDown, { passive: true });
-boardEl.addEventListener('pointermove', onBoardPointerMove, { passive: true });
-boardEl.addEventListener('pointerup', onBoardPointerUp, { passive: true });
-boardEl.addEventListener('pointercancel', onBoardPointerUp, { passive: true });
+document.addEventListener('pointerdown', onBoardPointerDown, { passive: true });
+document.addEventListener('pointermove', onBoardPointerMove, { passive: true });
+document.addEventListener('pointerup', onBoardPointerUp, { passive: true });
+document.addEventListener('pointercancel', onBoardPointerUp, { passive: true });
 
 document.addEventListener('pointermove', onPointerMove, { passive: false });
 document.addEventListener('pointermove', onDragPointerMove, { passive: false });
