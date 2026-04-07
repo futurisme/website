@@ -221,7 +221,7 @@ body {
 }
 
 .is-drag-source {
-  opacity: 0.32;
+  visibility: hidden;
 }
 
 .drag-ghost {
