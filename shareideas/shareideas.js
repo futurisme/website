@@ -1,6 +1,6 @@
 const API_URL = '/api/shareideas';
-const HOLD_DRAG_MS = 220;
-const HOLD_MOVE_CANCEL_PX = 8;
+const HOLD_DRAG_MS = 260;
+const HOLD_MOVE_CANCEL_PX = 26;
 
 const state = {
   db: { folders: [] },
@@ -10,6 +10,7 @@ const state = {
   online: false,
   drag: null,
   pendingHold: null,
+  dragCaptureEl: null,
 };
 
 const boardEl = document.getElementById('board');
@@ -166,6 +167,13 @@ function beginHoldDrag(payload) {
     currentY: payload.startY,
   };
   state.pendingHold = null;
+  state.dragCaptureEl = payload.captureEl ?? null;
+
+  if (state.dragCaptureEl && typeof state.dragCaptureEl.setPointerCapture === "function") {
+    try { state.dragCaptureEl.setPointerCapture(payload.pointerId); } catch {}
+  }
+
+  document.body.classList.add("drag-active");
   renderBoard();
 }
 
@@ -176,6 +184,7 @@ function pointerDownForDrag(payload, event) {
     clearTimeout(state.pendingHold.timerId);
   }
 
+  event.preventDefault();
   const timerId = setTimeout(() => beginHoldDrag(payload), HOLD_DRAG_MS);
 
   state.pendingHold = {
@@ -190,34 +199,39 @@ function onDragPointerMove(event) {
   const active = state.drag;
   if (!active || event.pointerId !== active.pointerId) return;
 
+  event.preventDefault();
   active.currentX = event.clientX;
   active.currentY = event.clientY;
 
-  const point = document.elementFromPoint(event.clientX, event.clientY);
-  if (!point) {
-    renderBoard();
-    return;
+  const draggingEl = document.querySelector('.is-dragging');
+  if (draggingEl) {
+    draggingEl.style.setProperty('--drag-x', `${active.currentX - active.startX}px`);
+    draggingEl.style.setProperty('--drag-y', `${active.currentY - active.startY}px`);
   }
+
+  const point = document.elementFromPoint(event.clientX, event.clientY);
+  if (!point) return;
+
+  let nextIndex = active.overIndex;
 
   if (active.kind === 'folder') {
     const hovered = point.closest('[data-drag-kind="folder"]');
     if (hovered) {
-      const nextIndex = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
-      if (Number.isFinite(nextIndex) && nextIndex >= 0 && nextIndex !== active.overIndex) {
-        active.overIndex = nextIndex;
-      }
+      const parsed = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
+      if (Number.isFinite(parsed) && parsed >= 0) nextIndex = parsed;
     }
   } else {
     const hovered = point.closest('[data-drag-kind="card"]');
     if (hovered && hovered.dataset.folderId === active.folderId) {
-      const nextIndex = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
-      if (Number.isFinite(nextIndex) && nextIndex >= 0 && nextIndex !== active.overIndex) {
-        active.overIndex = nextIndex;
-      }
+      const parsed = Number.parseInt(hovered.dataset.dragIndex ?? '-1', 10);
+      if (Number.isFinite(parsed) && parsed >= 0) nextIndex = parsed;
     }
   }
 
-  renderBoard();
+  if (nextIndex !== active.overIndex) {
+    active.overIndex = nextIndex;
+    renderBoard();
+  }
 }
 
 function finishDrag(event) {
@@ -243,7 +257,13 @@ function finishDrag(event) {
     }
   }
 
+  if (state.dragCaptureEl && typeof state.dragCaptureEl.releasePointerCapture === "function") {
+    try { state.dragCaptureEl.releasePointerCapture(event.pointerId); } catch {}
+  }
+
+  state.dragCaptureEl = null;
   state.drag = null;
+  document.body.classList.remove("drag-active");
   renderBoard();
 }
 
@@ -279,7 +299,7 @@ function renderBoard() {
     toggleBtn.textContent = folderCollapsed ? '▼ Expand' : '▲ Collapse';
 
     root.addEventListener('pointerdown', (event) => {
-      pointerDownForDrag({ kind: 'folder', pointerId: event.pointerId, fromIndex: folderIndex, startX: event.clientX, startY: event.clientY }, event);
+      pointerDownForDrag({ kind: 'folder', pointerId: event.pointerId, fromIndex: folderIndex, startX: event.clientX, startY: event.clientY, captureEl: event.currentTarget }, event);
     });
 
     toggleBtn.addEventListener('click', () => {
@@ -311,7 +331,7 @@ function renderBoard() {
       cardRoot.dataset.collapsed = String(itemCollapsed);
 
       cardRoot.addEventListener('pointerdown', (event) => {
-        pointerDownForDrag({ kind: 'card', folderId: folder.id, pointerId: event.pointerId, fromIndex: cardIndex, startX: event.clientX, startY: event.clientY }, event);
+        pointerDownForDrag({ kind: 'card', folderId: folder.id, pointerId: event.pointerId, fromIndex: cardIndex, startX: event.clientX, startY: event.clientY, captureEl: event.currentTarget }, event);
       });
 
       cardTitle.textContent = card.title;
@@ -493,7 +513,7 @@ modalLayer.addEventListener('click', (event) => {
 });
 
 document.addEventListener('pointermove', onPointerMove, { passive: true });
-document.addEventListener('pointermove', onDragPointerMove, { passive: true });
+document.addEventListener('pointermove', onDragPointerMove, { passive: false });
 document.addEventListener('pointerup', finishDrag, { passive: true });
 document.addEventListener('pointercancel', finishDrag, { passive: true });
 

@@ -233,3 +233,13 @@ body {
 .drag-shift-down {
   transform: translateY(6px);
 }
+
+body.drag-active {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.drag-active .folder,
+body.drag-active .idea-item {
+  touch-action: none;
+}
