@@ -816,6 +816,15 @@ function onBoardPointerMove(event) {
 function onBoardPointerUp(event) {
   const pending = state.pendingSwipe;
   if (!pending || pending.pointerId !== event.pointerId) return;
+  if (!pending.resolved) {
+    const dx = event.clientX - pending.startX;
+    const dy = event.clientY - pending.startY;
+    const elapsed = Date.now() - pending.startedAt;
+    if (elapsed <= 420 && Math.abs(dx) >= 64 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+      clearPendingHold(event.pointerId);
+      switchCategory(dx > 0 ? 1 : -1);
+    }
+  }
   state.pendingSwipe = null;
 }
 
