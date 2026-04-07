@@ -20,6 +20,10 @@
     {
       "src": "shareideas/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "Assets/Public/Images/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -92,6 +96,10 @@
     {
       "src": "/mindmapmaker/(.*)",
       "dest": "/website/website/mindmapmaker/$1"
+    },
+    {
+      "src": "/Assets/Public/Images/(.*)",
+      "dest": "/Assets/Public/Images/$1"
     }
   ]
 }
