@@ -125,6 +125,29 @@ function renderEmpty() {
   boardEl.append(empty);
 }
 
+function collapseAllExpanded() {
+  const nextFolders = {};
+  const nextCards = {};
+  state.db.folders.forEach((folder) => {
+    nextFolders[folder.id] = true;
+    folder.cards.forEach((card) => {
+      nextCards[card.id] = true;
+    });
+  });
+  state.collapsedFolders = nextFolders;
+  state.collapsedItems = nextCards;
+}
+
+function expandOnlyFolder(folderId) {
+  collapseAllExpanded();
+  if (folderId) state.collapsedFolders[folderId] = false;
+}
+
+function expandOnlyCard(cardId) {
+  collapseAllExpanded();
+  if (cardId) state.collapsedItems[cardId] = false;
+}
+
 function dragShiftOffset(index, kind, folderId) {
   const active = state.drag;
   if (!active || active.kind !== kind) return 0;
@@ -346,6 +369,8 @@ function finishDrag(event, commit = true) {
           if (movedCard) {
             const insertIndex = Math.max(0, Math.min(active.overIndex, targetFolder.cards.length));
             targetFolder.cards.splice(insertIndex, 0, movedCard);
+            expandOnlyFolder(targetFolderId);
+            state.collapsedFolders[sourceFolderId] = true;
             saveToServer();
           }
         }
@@ -381,7 +406,7 @@ function renderBoard() {
     const toggleBtn = fragment.querySelector('.folder-toggle');
     const content = fragment.querySelector('.folder-content');
 
-    const folderCollapsed = Boolean(state.collapsedFolders[folder.id]);
+    const folderCollapsed = state.collapsedFolders[folder.id] !== false;
     const folderShiftOffset = dragShiftOffset(folderIndex, 'folder');
     root.className = `folder${state.drag?.kind === 'folder' && state.drag.fromIndex === folderIndex ? ' is-drag-source' : ''}`;
     if (folderShiftOffset) root.style.setProperty('--slot-shift-y', `${folderShiftOffset}px`);
@@ -401,7 +426,11 @@ function renderBoard() {
     });
 
     toggleBtn.addEventListener('click', () => {
-      state.collapsedFolders[folder.id] = !state.collapsedFolders[folder.id];
+      if (folderCollapsed) {
+        expandOnlyFolder(folder.id);
+      } else {
+        state.collapsedFolders[folder.id] = true;
+      }
       renderBoard();
     });
 
@@ -417,7 +446,7 @@ function renderBoard() {
       const cardEdit = cardFrag.querySelector('.item-edit');
       const cardToggle = cardFrag.querySelector('.detail-toggle');
 
-      const itemCollapsed = Boolean(state.collapsedItems[card.id]);
+      const itemCollapsed = state.collapsedItems[card.id] !== false;
       const cardShiftOffset = dragShiftOffset(cardIndex, 'card', folder.id);
       cardRoot.className = `idea-item${state.drag?.kind === 'card' && state.drag.sourceFolderId === folder.id && state.drag.fromIndex === cardIndex ? ' is-drag-source' : ''}`;
       if (cardShiftOffset) cardRoot.style.setProperty('--slot-shift-y', `${cardShiftOffset}px`);
@@ -436,7 +465,11 @@ function renderBoard() {
       cardToggle.textContent = itemCollapsed ? '▼ Expand' : '▲ Collapse';
 
       cardToggle.addEventListener('click', () => {
-        state.collapsedItems[card.id] = !state.collapsedItems[card.id];
+        if (itemCollapsed) {
+          expandOnlyCard(card.id);
+        } else {
+          state.collapsedItems[card.id] = true;
+        }
         renderBoard();
       });
 
@@ -485,7 +518,9 @@ function openAddFolderModal() {
     const name = document.getElementById('new-folder-name').value.trim().slice(0, 80);
     if (!name) return;
 
-    state.db.folders.push({ id: randomId('folder'), name, cards: [] });
+    const folderId = randomId('folder');
+    state.db.folders.push({ id: folderId, name, cards: [] });
+    state.collapsedFolders[folderId] = true;
     closeModal();
     render();
     saveToServer();
@@ -520,7 +555,9 @@ function openAddCardModal() {
       const folder = state.db.folders.find((entry) => entry.id === folderId);
       if (!folder) return;
 
-      folder.cards.push({ id: randomId('card'), title, description: '' });
+      const cardId = randomId('card');
+      folder.cards.push({ id: cardId, title, description: '' });
+      state.collapsedItems[cardId] = true;
       closeModal();
       render();
       saveToServer();
@@ -594,10 +631,13 @@ async function loadFromServer() {
     const payload = await response.json().catch(() => ({}));
     state.db = sanitizeDb(payload.data);
     state.version = typeof payload.version === 'number' ? payload.version : null;
+    collapseAllExpanded();
     setOnlineStatus(true);
   } catch {
     state.db = { folders: [] };
     state.version = null;
+    state.collapsedFolders = {};
+    state.collapsedItems = {};
     setOnlineStatus(false);
   }
 

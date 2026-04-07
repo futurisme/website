@@ -26,6 +26,11 @@ type EditCardState = {
   description: string;
 } | null;
 
+type ExpandedState = {
+  kind: 'folder' | 'card' | null;
+  id: string | null;
+};
+
 function randomId(prefix: string) {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
 }
@@ -44,7 +49,7 @@ function ShareIdeasReplicaPageBase() {
 
   const [editFolder, setEditFolder] = useState<EditFolderState>(null);
   const [editCard, setEditCard] = useState<EditCardState>(null);
-  const [openCards, setOpenCards] = useState<Record<string, boolean>>({});
+  const [expanded, setExpanded] = useState<ExpandedState>({ kind: null, id: null });
 
   const dbRef = useRef(db);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -182,7 +187,6 @@ function ShareIdeasReplicaPageBase() {
       )),
     }));
 
-    setOpenCards((prev) => ({ ...prev, [newCard.id]: true }));
     setNewCardTitle('');
     setNewCardFolderId('');
     setShowAddModal(false);
@@ -256,7 +260,10 @@ function ShareIdeasReplicaPageBase() {
         </Panel>
       ) : null}
 
-      {db.folders.map((folder) => (
+      {db.folders.map((folder) => {
+        const folderHasExpandedCard = expanded.kind === 'card' && folder.cards.some((card) => card.id === expanded.id);
+        const isFolderExpanded = (expanded.kind === 'folder' && expanded.id === folder.id) || folderHasExpandedCard;
+        return (
         <Panel key={folder.id} style={{ borderColor: '#fb4e6f66', borderWidth: 1, borderStyle: 'solid', background: '#210114' }}>
           <Stack gap="sm" style={{ padding: 12 }}>
             <ActionGroup justify="between">
@@ -264,11 +271,14 @@ function ShareIdeasReplicaPageBase() {
               <ActionGroup>
                 <StatusChip label="ITEMCARDS" value={String(folder.cards.length)} tone="neutral" />
                 <Button tone="neutral" onClick={() => setEditFolder({ folderId: folder.id, name: folder.name })}>Edit</Button>
+                <Button tone="neutral" onClick={() => setExpanded((prev) => (prev.kind === 'folder' && prev.id === folder.id ? { kind: null, id: null } : { kind: 'folder', id: folder.id }))}>
+                  {isFolderExpanded ? '▲ Collapse' : '▼ Expand'}
+                </Button>
               </ActionGroup>
             </ActionGroup>
 
-            {folder.cards.map((card) => {
-              const isOpen = openCards[card.id] ?? true;
+            {isFolderExpanded ? folder.cards.map((card) => {
+              const isOpen = expanded.kind === 'card' && expanded.id === card.id;
               return (
                 <Panel key={card.id} style={{ padding: 12, border: '1px solid #24e8ff66', background: '#120119' }}>
                   <Stack gap="sm">
@@ -278,7 +288,7 @@ function ShareIdeasReplicaPageBase() {
                         <Button tone="neutral" onClick={() => setEditCard({ folderId: folder.id, cardId: card.id, title: card.title, description: card.description })}>
                           Edit
                         </Button>
-                        <Button tone="neutral" onClick={() => setOpenCards((prev) => ({ ...prev, [card.id]: !isOpen }))}>
+                        <Button tone="neutral" onClick={() => setExpanded((prev) => (prev.kind === 'card' && prev.id === card.id ? { kind: null, id: null } : { kind: 'card', id: card.id }))}>
                           {isOpen ? '▲ Collapse detail' : '▼ Expand detail'}
                         </Button>
                       </ActionGroup>
@@ -288,10 +298,10 @@ function ShareIdeasReplicaPageBase() {
                   </Stack>
                 </Panel>
               );
-            })}
+            }) : null}
           </Stack>
         </Panel>
-      ))}
+      )})}
 
       {showAddModal ? (
         <div style={{ position: 'fixed', inset: 0, background: '#01020ddd', zIndex: 40, display: 'grid', placeItems: 'center', padding: 12 }}>
