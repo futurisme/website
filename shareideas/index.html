@@ -52,12 +52,19 @@
     </main>
 
     <script type="module">
+      import { createWorkspace, goToWorkspace } from '/shareideas/fadhilwebideaslib.js';
+
       const createBtn = document.getElementById('create-new');
-      createBtn?.addEventListener('click', () => {
-        const id = (globalThis.crypto?.randomUUID?.() || `ws-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`)
-          .replaceAll(/[^a-zA-Z0-9_-]/g, '')
-          .slice(0, 64);
-        location.href = `/shareideas/page/${id}`;
+      createBtn?.addEventListener('click', async () => {
+        if (createBtn.disabled) return;
+        createBtn.disabled = true;
+        try {
+          const id = await createWorkspace();
+          goToWorkspace(id);
+        } catch (error) {
+          createBtn.disabled = false;
+          window.alert(error instanceof Error ? error.message : 'Gagal membuat workspace baru.');
+        }
       });
     </script>
   </body>

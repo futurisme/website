@@ -106,7 +106,7 @@
       "dest": "/shareideas/index.html"
     },
     {
-      "src": "/shareideas/page/([a-zA-Z0-9_-]+)",
+      "src": "/shareideas/page/([0-9]+)",
       "dest": "/shareideas/workspace.html"
     },
     {

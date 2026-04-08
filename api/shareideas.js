@@ -6,7 +6,7 @@ const DEFAULT_DATA = Object.freeze({
 });
 
 const RECORD_KEY = '__SYSTEM__SHARE_IDEAS_V1';
-const ID_PATTERN = /^[a-zA-Z0-9_-]{1,96}$/;
+const ID_PATTERN = /^[1-9][0-9]{0,95}$/;
 
 function resolveDatabaseUrl() {
   const candidates = [
@@ -134,6 +134,15 @@ async function ensureSchema() {
         data JSONB NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS shareideas_meta (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        next_id BIGINT NOT NULL
+      );
+
+      INSERT INTO shareideas_meta(id, next_id)
+      VALUES (1, 1)
+      ON CONFLICT (id) DO NOTHING;
     `);
   }
   await schemaReadyPromise;
@@ -146,21 +155,15 @@ async function getStateByKey(workspaceKey) {
     [workspaceKey]
   );
 
-  if (result.rowCount === 0) {
-    const seeded = sanitizeData(DEFAULT_DATA);
-    const insertResult = await pool.query(
-      'INSERT INTO shareideas_state(key, version, data) VALUES($1, 1, $2::jsonb) RETURNING version, data, updated_at',
-      [workspaceKey, JSON.stringify(seeded)]
-    );
-    return insertResult.rows[0];
-  }
-
-  return result.rows[0];
+  return result.rowCount > 0 ? result.rows[0] : null;
 }
 
 async function updateState(workspaceKey, payload, expectedVersion) {
   const sanitized = sanitizeData(payload);
   await ensureSchema();
+
+  const existing = await getStateByKey(workspaceKey);
+  if (!existing) return { missing: true, conflict: false, row: null };
 
   if (Number.isFinite(expectedVersion)) {
     const optimistic = await pool.query(
@@ -174,7 +177,7 @@ async function updateState(workspaceKey, payload, expectedVersion) {
     if (optimistic.rowCount > 0) return { conflict: false, row: optimistic.rows[0] };
 
     const latest = await getStateByKey(workspaceKey);
-    return { conflict: true, row: latest };
+    return { missing: false, conflict: true, row: latest };
   }
 
   const forced = await pool.query(
@@ -186,13 +189,38 @@ async function updateState(workspaceKey, payload, expectedVersion) {
     [workspaceKey, JSON.stringify(sanitized)]
   );
 
-  return { conflict: false, row: forced.rows[0] };
+  return { missing: false, conflict: false, row: forced.rows[0] };
+}
+
+async function createWorkspaceRecord() {
+  await ensureSchema();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const current = await client.query('SELECT next_id FROM shareideas_meta WHERE id = 1 FOR UPDATE');
+    const nextId = Number(current.rows[0]?.next_id ?? 1);
+    const workspaceId = String(nextId);
+    const workspaceKey = `${RECORD_KEY}:${workspaceId}`;
+
+    await client.query(
+      'INSERT INTO shareideas_state(key, version, data) VALUES($1, 1, $2::jsonb)',
+      [workspaceKey, JSON.stringify(DEFAULT_DATA)]
+    );
+    await client.query('UPDATE shareideas_meta SET next_id = $1 WHERE id = 1', [nextId + 1]);
+    await client.query('COMMIT');
+    return workspaceId;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
-    res.setHeader('Allow', 'GET, PUT, OPTIONS');
+    res.setHeader('Allow', 'GET, PUT, POST, OPTIONS');
     res.setHeader('Cache-Control', 'no-store');
     res.end();
     return;
@@ -205,15 +233,27 @@ module.exports = async (req, res) => {
   }
 
   const url = new URL(req.url, 'https://localhost');
-  const workspaceId = url.searchParams.get('id') || 'default';
-  if (!ID_PATTERN.test(workspaceId)) {
-    return json(res, 400, { error: 'Invalid workspace id' });
-  }
-  const workspaceKey = `${RECORD_KEY}:${workspaceId}`;
-
   try {
+    if (req.method === 'POST') {
+      const body = req.body && typeof req.body === 'object' ? req.body : {};
+      if (body.action !== 'create') {
+        return json(res, 400, { error: 'Invalid action' });
+      }
+      const id = await createWorkspaceRecord();
+      return json(res, 201, { id, url: `/shareideas/page/${id}` });
+    }
+
+    const workspaceId = url.searchParams.get('id') || '';
+    if (!ID_PATTERN.test(workspaceId)) {
+      return json(res, 400, { error: 'Invalid workspace id' });
+    }
+    const workspaceKey = `${RECORD_KEY}:${workspaceId}`;
+
     if (req.method === 'GET') {
       const row = await getStateByKey(workspaceKey);
+      if (!row) {
+        return json(res, 404, { error: 'Workspace not found' });
+      }
       return json(res, 200, {
         data: sanitizeData(row.data),
         version: row.version,
@@ -225,6 +265,9 @@ module.exports = async (req, res) => {
       const body = req.body && typeof req.body === 'object' ? req.body : {};
       const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
       const result = await updateState(workspaceKey, body.data, expectedVersion);
+      if (result.missing) {
+        return json(res, 404, { error: 'Workspace not found' });
+      }
 
       if (result.conflict) {
         return json(res, 409, {
@@ -243,7 +286,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    res.setHeader('Allow', 'GET, PUT');
+    res.setHeader('Allow', 'GET, PUT, POST');
     return json(res, 405, { error: 'Method not allowed' });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -1,7 +1,7 @@
-const WORKSPACE_ID_REGEX = /^\/shareideas\/page\/([a-zA-Z0-9_-]{1,96})\/?$/;
-const matchedWorkspace = WORKSPACE_ID_REGEX.exec(window.location.pathname);
-const WORKSPACE_ID = matchedWorkspace?.[1] || 'default';
-const API_URL = `/api/shareideas?id=${encodeURIComponent(WORKSPACE_ID)}`;
+import { buildWorkspaceApiUrl, redirectToLanding, resolveWorkspaceIdOrRedirect } from '/shareideas/fadhilwebideaslib.js';
+
+const WORKSPACE_ID = resolveWorkspaceIdOrRedirect();
+const API_URL = buildWorkspaceApiUrl(WORKSPACE_ID || '0');
 const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
 
@@ -810,6 +810,10 @@ async function loadFromServer() {
   try {
     const response = await fetch(API_URL, { cache: 'no-store' });
     const payload = await response.json().catch(() => ({}));
+    if (response.status === 404) {
+      redirectToLanding();
+      return;
+    }
     if (!response.ok) {
       throw new Error(payload?.message || payload?.error || 'load gagal');
     }
