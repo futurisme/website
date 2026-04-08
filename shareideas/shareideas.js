@@ -15,6 +15,10 @@ const state = {
   activeCategoryId: null,
   pendingSwipe: null,
   titleTapHistory: [],
+  uiCache: {
+    online: null,
+    appTitle: '',
+  },
 };
 
 const boardEl = document.getElementById('board');
@@ -45,6 +49,12 @@ function randomId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
 }
 
+function sanitizeAppTitle(input) {
+  if (typeof input !== 'string') return 'ShareIdeas';
+  const trimmed = input.trim().slice(0, 40);
+  return trimmed || 'ShareIdeas';
+}
+
 function reorderArray(values, fromIndex, toIndex) {
   if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= values.length || toIndex >= values.length) {
     return values;
@@ -57,9 +67,7 @@ function reorderArray(values, fromIndex, toIndex) {
 
 function sanitizeDb(input) {
   const root = input && typeof input === 'object' ? input : {};
-  const appTitle = typeof root.appTitle === 'string' && root.appTitle.trim()
-    ? root.appTitle.trim().slice(0, 40)
-    : 'ShareIdeas';
+  const appTitle = sanitizeAppTitle(root.appTitle);
   const rawCategories = Array.isArray(root.categories) ? root.categories : null;
   const fallbackFolders = Array.isArray(root.folders) ? root.folders : [];
 
@@ -113,14 +121,19 @@ function getActiveFolders() {
 }
 
 function setOnlineStatus(online) {
-  state.online = online;
-  statusDotEl.dataset.online = String(Boolean(online));
-  statusDotEl.setAttribute('aria-label', online ? 'Online' : 'Offline');
-  statusDotEl.title = online ? 'Online' : 'Offline';
+  const next = Boolean(online);
+  if (state.uiCache.online === next) return;
+  state.online = next;
+  state.uiCache.online = next;
+  statusDotEl.dataset.online = String(next);
+  statusDotEl.setAttribute('aria-label', next ? 'Online' : 'Offline');
+  statusDotEl.title = next ? 'Online' : 'Offline';
 }
 
 function renderTopbar() {
-  const title = state.db.appTitle || 'ShareIdeas';
+  const title = sanitizeAppTitle(state.db.appTitle);
+  if (state.uiCache.appTitle === title) return;
+  state.uiCache.appTitle = title;
   appTitleEl.textContent = title;
   document.title = title;
 }
@@ -137,7 +150,7 @@ function openChangeTitleModal() {
   `);
 
   document.getElementById('save-app-title').addEventListener('click', () => {
-    const nextTitle = document.getElementById('edit-app-title').value.trim().slice(0, 40);
+    const nextTitle = sanitizeAppTitle(document.getElementById('edit-app-title').value);
     if (!nextTitle || nextTitle === currentTitle) {
       closeModal();
       return;

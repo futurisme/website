@@ -81,7 +81,7 @@ body {
     0 0 18px #ff335877;
 }
 
-.board { overflow: auto; padding: 8px 8px 70px; display: flex; flex-direction: column; gap: 8px; align-items: stretch; touch-action: pan-y; }
+.board { overflow: auto; padding: 8px 8px 70px; display: flex; flex-direction: column; gap: 8px; align-items: stretch; touch-action: pan-y; contain: layout paint; }
 
 .empty {
   border: 1px solid #24e8ff66;
@@ -282,6 +282,14 @@ body {
   display: inline-grid;
   place-items: center;
   box-shadow: 0 0 10px #27e7ff30;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fab-panel,
+  .folder,
+  .idea-item {
+    transition: none !important;
+  }
 }
 
 .modal-layer {
