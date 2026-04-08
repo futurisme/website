@@ -215,6 +215,14 @@ async function updateState(payload, expectedVersion) {
 }
 
 module.exports = async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.statusCode = 204;
+    res.setHeader('Allow', 'GET, PUT, OPTIONS');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end();
+    return;
+  }
+
   if (!pool) {
     return json(res, 500, {
       error: 'Database belum terkonfigurasi. Set DATABASE_PUBLIC_URL atau DATABASE_URL_PUBLIC di Vercel.',

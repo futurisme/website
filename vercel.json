@@ -32,8 +32,16 @@
   ],
   "routes": [
     {
+      "src": "/api/shareideas",
+      "dest": "/api/shareideas.js"
+    },
+    {
+      "src": "/api/shareideas/",
+      "dest": "/api/shareideas.js"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api/$1.js"
     },
     {
       "src": "/$",
