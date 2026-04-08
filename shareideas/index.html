@@ -11,7 +11,19 @@
         display: grid;
         align-content: start;
         justify-items: center;
-        padding: max(8px, env(safe-area-inset-top)) 12px 16px;
+        padding: 0 12px 16px;
+      }
+      .top-header {
+        width: min(960px, 100%);
+        min-height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: max(2px, env(safe-area-inset-top)) 4px 0;
+        font-size: 11px;
+        line-height: 1;
+        color: #5d3b35;
+        letter-spacing: 0.04em;
       }
       .landing-card {
         width: min(960px, 100%);
@@ -108,12 +120,13 @@
   </head>
   <body>
     <main class="landing">
+      <div class="top-header">1.0.0</div>
       <section class="landing-card">
         <img class="hero-banner" src="/Assets/Public/Images/shareideas.webp" alt="ShareIdeas banner" loading="eager" decoding="async" />
         <div class="landing-intro">
           <p>By Fadhil Akbar</p>
           <h1>ShareIdeas</h1>
-          <p>Buat workspace publik baru tanpa login, langsung siap dipakai.</p>
+          <p>ShareIdeas is a digital workspace for creating and organizing various ideas using various categories, folders, and cards in one website page at no cost.</p>
           <div class="landing-actions">
             <button class="create-btn" id="create-new" type="button">Create new</button>
           </div>
