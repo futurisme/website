@@ -16,8 +16,15 @@
 
       <section class="board" id="board" aria-live="polite"></section>
 
-      <div class="bottom-header">
-        <button class="add-btn" type="button" id="open-add">Add</button>
+      <div class="fab-wrap" id="fab-wrap">
+        <div class="fab-panel fab-panel-left" id="fab-panel-left" aria-hidden="true"></div>
+        <button class="fab-main" type="button" id="fab-toggle" aria-expanded="false" aria-controls="fab-panel-left fab-panel-right">
+          <span class="fab-icon" aria-hidden="true">☰</span>
+          <span class="fab-label">Action</span>
+        </button>
+        <div class="fab-panel fab-panel-right" id="fab-panel-right" aria-hidden="true">
+          <button class="add-btn" type="button" id="open-add" title="Add">+</button>
+        </div>
       </div>
     </main>
 

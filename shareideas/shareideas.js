@@ -21,12 +21,24 @@ const boardEl = document.getElementById('board');
 const statusDotEl = document.getElementById('sync-status-dot');
 const appTitleEl = document.getElementById('app-title');
 const openAddBtn = document.getElementById('open-add');
+const fabWrapEl = document.getElementById('fab-wrap');
+const fabToggleEl = document.getElementById('fab-toggle');
+const fabPanelLeftEl = document.getElementById('fab-panel-left');
+const fabPanelRightEl = document.getElementById('fab-panel-right');
 const folderTemplate = document.getElementById('folder-template');
 const itemTemplate = document.getElementById('item-template');
 const modalLayer = document.getElementById('modal-layer');
 const modalEl = document.getElementById('modal');
 
 let saveTimer = null;
+
+function setFabOpen(nextOpen) {
+  const open = Boolean(nextOpen);
+  fabWrapEl.dataset.open = String(open);
+  fabToggleEl.setAttribute('aria-expanded', String(open));
+  fabPanelLeftEl.setAttribute('aria-hidden', String(!open));
+  fabPanelRightEl.setAttribute('aria-hidden', String(!open));
+}
 
 function randomId(prefix) {
   return `${prefix}-${Math.random().toString(36).slice(2, 10)}-${Date.now().toString(36)}`;
@@ -880,7 +892,24 @@ function onBoardPointerUp(event) {
   state.pendingSwipe = null;
 }
 
-openAddBtn.addEventListener('click', openAddChooser);
+fabToggleEl.addEventListener('click', () => {
+  const isOpen = fabWrapEl.dataset.open === 'true';
+  setFabOpen(!isOpen);
+});
+
+openAddBtn.addEventListener('click', () => {
+  setFabOpen(false);
+  openAddChooser();
+});
+
+document.addEventListener('pointerdown', (event) => {
+  if (!fabWrapEl.contains(event.target)) setFabOpen(false);
+}, { passive: true });
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') setFabOpen(false);
+});
+
 appTitleEl.addEventListener('pointerup', onTitlePointerUp);
 modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) event.preventDefault();
@@ -895,4 +924,5 @@ document.addEventListener('pointermove', onDragPointerMove, { passive: false });
 document.addEventListener('pointerup', (event) => finishDrag(event, true), { passive: true });
 document.addEventListener('pointercancel', (event) => finishDrag(event, false), { passive: true });
 
+setFabOpen(false);
 void loadFromServer();
