@@ -16,13 +16,21 @@
         width: min(760px, 100%);
         border: 1px solid #5c291f55;
         border-radius: 20px;
-        padding: 20px;
+        padding: 14px 14px 20px;
         background: linear-gradient(135deg, #6e3d23 0%, #7a3a2f 52%, #86373e 100%);
         color: #fff;
         box-shadow: 0 10px 30px #572a2559;
         display: grid;
         gap: 14px;
         text-align: center;
+      }
+      .hero-banner {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        border-radius: 14px;
+        display: block;
+        border: 1px solid #ffffff30;
       }
       .landing-card h1 { margin: 0; font-size: clamp(30px, 8vw, 56px); letter-spacing: 0.04em; }
       .landing-card p { margin: 0; font-size: 14px; opacity: 0.95; }
@@ -42,6 +50,7 @@
   <body>
     <main class="landing">
       <section class="landing-card">
+        <img class="hero-banner" src="/Assets/Public/Images/shareideas.webp" alt="ShareIdeas banner" loading="eager" decoding="async" />
         <p>By Fadhil Akbar</p>
         <h1>ShareIdeas</h1>
         <p>Buat workspace publik baru tanpa login, langsung siap dipakai.</p>
