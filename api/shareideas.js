@@ -21,11 +21,36 @@ function resolveDatabaseUrl() {
 }
 
 const connectionString = resolveDatabaseUrl();
-const pool = connectionString
+function normalizeConnectionString(input) {
+  if (!input) return null;
+  try {
+    const parsed = new URL(input);
+    const currentSslMode = (parsed.searchParams.get('sslmode') || '').toLowerCase();
+    const currentSsl = (parsed.searchParams.get('ssl') || '').toLowerCase();
+    const hasStrictSslMode = currentSslMode === 'verify-ca' || currentSslMode === 'verify-full';
+
+    if (!currentSslMode || hasStrictSslMode) {
+      parsed.searchParams.set('sslmode', 'require');
+    }
+    if (!currentSsl || currentSsl === 'false') {
+      parsed.searchParams.set('ssl', 'true');
+    }
+
+    return parsed.toString();
+  } catch {
+    return input;
+  }
+}
+
+const normalizedConnectionString = normalizeConnectionString(connectionString);
+const pool = normalizedConnectionString
   ? new Pool({
-      connectionString,
+      connectionString: normalizedConnectionString,
       ssl: { rejectUnauthorized: false },
       max: 2,
+      connectionTimeoutMillis: 8000,
+      idleTimeoutMillis: 10_000,
+      keepAlive: true,
     })
   : null;
 
@@ -39,7 +64,7 @@ function diagnoseDatabaseError(message) {
   if (lower.includes('no pg_hba.conf entry')) {
     return 'Akses host ditolak oleh pg_hba.conf atau policy jaringan.';
   }
-  if (lower.includes('self signed certificate') || lower.includes('ssl')) {
+  if (lower.includes('self signed certificate') || lower.includes('self-signed certificate') || lower.includes('ssl')) {
     return 'Masalah SSL/TLS database. Periksa mode SSL Railway.';
   }
   if (lower.includes('timeout') || lower.includes('etimedout')) {
@@ -58,9 +83,15 @@ function diagnoseDatabaseError(message) {
 }
 
 function buildDebugMeta(extra = {}) {
+  let sslMode = null;
+  try {
+    sslMode = normalizedConnectionString ? new URL(normalizedConnectionString).searchParams.get('sslmode') : null;
+  } catch {}
   return {
     namespace: 'fadhilwebideaslib.shareideas.api',
     hasDatabaseUrl: Boolean(connectionString),
+    hasNormalizedDatabaseUrl: Boolean(normalizedConnectionString),
+    sslMode,
     usedEnv: process.env.DATABASE_PUBLIC_URL
       ? 'DATABASE_PUBLIC_URL'
       : process.env.DATABASE_URL_PUBLIC
