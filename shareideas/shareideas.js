@@ -112,24 +112,41 @@ function renderTopbar() {
   document.title = title;
 }
 
-function changeAppTitle() {
+function openChangeTitleModal() {
   const currentTitle = state.db.appTitle || 'ShareIdeas';
-  const nextTitle = window.prompt('Ganti judul', currentTitle);
-  if (typeof nextTitle !== 'string') return;
-  const trimmed = nextTitle.trim().slice(0, 40);
-  if (!trimmed || trimmed === currentTitle) return;
-  state.db.appTitle = trimmed;
-  renderTopbar();
-  saveToServer();
+  showModal(`
+    <h3>Ganti judul</h3>
+    <label>Judul aplikasi<input id="edit-app-title" type="text" value="${currentTitle.replaceAll('"', '&quot;')}" maxlength="40" /></label>
+    <div class="actions">
+      <button type="button" id="save-app-title">Simpan</button>
+      <button type="button" id="close-modal">Batal</button>
+    </div>
+  `);
+
+  document.getElementById('save-app-title').addEventListener('click', () => {
+    const nextTitle = document.getElementById('edit-app-title').value.trim().slice(0, 40);
+    if (!nextTitle || nextTitle === currentTitle) {
+      closeModal();
+      return;
+    }
+    state.db.appTitle = nextTitle;
+    closeModal();
+    renderTopbar();
+    saveToServer();
+  });
+
+  document.getElementById('close-modal').addEventListener('click', closeModal);
 }
 
 function onTitlePointerUp(event) {
+  if (event.button !== 0) return;
+  if (modalLayer.getAttribute('aria-hidden') === 'false') return;
   const now = Date.now();
   state.titleTapHistory = [...state.titleTapHistory.filter((time) => now - time < 700), now];
   if (state.titleTapHistory.length >= 3) {
     state.titleTapHistory = [];
     event.preventDefault();
-    changeAppTitle();
+    openChangeTitleModal();
   }
 }
 
