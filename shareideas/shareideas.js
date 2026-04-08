@@ -3,7 +3,7 @@ const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
 
 const state = {
-  db: { categories: [] },
+  db: { appTitle: 'ShareIdeas', categories: [] },
   collapsedFolders: {},
   collapsedItems: {},
   version: null,
@@ -14,10 +14,12 @@ const state = {
   dragGhostEl: null,
   activeCategoryId: null,
   pendingSwipe: null,
+  titleTapHistory: [],
 };
 
 const boardEl = document.getElementById('board');
-const statusEl = document.getElementById('sync-status');
+const statusDotEl = document.getElementById('sync-status-dot');
+const appTitleEl = document.getElementById('app-title');
 const openAddBtn = document.getElementById('open-add');
 const folderTemplate = document.getElementById('folder-template');
 const itemTemplate = document.getElementById('item-template');
@@ -42,6 +44,9 @@ function reorderArray(values, fromIndex, toIndex) {
 
 function sanitizeDb(input) {
   const root = input && typeof input === 'object' ? input : {};
+  const appTitle = typeof root.appTitle === 'string' && root.appTitle.trim()
+    ? root.appTitle.trim().slice(0, 40)
+    : 'ShareIdeas';
   const rawCategories = Array.isArray(root.categories) ? root.categories : null;
   const fallbackFolders = Array.isArray(root.folders) ? root.folders : [];
 
@@ -80,7 +85,7 @@ function sanitizeDb(input) {
     })
     .filter(Boolean);
 
-  return { categories: categories.length ? categories : [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
+  return { appTitle, categories: categories.length ? categories : [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
 }
 
 function getActiveCategory() {
@@ -96,7 +101,36 @@ function getActiveFolders() {
 
 function setOnlineStatus(online) {
   state.online = online;
-  statusEl.textContent = online ? 'ONLINE' : 'OFFLINE';
+  statusDotEl.dataset.online = String(Boolean(online));
+  statusDotEl.setAttribute('aria-label', online ? 'Online' : 'Offline');
+  statusDotEl.title = online ? 'Online' : 'Offline';
+}
+
+function renderTopbar() {
+  const title = state.db.appTitle || 'ShareIdeas';
+  appTitleEl.textContent = title;
+  document.title = title;
+}
+
+function changeAppTitle() {
+  const currentTitle = state.db.appTitle || 'ShareIdeas';
+  const nextTitle = window.prompt('Ganti judul', currentTitle);
+  if (typeof nextTitle !== 'string') return;
+  const trimmed = nextTitle.trim().slice(0, 40);
+  if (!trimmed || trimmed === currentTitle) return;
+  state.db.appTitle = trimmed;
+  renderTopbar();
+  saveToServer();
+}
+
+function onTitlePointerUp(event) {
+  const now = Date.now();
+  state.titleTapHistory = [...state.titleTapHistory.filter((time) => now - time < 700), now];
+  if (state.titleTapHistory.length >= 3) {
+    state.titleTapHistory = [];
+    event.preventDefault();
+    changeAppTitle();
+  }
 }
 
 function showModal(html) {
@@ -540,6 +574,7 @@ function renderBoard() {
 }
 
 function render() {
+  renderTopbar();
   renderBoard();
 }
 
@@ -722,7 +757,7 @@ async function loadFromServer() {
     initCollapsedState();
     setOnlineStatus(true);
   } catch {
-    state.db = { categories: [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
+    state.db = { appTitle: 'ShareIdeas', categories: [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
     state.activeCategoryId = 'category-1';
     state.version = null;
     state.collapsedFolders = {};
@@ -829,6 +864,7 @@ function onBoardPointerUp(event) {
 }
 
 openAddBtn.addEventListener('click', openAddChooser);
+appTitleEl.addEventListener('pointerup', onTitlePointerUp);
 modalLayer.addEventListener('click', (event) => {
   if (event.target === modalLayer) event.preventDefault();
 });

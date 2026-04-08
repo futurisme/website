@@ -30,20 +30,55 @@ body {
 
 .topbar {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 6px 10px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 4px 8px;
   border-bottom: 1px solid var(--cyan-soft);
   background: #040a16d9;
+  min-height: 30px;
 }
 
 .credit,
-.status,
 .topbar h1 { margin: 0; white-space: nowrap; }
-.credit,
-.status { font-size: 10px; color: #9ceeff; }
-.topbar h1 { grid-column: 1 / -1; font-size: 13px; letter-spacing: 0.12em; color: var(--cyan); }
+.credit { font-size: 10px; color: #9ceeff; }
+.topbar h1 {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--cyan);
+  text-transform: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  justify-self: end;
+  border: 1px solid #ffffff26;
+  box-shadow: 0 0 0 1px #00000066 inset;
+  background: #ff2244;
+}
+
+.status-dot[data-online='true'] {
+  background: #39ff14;
+  box-shadow:
+    0 0 6px #39ff14,
+    0 0 12px #39ff14aa,
+    0 0 18px #39ff1475;
+}
+
+.status-dot[data-online='false'] {
+  background: #ff3358;
+  box-shadow:
+    0 0 6px #ff3358,
+    0 0 12px #ff3358b8,
+    0 0 18px #ff335877;
+}
 
 .board { overflow: auto; padding: 8px 8px 70px; display: flex; flex-direction: column; gap: 8px; align-items: stretch; touch-action: pan-y; }
 
