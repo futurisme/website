@@ -1,8 +1,6 @@
 const API_URL = '/api/shareideas';
 const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
-const CONNECTION_DEBUG_TIMEOUT_MS = 8_000;
-const MAX_DEBUG_EVENTS = 64;
 
 const state = {
   db: { appTitle: 'ShareIdeas', categories: [] },
@@ -21,12 +19,6 @@ const state = {
     online: null,
     appTitle: '',
   },
-  connectionDebug: {
-    startedAt: Date.now(),
-    firstSuccessAt: null,
-    overlayShown: false,
-    events: [],
-  },
 };
 
 const boardEl = document.getElementById('board');
@@ -44,26 +36,6 @@ const modalLayer = document.getElementById('modal-layer');
 const modalEl = document.getElementById('modal');
 
 let saveTimer = null;
-let connectionWatchdogTimer = null;
-
-function pushDebugEvent(type, payload = {}) {
-  const event = {
-    at: new Date().toISOString(),
-    type,
-    payload,
-  };
-  state.connectionDebug.events.push(event);
-  if (state.connectionDebug.events.length > MAX_DEBUG_EVENTS) {
-    state.connectionDebug.events.splice(0, state.connectionDebug.events.length - MAX_DEBUG_EVENTS);
-  }
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;');
-}
 
 function setFabOpen(nextOpen) {
   const open = Boolean(nextOpen);
@@ -153,47 +125,9 @@ function setOnlineStatus(online) {
   if (state.uiCache.online === next) return;
   state.online = next;
   state.uiCache.online = next;
-  if (next && !state.connectionDebug.firstSuccessAt) {
-    state.connectionDebug.firstSuccessAt = Date.now();
-    pushDebugEvent('connection-success', { afterMs: Date.now() - state.connectionDebug.startedAt });
-  }
   statusDotEl.dataset.online = String(next);
   statusDotEl.setAttribute('aria-label', next ? 'Online' : 'Offline');
   statusDotEl.title = next ? 'Online' : 'Offline';
-}
-
-function renderConnectionDebugOverlay() {
-  const elapsed = Date.now() - state.connectionDebug.startedAt;
-  const lines = state.connectionDebug.events
-    .map((entry, index) => `${index + 1}. [${entry.at}] ${entry.type}\n${JSON.stringify(entry.payload, null, 2)}`)
-    .join('\n\n');
-
-  showModal(`
-    <h3>Database Debug Report (ShareIdeas)</h3>
-    <p>Koneksi ke database belum berhasil setelah <strong>${Math.round(elapsed / 1000)} detik</strong>.</p>
-    <p><strong>Prediksi penyebab:</strong> kemungkinan endpoint API error, env DB tidak terbaca runtime, host DB tidak terjangkau, atau kredensial DB invalid.</p>
-    <label>Full logs & debug
-      <textarea rows="14" readonly>${escapeHtml(lines || 'Belum ada event debug yang tercatat.')}</textarea>
-    </label>
-    <div class="actions">
-      <button type="button" id="close-modal">Tutup</button>
-    </div>
-  `);
-  document.getElementById('close-modal').addEventListener('click', closeModal);
-}
-
-function startConnectionWatchdog() {
-  if (connectionWatchdogTimer) clearTimeout(connectionWatchdogTimer);
-  connectionWatchdogTimer = setTimeout(() => {
-    if (state.connectionDebug.firstSuccessAt) return;
-    if (state.connectionDebug.overlayShown) return;
-    state.connectionDebug.overlayShown = true;
-    pushDebugEvent('connection-timeout', {
-      afterMs: CONNECTION_DEBUG_TIMEOUT_MS,
-      warning: 'Tidak ada koneksi DB sukses dalam 8 detik.',
-    });
-    renderConnectionDebugOverlay();
-  }, CONNECTION_DEBUG_TIMEOUT_MS);
 }
 
 function renderTopbar() {
@@ -259,10 +193,6 @@ function saveToServer() {
 
   saveTimer = setTimeout(async () => {
     try {
-      pushDebugEvent('save-attempt', {
-        expectedVersion: state.version,
-        categories: state.db.categories?.length ?? 0,
-      });
       const response = await fetch(API_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -271,12 +201,6 @@ function saveToServer() {
 
       if (response.status === 409) {
         const payload = await response.json().catch(() => ({}));
-        pushDebugEvent('save-conflict', {
-          endpoint: API_URL,
-          status: 409,
-          serverVersion: payload?.version ?? null,
-          serverError: payload?.error ?? null,
-        });
         state.db = sanitizeDb(payload.data);
         state.activeCategoryId = getActiveCategory()?.id ?? state.activeCategoryId;
         initCollapsedState();
@@ -288,28 +212,13 @@ function saveToServer() {
 
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
-        pushDebugEvent('save-http-error', {
-          endpoint: API_URL,
-          status: response.status,
-          error: payload?.error ?? null,
-          message: payload?.message ?? null,
-          debug: payload?.debug ?? null,
-        });
         throw new Error(payload?.message || payload?.error || 'Save gagal');
       }
 
       const payload = await response.json().catch(() => ({}));
-      pushDebugEvent('save-success', {
-        endpoint: API_URL,
-        status: response.status,
-        version: payload?.version ?? null,
-      });
       state.version = typeof payload.version === 'number' ? payload.version : state.version;
       setOnlineStatus(true);
-    } catch (error) {
-      pushDebugEvent('save-failed', {
-        message: error instanceof Error ? error.message : String(error),
-      });
+    } catch {
       setOnlineStatus(false);
     }
   }, 120);
@@ -903,33 +812,17 @@ function openEditCard(folderId, cardId) {
 
 async function loadFromServer() {
   try {
-    pushDebugEvent('load-attempt');
     const response = await fetch(API_URL, { cache: 'no-store' });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      pushDebugEvent('load-http-error', {
-        endpoint: API_URL,
-        status: response.status,
-        error: payload?.error ?? null,
-        message: payload?.message ?? null,
-        debug: payload?.debug ?? null,
-      });
       throw new Error(payload?.message || payload?.error || 'load gagal');
     }
-    pushDebugEvent('load-success', {
-      endpoint: API_URL,
-      status: response.status,
-      version: payload?.version ?? null,
-    });
     state.db = sanitizeDb(payload.data);
     state.activeCategoryId = getActiveCategory()?.id ?? null;
     state.version = typeof payload.version === 'number' ? payload.version : null;
     initCollapsedState();
     setOnlineStatus(true);
-  } catch (error) {
-    pushDebugEvent('load-failed', {
-      message: error instanceof Error ? error.message : String(error),
-    });
+  } catch {
     state.db = { appTitle: 'ShareIdeas', categories: [{ id: 'category-1', name: 'Kategori 1', folders: [] }] };
     state.activeCategoryId = 'category-1';
     state.version = null;
@@ -1074,6 +967,4 @@ document.addEventListener('pointerup', (event) => finishDrag(event, true), { pas
 document.addEventListener('pointercancel', (event) => finishDrag(event, false), { passive: true });
 
 setFabOpen(false);
-pushDebugEvent('app-start', { apiUrl: API_URL });
-startConnectionWatchdog();
 void loadFromServer();

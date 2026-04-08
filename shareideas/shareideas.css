@@ -1,11 +1,11 @@
 :root {
   color-scheme: dark;
-  --bg: #03070f;
+  --bg: #e6c8b7;
   --panel: #130015;
   --panel-2: #1a031f;
   --cyan: #27e7ff;
   --cyan-soft: #27e7ff40;
-  --text: #eaf8ff;
+  --text: #2f1a11;
   --orange: #ffa34c;
   --hack-green: #39ff14;
   --hack-green-line: #71ff3d;
@@ -21,7 +21,8 @@ body {
   margin: 0;
   width: 100%;
   min-height: 100%;
-  background: radial-gradient(circle at 20% 10%, #0b2340, var(--bg) 45%);
+  background: linear-gradient(160deg, #e6c8b7 0%, #d9aa90 100%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
@@ -34,18 +35,18 @@ body {
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  border-bottom: 1px solid var(--cyan-soft);
-  background: #040a16d9;
+  border-bottom: 1px solid #5c291f55;
+  background: linear-gradient(130deg, #6e3d23 0%, #86373e 100%);
   min-height: 30px;
 }
 
 .credit,
 .topbar h1 { margin: 0; white-space: nowrap; }
-.credit { font-size: 10px; color: #9ceeff; justify-self: start; }
+.credit { font-size: 10px; color: #f9e8de; justify-self: start; }
 .topbar h1 {
   font-size: 12px;
   letter-spacing: 0.06em;
-  color: var(--cyan);
+  color: #ffece0;
   text-transform: none;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -204,9 +205,9 @@ body {
 
 .fab-main {
   appearance: none;
-  border: 1px solid #1fdfff75;
-  background: linear-gradient(120deg, #0b2d3f, #07182e);
-  color: var(--cyan);
+  border: 1px solid #5c291f66;
+  background: linear-gradient(130deg, #6e3d23 0%, #86373e 100%);
+  color: #ffece0;
   border-radius: 999px;
   min-height: 38px;
   padding: 0 12px;
@@ -215,7 +216,7 @@ body {
   gap: 6px;
   font-size: 12px;
   font-weight: 700;
-  box-shadow: 0 0 14px #27e7ff33;
+  box-shadow: 0 8px 20px #5f2d2752;
 }
 
 .fab-icon { font-size: 14px; line-height: 1; }
