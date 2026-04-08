@@ -535,13 +535,6 @@ function finishDrag(event, commit = true) {
 
 function renderBoard() {
   boardEl.textContent = '';
-  const activeCategory = getActiveCategory();
-  if (activeCategory) {
-    const meta = document.createElement('article');
-    meta.className = 'empty';
-    meta.textContent = `Kategori aktif: ${activeCategory.name}`;
-    boardEl.append(meta);
-  }
   const folders = getActiveFolders();
   if (!folders.length) {
     renderEmpty();
