@@ -74,3 +74,11 @@ Lalu buka:
 - Saat database masih kosong: halaman menampilkan creator kosong (tanpa folder/card).
 - Tambah folder → tambah card di dalam folder → edit deskripsi card.
 - Reload halaman: data tetap tersimpan dari Railway PostgreSQL.
+
+## Debug koneksi database (runtime)
+
+- Frontend `shareideas` mencatat event koneksi (`load-attempt`, `load-success`, `save-attempt`, `save-success`, `*-http-error`, `*-failed`) dalam buffer ringan.
+- Jika dalam 8 detik sejak halaman dibuka belum ada koneksi sukses, UI menampilkan fullframe debug report berisi:
+  - logs asli percobaan koneksi frontend,
+  - prediksi penyebab kegagalan.
+- API `/api/shareideas` mengirim metadata debug tambahan (`debug.prediction`, `debug.originalError`, env yang dipakai) untuk membantu diagnosis cepat di browser tanpa membuka log server terlebih dahulu.

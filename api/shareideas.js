@@ -31,6 +31,53 @@ const pool = connectionString
 
 let schemaReadyPromise = null;
 
+function diagnoseDatabaseError(message) {
+  const lower = String(message || '').toLowerCase();
+  if (lower.includes('password authentication failed')) {
+    return 'Auth database gagal: username/password tidak cocok.';
+  }
+  if (lower.includes('no pg_hba.conf entry')) {
+    return 'Akses host ditolak oleh pg_hba.conf atau policy jaringan.';
+  }
+  if (lower.includes('self signed certificate') || lower.includes('ssl')) {
+    return 'Masalah SSL/TLS database. Periksa mode SSL Railway.';
+  }
+  if (lower.includes('timeout') || lower.includes('etimedout')) {
+    return 'Koneksi timeout: host/port tidak dapat dijangkau dari runtime Vercel.';
+  }
+  if (lower.includes('enotfound') || lower.includes('getaddrinfo')) {
+    return 'Host database tidak ditemukan (DNS gagal).';
+  }
+  if (lower.includes('connection terminated') || lower.includes('connection reset')) {
+    return 'Koneksi diputus oleh server/proxy database.';
+  }
+  if (lower.includes('database') && lower.includes('does not exist')) {
+    return 'Nama database pada URL tidak ditemukan.';
+  }
+  return 'Koneksi DB gagal karena error runtime/konfigurasi. Periksa logs asli.';
+}
+
+function buildDebugMeta(extra = {}) {
+  return {
+    namespace: 'fadhilwebideaslib.shareideas.api',
+    hasDatabaseUrl: Boolean(connectionString),
+    usedEnv: process.env.DATABASE_PUBLIC_URL
+      ? 'DATABASE_PUBLIC_URL'
+      : process.env.DATABASE_URL_PUBLIC
+        ? 'DATABASE_URL_PUBLIC'
+        : process.env.POSTGRES_PRISMA_URL
+          ? 'POSTGRES_PRISMA_URL'
+          : process.env.POSTGRES_URL_NON_POOLING
+            ? 'POSTGRES_URL_NON_POOLING'
+            : process.env.POSTGRES_URL
+              ? 'POSTGRES_URL'
+              : process.env.DATABASE_URL
+                ? 'DATABASE_URL'
+                : null,
+    ...extra,
+  };
+}
+
 function json(res, status, payload) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -171,6 +218,9 @@ module.exports = async (req, res) => {
   if (!pool) {
     return json(res, 500, {
       error: 'Database belum terkonfigurasi. Set DATABASE_PUBLIC_URL atau DATABASE_URL_PUBLIC di Vercel.',
+      debug: buildDebugMeta({
+        prediction: 'Env database belum tersedia di runtime deployment.',
+      }),
     });
   }
 
@@ -210,6 +260,13 @@ module.exports = async (req, res) => {
     return json(res, 405, { error: 'Method not allowed' });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    return json(res, 500, { error: 'Failed to process shareideas request', message });
+    return json(res, 500, {
+      error: 'Failed to process shareideas request',
+      message,
+      debug: buildDebugMeta({
+        prediction: diagnoseDatabaseError(message),
+        originalError: message,
+      }),
+    });
   }
 };
