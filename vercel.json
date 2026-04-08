@@ -26,6 +26,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "library/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "Assets/Public/Images/**",
       "use": "@vercel/static"
     }
@@ -112,6 +116,10 @@
     {
       "src": "/shareideas/(.*)",
       "dest": "/shareideas/$1"
+    },
+    {
+      "src": "/library/(.*)",
+      "dest": "/library/$1"
     },
     {
       "src": "/mindmapmaker/(.*)",

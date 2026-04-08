@@ -1,4 +1,4 @@
-import { buildWorkspaceApiUrl, redirectToLanding, resolveWorkspaceIdOrRedirect } from '/shareideas/fadhilwebideaslib.js';
+import { buildWorkspaceApiUrl, redirectToLanding, resolveWorkspaceIdOrRedirect } from '/library/fadhilweblib/fadhilwebideaslib/runtime.js';
 
 const WORKSPACE_ID = resolveWorkspaceIdOrRedirect();
 const API_URL = buildWorkspaceApiUrl(WORKSPACE_ID || '0');
