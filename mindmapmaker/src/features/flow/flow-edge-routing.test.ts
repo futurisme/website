@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Edge, Node } from 'reactflow';
-import { ROUTE_COLUMN_TOLERANCE, ROUTE_ROW_TOLERANCE, ROUTE_SIDE_BY_SIDE_TOLERANCE } from './flow-constants';
+import { DEFAULT_NODE_SIZE, ROUTE_COLUMN_TOLERANCE, ROUTE_ROW_TOLERANCE, ROUTE_SIDE_BY_SIDE_TOLERANCE } from './flow-constants';
 import { buildAdaptiveRoutedEdges } from './flow-edge-routing';
 
 function buildNode(id: string, x: number, y: number): Node {
@@ -150,4 +150,22 @@ test('near-aligned horizontal routes share a clean central elbow', () => {
   assert.equal(routed.data?.kind, 'horizontal');
   assert.ok((routed.data?.points.length ?? 0) >= 3);
   assert.notEqual(routed.data?.points[1]?.x, routed.data?.points[0]?.x);
+});
+
+test('connector path starts and ends at node center body for cleaner symmetry', () => {
+  const source = buildNode('a', 100, 200);
+  const target = buildNode('b', 420, 200);
+  const [routed] = buildAdaptiveRoutedEdges([buildEdge('e1', 'a', 'b')], [source, target]);
+  const points = routed.data?.points ?? [];
+
+  const snap = (value: number) => Math.round(value / 8) * 8;
+  assert.ok(points.length >= 2);
+  assert.deepEqual(points[0], {
+    x: snap(source.position.x + DEFAULT_NODE_SIZE.width / 2),
+    y: snap(source.position.y + DEFAULT_NODE_SIZE.height / 2),
+  });
+  assert.deepEqual(points.at(-1), {
+    x: snap(target.position.x + DEFAULT_NODE_SIZE.width / 2),
+    y: snap(target.position.y + DEFAULT_NODE_SIZE.height / 2),
+  });
 });

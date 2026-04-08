@@ -1,5 +1,15 @@
 import type { Edge, Node } from 'reactflow';
-import { EDGE_STYLE } from './flow-constants';
+import {
+  EDGE_STYLE,
+  DEFAULT_NODE_SIZE,
+  ROUTE_BUS_PADDING,
+  ROUTE_COLUMN_TOLERANCE,
+  ROUTE_GRID_SIZE,
+  ROUTE_LANE_GAP,
+  ROUTE_ROW_TOLERANCE,
+  ROUTE_SIDE_BY_SIDE_TOLERANCE,
+} from './flow-constants';
+import { createSmartConnectorRuntime } from '@/lib/fadhilweblib/fadhilmindmaplib';
 import {
   buildAdaptiveRoutedEdgeGeometry,
   buildRoutingCacheKey,
@@ -9,7 +19,16 @@ import {
 } from './flow-edge-routing-core';
 import type { RoutedHierarchyEdge } from './flow-types';
 
-const routingCache = new Map<string, RoutedEdgeGeometry[]>();
+const routingRuntime = createSmartConnectorRuntime({
+  defaultNodeWidth: DEFAULT_NODE_SIZE.width,
+  defaultNodeHeight: DEFAULT_NODE_SIZE.height,
+  routeGridSize: ROUTE_GRID_SIZE,
+  rowTolerance: ROUTE_ROW_TOLERANCE,
+  columnTolerance: ROUTE_COLUMN_TOLERANCE,
+  sideBySideTolerance: ROUTE_SIDE_BY_SIDE_TOLERANCE,
+  laneGap: ROUTE_LANE_GAP,
+  busPadding: ROUTE_BUS_PADDING,
+});
 
 export function toCompactRouteNodes(nodes: Node[]): CompactRouteNode[] {
   return nodes.map((node) => ({
@@ -57,12 +76,7 @@ export function buildAdaptiveRoutedEdges(edges: Edge[], nodes: Node[]): RoutedHi
 
   const compactEdges = toCompactRouteEdges(edges);
   const compactNodes = toCompactRouteNodes(nodes);
-  const cacheKey = buildRoutingCacheKey(compactEdges, compactNodes);
-
-  const geometry = routingCache.get(cacheKey) ?? buildAdaptiveRoutedEdgeGeometry(compactEdges, compactNodes);
-  if (!routingCache.has(cacheKey)) {
-    routingCache.set(cacheKey, geometry);
-  }
+  const geometry = routingRuntime.route(compactEdges, compactNodes) as RoutedEdgeGeometry[];
 
   return applyRoutedEdgeGeometry(edges, geometry);
 }
