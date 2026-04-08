@@ -25,16 +25,12 @@ function normalizeConnectionString(input) {
   if (!input) return null;
   try {
     const parsed = new URL(input);
-    const currentSslMode = (parsed.searchParams.get('sslmode') || '').toLowerCase();
-    const currentSsl = (parsed.searchParams.get('ssl') || '').toLowerCase();
-    const hasStrictSslMode = currentSslMode === 'verify-ca' || currentSslMode === 'verify-full';
-
-    if (!currentSslMode || hasStrictSslMode) {
-      parsed.searchParams.set('sslmode', 'require');
-    }
-    if (!currentSsl || currentSsl === 'false') {
-      parsed.searchParams.set('ssl', 'true');
-    }
+    parsed.searchParams.delete('sslmode');
+    parsed.searchParams.delete('ssl');
+    parsed.searchParams.delete('sslcert');
+    parsed.searchParams.delete('sslkey');
+    parsed.searchParams.delete('sslrootcert');
+    parsed.searchParams.delete('uselibpqcompat');
 
     return parsed.toString();
   } catch {
@@ -46,7 +42,7 @@ const normalizedConnectionString = normalizeConnectionString(connectionString);
 const pool = normalizedConnectionString
   ? new Pool({
       connectionString: normalizedConnectionString,
-      ssl: { rejectUnauthorized: false },
+      ssl: { rejectUnauthorized: false, requestCert: false },
       max: 2,
       connectionTimeoutMillis: 8000,
       idleTimeoutMillis: 10_000,
@@ -91,7 +87,8 @@ function buildDebugMeta(extra = {}) {
     namespace: 'fadhilwebideaslib.shareideas.api',
     hasDatabaseUrl: Boolean(connectionString),
     hasNormalizedDatabaseUrl: Boolean(normalizedConnectionString),
-    sslMode,
+    sslMode: sslMode ?? 'driver-managed',
+    normalizedSslParamsRemoved: true,
     usedEnv: process.env.DATABASE_PUBLIC_URL
       ? 'DATABASE_PUBLIC_URL'
       : process.env.DATABASE_URL_PUBLIC

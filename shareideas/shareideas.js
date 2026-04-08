@@ -1,5 +1,4 @@
 const API_URL = '/api/shareideas';
-const API_FALLBACK_URL = '/api/shareideas.js';
 const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
 const CONNECTION_DEBUG_TIMEOUT_MS = 8_000;
@@ -57,26 +56,6 @@ function pushDebugEvent(type, payload = {}) {
   if (state.connectionDebug.events.length > MAX_DEBUG_EVENTS) {
     state.connectionDebug.events.splice(0, state.connectionDebug.events.length - MAX_DEBUG_EVENTS);
   }
-}
-
-async function fetchShareIdeasApi(init, phase) {
-  const endpoints = [API_URL, API_FALLBACK_URL];
-  let lastResponse = null;
-
-  for (let index = 0; index < endpoints.length; index += 1) {
-    const url = endpoints[index];
-    const response = await fetch(url, init);
-    if (response.status !== 404) {
-      if (index > 0) {
-        pushDebugEvent('api-fallback-success', { phase, url, status: response.status });
-      }
-      return { response, usedUrl: url };
-    }
-    lastResponse = response;
-    pushDebugEvent('api-endpoint-404', { phase, url });
-  }
-
-  return { response: lastResponse, usedUrl: endpoints[endpoints.length - 1] };
 }
 
 function escapeHtml(value) {
@@ -284,16 +263,16 @@ function saveToServer() {
         expectedVersion: state.version,
         categories: state.db.categories?.length ?? 0,
       });
-      const { response, usedUrl } = await fetchShareIdeasApi({
+      const response = await fetch(API_URL, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: state.db, expectedVersion: state.version }),
-      }, 'save');
+      });
 
       if (response.status === 409) {
         const payload = await response.json().catch(() => ({}));
         pushDebugEvent('save-conflict', {
-          endpoint: usedUrl,
+          endpoint: API_URL,
           status: 409,
           serverVersion: payload?.version ?? null,
           serverError: payload?.error ?? null,
@@ -310,7 +289,7 @@ function saveToServer() {
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         pushDebugEvent('save-http-error', {
-          endpoint: usedUrl,
+          endpoint: API_URL,
           status: response.status,
           error: payload?.error ?? null,
           message: payload?.message ?? null,
@@ -321,7 +300,7 @@ function saveToServer() {
 
       const payload = await response.json().catch(() => ({}));
       pushDebugEvent('save-success', {
-        endpoint: usedUrl,
+        endpoint: API_URL,
         status: response.status,
         version: payload?.version ?? null,
       });
@@ -925,11 +904,11 @@ function openEditCard(folderId, cardId) {
 async function loadFromServer() {
   try {
     pushDebugEvent('load-attempt');
-    const { response, usedUrl } = await fetchShareIdeasApi({ cache: 'no-store' }, 'load');
+    const response = await fetch(API_URL, { cache: 'no-store' });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       pushDebugEvent('load-http-error', {
-        endpoint: usedUrl,
+        endpoint: API_URL,
         status: response.status,
         error: payload?.error ?? null,
         message: payload?.message ?? null,
@@ -938,7 +917,7 @@ async function loadFromServer() {
       throw new Error(payload?.message || payload?.error || 'load gagal');
     }
     pushDebugEvent('load-success', {
-      endpoint: usedUrl,
+      endpoint: API_URL,
       status: response.status,
       version: payload?.version ?? null,
     });
@@ -1095,6 +1074,6 @@ document.addEventListener('pointerup', (event) => finishDrag(event, true), { pas
 document.addEventListener('pointercancel', (event) => finishDrag(event, false), { passive: true });
 
 setFabOpen(false);
-pushDebugEvent('app-start', { apiUrl: API_URL, apiFallbackUrl: API_FALLBACK_URL });
+pushDebugEvent('app-start', { apiUrl: API_URL });
 startConnectionWatchdog();
 void loadFromServer();
