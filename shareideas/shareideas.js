@@ -1,4 +1,7 @@
-const API_URL = '/api/shareideas';
+const WORKSPACE_ID_REGEX = /^\/shareideas\/page\/([a-zA-Z0-9_-]{1,96})\/?$/;
+const matchedWorkspace = WORKSPACE_ID_REGEX.exec(window.location.pathname);
+const WORKSPACE_ID = matchedWorkspace?.[1] || 'default';
+const API_URL = `/api/shareideas?id=${encodeURIComponent(WORKSPACE_ID)}`;
 const HOLD_DRAG_MS = 260;
 const HOLD_MOVE_CANCEL_PX = 64;
 

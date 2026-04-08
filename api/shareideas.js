@@ -6,6 +6,7 @@ const DEFAULT_DATA = Object.freeze({
 });
 
 const RECORD_KEY = '__SYSTEM__SHARE_IDEAS_V1';
+const ID_PATTERN = /^[a-zA-Z0-9_-]{1,96}$/;
 
 function resolveDatabaseUrl() {
   const candidates = [
@@ -138,18 +139,18 @@ async function ensureSchema() {
   await schemaReadyPromise;
 }
 
-async function getState() {
+async function getStateByKey(workspaceKey) {
   await ensureSchema();
   const result = await pool.query(
     'SELECT version, data, updated_at FROM shareideas_state WHERE key = $1 LIMIT 1',
-    [RECORD_KEY]
+    [workspaceKey]
   );
 
   if (result.rowCount === 0) {
     const seeded = sanitizeData(DEFAULT_DATA);
     const insertResult = await pool.query(
       'INSERT INTO shareideas_state(key, version, data) VALUES($1, 1, $2::jsonb) RETURNING version, data, updated_at',
-      [RECORD_KEY, JSON.stringify(seeded)]
+      [workspaceKey, JSON.stringify(seeded)]
     );
     return insertResult.rows[0];
   }
@@ -157,7 +158,7 @@ async function getState() {
   return result.rows[0];
 }
 
-async function updateState(payload, expectedVersion) {
+async function updateState(workspaceKey, payload, expectedVersion) {
   const sanitized = sanitizeData(payload);
   await ensureSchema();
 
@@ -167,12 +168,12 @@ async function updateState(payload, expectedVersion) {
        SET data = $1::jsonb, version = version + 1, updated_at = NOW()
        WHERE key = $2 AND version = $3
        RETURNING version, data, updated_at`,
-      [JSON.stringify(sanitized), RECORD_KEY, expectedVersion]
+      [JSON.stringify(sanitized), workspaceKey, expectedVersion]
     );
 
     if (optimistic.rowCount > 0) return { conflict: false, row: optimistic.rows[0] };
 
-    const latest = await getState();
+    const latest = await getStateByKey(workspaceKey);
     return { conflict: true, row: latest };
   }
 
@@ -182,7 +183,7 @@ async function updateState(payload, expectedVersion) {
      ON CONFLICT (key)
      DO UPDATE SET data = EXCLUDED.data, version = shareideas_state.version + 1, updated_at = NOW()
      RETURNING version, data, updated_at`,
-    [RECORD_KEY, JSON.stringify(sanitized)]
+    [workspaceKey, JSON.stringify(sanitized)]
   );
 
   return { conflict: false, row: forced.rows[0] };
@@ -203,9 +204,16 @@ module.exports = async (req, res) => {
     });
   }
 
+  const url = new URL(req.url, 'https://localhost');
+  const workspaceId = url.searchParams.get('id') || 'default';
+  if (!ID_PATTERN.test(workspaceId)) {
+    return json(res, 400, { error: 'Invalid workspace id' });
+  }
+  const workspaceKey = `${RECORD_KEY}:${workspaceId}`;
+
   try {
     if (req.method === 'GET') {
-      const row = await getState();
+      const row = await getStateByKey(workspaceKey);
       return json(res, 200, {
         data: sanitizeData(row.data),
         version: row.version,
@@ -216,7 +224,7 @@ module.exports = async (req, res) => {
     if (req.method === 'PUT') {
       const body = req.body && typeof req.body === 'object' ? req.body : {};
       const expectedVersion = typeof body.expectedVersion === 'number' ? body.expectedVersion : null;
-      const result = await updateState(body.data, expectedVersion);
+      const result = await updateState(workspaceKey, body.data, expectedVersion);
 
       if (result.conflict) {
         return json(res, 409, {
