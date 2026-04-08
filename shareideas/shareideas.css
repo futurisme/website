@@ -30,7 +30,7 @@ body {
 
 .topbar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
@@ -41,7 +41,7 @@ body {
 
 .credit,
 .topbar h1 { margin: 0; white-space: nowrap; }
-.credit { font-size: 10px; color: #9ceeff; }
+.credit { font-size: 10px; color: #9ceeff; justify-self: start; }
 .topbar h1 {
   font-size: 12px;
   letter-spacing: 0.06em;
@@ -197,9 +197,9 @@ body {
   bottom: max(12px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 35;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: max-content;
+  display: grid;
+  place-items: center;
 }
 
 .fab-main {
@@ -221,13 +221,15 @@ body {
 .fab-icon { font-size: 14px; line-height: 1; }
 
 .fab-panel {
-  display: inline-flex;
+  position: absolute;
+  top: 50%;
+  display: flex;
   align-items: center;
   gap: 6px;
   pointer-events: none;
   opacity: 0;
-  transform: translateX(0) scale(0.9);
-  transform-origin: center;
+  transform: translateY(-50%) scale(0.92);
+  transform-origin: center center;
   transition: transform 180ms ease, opacity 150ms ease;
 }
 
@@ -237,11 +239,19 @@ body {
 }
 
 .fab-wrap[data-open='true'] .fab-panel-left {
-  transform: translateX(-8px) scale(1);
+  transform: translate(calc(-100% - 8px), -50%) scale(1);
 }
 
 .fab-wrap[data-open='true'] .fab-panel-right {
-  transform: translateX(8px) scale(1);
+  transform: translate(8px, -50%) scale(1);
+}
+
+.fab-panel-left {
+  left: 0;
+}
+
+.fab-panel-right {
+  left: 100%;
 }
 
 .add-btn {
@@ -257,6 +267,21 @@ body {
   display: inline-grid;
   place-items: center;
   box-shadow: 0 0 14px #27e7ff47;
+}
+
+.fab-mini-btn {
+  appearance: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #1fdfff75;
+  background: radial-gradient(circle at 30% 30%, #17304d, #081223);
+  color: #eaffff;
+  font-size: 20px;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  box-shadow: 0 0 10px #27e7ff30;
 }
 
 .modal-layer {
@@ -284,6 +309,8 @@ body {
 .modal h3,
 .modal p { margin: 0; }
 .modal h3 { font-size: 22px; }
+.modal ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.modal li { line-height: 1.25; }
 
 .modal label { display: grid; gap: 8px; font-size: 15px; }
 .modal input,

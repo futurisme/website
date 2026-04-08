@@ -21,6 +21,7 @@ const boardEl = document.getElementById('board');
 const statusDotEl = document.getElementById('sync-status-dot');
 const appTitleEl = document.getElementById('app-title');
 const openAddBtn = document.getElementById('open-add');
+const openHelpBtn = document.getElementById('open-help');
 const fabWrapEl = document.getElementById('fab-wrap');
 const fabToggleEl = document.getElementById('fab-toggle');
 const fabPanelLeftEl = document.getElementById('fab-panel-left');
@@ -210,8 +211,27 @@ function saveToServer() {
 function renderEmpty() {
   const empty = document.createElement('article');
   empty.className = 'empty';
-  empty.innerHTML = 'Workspace masih kosong. Tekan tombol <strong>Add</strong> di bottom header.';
+  empty.innerHTML = 'Workspace masih kosong. Buka menu <strong>Actions</strong> lalu tekan tombol <strong>+</strong>.';
   boardEl.append(empty);
+}
+
+function openControlGuideModal() {
+  showModal(`
+    <h3>List Control for PC and Mobile</h3>
+    <p>Ringkasan gestur dan aksi utama:</p>
+    <ul>
+      <li><strong>Triple tap judul</strong> untuk ganti judul workspace.</li>
+      <li><strong>Tap Actions</strong> untuk membuka tombol aksi.</li>
+      <li><strong>Tombol +</strong> untuk Add Folder / Add Card.</li>
+      <li><strong>Swipe kanan/kiri</strong> di area board untuk pindah kategori.</li>
+      <li><strong>Hold + drag</strong> folder/card untuk urutkan ulang.</li>
+      <li><strong>Tap Expand/Collapse</strong> untuk buka/tutup detail.</li>
+    </ul>
+    <div class="actions">
+      <button type="button" id="close-modal">Tutup</button>
+    </div>
+  `);
+  document.getElementById('close-modal').addEventListener('click', closeModal);
 }
 
 function collapseAllFolders() {
@@ -900,6 +920,11 @@ fabToggleEl.addEventListener('click', () => {
 openAddBtn.addEventListener('click', () => {
   setFabOpen(false);
   openAddChooser();
+});
+
+openHelpBtn.addEventListener('click', () => {
+  setFabOpen(false);
+  openControlGuideModal();
 });
 
 document.addEventListener('pointerdown', (event) => {
