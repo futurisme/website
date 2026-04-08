@@ -217,6 +217,30 @@ async function createWorkspaceRecord() {
   }
 }
 
+async function listWorkspaceRecords() {
+  await ensureSchema();
+  const rows = await pool.query(
+    `SELECT key, data, updated_at
+     FROM shareideas_state
+     WHERE key LIKE $1
+     ORDER BY updated_at DESC
+     LIMIT 500`,
+    [`${RECORD_KEY}:%`]
+  );
+
+  return rows.rows.map((row) => {
+    const id = String(row.key).split(':').at(-1) || '';
+    const data = sanitizeData(row.data);
+    return {
+      id,
+      title: typeof data.appTitle === 'string' && data.appTitle.trim()
+        ? data.appTitle.trim().slice(0, 40)
+        : `Page ${id}`,
+      updatedAt: row.updated_at,
+    };
+  });
+}
+
 module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.statusCode = 204;
@@ -244,6 +268,10 @@ module.exports = async (req, res) => {
     }
 
     const workspaceId = url.searchParams.get('id') || '';
+    if (req.method === 'GET' && !workspaceId) {
+      const pages = await listWorkspaceRecords();
+      return json(res, 200, { pages });
+    }
     if (!ID_PATTERN.test(workspaceId)) {
       return json(res, 400, { error: 'Invalid workspace id' });
     }

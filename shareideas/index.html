@@ -9,20 +9,26 @@
       .landing {
         min-height: 100dvh;
         display: grid;
-        place-items: center;
-        padding: 20px;
+        align-content: start;
+        justify-items: center;
+        padding: max(8px, env(safe-area-inset-top)) 12px 16px;
       }
       .landing-card {
-        width: min(760px, 100%);
+        width: min(960px, 100%);
         border: 1px solid #5c291f55;
         border-radius: 20px;
-        padding: 14px 14px 20px;
+        padding: 10px 10px 14px;
         background: linear-gradient(135deg, #6e3d23 0%, #7a3a2f 52%, #86373e 100%);
         color: #fff;
         box-shadow: 0 10px 30px #572a2559;
         display: grid;
-        gap: 14px;
+        gap: 12px;
         text-align: center;
+      }
+      .landing-intro {
+        display: grid;
+        gap: 10px;
+        padding: 0 8px;
       }
       .hero-banner {
         width: 100%;
@@ -35,6 +41,59 @@
       .landing-card h1 { margin: 0; font-size: clamp(30px, 8vw, 56px); letter-spacing: 0.04em; }
       .landing-card p { margin: 0; font-size: 14px; opacity: 0.95; }
       .landing-actions { display: flex; justify-content: center; }
+      .pages-wrap {
+        margin-top: 2px;
+        border: 1px solid #ffffff2e;
+        border-radius: 14px;
+        background: #00000024;
+        padding: 8px;
+        text-align: left;
+      }
+      .pages-title {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .pages-list {
+        display: grid;
+        gap: 8px;
+        max-height: min(52dvh, 460px);
+        overflow: auto;
+      }
+      .page-card {
+        width: 100%;
+        border: 1px solid #ffffff33;
+        border-radius: 10px;
+        background: #ffffff1a;
+        color: #fff;
+        padding: 10px 12px;
+        display: grid;
+        gap: 4px;
+        text-align: left;
+      }
+      .page-card-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .page-id {
+        font-size: 12px;
+        font-weight: 700;
+        opacity: 0.95;
+      }
+      .page-date {
+        font-size: 11px;
+        opacity: 0.82;
+      }
+      .page-title {
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .create-btn {
         appearance: none;
         border: 1px solid #ffffff57;
@@ -51,19 +110,64 @@
     <main class="landing">
       <section class="landing-card">
         <img class="hero-banner" src="/Assets/Public/Images/shareideas.webp" alt="ShareIdeas banner" loading="eager" decoding="async" />
-        <p>By Fadhil Akbar</p>
-        <h1>ShareIdeas</h1>
-        <p>Buat workspace publik baru tanpa login, langsung siap dipakai.</p>
-        <div class="landing-actions">
-          <button class="create-btn" id="create-new" type="button">Create new</button>
+        <div class="landing-intro">
+          <p>By Fadhil Akbar</p>
+          <h1>ShareIdeas</h1>
+          <p>Buat workspace publik baru tanpa login, langsung siap dipakai.</p>
+          <div class="landing-actions">
+            <button class="create-btn" id="create-new" type="button">Create new</button>
+          </div>
+        </div>
+        <div class="pages-wrap">
+          <p class="pages-title">Page List</p>
+          <div class="pages-list" id="pages-list"></div>
         </div>
       </section>
     </main>
 
     <script type="module">
-      import { createWorkspace, goToWorkspace } from '/library/fadhilweblib/fadhilwebideaslib/runtime.js';
+      import { createWorkspace, fetchWorkspaceList, goToWorkspace } from '/library/fadhilweblib/fadhilwebideaslib/runtime.js';
 
       const createBtn = document.getElementById('create-new');
+      const pagesListEl = document.getElementById('pages-list');
+
+      const formatDateTime = (value) => {
+        const parsed = new Date(value);
+        if (Number.isNaN(parsed.getTime())) return '-';
+        return new Intl.DateTimeFormat('id-ID', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(parsed);
+      };
+
+      const renderPages = async () => {
+        try {
+          const pages = await fetchWorkspaceList();
+          if (!pages.length) {
+            pagesListEl.innerHTML = '<p class="page-date">Belum ada page. Buat page baru dengan Create new.</p>';
+            return;
+          }
+
+          pagesListEl.innerHTML = '';
+          pages.forEach((page) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'page-card';
+            button.innerHTML = `
+              <span class="page-card-top">
+                <span class="page-id">#${String(page.id || '-')}</span>
+                <span class="page-date">${formatDateTime(page.updatedAt)}</span>
+              </span>
+              <span class="page-title">${String(page.title || `Page ${page.id || '-'}`)}</span>
+            `;
+            button.addEventListener('click', () => goToWorkspace(page.id));
+            pagesListEl.append(button);
+          });
+        } catch (error) {
+          pagesListEl.innerHTML = `<p class="page-date">${error instanceof Error ? error.message : 'Gagal memuat daftar page.'}</p>`;
+        }
+      };
+
       createBtn?.addEventListener('click', async () => {
         if (createBtn.disabled) return;
         createBtn.disabled = true;
@@ -75,6 +179,8 @@
           window.alert(error instanceof Error ? error.message : 'Gagal membuat workspace baru.');
         }
       });
+
+      void renderPages();
     </script>
   </body>
 </html>

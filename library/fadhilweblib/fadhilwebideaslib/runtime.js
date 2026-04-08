@@ -26,6 +26,15 @@ export async function createWorkspace() {
   return String(payload.id);
 }
 
+export async function fetchWorkspaceList() {
+  const response = await fetch('/api/shareideas', { cache: 'no-store' });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(payload?.error || 'Gagal memuat daftar workspace.');
+  }
+  return Array.isArray(payload?.pages) ? payload.pages : [];
+}
+
 export function goToWorkspace(workspaceId) {
   window.location.href = `/shareideas/page/${encodeURIComponent(String(workspaceId))}`;
 }
