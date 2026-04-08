@@ -33,5 +33,3 @@ export { Metric } from './components/feedback/Metric';
 export { Notice } from './components/feedback/Notice';
 export { ProgressBar } from './components/feedback/ProgressBar';
 export { Skeleton } from './components/feedback/Skeleton';
-
-export * from './fadhilmindmaplib';
