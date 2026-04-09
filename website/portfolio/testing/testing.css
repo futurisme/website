@@ -65,15 +65,15 @@
   --about-emblem-gap: clamp(0.14rem, 0.25vw, 0.28rem);
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: clamp(0.55rem, 1.2vw, 1.2rem);
   width: 100%;
 }
 .about-heading-text {
   display: grid;
   gap: 0.04rem;
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 1 clamp(13rem, 28vw, 20rem);
 }
 .about-heading-name {
   display: block;
@@ -92,17 +92,16 @@
 }
 .about-emblems-row {
   display: flex;
-  flex: 0 1 clamp(22rem, 42vw, 31rem);
+  flex: 0 1 clamp(22rem, 40vw, 29.5rem);
   justify-content: center;
   align-items: center;
   gap: var(--about-emblem-gap);
-  width: min(100%, 31rem);
-  margin-inline: auto;
+  width: min(100%, 29.5rem);
 }
 .about-emblems-row > * {
   flex: 1 1 calc((100% - (5 * var(--about-emblem-gap))) / 6);
   min-width: 3.1rem;
-  max-width: 4.9rem;
+  max-width: 4.6rem;
 }
 @media (max-width: 740px) {
   .about-heading-row {
@@ -119,19 +118,10 @@
     flex: none;
     justify-content: center;
     width: 100%;
-    margin-inline: 0;
   }
   .about-emblems-row > * {
     min-width: 0;
     max-width: none;
     flex-basis: calc((100% - (5 * var(--about-emblem-gap))) / 6);
-  }
-}
-@media (min-width: 741px) {
-  .about-heading-row {
-    align-items: flex-end;
-  }
-  .about-emblems-row {
-    margin-inline: auto;
   }
 }
