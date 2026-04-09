@@ -62,17 +62,18 @@
 
 /* Portfolio about heading emblem alignment fix */
 .about-heading-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18.5rem, 34vw);
-  align-items: end;
-  column-gap: 0.5rem;
-  row-gap: 0.32rem;
+  --about-emblem-gap: clamp(0.14rem, 0.25vw, 0.28rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
   width: 100%;
 }
 .about-heading-text {
   display: grid;
   gap: 0.04rem;
   min-width: 0;
+  flex: 1 1 auto;
 }
 .about-heading-name {
   display: block;
@@ -90,21 +91,47 @@
   text-wrap: balance;
 }
 .about-emblems-row {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: flex;
+  flex: 0 1 clamp(22rem, 42vw, 31rem);
+  justify-content: center;
   align-items: center;
-  gap: clamp(0.14rem, 0.25vw, 0.28rem);
-  width: min(100%, 26.5rem);
-  justify-self: end;
+  gap: var(--about-emblem-gap);
+  width: min(100%, 31rem);
+  margin-inline: auto;
+}
+.about-emblems-row > * {
+  flex: 1 1 calc((100% - (5 * var(--about-emblem-gap))) / 6);
+  min-width: 3.1rem;
+  max-width: 4.9rem;
 }
 @media (max-width: 740px) {
   .about-heading-row {
-    grid-template-columns: 1fr;
+    display: grid;
+    gap: 0.32rem;
+    justify-content: initial;
     align-items: start;
   }
+  .about-heading-text {
+    flex: initial;
+  }
   .about-emblems-row {
+    --about-emblem-gap: clamp(0.15rem, 0.7vw, 0.28rem);
+    flex: none;
+    justify-content: center;
     width: 100%;
-    justify-self: stretch;
-    gap: clamp(0.15rem, 0.7vw, 0.28rem);
+    margin-inline: 0;
+  }
+  .about-emblems-row > * {
+    min-width: 0;
+    max-width: none;
+    flex-basis: calc((100% - (5 * var(--about-emblem-gap))) / 6);
+  }
+}
+@media (min-width: 741px) {
+  .about-heading-row {
+    align-items: flex-end;
+  }
+  .about-emblems-row {
+    margin-inline: auto;
   }
 }
