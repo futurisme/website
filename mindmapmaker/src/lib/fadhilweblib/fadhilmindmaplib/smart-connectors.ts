@@ -51,6 +51,13 @@ export interface SmartConnectorRuntime {
   cacheSize: () => number;
 }
 
+interface NodeMetrics {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+}
+
 interface AnchorMeta {
   sourceAnchor: SmartRoutePoint;
   targetAnchor: SmartRoutePoint;
@@ -89,11 +96,13 @@ function getNodeSize(node: SmartConnectorNode, config: SmartConnectorConfig) {
   };
 }
 
-function getNodeCenter(node: SmartConnectorNode, config: SmartConnectorConfig) {
+function createNodeMetrics(node: SmartConnectorNode, config: SmartConnectorConfig): NodeMetrics {
   const size = getNodeSize(node, config);
   return {
-    x: node.x + size.width / 2,
-    y: node.y + size.height / 2,
+    centerX: node.x + size.width / 2,
+    centerY: node.y + size.height / 2,
+    width: size.width,
+    height: size.height,
   };
 }
 
@@ -103,14 +112,14 @@ function snapToRouteGrid(value: number, config: SmartConnectorConfig) {
 
 function buildPath(points: SmartRoutePoint[], config: SmartConnectorConfig) {
   const normalized: SmartRoutePoint[] = [];
-
-  points.forEach((point) => {
+  for (let i = 0; i < points.length; i += 1) {
+    const point = points[i];
     const snapped = { x: snapToRouteGrid(point.x, config), y: snapToRouteGrid(point.y, config) };
     const prev = normalized[normalized.length - 1];
     if (!prev || prev.x !== snapped.x || prev.y !== snapped.y) {
       normalized.push(snapped);
     }
-  });
+  }
 
   return normalized;
 }
@@ -127,14 +136,9 @@ function resolveDirectionGroup(sourceY: number, targetY: number, config: SmartCo
   return 'flat';
 }
 
-function resolveOrientation(source: SmartConnectorNode, target: SmartConnectorNode, config: SmartConnectorConfig): Exclude<SmartRouteKind, 'bus'> {
-  const sourceCenter = getNodeCenter(source, config);
-  const targetCenter = getNodeCenter(target, config);
-  const sourceSize = getNodeSize(source, config);
-  const targetSize = getNodeSize(target, config);
-
-  const dx = targetCenter.x - sourceCenter.x;
-  const dy = targetCenter.y - sourceCenter.y;
+function resolveOrientationFromMetrics(source: NodeMetrics, target: NodeMetrics, config: SmartConnectorConfig): Exclude<SmartRouteKind, 'bus'> {
+  const dx = target.centerX - source.centerX;
+  const dy = target.centerY - source.centerY;
   const absDx = Math.abs(dx);
   const absDy = Math.abs(dy);
 
@@ -146,73 +150,64 @@ function resolveOrientation(source: SmartConnectorNode, target: SmartConnectorNo
     return 'vertical';
   }
 
-  const normDx = absDx / Math.max(1, sourceSize.width + targetSize.width);
-  const normDy = absDy / Math.max(1, sourceSize.height + targetSize.height);
+  const normDx = absDx / Math.max(1, source.width + target.width);
+  const normDy = absDy / Math.max(1, source.height + target.height);
 
   return normDx >= normDy ? 'horizontal' : 'vertical';
 }
 
-function getVerticalAnchors(source: SmartConnectorNode, target: SmartConnectorNode, sign: 1 | -1, config: SmartConnectorConfig): AnchorMeta {
-  const sourceCenter = getNodeCenter(source, config);
-  const targetCenter = getNodeCenter(target, config);
-
+function getVerticalAnchors(source: NodeMetrics, target: NodeMetrics, sign: 1 | -1): AnchorMeta {
   if (sign >= 0) {
     return {
-      sourceAnchor: { x: sourceCenter.x, y: sourceCenter.y },
-      targetAnchor: { x: targetCenter.x, y: targetCenter.y },
+      sourceAnchor: { x: source.centerX, y: source.centerY },
+      targetAnchor: { x: target.centerX, y: target.centerY },
       sourceHandle: 's-bottom',
       targetHandle: 't-top',
     };
   }
 
   return {
-    sourceAnchor: { x: sourceCenter.x, y: sourceCenter.y },
-    targetAnchor: { x: targetCenter.x, y: targetCenter.y },
+    sourceAnchor: { x: source.centerX, y: source.centerY },
+    targetAnchor: { x: target.centerX, y: target.centerY },
     sourceHandle: 's-top',
     targetHandle: 't-bottom',
   };
 }
 
-function getHorizontalAnchors(source: SmartConnectorNode, target: SmartConnectorNode, sign: 1 | -1, config: SmartConnectorConfig): AnchorMeta {
-  const sourceCenter = getNodeCenter(source, config);
-  const targetCenter = getNodeCenter(target, config);
-
+function getHorizontalAnchors(source: NodeMetrics, target: NodeMetrics, sign: 1 | -1): AnchorMeta {
   if (sign >= 0) {
     return {
-      sourceAnchor: { x: sourceCenter.x, y: sourceCenter.y },
-      targetAnchor: { x: targetCenter.x, y: targetCenter.y },
+      sourceAnchor: { x: source.centerX, y: source.centerY },
+      targetAnchor: { x: target.centerX, y: target.centerY },
       sourceHandle: 's-right',
       targetHandle: 't-left',
     };
   }
 
   return {
-    sourceAnchor: { x: sourceCenter.x, y: sourceCenter.y },
-    targetAnchor: { x: targetCenter.x, y: targetCenter.y },
+    sourceAnchor: { x: source.centerX, y: source.centerY },
+    targetAnchor: { x: target.centerX, y: target.centerY },
     sourceHandle: 's-left',
     targetHandle: 't-right',
   };
 }
 
 function edgeToBusRoute(
-  source: SmartConnectorNode,
-  target: SmartConnectorNode,
+  source: NodeMetrics,
+  target: NodeMetrics,
   laneIndex: number,
   sharedBusId: string,
   directionGroup: Extract<SmartDirectionGroup, 'up' | 'down'>,
   config: SmartConnectorConfig
 ): BusEdgeMeta {
-  const sourceCenter = getNodeCenter(source, config);
-  const targetCenter = getNodeCenter(target, config);
-
   const directionSign: 1 | -1 = directionGroup === 'down' ? 1 : -1;
   const sourceAnchor = {
-    x: sourceCenter.x,
-    y: sourceCenter.y,
+    x: source.centerX,
+    y: source.centerY,
   };
   const targetAnchor = {
-    x: targetCenter.x,
-    y: targetCenter.y,
+    x: target.centerX,
+    y: target.centerY,
   };
 
   const span = Math.max(1, Math.abs(targetAnchor.y - sourceAnchor.y));
@@ -282,18 +277,23 @@ export function buildSmartConnectorGeometry(
     return [];
   }
 
-  const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+  const nodeMap = new Map<string, NodeMetrics>();
+  for (let i = 0; i < nodes.length; i += 1) {
+    const node = nodes[i];
+    nodeMap.set(node.id, createNodeMetrics(node, config));
+  }
   const busEdgeMap = new Map<string, BusEdgeMeta>();
   const outgoingMap = new Map<string, SmartConnectorEdge[]>();
 
-  edges.forEach((edge) => {
+  for (let i = 0; i < edges.length; i += 1) {
+    const edge = edges[i];
     const current = outgoingMap.get(edge.source);
     if (current) {
       current.push(edge);
     } else {
       outgoingMap.set(edge.source, [edge]);
     }
-  });
+  }
 
   outgoingMap.forEach((outgoing, sourceId) => {
     if (outgoing.length < 2) {
@@ -307,29 +307,25 @@ export function buildSmartConnectorGeometry(
 
     const withTargets = outgoing
       .map((edge) => ({ edge, target: nodeMap.get(edge.target) }))
-      .filter((item): item is { edge: SmartConnectorEdge; target: SmartConnectorNode } => Boolean(item.target))
+      .filter((item): item is { edge: SmartConnectorEdge; target: NodeMetrics } => Boolean(item.target))
       .sort((a, b) => {
-        const centerA = getNodeCenter(a.target, config);
-        const centerB = getNodeCenter(b.target, config);
-        if (centerA.x === centerB.x) {
+        if (a.target.centerX === b.target.centerX) {
           return a.edge.id.localeCompare(b.edge.id);
         }
-        return centerA.x - centerB.x;
+        return a.target.centerX - b.target.centerX;
       });
 
     if (withTargets.length < 2) {
       return;
     }
 
-    const grouped: Record<'down' | 'up', Array<{ edge: SmartConnectorEdge; target: SmartConnectorNode }>> = {
+    const grouped: Record<'down' | 'up', Array<{ edge: SmartConnectorEdge; target: NodeMetrics }>> = {
       down: [],
       up: [],
     };
 
-    const sourceCenter = getNodeCenter(sourceNode, config);
     withTargets.forEach((item) => {
-      const targetCenter = getNodeCenter(item.target, config);
-      const direction = resolveDirectionGroup(sourceCenter.y, targetCenter.y, config);
+      const direction = resolveDirectionGroup(sourceNode.centerY, item.target.centerY, config);
       if (direction === 'down' || direction === 'up') {
         grouped[direction].push(item);
       }
@@ -356,17 +352,15 @@ export function buildSmartConnectorGeometry(
       continue;
     }
 
-    const sourceCenter = getNodeCenter(source, config);
-    const targetCenter = getNodeCenter(target, config);
-    const kind = resolveOrientation(source, target, config);
+    const kind = resolveOrientationFromMetrics(source, target, config);
 
     const sign: 1 | -1 = kind === 'horizontal'
-      ? targetCenter.x >= sourceCenter.x ? 1 : -1
-      : targetCenter.y >= sourceCenter.y ? 1 : -1;
+      ? target.centerX >= source.centerX ? 1 : -1
+      : target.centerY >= source.centerY ? 1 : -1;
 
     const anchors = kind === 'horizontal'
-      ? getHorizontalAnchors(source, target, sign, config)
-      : getVerticalAnchors(source, target, sign, config);
+      ? getHorizontalAnchors(source, target, sign)
+      : getVerticalAnchors(source, target, sign);
 
     routingMeta.push({
       edge,
@@ -376,12 +370,23 @@ export function buildSmartConnectorGeometry(
       targetAnchor: anchors.targetAnchor,
       sourceHandle: anchors.sourceHandle,
       targetHandle: anchors.targetHandle,
-      directionGroup: resolveDirectionGroup(sourceCenter.y, targetCenter.y, config),
+      directionGroup: resolveDirectionGroup(source.centerY, target.centerY, config),
     });
   }
 
-  const horizontalOffsets = buildLaneOffsets(routingMeta.filter((item) => item.kind === 'horizontal'), 'y', config);
-  const verticalOffsets = buildLaneOffsets(routingMeta.filter((item) => item.kind === 'vertical'), 'x', config);
+  const horizontalRoutingMeta: EdgeRoutingMeta[] = [];
+  const verticalRoutingMeta: EdgeRoutingMeta[] = [];
+  for (let i = 0; i < routingMeta.length; i += 1) {
+    const item = routingMeta[i];
+    if (item.kind === 'horizontal') {
+      horizontalRoutingMeta.push(item);
+    } else {
+      verticalRoutingMeta.push(item);
+    }
+  }
+
+  const horizontalOffsets = buildLaneOffsets(horizontalRoutingMeta, 'y', config);
+  const verticalOffsets = buildLaneOffsets(verticalRoutingMeta, 'x', config);
 
   return routingMeta.map((meta) => {
     const busMeta = busEdgeMap.get(meta.edge.id);
