@@ -22,6 +22,7 @@ export class MindmapInteractionRuntime {
   private readonly observers = new Set<(patch: InteractionPatch) => void>();
   private readonly queue: InteractionCommand[] = [];
   private readonly history: MindmapSnapshot[] = [];
+  private historyStart = 0;
   private readonly maxHistory: number;
   private scheduled = false;
 
@@ -48,14 +49,15 @@ export class MindmapInteractionRuntime {
   }
 
   undo(): CommandResult {
-    if (this.history.length <= 1) {
+    const size = this.history.length - this.historyStart;
+    if (size <= 1) {
       return { ok: false, reason: 'No history to undo.' };
     }
 
     this.history.pop();
-    const prev = this.history[this.history.length - 1];
+    const prev = this.history[this.history.length - 1]!;
     this.engine.replaceSnapshot(prev);
-    this.emit();
+    this.emit(prev);
     return { ok: true };
   }
 
@@ -65,8 +67,9 @@ export class MindmapInteractionRuntime {
       return;
     }
 
-    while (this.queue.length > 0) {
-      const command = this.queue.shift()!;
+    const queued = this.queue.splice(0, this.queue.length);
+    for (let i = 0; i < queued.length; i += 1) {
+      const command = queued[i];
       switch (command.type) {
         case 'create_root':
           this.engine.createRoot(command.title);
@@ -80,19 +83,23 @@ export class MindmapInteractionRuntime {
       }
     }
 
-    this.pushHistory(this.engine.getSnapshot());
-    this.emit();
+    const snapshot = this.engine.getSnapshot();
+    this.pushHistory(snapshot);
+    this.emit(snapshot);
   }
 
   private pushHistory(snapshot: MindmapSnapshot): void {
     this.history.push(snapshot);
-    if (this.history.length > this.maxHistory) {
-      this.history.shift();
+    if (this.history.length - this.historyStart > this.maxHistory) {
+      this.historyStart += 1;
+    }
+    if (this.historyStart > 32 && this.historyStart * 2 > this.history.length) {
+      this.history.splice(0, this.historyStart);
+      this.historyStart = 0;
     }
   }
 
-  private emit(): void {
-    const snapshot = this.engine.getSnapshot();
+  private emit(snapshot: MindmapSnapshot): void {
     const patch: InteractionPatch = {
       version: snapshot.version,
       snapshot,

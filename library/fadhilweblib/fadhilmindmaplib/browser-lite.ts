@@ -38,7 +38,13 @@ export class FadhilMindmapLite {
     if (Array.isArray(snapshot?.nodes) && snapshot.nodes.length > 0) {
       engine.nodes = snapshot.nodes.map((n) => ({ ...n }));
       engine.links = Array.isArray(snapshot.links) ? snapshot.links.map((l) => ({ ...l })) : [];
-      engine.nextId = Math.max(...engine.nodes.map((n) => n.id), 1) + 1;
+      let maxId = 1;
+      for (let i = 0; i < engine.nodes.length; i += 1) {
+        if (engine.nodes[i].id > maxId) {
+          maxId = engine.nodes[i].id;
+        }
+      }
+      engine.nextId = maxId + 1;
       engine.version = snapshot.version || 1;
       engine.rebuildIndexes();
       engine.history = [];
@@ -53,14 +59,30 @@ export class FadhilMindmapLite {
       return this.cachedSnapshot;
     }
 
-    const treeEdges = this.nodes.filter((n) => n.parentId !== null).map((n) => ({ from: n.parentId!, to: n.id, kind: 'tree' as const }));
-    const linkEdges = this.links.map((l) => ({ ...l, kind: 'link' as const }));
+    const nodes = new Array<LiteNode>(this.nodes.length);
+    const treeEdges: LiteSnapshot['edges'] = [];
+    for (let i = 0; i < this.nodes.length; i += 1) {
+      const node = this.nodes[i];
+      nodes[i] = { ...node };
+      if (node.parentId !== null) {
+        treeEdges.push({ from: node.parentId, to: node.id, kind: 'tree' });
+      }
+    }
+
+    const links = new Array<{ from: number; to: number }>(this.links.length);
+    const edges = treeEdges.slice();
+    for (let i = 0; i < this.links.length; i += 1) {
+      const link = this.links[i];
+      const clonedLink = { from: link.from, to: link.to };
+      links[i] = clonedLink;
+      edges.push({ from: link.from, to: link.to, kind: 'link' });
+    }
 
     this.cachedSnapshot = {
       version: this.version,
-      nodes: this.nodes.map((n) => ({ ...n })),
-      links: this.links.map((l) => ({ ...l })),
-      edges: [...treeEdges, ...linkEdges],
+      nodes,
+      links,
+      edges,
     };
     this.dirtySnapshot = false;
     return this.cachedSnapshot;
@@ -98,7 +120,19 @@ export class FadhilMindmapLite {
     if (!target) return false;
     const parentId = target.parentId ?? 1;
 
-    this.nodes = this.nodes.filter((n) => n.id !== id).map((n) => (n.parentId === id ? { ...n, parentId } : n));
+    const compacted: LiteNode[] = [];
+    for (let i = 0; i < this.nodes.length; i += 1) {
+      const node = this.nodes[i];
+      if (node.id === id) {
+        continue;
+      }
+      if (node.parentId === id) {
+        compacted.push({ ...node, parentId });
+      } else {
+        compacted.push(node);
+      }
+    }
+    this.nodes = compacted;
     this.links = this.links.filter((l) => l.from !== id && l.to !== id);
     this.rebuildIndexes();
     this.bumpVersion();
@@ -235,7 +269,13 @@ export class FadhilMindmapLite {
     this.nodes = snapshot.nodes.map((node) => ({ ...node }));
     this.links = snapshot.links.map((link) => ({ ...link }));
     this.version = snapshot.version;
-    this.nextId = Math.max(...this.nodes.map((node) => node.id), 1) + 1;
+    let maxId = 1;
+    for (let i = 0; i < this.nodes.length; i += 1) {
+      if (this.nodes[i].id > maxId) {
+        maxId = this.nodes[i].id;
+      }
+    }
+    this.nextId = maxId + 1;
     this.rebuildIndexes();
   }
 

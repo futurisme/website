@@ -1,4 +1,13 @@
 const WORKSPACE_PATH_REGEX = /^\/shareideas\/page\/([1-9][0-9]*)\/?$/;
+const SHAREIDEAS_API = '/api/shareideas';
+
+async function parseJsonSafe(response) {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+}
 
 export function resolveWorkspaceIdOrRedirect(pathname = window.location.pathname) {
   const matched = WORKSPACE_PATH_REGEX.exec(pathname);
@@ -14,12 +23,12 @@ export function buildWorkspaceApiUrl(workspaceId) {
 }
 
 export async function createWorkspace() {
-  const response = await fetch('/api/shareideas', {
+  const response = await fetch(SHAREIDEAS_API, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'create' }),
   });
-  const payload = await response.json().catch(() => ({}));
+  const payload = await parseJsonSafe(response);
   if (!response.ok || !payload?.id) {
     throw new Error(payload?.error || 'Gagal membuat workspace baru.');
   }
@@ -27,8 +36,8 @@ export async function createWorkspace() {
 }
 
 export async function fetchWorkspaceList() {
-  const response = await fetch('/api/shareideas', { cache: 'no-store' });
-  const payload = await response.json().catch(() => ({}));
+  const response = await fetch(SHAREIDEAS_API, { cache: 'no-store' });
+  const payload = await parseJsonSafe(response);
   if (!response.ok) {
     throw new Error(payload?.error || 'Gagal memuat daftar workspace.');
   }
