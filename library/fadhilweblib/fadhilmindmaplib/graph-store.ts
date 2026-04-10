@@ -75,21 +75,23 @@ export class MindmapGraphStore {
   }
 
   getSnapshot(): MindmapSnapshot {
-    const nodes: MindmapNodeSnapshot[] = new Array(this.ids.length);
-    for (let i = 0; i < this.ids.length; i += 1) {
+    const length = this.ids.length;
+    const nodes: MindmapNodeSnapshot[] = new Array(length);
+    const edges: MindmapEdge[] = new Array(Math.max(0, length - 1));
+    let edgeIndex = 0;
+
+    for (let i = 0; i < length; i += 1) {
+      const parentId = this.parents[i] === ROOT_PARENT ? null : this.parents[i];
       nodes[i] = {
         id: this.ids[i],
         title: this.titles[i],
-        parentId: this.parents[i] === ROOT_PARENT ? null : this.parents[i],
+        parentId,
         depth: this.depths[i],
         weight: this.weights[i],
       };
-    }
-
-    const edges: MindmapEdge[] = [];
-    for (const node of nodes) {
-      if (node.parentId !== null) {
-        edges.push({ from: node.parentId, to: node.id });
+      if (parentId !== null) {
+        edges[edgeIndex] = { from: parentId, to: this.ids[i] };
+        edgeIndex += 1;
       }
     }
 
@@ -97,7 +99,7 @@ export class MindmapGraphStore {
       version: this.version,
       rootId: this.rootId,
       nodes,
-      edges,
+      edges: edgeIndex === edges.length ? edges : edges.slice(0, edgeIndex),
     };
   }
 

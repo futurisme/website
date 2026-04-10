@@ -29,56 +29,89 @@ export function computeMindmapLayout(snapshot: MindmapSnapshot, options: LayoutO
     return { width: 0, height: 0, nodes: [] };
   }
 
-  const children = new Map<MindmapNodeId, MindmapNodeId[]>();
-  const depthById = new Map<MindmapNodeId, number>();
+  const nodeCount = snapshot.nodes.length;
+  const indexById = new Map<MindmapNodeId, number>();
+  const children: number[][] = Array.from({ length: nodeCount }, () => []);
 
-  for (const node of snapshot.nodes) {
-    children.set(node.id, []);
-    depthById.set(node.id, node.depth);
-  }
-  for (const edge of snapshot.edges) {
-    children.get(edge.from)?.push(edge.to);
+  for (let i = 0; i < nodeCount; i += 1) {
+    indexById.set(snapshot.nodes[i].id, i);
   }
 
-  const out: MutableNode[] = [];
+  for (let i = 0; i < snapshot.edges.length; i += 1) {
+    const edge = snapshot.edges[i];
+    const parentIndex = indexById.get(edge.from);
+    const childIndex = indexById.get(edge.to);
+    if (parentIndex !== undefined && childIndex !== undefined) {
+      children[parentIndex].push(childIndex);
+    }
+  }
+
+  const rootIndex = indexById.get(snapshot.rootId);
+  if (rootIndex === undefined) {
+    return { width: 0, height: 0, nodes: [] };
+  }
+
+  const order: number[] = [];
+  const stack: number[] = [rootIndex];
+  while (stack.length > 0) {
+    const index = stack.pop()!;
+    order.push(index);
+    const childIndexes = children[index];
+    for (let i = childIndexes.length - 1; i >= 0; i -= 1) {
+      stack.push(childIndexes[i]);
+    }
+  }
+
+  const out: MutableNode[] = new Array(order.length);
+  const positionedByIndex: Array<MutableNode | undefined> = new Array(nodeCount);
   let row = 0;
-  const walk = (id: MindmapNodeId): void => {
-    const depth = depthById.get(id) ?? 0;
+  let maxX = 0;
+  let maxY = config.padding;
+  for (let i = 0; i < order.length; i += 1) {
+    const index = order[i];
+    const source = snapshot.nodes[index];
     const y = config.padding + row * config.verticalGap;
     row += 1;
-
-    out.push({
-      id,
-      depth,
-      x: config.padding + depth * config.horizontalGap,
+    const x = config.padding + source.depth * config.horizontalGap;
+    const positioned: MutableNode = {
+      id: source.id,
+      depth: source.depth,
+      x,
       y,
       radius: config.nodeRadius,
-    });
-
-    const childIds = children.get(id) ?? [];
-    for (const child of childIds) {
-      walk(child);
+    };
+    out[i] = positioned;
+    positionedByIndex[index] = positioned;
+    if (x > maxX) {
+      maxX = x;
     }
-  };
-
-  walk(snapshot.rootId);
-
-  const byId = new Map(out.map((n) => [n.id, n] as const));
-  for (let i = out.length - 1; i >= 0; i -= 1) {
-    const node = out[i];
-    const childIds = children.get(node.id) ?? [];
-    if (childIds.length === 0) {
-      continue;
-    }
-    const first = byId.get(childIds[0]);
-    const last = byId.get(childIds[childIds.length - 1]);
-    if (first && last) {
-      node.y = (first.y + last.y) / 2;
+    if (y > maxY) {
+      maxY = y;
     }
   }
 
-  const width = Math.max(...out.map((n) => n.x)) + config.padding;
-  const height = Math.max(...out.map((n) => n.y)) + config.padding;
+  for (let i = order.length - 1; i >= 0; i -= 1) {
+    const index = order[i];
+    const node = positionedByIndex[index];
+    if (!node) {
+      continue;
+    }
+    const childIndexes = children[index];
+    if (childIndexes.length === 0) {
+      continue;
+    }
+    const first = positionedByIndex[childIndexes[0]];
+    const last = positionedByIndex[childIndexes[childIndexes.length - 1]];
+    if (first && last) {
+      node.y = (first.y + last.y) / 2;
+      if (node.y > maxY) {
+        maxY = node.y;
+      }
+    }
+  }
+
+  const width = maxX + config.padding;
+  const height = maxY + config.padding;
 
   return {
     width,

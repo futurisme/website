@@ -30,8 +30,22 @@ test('engine builds snapshot and layout deterministically', () => {
   assert.ok(layout.height > 0);
 
   const encoded = serializeMindmap(snapshot);
+  const compact = JSON.parse(encoded) as { v?: number };
+  assert.equal(compact.v, 2);
   const decoded = deserializeMindmap(encoded);
   assert.equal(decoded.nodes.length, snapshot.nodes.length);
+});
+
+test('serializer supports legacy payload compatibility', () => {
+  const legacyPayload = JSON.stringify({
+    version: 3,
+    rootId: 1,
+    nodes: [{ id: 1, title: 'Root', parentId: null, depth: 0, weight: 1 }],
+    edges: [],
+  });
+  const parsed = deserializeMindmap(legacyPayload);
+  assert.equal(parsed.version, 3);
+  assert.equal(parsed.nodes[0].title, 'Root');
 });
 
 test('syntax parser creates deterministic node plan', () => {
