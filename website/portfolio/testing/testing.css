@@ -51,14 +51,22 @@
 
 [data-slot="theme-scope"][data-fwlb-theme="game"] :is(h1,h2,h3,h4,h5,h6,p,li,a,span,strong,small,label,[data-slot]){
   color:#ffffff !important;
-  text-shadow:0 1px 1px rgba(9, 22, 48, .52), 0 0 .7px rgba(7, 16, 38, .55);
+  text-shadow:0 .3px .6px rgba(7, 16, 38, .2);
 }
 
 [data-about-interactive] [data-scroll-motion]{
   color:#ffffff !important;
   font-size:clamp(0.92rem, 0.28vw + 0.88rem, 1.06rem) !important;
-  line-height:1.62 !important;
+  line-height:1.5 !important;
   letter-spacing:.004em;
+  margin-top:.04rem;
+  margin-bottom:.02rem;
+  display:block;
+}
+
+[data-about-interactive] [data-slot="section-body"]{
+  display:grid;
+  gap:.28rem;
 }
 
 @media (prefers-reduced-transparency: reduce){
