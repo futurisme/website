@@ -10,7 +10,7 @@
 
 .portfolio-panel-compact [data-slot="collapsible-panel-content"]{padding-top:0.22rem !important;}
 
-/* Portfolio gradient fix: maroon → purple (#8A00C4) → modern azure → elegant white */
+/* Portfolio gradient fix: maroon → purple (#8A00C4) → modern azure → maroon */
 [data-slot="theme-scope"][data-fwlb-theme="game"]{
   background-color:#2a0f22 !important;
   --fwlb-text-strong:#f8fbff !important;
