@@ -49,10 +49,7 @@
     },
     {
       "src": "/$",
-      "status": 308,
-      "headers": {
-        "Location": "/home"
-      }
+      "dest": "/website/portfolio/index.html"
     },
     {
       "src": "/home",
