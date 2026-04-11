@@ -51,14 +51,20 @@
 
 [data-slot="theme-scope"][data-fwlb-theme="game"] :is(h1,h2,h3,h4,h5,h6,p,li,a,span,strong,small,label,[data-slot]){
   color:#ffffff !important;
-  text-shadow:0 .3px .6px rgba(7, 16, 38, .2);
+  -webkit-text-fill-color:#ffffff !important;
+  text-shadow:none !important;
+  opacity:1 !important;
+  filter:none !important;
+  mix-blend-mode:normal !important;
 }
 
 [data-about-interactive] [data-scroll-motion]{
   color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
   font-size:clamp(0.92rem, 0.28vw + 0.88rem, 1.06rem) !important;
   line-height:1.5 !important;
   letter-spacing:.004em;
+  font-weight:500;
   margin-top:.04rem;
   margin-bottom:.02rem;
   display:block;
