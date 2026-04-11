@@ -125,6 +125,10 @@
     {
       "src": "/Assets/Public/Images/(.*)",
       "dest": "/Assets/Public/Images/$1"
+    },
+    {
+      "src": "/portfolio.webp",
+      "dest": "/Assets/Public/Images/Portfolio.webp"
     }
   ]
 }
