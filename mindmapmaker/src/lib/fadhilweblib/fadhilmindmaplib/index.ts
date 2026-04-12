@@ -10,3 +10,13 @@ export {
   type SmartConnectorRuntime,
   type SmartRouteData,
 } from './smart-connectors';
+
+export {
+  createRafCoalescer,
+  createViewportInteractionRuntime,
+  type RafCoalescer,
+  type ViewportFrameInput,
+  type ViewportInteractionRuntime,
+  type ViewportInteractionRuntimeOptions,
+  type ViewportThresholdState,
+} from './interaction-performance';

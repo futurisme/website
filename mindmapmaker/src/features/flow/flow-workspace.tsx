@@ -55,6 +55,7 @@ import {
   getNodeSize,
 } from './flow-node-placement';
 import { FlowToolbarMobile } from './flow-toolbar-mobile';
+import { createRafCoalescer, createViewportInteractionRuntime } from '@/lib/fadhilweblib/fadhilmindmaplib';
 import type {
   ConceptNode,
   ConceptNodeData,
@@ -145,7 +146,8 @@ interface WorkspaceArchiveFile {
 }
 
 const FRAME_BUDGET_MS = 16.7;
-const PRESENCE_MOVE_CADENCE_MS = 120;
+const PRESENCE_MOVE_CADENCE_DESKTOP_MS = 120;
+const PRESENCE_MOVE_CADENCE_MOBILE_MS = 220;
 const NODE_DRAG_HANDLE_SELECTOR = '.flow-node-drag-handle';
 const WORKSPACE_ARCHIVE_MAGIC = 'chartworkspace/archive';
 const WORKSPACE_ARCHIVE_VERSION = 1;
@@ -435,7 +437,8 @@ export function FlowWorkspace({
   const [unconnectSourceNodeId, setUnconnectSourceNodeId] = useState<string | null>(null);
   const [isRefreshingPage, setIsRefreshingPage] = useState(false);
   const [refreshAlertBroadcast, setRefreshAlertBroadcast] = useState<RefreshAlertBroadcast | null>(null);
-  const [viewportZoom, setViewportZoom] = useState(1);
+  const [isZoomBelowEdgeSimplifyThreshold, setIsZoomBelowEdgeSimplifyThreshold] = useState(false);
+  const [isZoomBelowMobileSnapThreshold, setIsZoomBelowMobileSnapThreshold] = useState(false);
 
   const nodeCountRef = useRef(0);
   const undoManagerRef = useRef<Y.UndoManager | null>(null);
@@ -457,13 +460,13 @@ export function FlowWorkspace({
   const shouldSimplifyEdges =
     nodes.length >= EDGE_SIMPLIFICATION_NODE_THRESHOLD
     && edges.length >= EDGE_SIMPLIFICATION_EDGE_THRESHOLD
-    && viewportZoom < EDGE_SIMPLIFICATION_ZOOM_THRESHOLD;
+    && isZoomBelowEdgeSimplifyThreshold;
   const renderedEdges = useMemo(
     () => (shouldSimplifyEdges ? buildSimplifiedEdges(routedEdges, selectedNodeId) : routedEdges),
     [routedEdges, selectedNodeId, shouldSimplifyEdges]
   );
   const shouldRenderMiniMap = !isMobileViewport && nodes.length <= MINIMAP_MAX_NODE_THRESHOLD;
-  const effectiveSnapToGrid = snapEnabled && (!isMobileViewport || viewportZoom >= MOBILE_SNAP_ZOOM_THRESHOLD);
+  const effectiveSnapToGrid = snapEnabled && (!isMobileViewport || !isZoomBelowMobileSnapThreshold);
   const telemetryRef = useRef<Record<string, { samples: number; totalDurationMs: number; droppedFrames: number; maxDurationMs: number }>>({});
   const lastMovePresenceUpdateRef = useRef(0);
   const pendingMovePresenceRef = useRef<{
@@ -476,6 +479,14 @@ export function FlowWorkspace({
   const pendingDragPresenceRef = useRef<{ nodeId: string; cursorX: number; cursorY: number } | null>(null);
   const dragPresenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastDragPresenceUpdateRef = useRef(0);
+
+  const moveFrameCoalescer = useMemo(() => createRafCoalescer(), []);
+  const dragFrameCoalescer = useMemo(() => createRafCoalescer(), []);
+  const viewportInteractionRuntime = useMemo(() => createViewportInteractionRuntime({
+    edgeSimplificationZoomThreshold: EDGE_SIMPLIFICATION_ZOOM_THRESHOLD,
+    mobileSnapZoomThreshold: MOBILE_SNAP_ZOOM_THRESHOLD,
+    thresholdHysteresis: 0.018,
+  }), []);
 
   const getParentIdFor = useCallback(
     (childId: string) => edges.find((edge) => edge.target === childId)?.source ?? null,
@@ -595,6 +606,10 @@ export function FlowWorkspace({
   }, []);
 
   const profileHandler = useCallback(<T,>(handler: string, callback: () => T): T => {
+    if (!FLOW_TELEMETRY_ENABLED) {
+      return callback();
+    }
+
     const start = performance.now();
     const result = callback();
     trackTelemetry(handler, performance.now() - start);
@@ -620,9 +635,10 @@ export function FlowWorkspace({
       cameraY,
     };
 
+    const cadenceMs = isMobileViewport ? PRESENCE_MOVE_CADENCE_MOBILE_MS : PRESENCE_MOVE_CADENCE_DESKTOP_MS;
     const now = Date.now();
     const elapsed = now - lastMovePresenceUpdateRef.current;
-    if (elapsed >= PRESENCE_MOVE_CADENCE_MS) {
+    if (elapsed >= cadenceMs) {
       flushMovePresence();
       return;
     }
@@ -634,8 +650,8 @@ export function FlowWorkspace({
     movePresenceTimerRef.current = setTimeout(() => {
       movePresenceTimerRef.current = null;
       flushMovePresence();
-    }, PRESENCE_MOVE_CADENCE_MS - elapsed);
-  }, [flushMovePresence]);
+    }, cadenceMs - elapsed);
+  }, [flushMovePresence, isMobileViewport]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof Worker === 'undefined') {
@@ -926,7 +942,7 @@ export function FlowWorkspace({
 
     const now = Date.now();
     const elapsed = now - lastDragPresenceUpdateRef.current;
-    if (elapsed >= PRESENCE_MOVE_CADENCE_MS) {
+    if (elapsed >= PRESENCE_MOVE_CADENCE_DESKTOP_MS) {
       lastDragPresenceUpdateRef.current = now;
       flushDragPresence();
       return;
@@ -940,7 +956,7 @@ export function FlowWorkspace({
       dragPresenceTimerRef.current = null;
       lastDragPresenceUpdateRef.current = Date.now();
       flushDragPresence();
-    }, PRESENCE_MOVE_CADENCE_MS - elapsed);
+    }, PRESENCE_MOVE_CADENCE_DESKTOP_MS - elapsed);
   }, [flushDragPresence]);
 
   useEffect(() => {
@@ -1763,12 +1779,28 @@ export function FlowWorkspace({
 
   const handleMove = useCallback<OnMove>(
     (_event, viewport) => {
-      profileHandler('viewport.move', () => {
-        scheduleMovePresenceFlush(Math.round(viewport.x), Math.round(viewport.y));
-        setViewportZoom(viewport.zoom);
-      });
+      viewportInteractionRuntime.schedule(
+        { x: viewport.x, y: viewport.y, zoom: viewport.zoom },
+        {
+          onSample: (x, y) => {
+            moveFrameCoalescer.schedule(() => {
+              profileHandler('viewport.move', () => {
+                scheduleMovePresenceFlush(x, y);
+              });
+            });
+          },
+          onThresholdState: (state) => {
+            setIsZoomBelowEdgeSimplifyThreshold((previous) => (
+              previous === state.isZoomBelowEdgeSimplifyThreshold ? previous : state.isZoomBelowEdgeSimplifyThreshold
+            ));
+            setIsZoomBelowMobileSnapThreshold((previous) => (
+              previous === state.isZoomBelowMobileSnapThreshold ? previous : state.isZoomBelowMobileSnapThreshold
+            ));
+          },
+        }
+      );
     },
-    [profileHandler, scheduleMovePresenceFlush]
+    [moveFrameCoalescer, profileHandler, scheduleMovePresenceFlush, viewportInteractionRuntime]
   );
 
   const handleSelectionChange = useCallback(
@@ -1802,6 +1834,9 @@ export function FlowWorkspace({
     [handleChangeColor, handleToggleDescriptionPanel, isReadOnly]
   );
   useEffect(() => () => {
+    viewportInteractionRuntime.cancel();
+    moveFrameCoalescer.cancel();
+    dragFrameCoalescer.cancel();
     if (movePresenceTimerRef.current) {
       clearTimeout(movePresenceTimerRef.current);
       movePresenceTimerRef.current = null;
@@ -1812,7 +1847,7 @@ export function FlowWorkspace({
     }
     flushMovePresence();
     flushDragPresence();
-  }, [flushDragPresence, flushMovePresence]);
+  }, [dragFrameCoalescer, flushDragPresence, flushMovePresence, moveFrameCoalescer, viewportInteractionRuntime]);
 
 
   useEffect(() => {
@@ -2042,14 +2077,22 @@ export function FlowWorkspace({
             }}
             onNodesChange={handleNodesChange}
             onNodeDrag={(_event, node) => {
-              scheduleDragPresenceFlush(node.id, Math.round(node.position.x), Math.round(node.position.y));
+              const nodeId = node.id;
+              const x = Math.round(node.position.x);
+              const y = Math.round(node.position.y);
+              dragFrameCoalescer.schedule(() => {
+                scheduleDragPresenceFlush(nodeId, x, y);
+              });
             }}
             onNodeDragStop={handleNodeDragStop}
             onEdgesChange={handleEdgesChange}
             onConnect={handleConnect}
             onSelectionChange={handleSelectionChange}
             onMove={handleMove}
-            onMoveEnd={flushMovePresence}
+            onMoveEnd={() => {
+              viewportInteractionRuntime.flush();
+              flushMovePresence();
+            }}
             onNodeClick={(_event, node) => {
               if (connectSourceNodeId && connectSourceNodeId !== node.id) {
                 createConnectionEdge(connectSourceNodeId, node.id);
