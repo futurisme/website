@@ -6,6 +6,7 @@ import {
   decodeFdhl,
   encodeFdhl,
   loadSnapshot,
+  loadSnapshotRemote,
   saveSnapshot,
 } from '/mindmapmaker/lib/fadhilmindmaplib.browser.js';
 
@@ -47,6 +48,7 @@ let renderQueued = false;
 let fullRenderRequired = true;
 
 centerCameraOnContent(engine.getSnapshot().nodes);
+void hydrateFromRemote();
 
 function render() {
   renderQueued = false;
@@ -113,6 +115,21 @@ function syncToolbarButtons() {
 
 function save() {
   saveSnapshot(safeMapId, engine.getSnapshot());
+}
+
+async function hydrateFromRemote() {
+  const remote = await loadSnapshotRemote(safeMapId);
+  if (!remote) return;
+  try {
+    engine = FadhilMindmapLite.fromSnapshot(remote);
+    selectedId = engine.getSnapshot().nodes[0]?.id ?? selectedId;
+    centerCameraOnContent(engine.getSnapshot().nodes);
+    setStatus('Workspace loaded from database.');
+    saveSnapshot(safeMapId, engine.getSnapshot());
+    requestRender({ full: true });
+  } catch {
+    // Keep local fallback snapshot when remote payload is not usable.
+  }
 }
 
 function pointerStart(event) {

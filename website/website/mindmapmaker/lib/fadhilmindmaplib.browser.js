@@ -290,8 +290,46 @@ export function defaultStorageKey(mapId) {
   return `fadhil_mindmap_${mapId}`;
 }
 
+function sanitizeMapId(mapId) {
+  const parsed = Number(mapId);
+  if (!Number.isInteger(parsed) || parsed < 1) return null;
+  return parsed;
+}
+
+function normalizeSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return null;
+  const nodes = Array.isArray(snapshot.nodes) ? snapshot.nodes : [];
+  const links = Array.isArray(snapshot.links) ? snapshot.links : [];
+  const edges = Array.isArray(snapshot.edges) ? snapshot.edges : [];
+  if (!nodes.length) return null;
+  return {
+    version: Number.isFinite(Number(snapshot.version)) ? Number(snapshot.version) : 1,
+    nodes,
+    links,
+    edges,
+  };
+}
+
+async function syncRemoteSnapshot(mapId, snapshot) {
+  const id = sanitizeMapId(mapId);
+  const normalized = normalizeSnapshot(snapshot);
+  if (!id || !normalized) return;
+  try {
+    await fetch(`/api/mindmapmaker?id=${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      keepalive: true,
+      body: JSON.stringify({ data: normalized }),
+    });
+  } catch {
+    // Best-effort sync: local persistence is still the primary fallback.
+  }
+}
+
 export function saveSnapshot(mapId, snapshot) {
   localStorage.setItem(defaultStorageKey(mapId), JSON.stringify(snapshot));
+  void syncRemoteSnapshot(mapId, snapshot);
 }
 
 export function loadSnapshot(mapId) {
@@ -299,6 +337,22 @@ export function loadSnapshot(mapId) {
   if (!raw) return null;
   try {
     return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+export async function loadSnapshotRemote(mapId) {
+  const id = sanitizeMapId(mapId);
+  if (!id) return null;
+  try {
+    const response = await fetch(`/api/mindmapmaker?id=${id}`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    const payload = await response.json();
+    return normalizeSnapshot(payload?.data);
   } catch {
     return null;
   }
