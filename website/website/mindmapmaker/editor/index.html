@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Mindmapmaker Workspace</title>
     <style>
       html, body { margin: 0; min-height: 100%; background: #020617; color: #e2f8ff; }
@@ -18,6 +18,7 @@
       <section class="workspace panel">
         <div class="help" id="status">Pan canvas: drag empty area. Select node: tap/click. Drag node: drag selected node.</div>
         <div id="viewport" class="viewport" aria-label="Mindmap canvas">
+          <div id="workspace-boundary" class="workspace-boundary" aria-hidden="true"></div>
           <svg id="edges" class="edges" aria-hidden="true"></svg>
           <div id="nodes" class="nodes"></div>
         </div>

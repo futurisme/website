@@ -106,6 +106,17 @@ body {
   height: 100%;
   transform-origin: 0 0;
 }
+.workspace-boundary {
+  position: absolute;
+  transform-origin: 0 0;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px dashed color-mix(in oklab, var(--fwlb-tone-info-border) 75%, #dbeafe);
+  border-radius: .82rem;
+  background:
+    linear-gradient(transparent 95%, rgb(148 163 184 / 0.22) 95%) 0 0 / 100% 48px,
+    linear-gradient(90deg, transparent 95%, rgb(148 163 184 / 0.22) 95%) 0 0 / 48px 100%;
+}
 .edges { z-index: 0; pointer-events: none; }
 .nodes { z-index: 1; }
 .edge-path { fill: none; stroke: color-mix(in oklab, var(--fwlb-tone-info-border) 70%, #ffffff); stroke-width: 2; }

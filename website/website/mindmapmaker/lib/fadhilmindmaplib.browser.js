@@ -100,9 +100,10 @@ export class FadhilMindmapLite {
     return true;
   }
 
-  updateNode(id, patch) {
+  updateNode(id, patch, options = {}) {
     const node = this.getNode(id);
     if (!node) return;
+    const shouldRecord = options.recordHistory !== false;
     const prevTitle = node.title;
     const prevX = node.x;
     const prevY = node.y;
@@ -110,8 +111,12 @@ export class FadhilMindmapLite {
     if (patch.x !== undefined) node.x = patch.x;
     if (patch.y !== undefined) node.y = patch.y;
     if (node.title !== prevTitle || node.x !== prevX || node.y !== prevY) {
-      this.bumpVersion();
-      this.recordHistory();
+      this.dirtySnapshot = true;
+      this.cachedSnapshot = null;
+      if (shouldRecord) {
+        this.bumpVersion();
+        this.recordHistory();
+      }
     }
   }
 
@@ -310,10 +315,24 @@ function normalizeSnapshot(snapshot) {
   };
 }
 
-async function syncRemoteSnapshot(mapId, snapshot) {
+const localSignatureByMap = new Map();
+const remoteSignatureByMap = new Map();
+const remoteDebounceByMap = new Map();
+
+function snapshotSignature(snapshot) {
+  return JSON.stringify({
+    version: snapshot.version,
+    nodes: snapshot.nodes,
+    links: snapshot.links,
+  });
+}
+
+async function syncRemoteSnapshot(mapId, snapshot, signature) {
   const id = sanitizeMapId(mapId);
   const normalized = normalizeSnapshot(snapshot);
   if (!id || !normalized) return;
+  const nextSignature = signature || snapshotSignature(normalized);
+  if (remoteSignatureByMap.get(id) === nextSignature) return;
   try {
     await fetch(`/api/mindmapmaker?id=${id}`, {
       method: 'PUT',
@@ -322,21 +341,52 @@ async function syncRemoteSnapshot(mapId, snapshot) {
       keepalive: true,
       body: JSON.stringify({ data: normalized }),
     });
+    remoteSignatureByMap.set(id, nextSignature);
   } catch {
     // Best-effort sync: local persistence is still the primary fallback.
   }
 }
 
-export function saveSnapshot(mapId, snapshot) {
-  localStorage.setItem(defaultStorageKey(mapId), JSON.stringify(snapshot));
-  void syncRemoteSnapshot(mapId, snapshot);
+function queueRemoteSync(mapId, snapshot, signature) {
+  const id = sanitizeMapId(mapId);
+  if (!id) return;
+  const pending = remoteDebounceByMap.get(id);
+  if (pending) {
+    clearTimeout(pending);
+  }
+  const timer = setTimeout(() => {
+    remoteDebounceByMap.delete(id);
+    void syncRemoteSnapshot(id, snapshot, signature);
+  }, 450);
+  remoteDebounceByMap.set(id, timer);
+}
+
+export function saveSnapshot(mapId, snapshot, options = {}) {
+  const id = sanitizeMapId(mapId);
+  const normalized = normalizeSnapshot(snapshot);
+  if (!id || !normalized) return false;
+  const signature = snapshotSignature(normalized);
+  if (localSignatureByMap.get(id) === signature) {
+    return false;
+  }
+  localStorage.setItem(defaultStorageKey(id), JSON.stringify(normalized));
+  localSignatureByMap.set(id, signature);
+  if (options.remote !== false) {
+    queueRemoteSync(id, normalized, signature);
+  }
+  return true;
 }
 
 export function loadSnapshot(mapId) {
-  const raw = localStorage.getItem(defaultStorageKey(mapId));
+  const id = sanitizeMapId(mapId);
+  if (!id) return null;
+  const raw = localStorage.getItem(defaultStorageKey(id));
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    const parsed = normalizeSnapshot(JSON.parse(raw));
+    if (!parsed) return null;
+    localSignatureByMap.set(id, snapshotSignature(parsed));
+    return parsed;
   } catch {
     return null;
   }
@@ -352,7 +402,13 @@ export async function loadSnapshotRemote(mapId) {
     });
     if (!response.ok) return null;
     const payload = await response.json();
-    return normalizeSnapshot(payload?.data);
+    const normalized = normalizeSnapshot(payload?.data);
+    if (normalized) {
+      const signature = snapshotSignature(normalized);
+      localSignatureByMap.set(id, signature);
+      remoteSignatureByMap.set(id, signature);
+    }
+    return normalized;
   } catch {
     return null;
   }

@@ -15,6 +15,7 @@ const statusEl = document.getElementById('status');
 const nodesLayer = document.getElementById('nodes');
 const edgesLayer = document.getElementById('edges');
 const viewport = document.getElementById('viewport');
+const boundaryLayer = document.getElementById('workspace-boundary');
 const addNodeBtn = document.getElementById('add-node');
 const removeNodeBtn = document.getElementById('remove-node');
 const connectBtn = document.getElementById('connect-node');
@@ -46,6 +47,10 @@ let startCamera = { x: 0, y: 0 };
 let dragTargetId = null;
 let renderQueued = false;
 let fullRenderRequired = true;
+let lastSavedVersion = Number.isFinite(engine.version) ? engine.version : 0;
+let dragMoved = false;
+let dragNodePosition = null;
+let pinchState = null;
 
 centerCameraOnContent(engine.getSnapshot().nodes);
 void hydrateFromRemote();
@@ -55,11 +60,16 @@ function render() {
   const transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
   edgesLayer.style.transform = transform;
   nodesLayer.style.transform = transform;
+  if (boundaryLayer) {
+    boundaryLayer.style.transform = transform;
+  }
   if (!fullRenderRequired) {
     return;
   }
   fullRenderRequired = false;
   const snapshot = engine.getSnapshot();
+  const bounds = getWorkspaceBounds(snapshot.nodes);
+  renderWorkspaceBoundary(bounds);
 
   const byId = new Map(snapshot.nodes.map((n) => [n.id, n]));
   edgesLayer.innerHTML = snapshot.links
@@ -114,7 +124,13 @@ function syncToolbarButtons() {
 }
 
 function save() {
-  saveSnapshot(safeMapId, engine.getSnapshot());
+  if (!Number.isFinite(engine.version) || engine.version === lastSavedVersion) {
+    return;
+  }
+  const didSave = saveSnapshot(safeMapId, engine.getSnapshot());
+  if (didSave) {
+    lastSavedVersion = engine.version;
+  }
 }
 
 async function hydrateFromRemote() {
@@ -125,7 +141,8 @@ async function hydrateFromRemote() {
     selectedId = engine.getSnapshot().nodes[0]?.id ?? selectedId;
     centerCameraOnContent(engine.getSnapshot().nodes);
     setStatus('Workspace loaded from database.');
-    saveSnapshot(safeMapId, engine.getSnapshot());
+    saveSnapshot(safeMapId, engine.getSnapshot(), { remote: false });
+    lastSavedVersion = Number.isFinite(engine.version) ? engine.version : lastSavedVersion;
     requestRender({ full: true });
   } catch {
     // Keep local fallback snapshot when remote payload is not usable.
@@ -133,6 +150,15 @@ async function hydrateFromRemote() {
 }
 
 function pointerStart(event) {
+  registerPointer(event);
+  if (activePointers.size >= 2) {
+    dragMode = 'idle';
+    dragTargetId = null;
+    dragMoved = false;
+    dragNodePosition = null;
+    syncPinchState();
+    return;
+  }
   if (activePointerId !== null) return;
   activePointerId = event.pointerId;
   viewport.setPointerCapture(event.pointerId);
@@ -158,6 +184,8 @@ function pointerStart(event) {
     if (node) {
       startNode = { x: node.x, y: node.y };
       dragMode = 'node';
+      dragMoved = false;
+      dragNodePosition = null;
     }
   } else {
     dragMode = 'pan';
@@ -167,15 +195,30 @@ function pointerStart(event) {
 }
 
 function pointerMove(event) {
+  if (!activePointers.has(event.pointerId)) return;
+  registerPointer(event);
+  if (activePointers.size >= 2) {
+    event.preventDefault();
+    applyPinchZoom();
+    requestRender();
+    return;
+  }
   if (event.pointerId !== activePointerId) return;
   if (dragMode === 'idle') return;
   event.preventDefault();
 
+  const bounds = getWorkspaceBounds(engine.getSnapshot().nodes);
   const dx = (event.clientX - startPointer.x) / camera.scale;
   const dy = (event.clientY - startPointer.y) / camera.scale;
 
   if (dragMode === 'node' && dragTargetId !== null) {
-    engine.updateNode(dragTargetId, { x: startNode.x + dx, y: startNode.y + dy });
+    const nextX = clampNodeX(startNode.x + dx, bounds);
+    const nextY = clampNodeY(startNode.y + dy, bounds);
+    if (nextX !== startNode.x || nextY !== startNode.y) {
+      dragMoved = true;
+      dragNodePosition = { x: nextX, y: nextY };
+      engine.updateNode(dragTargetId, { x: nextX, y: nextY }, { recordHistory: false });
+    }
   } else if (dragMode === 'pan') {
     camera.x = startCamera.x + (event.clientX - startPointer.x) * PAN_SENSITIVITY;
     camera.y = startCamera.y + (event.clientY - startPointer.y) * PAN_SENSITIVITY;
@@ -185,18 +228,39 @@ function pointerMove(event) {
 }
 
 function pointerEnd(event) {
+  unregisterPointer(event);
+  if (activePointers.size >= 2) {
+    syncPinchState();
+    return;
+  }
+  if (pinchState && activePointers.size === 1) {
+    const [pointer] = activePointers.values();
+    startPointer = { x: pointer.x, y: pointer.y };
+    startCamera = { x: camera.x, y: camera.y };
+    dragMode = 'pan';
+    activePointerId = pointer.id;
+    pinchState = null;
+    return;
+  }
   if (activePointerId !== null && event.pointerId === activePointerId) {
     viewport.releasePointerCapture(event.pointerId);
+  }
+  if (dragMode === 'node' && dragTargetId !== null && dragMoved && dragNodePosition) {
+    engine.updateNode(dragTargetId, dragNodePosition);
+    save();
   }
   activePointerId = null;
   dragMode = 'idle';
   dragTargetId = null;
-  save();
+  dragMoved = false;
+  dragNodePosition = null;
+  pinchState = null;
 }
 
 function onWheel(event) {
   event.preventDefault();
-  camera.scale = clampScale(camera.scale + (event.deltaY > 0 ? -0.05 : 0.05));
+  const nextScale = clampScale(camera.scale + (event.deltaY > 0 ? -0.05 : 0.05));
+  zoomAtPoint(event.clientX, event.clientY, nextScale);
   requestRender();
 }
 
@@ -635,6 +699,98 @@ function centerCameraOnContent(nodes) {
   const centerY = minY + contentHeight / 2;
   camera.x = viewportWidth / 2 - centerX * fitScale;
   camera.y = viewportHeight / 2 - centerY * fitScale;
+}
+
+function getWorkspaceBounds(nodes = []) {
+  const viewportWidth = Math.max(360, viewport.clientWidth || 360);
+  const viewportHeight = Math.max(240, viewport.clientHeight || 240);
+  const dynamicWidth = Math.max(2400, Math.round(viewportWidth * 4.8));
+  const dynamicHeight = Math.max(1600, Math.round(viewportHeight * 4.8));
+  let maxNodeX = 0;
+  let maxNodeY = 0;
+  for (const node of nodes) {
+    const x = Number(node?.x);
+    const y = Number(node?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    maxNodeX = Math.max(maxNodeX, x + NODE_BOX.width + 320);
+    maxNodeY = Math.max(maxNodeY, y + NODE_BOX.height + 240);
+  }
+  return {
+    minX: 0,
+    minY: 0,
+    maxX: Math.max(dynamicWidth, maxNodeX),
+    maxY: Math.max(dynamicHeight, maxNodeY),
+  };
+}
+
+function clampNodeX(x, bounds) {
+  return Math.min(bounds.maxX - NODE_BOX.width, Math.max(bounds.minX, x));
+}
+
+function clampNodeY(y, bounds) {
+  return Math.min(bounds.maxY - NODE_BOX.height, Math.max(bounds.minY, y));
+}
+
+function renderWorkspaceBoundary(bounds) {
+  if (!boundaryLayer) return;
+  boundaryLayer.style.left = `${bounds.minX}px`;
+  boundaryLayer.style.top = `${bounds.minY}px`;
+  boundaryLayer.style.width = `${Math.max(1, bounds.maxX - bounds.minX)}px`;
+  boundaryLayer.style.height = `${Math.max(1, bounds.maxY - bounds.minY)}px`;
+}
+
+const activePointers = new Map();
+
+function registerPointer(event) {
+  activePointers.set(event.pointerId, { id: event.pointerId, x: event.clientX, y: event.clientY });
+}
+
+function unregisterPointer(event) {
+  activePointers.delete(event.pointerId);
+}
+
+function syncPinchState() {
+  if (activePointers.size < 2) {
+    pinchState = null;
+    return;
+  }
+  const [a, b] = Array.from(activePointers.values()).slice(0, 2);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const distance = Math.max(8, Math.hypot(dx, dy));
+  pinchState = {
+    startDistance: distance,
+    startScale: camera.scale,
+    startX: (a.x + b.x) / 2,
+    startY: (a.y + b.y) / 2,
+  };
+}
+
+function applyPinchZoom() {
+  if (!pinchState || activePointers.size < 2) {
+    syncPinchState();
+    return;
+  }
+  const [a, b] = Array.from(activePointers.values()).slice(0, 2);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const distance = Math.max(8, Math.hypot(dx, dy));
+  const centerX = (a.x + b.x) / 2;
+  const centerY = (a.y + b.y) / 2;
+  const ratio = distance / pinchState.startDistance;
+  const nextScale = clampScale(pinchState.startScale * ratio);
+  zoomAtPoint(centerX, centerY, nextScale);
+}
+
+function zoomAtPoint(clientX, clientY, nextScale) {
+  const rect = viewport.getBoundingClientRect();
+  const px = clientX - rect.left;
+  const py = clientY - rect.top;
+  const worldX = (px - camera.x) / camera.scale;
+  const worldY = (py - camera.y) / camera.scale;
+  camera.scale = nextScale;
+  camera.x = px - worldX * nextScale;
+  camera.y = py - worldY * nextScale;
 }
 
 function extractViewport(input) {
