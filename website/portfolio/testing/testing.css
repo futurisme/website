@@ -139,3 +139,35 @@
     flex-basis: calc((100% - (5 * var(--about-emblem-gap))) / 6);
   }
 }
+
+/* Desktop/Laptop-only image tightening (mobile untouched by design) */
+@media (min-width: 1024px) {
+  #app [data-slot="theme-scope"] {
+    --fwlb-container-max: 64rem;
+  }
+
+  #about-testing img[alt="Fadhil Akbar portfolio banner"] {
+    width: min(100%, 860px) !important;
+    height: auto !important;
+    max-height: 420px;
+    margin-inline: auto;
+  }
+
+  #portfolio-testing [data-project-card] {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  #portfolio-testing [data-project-card] img[data-src] {
+    max-height: 260px !important;
+    object-fit: cover;
+  }
+
+  .about-emblems-row {
+    width: min(100%, 25rem);
+  }
+
+  .about-emblems-row > * {
+    max-width: 3.9rem;
+  }
+}
