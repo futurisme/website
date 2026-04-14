@@ -25,6 +25,7 @@ const loadBtn = document.getElementById('load-map');
 const loadInput = document.getElementById('load-input');
 const undoBtn = document.getElementById('undo-node');
 const redoBtn = document.getElementById('redo-node');
+const syncStatusDotEl = document.getElementById('sync-status-dot');
 
 const mapIdMatch = window.location.pathname.match(/\/(mindmapmaker\/)?editor\/(\d+)/);
 const safeMapId = Number.isInteger(Number(mapIdMatch?.[2])) && Number(mapIdMatch[2]) > 0 ? Number(mapIdMatch[2]) : 1;
@@ -34,7 +35,11 @@ const persisted = loadSnapshot(safeMapId);
 let engine = persisted ? FadhilMindmapLite.fromSnapshot(persisted) : new FadhilMindmapLite();
 const camera = createViewportState();
 const IS_TOUCH_PRIMARY = matchMedia('(pointer: coarse)').matches;
-const NODE_BOX = { width: 180, height: 56 };
+const GRID_SIZE = 100;
+const GRID_COLUMNS_SHORT = 2;
+const GRID_COLUMNS_LONG = 4;
+const GRID_ROWS = 1;
+const LONG_NODE_THRESHOLD = 36;
 const PAN_SENSITIVITY = IS_TOUCH_PRIMARY ? 0.78 : 1;
 
 let selectedId = engine.getSnapshot().nodes[0]?.id ?? 1;
@@ -51,18 +56,17 @@ let lastSavedVersion = Number.isFinite(engine.version) ? engine.version : 0;
 let dragMoved = false;
 let dragNodePosition = null;
 let pinchState = null;
+let nodeElementById = new Map();
+let edgeElementsByNodeId = new Map();
+const tapBurst = { nodeId: null, stamps: [] };
 
+snapEngineNodesToGrid();
 centerCameraOnContent(engine.getSnapshot().nodes);
 void hydrateFromRemote();
 
 function render() {
   renderQueued = false;
-  const transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
-  edgesLayer.style.transform = transform;
-  nodesLayer.style.transform = transform;
-  if (boundaryLayer) {
-    boundaryLayer.style.transform = transform;
-  }
+  applyViewportTransform();
   if (!fullRenderRequired) {
     return;
   }
@@ -78,27 +82,103 @@ function render() {
       const to = byId.get(edge.to);
       if (!from || !to) return '';
       const klass = 'edge-path edge-link';
-      const fromAnchor = { x: from.x + NODE_BOX.width / 2, y: from.y + NODE_BOX.height / 2 };
-      const toAnchor = { x: to.x + NODE_BOX.width / 2, y: to.y + NODE_BOX.height / 2 };
+      const fromMetrics = getNodeMetrics(from);
+      const toMetrics = getNodeMetrics(to);
+      const fromAnchor = { x: from.x + fromMetrics.width / 2, y: from.y + fromMetrics.height / 2 };
+      const toAnchor = { x: to.x + toMetrics.width / 2, y: to.y + toMetrics.height / 2 };
       const path = buildEdgePath(fromAnchor, toAnchor);
       if (!path) return '';
-      return `<path class="${klass}" d="${path}"></path>`;
+      return `<path class="${klass}" data-from="${edge.from}" data-to="${edge.to}" d="${path}"></path>`;
     })
     .join('');
 
   nodesLayer.innerHTML = snapshot.nodes
     .map(
-      (node) => `
-      <button class="node" data-id="${node.id}" data-selected="${node.id === selectedId}" style="left:${node.x}px;top:${node.y}px">
+      (node) => {
+        const metrics = getNodeMetrics(node);
+        return `
+      <button class="node" data-id="${node.id}" data-selected="${node.id === selectedId}" data-grid-columns="${metrics.columns}" style="left:${node.x}px;top:${node.y}px;width:${metrics.width}px;height:${metrics.height}px">
         ${escapeHtml(node.title)}
         <small>ID ${node.id}</small>
       </button>
-    `,
+    `;
+      },
     )
     .join('');
+  rebuildRenderIndexes();
 
   connectBtn.textContent = engine.hasConnectionFrom(selectedId) ? 'Unconnect' : 'Connect';
   syncToolbarButtons();
+}
+
+function applyViewportTransform() {
+  const snapUnit = 1 / Math.max(1, window.devicePixelRatio || 1);
+  const snappedX = Math.round(camera.x / snapUnit) * snapUnit;
+  const snappedY = Math.round(camera.y / snapUnit) * snapUnit;
+  const transform = `translate3d(${snappedX}px, ${snappedY}px, 0) scale(${camera.scale})`;
+  edgesLayer.style.transform = transform;
+  nodesLayer.style.transform = transform;
+  if (boundaryLayer) {
+    boundaryLayer.style.transform = transform;
+  }
+}
+
+function rebuildRenderIndexes() {
+  nodeElementById = new Map();
+  edgeElementsByNodeId = new Map();
+  nodesLayer.querySelectorAll('.node').forEach((nodeEl) => {
+    const id = Number(nodeEl.dataset.id);
+    if (Number.isFinite(id)) {
+      nodeElementById.set(id, nodeEl);
+    }
+  });
+  edgesLayer.querySelectorAll('path[data-from][data-to]').forEach((pathEl) => {
+    const from = Number(pathEl.dataset.from);
+    const to = Number(pathEl.dataset.to);
+    if (!Number.isFinite(from) || !Number.isFinite(to)) return;
+    bindEdgeToNode(from, pathEl);
+    bindEdgeToNode(to, pathEl);
+  });
+}
+
+function bindEdgeToNode(nodeId, edgeEl) {
+  let list = edgeElementsByNodeId.get(nodeId);
+  if (!list) {
+    list = [];
+    edgeElementsByNodeId.set(nodeId, list);
+  }
+  list.push(edgeEl);
+}
+
+function updateNodeVisual(nodeId) {
+  const node = engine.getNode(nodeId);
+  if (!node) return;
+  const nodeEl = nodeElementById.get(nodeId);
+  const metrics = getNodeMetrics(node);
+  if (nodeEl) {
+    nodeEl.style.left = `${node.x}px`;
+    nodeEl.style.top = `${node.y}px`;
+    nodeEl.style.width = `${metrics.width}px`;
+    nodeEl.style.height = `${metrics.height}px`;
+    nodeEl.dataset.gridColumns = String(metrics.columns);
+  }
+  const edges = edgeElementsByNodeId.get(nodeId);
+  if (!edges || edges.length === 0) return;
+  for (const edgeEl of edges) {
+    const from = Number(edgeEl.dataset.from);
+    const to = Number(edgeEl.dataset.to);
+    const fromNode = engine.getNode(from);
+    const toNode = engine.getNode(to);
+    if (!fromNode || !toNode) continue;
+    const fromMetrics = getNodeMetrics(fromNode);
+    const toMetrics = getNodeMetrics(toNode);
+    const fromAnchor = { x: fromNode.x + fromMetrics.width / 2, y: fromNode.y + fromMetrics.height / 2 };
+    const toAnchor = { x: toNode.x + toMetrics.width / 2, y: toNode.y + toMetrics.height / 2 };
+    const path = buildEdgePath(fromAnchor, toAnchor);
+    if (path) {
+      edgeEl.setAttribute('d', path);
+    }
+  }
 }
 
 function requestRender({ full = false } = {}) {
@@ -112,6 +192,14 @@ function requestRender({ full = false } = {}) {
 
 function setStatus(text) {
   statusEl.textContent = text;
+}
+
+function setRemoteOnline(online) {
+  if (!syncStatusDotEl) return;
+  const next = Boolean(online);
+  syncStatusDotEl.dataset.online = String(next);
+  syncStatusDotEl.setAttribute('aria-label', next ? 'Online' : 'Offline');
+  syncStatusDotEl.title = next ? 'Online' : 'Offline';
 }
 
 function syncToolbarButtons() {
@@ -135,17 +223,32 @@ function save() {
 
 async function hydrateFromRemote() {
   const remote = await loadSnapshotRemote(safeMapId);
-  if (!remote) return;
+  if (!remote) {
+    setRemoteOnline(false);
+    return;
+  }
   try {
     engine = FadhilMindmapLite.fromSnapshot(remote);
+    snapEngineNodesToGrid();
     selectedId = engine.getSnapshot().nodes[0]?.id ?? selectedId;
     centerCameraOnContent(engine.getSnapshot().nodes);
     setStatus('Workspace loaded from database.');
     saveSnapshot(safeMapId, engine.getSnapshot(), { remote: false });
     lastSavedVersion = Number.isFinite(engine.version) ? engine.version : lastSavedVersion;
+    setRemoteOnline(true);
     requestRender({ full: true });
   } catch {
+    setRemoteOnline(false);
     // Keep local fallback snapshot when remote payload is not usable.
+  }
+}
+
+async function probeRemoteConnection() {
+  try {
+    const response = await fetch(`/api/mindmapmaker?id=${safeMapId}`, { method: 'GET', cache: 'no-store' });
+    setRemoteOnline(response.ok);
+  } catch {
+    setRemoteOnline(false);
   }
 }
 
@@ -212,19 +315,26 @@ function pointerMove(event) {
   const dy = (event.clientY - startPointer.y) / camera.scale;
 
   if (dragMode === 'node' && dragTargetId !== null) {
-    const nextX = clampNodeX(startNode.x + dx, bounds);
-    const nextY = clampNodeY(startNode.y + dy, bounds);
-    if (nextX !== startNode.x || nextY !== startNode.y) {
+    const activeNode = engine.getNode(dragTargetId);
+    if (!activeNode) {
+      return;
+    }
+    const nextX = clampNodeX(snapToGrid(startNode.x + dx), bounds, dragTargetId);
+    const nextY = clampNodeY(snapToGrid(startNode.y + dy), bounds, dragTargetId);
+    if (nextX !== activeNode.x || nextY !== activeNode.y) {
       dragMoved = true;
       dragNodePosition = { x: nextX, y: nextY };
       engine.updateNode(dragTargetId, { x: nextX, y: nextY }, { recordHistory: false });
+      updateNodeVisual(dragTargetId);
     }
   } else if (dragMode === 'pan') {
     camera.x = startCamera.x + (event.clientX - startPointer.x) * PAN_SENSITIVITY;
     camera.y = startCamera.y + (event.clientY - startPointer.y) * PAN_SENSITIVITY;
   }
 
-  requestRender({ full: dragMode !== 'pan' });
+  if (dragMode === 'pan') {
+    requestRender();
+  }
 }
 
 function pointerEnd(event) {
@@ -245,6 +355,9 @@ function pointerEnd(event) {
   if (activePointerId !== null && event.pointerId === activePointerId) {
     viewport.releasePointerCapture(event.pointerId);
   }
+  if (dragMode === 'node' && dragTargetId !== null && !dragMoved) {
+    handleNodeTapForRename(dragTargetId);
+  }
   if (dragMode === 'node' && dragTargetId !== null && dragMoved && dragNodePosition) {
     engine.updateNode(dragTargetId, dragNodePosition);
     save();
@@ -255,6 +368,33 @@ function pointerEnd(event) {
   dragMoved = false;
   dragNodePosition = null;
   pinchState = null;
+}
+
+function handleNodeTapForRename(nodeId) {
+  const now = Date.now();
+  const recent = tapBurst.nodeId === nodeId ? tapBurst.stamps.filter((ts) => now - ts < 700) : [];
+  recent.push(now);
+  tapBurst.nodeId = nodeId;
+  tapBurst.stamps = recent;
+  if (recent.length < 3) {
+    return;
+  }
+  tapBurst.stamps = [];
+  openRenameNodePopup(nodeId);
+}
+
+function openRenameNodePopup(nodeId) {
+  const node = engine.getNode(nodeId);
+  if (!node) return;
+  const draft = window.prompt('Rename node', node.title);
+  if (draft === null) return;
+  const nextTitle = draft.trim();
+  if (!nextTitle || nextTitle === node.title) return;
+  engine.updateNode(nodeId, { title: nextTitle });
+  selectedId = nodeId;
+  requestRender({ full: true });
+  save();
+  setStatus(`Node ${nodeId} renamed.`);
 }
 
 function onWheel(event) {
@@ -275,7 +415,10 @@ function download(filename, content, mime) {
 }
 
 addNodeBtn.addEventListener('click', () => {
-  engine.addNode(selectedId, `Node ${Date.now().toString().slice(-4)}`);
+  const created = engine.addNode(selectedId, `Node ${Date.now().toString().slice(-4)}`);
+  if (created) {
+    engine.updateNode(created.id, { x: snapToGrid(created.x), y: snapToGrid(created.y) }, { recordHistory: false });
+  }
   requestRender({ full: true });
   save();
   setStatus('Node added.');
@@ -353,6 +496,7 @@ loadInput.addEventListener('change', async () => {
     const lowerName = file.name.toLowerCase();
     if (lowerName.endsWith('.csv')) {
       engine.fromCsv(text);
+      snapEngineNodesToGrid();
       setStatus('CSV loaded.');
     } else {
       const decoded = lowerName.endsWith('.cws') ? decodeLegacyCws(text) : await decodeFdhl(text);
@@ -366,6 +510,7 @@ loadInput.addEventListener('change', async () => {
       if (normalized) {
         const transformed = transformLegacySnapshot(normalized);
         engine = FadhilMindmapLite.fromSnapshot(transformed);
+        snapEngineNodesToGrid();
         const preferredViewport = extractViewport(apiDecoded) ?? extractViewport(decoded) ?? extractViewport(normalized);
         if (preferredViewport) {
           applyCameraViewport(preferredViewport);
@@ -397,13 +542,48 @@ viewport.addEventListener('pointerup', pointerEnd);
 viewport.addEventListener('pointercancel', pointerEnd);
 viewport.addEventListener('wheel', onWheel, { passive: false });
 window.addEventListener('beforeunload', save);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    void probeRemoteConnection();
+  }
+});
 
 document.addEventListener('gesturestart', (e) => e.preventDefault());
+setRemoteOnline(false);
+void probeRemoteConnection();
+setInterval(() => {
+  void probeRemoteConnection();
+}, 20000);
 
 requestRender({ full: true });
 
 function escapeHtml(input) {
   return input.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+}
+
+function getNodeMetrics(node) {
+  const title = typeof node?.title === 'string' ? node.title.trim() : '';
+  const columns = title.length > LONG_NODE_THRESHOLD ? GRID_COLUMNS_LONG : GRID_COLUMNS_SHORT;
+  return {
+    columns,
+    width: columns * GRID_SIZE,
+    height: GRID_ROWS * GRID_SIZE,
+  };
+}
+
+function snapToGrid(value) {
+  return Math.round(Number(value) / GRID_SIZE) * GRID_SIZE;
+}
+
+function snapEngineNodesToGrid() {
+  const snapshot = engine.getSnapshot();
+  for (const node of snapshot.nodes) {
+    const nextX = snapToGrid(node.x);
+    const nextY = snapToGrid(node.y);
+    if (nextX !== node.x || nextY !== node.y) {
+      engine.updateNode(node.id, { x: nextX, y: nextY }, { recordHistory: false });
+    }
+  }
 }
 
 function normalizeLiteSnapshot(input) {
@@ -683,10 +863,11 @@ function centerCameraOnContent(nodes) {
     const x = Number(node.x);
     const y = Number(node.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    const metrics = getNodeMetrics(node);
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x + NODE_BOX.width);
-    maxY = Math.max(maxY, y + NODE_BOX.height);
+    maxX = Math.max(maxX, x + metrics.width);
+    maxY = Math.max(maxY, y + metrics.height);
   }
   if (!Number.isFinite(minX) || !Number.isFinite(minY)) return;
 
@@ -712,8 +893,9 @@ function getWorkspaceBounds(nodes = []) {
     const x = Number(node?.x);
     const y = Number(node?.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-    maxNodeX = Math.max(maxNodeX, x + NODE_BOX.width + 320);
-    maxNodeY = Math.max(maxNodeY, y + NODE_BOX.height + 240);
+    const metrics = getNodeMetrics(node);
+    maxNodeX = Math.max(maxNodeX, x + metrics.width + 320);
+    maxNodeY = Math.max(maxNodeY, y + metrics.height + 240);
   }
   return {
     minX: 0,
@@ -723,12 +905,14 @@ function getWorkspaceBounds(nodes = []) {
   };
 }
 
-function clampNodeX(x, bounds) {
-  return Math.min(bounds.maxX - NODE_BOX.width, Math.max(bounds.minX, x));
+function clampNodeX(x, bounds, nodeId = null) {
+  const metrics = getNodeMetrics(nodeId === null ? null : engine.getNode(nodeId));
+  return Math.min(bounds.maxX - metrics.width, Math.max(bounds.minX, x));
 }
 
-function clampNodeY(y, bounds) {
-  return Math.min(bounds.maxY - NODE_BOX.height, Math.max(bounds.minY, y));
+function clampNodeY(y, bounds, nodeId = null) {
+  const metrics = getNodeMetrics(nodeId === null ? null : engine.getNode(nodeId));
+  return Math.min(bounds.maxY - metrics.height, Math.max(bounds.minY, y));
 }
 
 function renderWorkspaceBoundary(bounds) {
@@ -818,10 +1002,11 @@ function hasVisibleNodeInViewport(nodes) {
     const x = Number(node.x);
     const y = Number(node.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    const metrics = getNodeMetrics(node);
     const sx = x * camera.scale + camera.x;
     const sy = y * camera.scale + camera.y;
-    const sw = NODE_BOX.width * camera.scale;
-    const sh = NODE_BOX.height * camera.scale;
+    const sw = metrics.width * camera.scale;
+    const sh = metrics.height * camera.scale;
     if (sx + sw >= 0 && sy + sh >= 0 && sx <= width && sy <= height) {
       return true;
     }
