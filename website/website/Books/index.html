@@ -43,7 +43,9 @@
         releaseProgress: 0.36,
         velocityThreshold: 0.56,
         maxTilt: 7,
-        pageResistance: 0.84
+        maxTwist: 5.4,
+        pageResistance: 0.84,
+        curveStrength: 0.72
       });
       window.addEventListener('storage', () => engine.setBook(loadBook()));
     </script>
