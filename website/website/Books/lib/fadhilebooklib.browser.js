@@ -10,13 +10,13 @@ const DEFAULT_BOOK = {
 };
 
 const DEFAULT_OPTIONS = {
-  duration: 240,
+  duration: 220,
   edgeStartRatio: 0.16,
   minDragDistance: 14,
   minHoldMs: 55,
   releaseProgress: 0.32,
   velocityThreshold: 0.48,
-  meshSegments: 28,
+  meshSegments: 30,
   curveStrength: 20,
   maxCacheDistance: 1
 };
@@ -53,6 +53,8 @@ export class FadhilEBookLite {
     this.width = 1;
     this.height = 1;
     this.dpr = 1;
+    this.pixelWidth = 1;
+    this.pixelHeight = 1;
 
     this.pageCache = new Map();
     this.drag = null;
@@ -60,6 +62,8 @@ export class FadhilEBookLite {
     this.velocityX = 0;
     this.lastMoveTs = 0;
     this.renderQueued = false;
+    this.lastFrameTs = performance.now();
+    this.adaptiveSegments = this.options.meshSegments;
 
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -88,16 +92,21 @@ export class FadhilEBookLite {
 
   setOptions(nextOptions = {}) {
     this.options = { ...this.options, ...nextOptions };
+    this.adaptiveSegments = this.options.meshSegments;
   }
 
   resize() {
     const rect = this.frame.getBoundingClientRect();
-    this.dpr = clamp(window.devicePixelRatio || 1, 1, 2);
+    this.dpr = clamp(window.devicePixelRatio || 1, 1, 2.5);
     this.width = Math.max(1, Math.round(rect.width));
     this.height = Math.max(1, Math.round(rect.height));
-    this.canvas.width = Math.round(this.width * this.dpr);
-    this.canvas.height = Math.round(this.height * this.dpr);
+    this.pixelWidth = Math.max(1, Math.round(this.width * this.dpr));
+    this.pixelHeight = Math.max(1, Math.round(this.height * this.dpr));
+    this.canvas.width = this.pixelWidth;
+    this.canvas.height = this.pixelHeight;
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = 'high';
     this.pageCache.clear();
     this.renderStatic();
   }
@@ -189,7 +198,7 @@ export class FadhilEBookLite {
     const from = dragState.progress;
     const dir = dragState.dir;
     const start = performance.now();
-    const duration = clamp(this.options.duration * (0.45 + Math.abs(targetProgress - from)), 120, 280);
+    const duration = clamp(this.options.duration * (0.45 + Math.abs(targetProgress - from)), 100, 250);
 
     const tick = (now) => {
       const t = clamp((now - start) / duration, 0, 1);
@@ -214,23 +223,34 @@ export class FadhilEBookLite {
   queueRender() {
     if (this.renderQueued || !this.drag) return;
     this.renderQueued = true;
-    requestAnimationFrame(() => {
+
+    requestAnimationFrame((now) => {
       this.renderQueued = false;
       if (!this.drag) return;
+
+      const frameMs = now - this.lastFrameTs;
+      this.lastFrameTs = now;
+      if (frameMs > 20) this.adaptiveSegments = Math.max(14, this.adaptiveSegments - 2);
+      else this.adaptiveSegments = Math.min(this.options.meshSegments, this.adaptiveSegments + 1);
+
       this.drawFlip(this.drag.progress, this.drag.dir, this.drag.touchY);
     });
   }
 
   getPageCanvas(index) {
     const safeIndex = clamp(index, 0, this.book.pages.length - 1);
-    const cached = this.pageCache.get(safeIndex);
+    const cacheKey = `${safeIndex}@${this.pixelWidth}x${this.pixelHeight}`;
+    const cached = this.pageCache.get(cacheKey);
     if (cached) return cached;
 
     const page = this.pageAt(safeIndex);
     const cvs = document.createElement('canvas');
-    cvs.width = this.width;
-    cvs.height = this.height;
+    cvs.width = this.pixelWidth;
+    cvs.height = this.pixelHeight;
     const ctx = cvs.getContext('2d', { alpha: false, desynchronized: true });
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     ctx.fillStyle = '#0b1224';
     ctx.fillRect(0, 0, this.width, this.height);
@@ -254,15 +274,31 @@ export class FadhilEBookLite {
     ctx.font = `${Math.max(14, this.width * 0.032)}px Inter, system-ui, sans-serif`;
     this.wrapText(ctx, page.content || '', pad, pad + Math.max(52, this.width * 0.09), this.width - pad * 2, Math.max(20, this.width * 0.043));
 
-    this.pageCache.set(safeIndex, cvs);
+    this.pageCache.set(cacheKey, cvs);
     this.trimCache();
     return cvs;
+  }
+
+  prewarmNeighbors() {
+    const warm = () => {
+      for (let d = -1; d <= 1; d++) {
+        const idx = this.i + d;
+        if (idx < 0 || idx >= this.book.pages.length) continue;
+        const key = `${idx}@${this.pixelWidth}x${this.pixelHeight}`;
+        if (!this.pageCache.has(key)) this.getPageCanvas(idx);
+      }
+    };
+
+    if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 80 });
+    else setTimeout(warm, 16);
   }
 
   trimCache() {
     const keep = new Set();
     for (let d = -this.options.maxCacheDistance; d <= this.options.maxCacheDistance; d++) {
-      keep.add(clamp(this.i + d, 0, this.book.pages.length - 1));
+      const idx = this.i + d;
+      if (idx < 0 || idx >= this.book.pages.length) continue;
+      keep.add(`${idx}@${this.pixelWidth}x${this.pixelHeight}`);
     }
     for (const key of this.pageCache.keys()) {
       if (!keep.has(key)) this.pageCache.delete(key);
@@ -314,7 +350,7 @@ export class FadhilEBookLite {
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
-    const seg = clamp(this.options.meshSegments | 0, 12, 44);
+    const seg = clamp(this.adaptiveSegments | 0, 12, 44);
     const flapStart = dir > 0 ? foldX : 0;
     const flapEnd = dir > 0 ? w : foldX;
     const flapWidth = Math.max(0, flapEnd - flapStart);
@@ -333,11 +369,13 @@ export class FadhilEBookLite {
       const dy = curve * touchInfluence;
       const dx = dir > 0 ? foldX - (sx - foldX) - sw : foldX + (foldX - sx) - sw;
 
+      const x0 = Math.floor(dx);
+      const w0 = Math.ceil(sw) + 1;
       ctx.save();
       ctx.beginPath();
-      ctx.rect(dx, -Math.abs(dy), sw + 1, h + Math.abs(dy) * 2);
+      ctx.rect(x0, -Math.abs(dy) - 1, w0, h + Math.abs(dy) * 2 + 2);
       ctx.clip();
-      ctx.drawImage(pageCanvas, sx, 0, sw, h, dx, dy, sw, h);
+      ctx.drawImage(pageCanvas, sx, 0, sw, h, x0, dy, w0, h);
       ctx.restore();
     }
   }
@@ -347,8 +385,8 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spread = clamp(26 + progress * 54, 20, 84);
-    const dark = clamp(0.1 + progress * 0.28, 0, 0.38);
+    const spread = clamp(24 + progress * 44, 18, 72);
+    const dark = clamp(0.1 + progress * 0.24, 0, 0.34);
 
     const shadow = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
     if (dir > 0) {
@@ -369,6 +407,7 @@ export class FadhilEBookLite {
     this.ctx.clearRect(0, 0, this.width, this.height);
     this.ctx.drawImage(current, 0, 0, this.width, this.height);
     this.trimCache();
+    this.prewarmNeighbors();
 
     if (this.counter) this.counter.textContent = `${this.i + 1} / ${this.book.pages.length}`;
     if (this.titleNode) this.titleNode.textContent = this.book.title || 'Untitled';
