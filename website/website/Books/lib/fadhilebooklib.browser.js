@@ -10,11 +10,13 @@ const DEFAULT_BOOK = {
 };
 
 const DEFAULT_OPTIONS = {
-  duration: 240,
-  dragThreshold: 0.24,
-  tapZoneRatio: 0.2,
-  velocityThreshold: 0.45,
-  maxTilt: 6.5
+  duration: 260,
+  edgeStartRatio: 0.18,
+  minDragDistance: 14,
+  releaseProgress: 0.34,
+  velocityThreshold: 0.52,
+  maxTilt: 7,
+  pageResistance: 0.86
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -39,7 +41,7 @@ export class FadhilEBookLite {
     this.book = book;
     this.i = 0;
     this.options = { ...DEFAULT_OPTIONS, ...options };
-    this.ms = Math.max(140, this.options.duration);
+    this.ms = Math.max(160, this.options.duration);
     this.busy = false;
 
     this.cur = root.querySelector('[data-slot="page-current"]');
@@ -56,7 +58,7 @@ export class FadhilEBookLite {
     this.rafId = 0;
 
     this.bindGestures();
-    this.bindDesktopKeys();
+    this.bindDesktopDragAssist();
     this.render();
   }
 
@@ -72,7 +74,16 @@ export class FadhilEBookLite {
 
   setOptions(nextOptions = {}) {
     this.options = { ...this.options, ...nextOptions };
-    this.ms = Math.max(140, this.options.duration);
+    this.ms = Math.max(160, this.options.duration);
+  }
+
+  on(eventName, callback) {
+    this.root.addEventListener(`book:${eventName}`, callback);
+    return () => this.root.removeEventListener(`book:${eventName}`, callback);
+  }
+
+  emit(eventName, detail = {}) {
+    this.root.dispatchEvent(new CustomEvent(`book:${eventName}`, { detail }));
   }
 
   canStep(dir) {
@@ -80,10 +91,10 @@ export class FadhilEBookLite {
     return !this.busy && target >= 0 && target < this.book.pages.length;
   }
 
-  bindDesktopKeys() {
+  bindDesktopDragAssist() {
     window.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight') this.step(1);
-      else if (event.key === 'ArrowLeft') this.step(-1);
+      if (event.key === 'ArrowRight' && this.canStep(1)) this.autoDrag(1);
+      else if (event.key === 'ArrowLeft' && this.canStep(-1)) this.autoDrag(-1);
     });
   }
 
@@ -92,15 +103,18 @@ export class FadhilEBookLite {
 
     this.frame.addEventListener('pointerdown', (event) => {
       if (!event.isPrimary || this.busy) return;
+
       const rect = this.frame.getBoundingClientRect();
       const x = clamp(event.clientX - rect.left, 0, rect.width);
       const y = clamp(event.clientY - rect.top, 0, rect.height);
-      const zone = rect.width * clamp(this.options.tapZoneRatio, 0.12, 0.3);
+      const edge = rect.width * clamp(this.options.edgeStartRatio, 0.12, 0.28);
 
       let dir = 0;
-      if (x >= rect.width - zone && this.canStep(1)) dir = 1;
-      else if (x <= zone && this.canStep(-1)) dir = -1;
+      if (x >= rect.width - edge && this.canStep(1)) dir = 1; // kanan -> kiri = next
+      else if (x <= edge && this.canStep(-1)) dir = -1; // kiri -> kanan = previous
+      if (!dir) return;
 
+      event.preventDefault();
       this.drag = {
         pointerId: event.pointerId,
         dir,
@@ -108,7 +122,8 @@ export class FadhilEBookLite {
         startX: x,
         startY: y,
         progress: 0,
-        moved: false
+        moved: false,
+        active: true
       };
 
       this.lastX = x;
@@ -116,15 +131,13 @@ export class FadhilEBookLite {
       this.lastMoveTs = performance.now();
       this.velocityX = 0;
       this.frame.setPointerCapture(event.pointerId);
-
-      if (dir) {
-        event.preventDefault();
-        this.prepareDrag(dir);
-      }
+      this.prepareDrag(dir);
+      this.emit('dragstart', { index: this.i, dir });
     }, { passive: false });
 
     this.frame.addEventListener('pointermove', (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+
       const now = performance.now();
       const rect = this.drag.rect;
       const x = clamp(event.clientX - rect.left, 0, rect.width);
@@ -137,17 +150,9 @@ export class FadhilEBookLite {
       this.lastY = y;
       this.lastMoveTs = now;
 
-      if (Math.abs(x - this.drag.startX) > 4 || Math.abs(y - this.drag.startY) > 4) this.drag.moved = true;
-
-      if (!this.drag.dir) {
-        const dir = x < this.drag.startX ? 1 : -1;
-        if (Math.abs(x - this.drag.startX) > 12 && this.canStep(dir)) {
-          this.drag.dir = dir;
-          this.prepareDrag(dir);
-        } else {
-          return;
-        }
-      }
+      const movedX = Math.abs(x - this.drag.startX);
+      const movedY = Math.abs(y - this.drag.startY);
+      if (movedX > this.options.minDragDistance || movedY > 4) this.drag.moved = true;
 
       this.updateDrag(x, y);
     }, { passive: true });
@@ -155,16 +160,13 @@ export class FadhilEBookLite {
     const release = (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
 
-      if (!this.drag.dir) {
-        this.tryTapStep();
-        this.drag = null;
-        return;
-      }
+      const drag = this.drag;
+      const speed = clamp(this.options.velocityThreshold, 0.24, 1.2);
+      const flingForward = drag.dir > 0 && this.velocityX < -speed;
+      const flingBackward = drag.dir < 0 && this.velocityX > speed;
+      const movedEnough = drag.moved && Math.abs(this.lastX - drag.startX) >= this.options.minDragDistance;
+      const shouldTurn = movedEnough && (drag.progress >= clamp(this.options.releaseProgress, 0.2, 0.55) || flingForward || flingBackward);
 
-      const speed = clamp(this.options.velocityThreshold, 0.25, 1);
-      const flingForward = this.drag.dir > 0 && this.velocityX < -speed;
-      const flingBackward = this.drag.dir < 0 && this.velocityX > speed;
-      const shouldTurn = this.drag.progress >= clamp(this.options.dragThreshold, 0.18, 0.45) || flingForward || flingBackward;
       this.finishDrag(shouldTurn);
     };
 
@@ -172,13 +174,21 @@ export class FadhilEBookLite {
     this.frame.addEventListener('pointercancel', release);
   }
 
-  tryTapStep() {
-    if (!this.drag || this.drag.moved || this.busy) return;
-    const { rect, startX } = this.drag;
-    const zone = rect.width * clamp(this.options.tapZoneRatio, 0.12, 0.3);
-
-    if (startX >= rect.width - zone) this.step(1);
-    else if (startX <= zone) this.step(-1);
+  autoDrag(dir) {
+    if (!this.canStep(dir)) return;
+    this.prepareDrag(dir);
+    this.drag = {
+      pointerId: -1,
+      dir,
+      rect: this.frame.getBoundingClientRect(),
+      startX: 0,
+      startY: 0,
+      progress: 0.28,
+      moved: true,
+      active: false
+    };
+    this.lastY = this.drag.rect.height * 0.5;
+    this.finishDrag(true);
   }
 
   prepareDrag(dir) {
@@ -195,19 +205,22 @@ export class FadhilEBookLite {
   updateDrag(x, y) {
     if (!this.drag?.dir) return;
     const { rect, dir } = this.drag;
+
     const edgeDistance = dir > 0 ? rect.width - x : x;
-    const progress = clamp(1 - edgeDistance / rect.width, 0, 1);
+    const linear = clamp(1 - edgeDistance / rect.width, 0, 1);
+    const easedProgress = 1 - Math.pow(1 - linear, this.options.pageResistance);
     const yFactor = (y / rect.height - 0.5) * 2;
 
-    this.drag.progress = progress;
-    this.setFlipPose(progress, dir, yFactor);
+    this.drag.progress = easedProgress;
+    this.setFlipPose(easedProgress, dir, yFactor);
+    this.emit('dragmove', { progress: easedProgress, dir, index: this.i });
   }
 
   setFlipPose(progress, dir, yFactor) {
     const angle = clamp(dir * -progress * 176, -176, 176);
-    const tilt = clamp(yFactor * this.options.maxTilt * Math.min(progress, 0.9), -8, 8);
-    const shine = 0.1 + progress * 0.28;
-    const shadow = 0.14 + progress * 0.3;
+    const tilt = clamp(yFactor * this.options.maxTilt * Math.min(progress, 0.9), -9, 9);
+    const shine = 0.08 + progress * 0.3;
+    const shadow = 0.14 + progress * 0.33;
 
     this.flip.style.setProperty('--shine', shine.toFixed(3));
     this.flip.style.transform = `rotateY(${angle.toFixed(2)}deg) rotateZ(${tilt.toFixed(2)}deg)`;
@@ -223,7 +236,7 @@ export class FadhilEBookLite {
     const to = complete ? 1 : 0;
     const target = this.i + drag.dir;
     const yFactor = (this.lastY / drag.rect.height - 0.5) * 2;
-    const duration = clamp(this.ms * (0.45 + Math.abs(to - from)), 120, 280);
+    const duration = clamp(this.ms * (0.45 + Math.abs(to - from)), 130, 320);
 
     this.busy = true;
     this.frame.dataset.dragging = '0';
@@ -243,26 +256,11 @@ export class FadhilEBookLite {
       if (complete) this.i = target;
       this.busy = false;
       this.render();
+      this.emit('dragend', { changed: complete, index: this.i, dir: drag.dir });
     };
 
     cancelAnimationFrame(this.rafId);
     this.rafId = requestAnimationFrame(tick);
-  }
-
-  step(dir) {
-    if (!this.canStep(dir)) return;
-    this.prepareDrag(dir);
-    this.drag = {
-      pointerId: -1,
-      dir,
-      rect: this.frame.getBoundingClientRect(),
-      progress: 0,
-      startX: 0,
-      startY: 0,
-      moved: true
-    };
-    this.lastY = this.drag.rect.height * 0.5;
-    this.finishDrag(true);
   }
 
   render() {
