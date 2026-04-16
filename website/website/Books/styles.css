@@ -102,7 +102,7 @@ body {
   pointer-events: none;
   background:
     linear-gradient(100deg, rgba(255, 255, 255, 0) calc(58% - var(--curl, 0) * 12%), rgba(255, 255, 255, var(--shine)) 100%),
-    radial-gradient(circle at calc(var(--touch-y, .5) * 100%) 50%, rgba(255,255,255,calc(var(--curl,0) * .12)), rgba(255,255,255,0) 55%),
+    radial-gradient(circle at calc(var(--touch-x, .5) * 100%) calc(var(--touch-y, .5) * 100%), rgba(255,255,255,calc(var(--curl,0) * .12)), rgba(255,255,255,0) 55%),
     linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
 }
 
@@ -127,8 +127,8 @@ body {
 .page-flip {
   transform-origin: left center;
   will-change: transform;
-  transform: rotateY(0deg) rotateZ(0deg);
-  filter: drop-shadow(calc(var(--curl, 0) * 14px) 0 calc(var(--curl, 0) * 18px) rgba(2, 6, 23, .32));
+  transform: rotateY(0deg) rotateZ(0deg) skewY(var(--micro-bend, 0deg));
+  box-shadow: inset calc(var(--curl, 0) * -18px) 0 calc(var(--curl, 0) * 22px) rgba(15, 23, 42, .22);
 }
 
 .counter {

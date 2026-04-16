@@ -10,17 +10,18 @@ const DEFAULT_BOOK = {
 };
 
 const DEFAULT_OPTIONS = {
-  duration: 270,
+  duration: 250,
   edgeStartRatio: 0.16,
   minDragDistance: 18,
   minHoldMs: 70,
-  releaseProgress: 0.36,
-  velocityThreshold: 0.56,
-  maxTilt: 7,
-  maxTwist: 5.4,
-  pageResistance: 0.84,
+  releaseProgress: 0.34,
+  velocityThreshold: 0.52,
+  maxTilt: 6.5,
+  maxTwist: 6,
+  pageResistance: 0.8,
   curveStrength: 0.72,
-  physicsMapper: null
+  physicsMapper: null,
+  emitDragMove: false
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -59,6 +60,7 @@ export class FadhilEBookLite {
     this.lastMoveTs = 0;
     this.velocityX = 0;
     this.rafId = 0;
+    this.dragRaf = 0;
 
     this.bindGestures();
     this.render();
@@ -125,6 +127,9 @@ export class FadhilEBookLite {
         active: false,
         startedAt: performance.now(),
         lastX: x,
+        latestX: x,
+        latestY: y,
+        touchX: x / rect.width,
         touchY: y / rect.height,
         pressure: clamp(event.pressure || 0.35, 0.15, 1)
       };
@@ -150,28 +155,20 @@ export class FadhilEBookLite {
       this.lastY = y;
       this.lastMoveTs = now;
 
-      const dx = x - this.drag.startX;
-      const dy = y - this.drag.startY;
-      const dirDistance = this.drag.dir > 0 ? -dx : dx;
-
+      this.drag.latestX = x;
+      this.drag.latestY = y;
+      this.drag.touchX = x / rect.width;
       this.drag.touchY = y / rect.height;
       this.drag.pressure = clamp(event.pressure || this.drag.pressure || 0.35, 0.15, 1);
 
-      if (!this.drag.active) {
-        const horizontalIntent = Math.abs(dx) > Math.abs(dy) * 1.15;
-        if (!horizontalIntent || dirDistance < this.options.minDragDistance) return;
-
-        this.drag.active = true;
-        this.drag.moved = true;
-        this.prepareDrag(this.drag.dir);
-        this.emit('dragstart', { index: this.i, dir: this.drag.dir });
-      }
-
-      this.updateDrag(dirDistance, y);
+      if (!this.dragRaf) this.dragRaf = requestAnimationFrame(() => this.flushDragFrame());
     }, { passive: true });
 
     const release = (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+      cancelAnimationFrame(this.dragRaf);
+      this.dragRaf = 0;
+      this.flushDragFrame();
 
       const drag = this.drag;
       if (!drag.active) {
@@ -195,6 +192,26 @@ export class FadhilEBookLite {
     this.frame.addEventListener('pointercancel', release);
   }
 
+  flushDragFrame() {
+    if (!this.drag) return;
+    this.dragRaf = 0;
+
+    const dx = this.drag.latestX - this.drag.startX;
+    const dy = this.drag.latestY - this.drag.startY;
+    const dirDistance = this.drag.dir > 0 ? -dx : dx;
+
+    if (!this.drag.active) {
+      const horizontalIntent = Math.abs(dx) > Math.abs(dy) * 1.15;
+      if (!horizontalIntent || dirDistance < this.options.minDragDistance) return;
+      this.drag.active = true;
+      this.drag.moved = true;
+      this.prepareDrag(this.drag.dir);
+      this.emit('dragstart', { index: this.i, dir: this.drag.dir });
+    }
+
+    this.updateDrag(dirDistance, this.drag.latestY);
+  }
+
   prepareDrag(dir) {
     const currentPage = this.pageAt(this.i);
     const targetPage = this.pageAt(this.i + dir);
@@ -208,7 +225,7 @@ export class FadhilEBookLite {
 
   updateDrag(dirDistance, y) {
     if (!this.drag?.dir || !this.drag.active) return;
-    const { rect, dir, touchY, pressure } = this.drag;
+    const { rect, dir, touchX, touchY, pressure } = this.drag;
 
     const linear = clamp(dirDistance / (rect.width * 0.92), 0, 1);
     const mapped = this.options.physicsMapper ? this.options.physicsMapper(linear, this.drag, this.options) : linear;
@@ -216,21 +233,24 @@ export class FadhilEBookLite {
     const yFactor = (y / rect.height - 0.5) * 2;
 
     this.drag.progress = easedProgress;
-    this.setFlipPose(easedProgress, dir, yFactor, touchY, pressure);
-    this.emit('dragmove', { progress: easedProgress, dir, index: this.i });
+    this.setFlipPose(easedProgress, dir, yFactor, touchX, touchY, pressure);
+    if (this.options.emitDragMove) this.emit('dragmove', { progress: easedProgress, dir, index: this.i });
   }
 
-  setFlipPose(progress, dir, yFactor, touchY = 0.5, pressure = 0.35) {
+  setFlipPose(progress, dir, yFactor, touchX = 0.5, touchY = 0.5, pressure = 0.35) {
     const angle = clamp(dir * -progress * 176, -176, 176);
     const curl = clamp(progress * this.options.curveStrength + pressure * 0.2, 0, 1);
     const tilt = clamp(yFactor * this.options.maxTilt * Math.min(progress, 0.9), -9, 9);
     const twist = clamp((touchY - 0.5) * this.options.maxTwist * (0.45 + progress), -9, 9);
+    const micro = clamp((touchX - 0.5) * 1.8 * progress, -1.2, 1.2);
     const shine = 0.08 + progress * 0.3;
     const shadow = 0.14 + progress * 0.33;
 
     this.flip.style.setProperty('--shine', shine.toFixed(3));
     this.flip.style.setProperty('--curl', curl.toFixed(3));
     this.flip.style.setProperty('--touch-y', touchY.toFixed(3));
+    this.flip.style.setProperty('--touch-x', touchX.toFixed(3));
+    this.flip.style.setProperty('--micro-bend', `${micro.toFixed(3)}deg`);
     this.flip.style.transform = `rotateY(${angle.toFixed(2)}deg) rotateZ(${(tilt + twist).toFixed(2)}deg)`;
     this.cur.style.setProperty('--page-shadow', shadow.toFixed(3));
   }
@@ -244,7 +264,7 @@ export class FadhilEBookLite {
     const to = complete ? 1 : 0;
     const target = this.i + drag.dir;
     const yFactor = (this.lastY / drag.rect.height - 0.5) * 2;
-    const duration = clamp(this.ms * (0.45 + Math.abs(to - from)), 130, 320);
+    const duration = clamp(this.ms * (0.45 + Math.abs(to - from)), 120, 290);
 
     this.busy = true;
     this.frame.dataset.dragging = '0';
@@ -254,7 +274,7 @@ export class FadhilEBookLite {
       const t = clamp((now - t0) / duration, 0, 1);
       const eased = cubicOut(t);
       const progress = from + (to - from) * eased;
-      this.setFlipPose(progress, drag.dir, yFactor, drag.touchY, drag.pressure);
+      this.setFlipPose(progress, drag.dir, yFactor, drag.touchX, drag.touchY, drag.pressure);
 
       if (t < 1) {
         this.rafId = requestAnimationFrame(tick);
@@ -273,6 +293,8 @@ export class FadhilEBookLite {
 
   render() {
     cancelAnimationFrame(this.rafId);
+    cancelAnimationFrame(this.dragRaf);
+    this.dragRaf = 0;
     const page = this.pageAt(this.i);
     this.paint(this.cur, page);
     this.paint(this.flip, page);
@@ -281,6 +303,8 @@ export class FadhilEBookLite {
     this.flip.style.setProperty('--shine', '0.1');
     this.flip.style.setProperty('--curl', '0');
     this.flip.style.setProperty('--touch-y', '0.5');
+    this.flip.style.setProperty('--touch-x', '0.5');
+    this.flip.style.setProperty('--micro-bend', '0deg');
     this.cur.style.setProperty('--page-shadow', '0.14');
     if (this.n) this.n.textContent = `${this.i + 1} / ${this.book.pages.length}`;
     if (this.t) this.t.textContent = this.book.title || 'Untitled';
