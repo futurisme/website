@@ -20,7 +20,9 @@ const DEFAULT_OPTIONS = {
   velocityThreshold: 0.48,
   meshSegments: 30,
   curveStrength: 20,
-  maxCacheDistance: 1
+  maxCacheDistance: 1,
+  smoothing: 0.22,
+  touchSmoothing: 0.18
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -164,9 +166,11 @@ export class FadhilEBookLite {
         touchY: y / rect.height,
         active: false,
         progress: 0,
+        smoothProgress: 0,
         startedAt: performance.now(),
         lastX: x,
-        fromCenter
+        fromCenter,
+        smoothTouchY: y / rect.height
       };
 
       this.velocityX = 0;
@@ -187,6 +191,7 @@ export class FadhilEBookLite {
       this.drag.x = x;
       this.drag.y = y;
       this.drag.touchY = y / this.drag.rect.height;
+      this.drag.smoothTouchY += (this.drag.touchY - this.drag.smoothTouchY) * this.options.touchSmoothing;
       this.lastMoveTs = now;
 
       const dx = x - this.drag.startX;
@@ -211,6 +216,7 @@ export class FadhilEBookLite {
       }
 
       this.drag.progress = clamp(dragDistance / (this.drag.rect.width * 0.92), 0, 1);
+      this.drag.smoothProgress += (this.drag.progress - this.drag.smoothProgress) * this.options.smoothing;
       this.queueRender();
     }, { passive: true });
 
@@ -228,7 +234,7 @@ export class FadhilEBookLite {
       const flingForward = drag.dir > 0 && this.velocityX < -this.options.velocityThreshold;
       const flingBackward = drag.dir < 0 && this.velocityX > this.options.velocityThreshold;
       const fairProgress = this.options.releaseProgress * (drag.fromCenter ? 1.1 : 1);
-      const complete = heldMs >= this.options.minHoldMs && (drag.progress >= fairProgress || flingForward || flingBackward);
+      const complete = heldMs >= this.options.minHoldMs && (drag.smoothProgress >= fairProgress || flingForward || flingBackward);
       this.animateTo(complete ? 1 : 0, drag);
     };
 
@@ -238,7 +244,7 @@ export class FadhilEBookLite {
 
   animateTo(targetProgress, dragState) {
     cancelAnimationFrame(this.anim?.id || 0);
-    const from = dragState.progress;
+    const from = dragState.smoothProgress ?? dragState.progress;
     const dir = dragState.dir;
     const start = performance.now();
     const duration = clamp(this.options.duration * (0.45 + Math.abs(targetProgress - from)), 100, 250);
@@ -248,7 +254,7 @@ export class FadhilEBookLite {
       const eased = cubicOut(t);
       const progress = from + (targetProgress - from) * eased;
 
-      this.drawFlip(progress, dir, dragState.touchY);
+      this.drawFlip(progress, dir, dragState.smoothTouchY ?? dragState.touchY);
       if (t < 1) {
         this.anim.id = requestAnimationFrame(tick);
         return;
@@ -276,7 +282,7 @@ export class FadhilEBookLite {
       if (frameMs > 20) this.adaptiveSegments = Math.max(14, this.adaptiveSegments - 2);
       else this.adaptiveSegments = Math.min(this.options.meshSegments, this.adaptiveSegments + 1);
 
-      this.drawFlip(this.drag.progress, this.drag.dir, this.drag.touchY);
+      this.drawFlip(this.drag.smoothProgress, this.drag.dir, this.drag.smoothTouchY);
     });
   }
 
@@ -387,7 +393,7 @@ export class FadhilEBookLite {
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(target, 0, 0, w, h);
 
-    const foldX = clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w);
+    const foldX = Math.round(clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w) * 2) / 2;
     const staticStart = dir > 0 ? 0 : foldX;
     const staticWidth = dir > 0 ? foldX : w - foldX;
 
@@ -415,7 +421,7 @@ export class FadhilEBookLite {
     if (flapWidth < 1) return;
 
     const bend = progress * this.options.curveStrength;
-    const touchInfluence = (touchY - 0.5) * 2;
+    const touchInfluence = clamp((touchY - 0.5) * 1.25, -0.85, 0.85);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -427,14 +433,9 @@ export class FadhilEBookLite {
       const dy = curve * touchInfluence;
       const dx = dir > 0 ? foldX - (sx - foldX) - sw : foldX + (foldX - sx) - sw;
 
-      const x0 = Math.floor(dx);
-      const w0 = Math.ceil(sw) + 1;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(x0, -Math.abs(dy) - 1, w0, h + Math.abs(dy) * 2 + 2);
-      ctx.clip();
-      ctx.drawImage(pageCanvas, sx, 0, sw, h, x0, dy, w0, h);
-      ctx.restore();
+      const x0 = Math.round(dx * 2) / 2;
+      const w0 = Math.ceil(sw) + 2;
+      ctx.drawImage(pageCanvas, sx, 0, sw + 0.5, h, x0 - 1, dy, w0, h);
     }
   }
 
