@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books</title>
+    <link rel="stylesheet" href="/Books/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <h1 data-slot="book-title">Books</h1>
+        <a class="btn" href="/Books/Editor">Editor Buku</a>
+      </header>
+
+      <section class="bookstage" aria-label="Book viewer">
+        <div class="page-frame" data-slot="page-frame">
+          <article class="page" data-slot="page-current">
+            <h2 data-slot="title"></h2>
+            <p data-slot="content"></p>
+          </article>
+          <article class="page page-flip" data-slot="page-flip">
+            <h2 data-slot="title"></h2>
+            <p data-slot="content"></p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="controls">
+        <button class="btn" data-action="prev" type="button">Sebelumnya</button>
+        <p class="counter" data-slot="page-number">1 / 1</p>
+        <button class="btn" data-action="next" type="button">Berikutnya</button>
+      </footer>
+    </main>
+
+    <script type="module">
+      import { FadhilEBookLite, loadBook } from '/Books/lib/fadhilebooklib.browser.js';
+      const root = document.querySelector('.shell');
+      const engine = new FadhilEBookLite(root, loadBook(), { duration: 190 });
+      window.addEventListener('storage', () => engine.setBook(loadBook()));
+    </script>
+  </body>
+</html>

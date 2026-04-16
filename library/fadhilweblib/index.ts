@@ -39,3 +39,5 @@ export * from './core/compiler';
 export * from './fadhilailib';
 
 export * from './fadhilmindmaplib';
+
+export * from './fadhilebooklib';
