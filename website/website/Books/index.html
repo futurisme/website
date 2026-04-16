@@ -14,30 +14,33 @@
       </header>
 
       <section class="bookstage" aria-label="Book viewer">
-        <p class="book-hint">Geser dari tepi halaman kiri/kanan untuk melipat, tahan untuk melihat efek kertas.</p>
+        <p class="book-hint">Smart gesture: swipe/drag kiri-kanan untuk flip, tap sisi kiri/kanan untuk pindah 1 halaman.</p>
         <div class="page-frame" data-slot="page-frame" data-dragging="0">
           <article class="page page-current" data-slot="page-current">
             <h2 data-slot="title"></h2>
             <p data-slot="content"></p>
           </article>
-          <article class="page page-flip" data-slot="page-flip">
+          <article class="page page-flip" data-slot="page-flip" aria-hidden="true">
             <h2 data-slot="title"></h2>
             <p data-slot="content"></p>
           </article>
         </div>
       </section>
 
-      <footer class="controls">
-        <button class="btn" data-action="prev" type="button">Sebelumnya</button>
+      <footer class="statusbar">
         <p class="counter" data-slot="page-number">1 / 1</p>
-        <button class="btn" data-action="next" type="button">Berikutnya</button>
       </footer>
     </main>
 
     <script type="module">
       import { FadhilEBookLite, loadBook } from '/Books/lib/fadhilebooklib.browser.js';
       const root = document.querySelector('.shell');
-      const engine = new FadhilEBookLite(root, loadBook(), { duration: 220 });
+      const engine = new FadhilEBookLite(root, loadBook(), {
+        duration: 240,
+        dragThreshold: 0.24,
+        tapZoneRatio: 0.2,
+        velocityThreshold: 0.45
+      });
       window.addEventListener('storage', () => engine.setBook(loadBook()));
     </script>
   </body>

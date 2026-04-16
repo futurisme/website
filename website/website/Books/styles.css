@@ -1,7 +1,6 @@
 :root {
   color-scheme: dark;
   --bg: #020617;
-  --panel: #0f172a;
   --text: #dbeafe;
   --accent: #38bdf8;
 }
@@ -10,27 +9,28 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: radial-gradient(circle at top, #0f172a, var(--bg));
   color: var(--text);
   font-family: Inter, system-ui, sans-serif;
 }
 
 .shell {
-  max-width: 980px;
+  min-height: 100dvh;
+  width: min(100vw, 1400px);
   margin: 0 auto;
-  padding: 20px;
+  padding: clamp(10px, 2.5vw, 22px);
   display: grid;
-  gap: 16px;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
 }
 
 .topbar,
-.controls {
+.statusbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .btn {
@@ -40,38 +40,48 @@ body {
   color: var(--text);
   padding: 10px 14px;
   text-decoration: none;
-  cursor: pointer;
 }
 
-.btn:disabled { opacity: .4; cursor: not-allowed; }
-
-.bookstage { display: grid; gap: 10px; place-items: center; }
+.bookstage {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 0;
+}
 
 .book-hint {
   margin: 0;
-  font-size: .9rem;
-  opacity: .72;
+  opacity: .76;
+  text-align: center;
+  font-size: clamp(.78rem, 1.8vw, .95rem);
 }
 
 .page-frame {
-  width: min(96vw, 920px);
-  aspect-ratio: 1.6 / 1;
+  width: min(100%, calc(100dvh * (16 / 9)));
+  max-height: calc(100dvh - 160px);
+  aspect-ratio: 16 / 9;
   position: relative;
-  perspective: 1600px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid #334155;
+  perspective: 1800px;
   transform-style: preserve-3d;
-  touch-action: none;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
+  contain: content;
+  background: #0b1224;
 }
 
 .page {
   --page-shadow: .12;
+  --shine: .08;
   position: absolute;
   inset: 0;
   border-radius: 18px;
   background: linear-gradient(160deg, #111c34, #0b1224);
-  border: 1px solid #334155;
-  padding: clamp(16px, 3.4vw, 30px);
-  box-shadow: 0 24px 44px rgba(2, 6, 23, .45);
+  padding: clamp(14px, 3.2vw, 34px);
+  box-shadow: 0 24px 44px rgba(2, 6, 23, .42);
   overflow: hidden;
   backface-visibility: hidden;
   transform-style: preserve-3d;
@@ -82,45 +92,51 @@ body {
   position: absolute;
   inset: 0 auto 0 0;
   width: 7px;
-  background: var(--page-accent, var(--accent));
+  background: var(--accent);
 }
 
 .page::after {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(100deg, rgba(255, 255, 255, 0) 68%, rgba(255, 255, 255, var(--shine, .08)) 100%);
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0) 64%, rgba(255, 255, 255, var(--shine)) 100%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
 }
 
-.page h2 { margin: 0 0 12px; font-size: clamp(1.1rem, 2.2vw, 1.7rem); }
-.page p { margin: 0; line-height: 1.55; white-space: pre-wrap; }
-
-.page-frame[data-dragging='1'] .page {
-  transition: none;
+.page h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1rem, 2.8vw, 2rem);
 }
 
-.page-frame[data-dragging='0'] .page {
-  transition: box-shadow .16s ease;
+.page p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-size: clamp(.92rem, 1.65vw, 1.2rem);
 }
 
 .page-current {
   box-shadow:
-    0 24px 44px rgba(2, 6, 23, .45),
+    0 24px 44px rgba(2, 6, 23, .42),
     inset -28px 0 36px rgba(2, 6, 23, var(--page-shadow));
 }
 
 .page-flip {
   transform-origin: left center;
   will-change: transform;
-  transform: rotateY(0deg);
-  filter: saturate(.98);
+  transform: rotateY(0deg) rotateZ(0deg);
 }
 
-.counter { margin: 0; font-weight: 700; opacity: .84; }
+.counter {
+  margin: 0;
+  font-weight: 700;
+  opacity: .84;
+}
 
 @media (max-width: 700px) {
-  .shell { padding: 14px; }
-  .btn { padding: 8px 12px; }
+  .topbar h1 { font-size: 1.1rem; }
+  .btn { padding: 8px 12px; font-size: .9rem; }
+  .page-frame { max-height: calc(100dvh - 130px); }
 }
