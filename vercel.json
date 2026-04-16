@@ -22,6 +22,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "website/website/Books/**/*",
+      "use": "@vercel/static"
+    },
+    {
       "src": "shareideas/**",
       "use": "@vercel/static"
     },
@@ -97,6 +101,26 @@
     {
       "src": "/editor/([0-9]+)",
       "dest": "/website/website/mindmapmaker/editor/index.html"
+    },
+    {
+      "src": "/Books",
+      "dest": "/website/website/Books/index.html"
+    },
+    {
+      "src": "/Books/",
+      "dest": "/website/website/Books/index.html"
+    },
+    {
+      "src": "/Books/Editor",
+      "dest": "/website/website/Books/Editor/index.html"
+    },
+    {
+      "src": "/Books/Editor/",
+      "dest": "/website/website/Books/Editor/index.html"
+    },
+    {
+      "src": "/Books/(.*)",
+      "dest": "/website/website/Books/$1"
     },
     {
       "src": "/shareideas",
