@@ -10,9 +10,11 @@ const DEFAULT_BOOK = {
 };
 
 const DEFAULT_OPTIONS = {
-  duration: 220,
+  duration: 210,
   edgeStartRatio: 0.16,
+  centerStartEnabled: true,
   minDragDistance: 14,
+  centerDragPenalty: 1.35,
   minHoldMs: 55,
   releaseProgress: 0.32,
   velocityThreshold: 0.48,
@@ -46,7 +48,7 @@ export class FadhilEBookLite {
 
     this.frame = root.querySelector('[data-slot="page-frame"]');
     this.canvas = root.querySelector('[data-slot="book-canvas"]');
-    this.ctx = this.canvas.getContext('2d', { alpha: false, desynchronized: true });
+    this.ctx = this.canvas?.getContext('2d', { alpha: false, desynchronized: true }) || null;
     this.counter = root.querySelector('[data-slot="page-number"]');
     this.titleNode = root.querySelector('[data-slot="book-title"]');
 
@@ -64,6 +66,7 @@ export class FadhilEBookLite {
     this.renderQueued = false;
     this.lastFrameTs = performance.now();
     this.adaptiveSegments = this.options.meshSegments;
+    this.idleWarm = null;
 
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -76,7 +79,32 @@ export class FadhilEBookLite {
   destroy() {
     window.removeEventListener('resize', this.onResize);
     cancelAnimationFrame(this.anim?.id || 0);
+    this.cancelIdleWarm();
     this.pageCache.clear();
+  }
+
+  setOptions(nextOptions = {}) {
+    this.options = { ...this.options, ...nextOptions };
+    this.adaptiveSegments = this.options.meshSegments;
+  }
+
+  setInteractionProfile(profile = 'balanced') {
+    if (profile === 'snappy') this.setOptions({ duration: 180, releaseProgress: 0.27, centerDragPenalty: 1.2 });
+    else if (profile === 'precise') this.setOptions({ duration: 240, releaseProgress: 0.38, centerDragPenalty: 1.55 });
+    else this.setOptions({ duration: 210, releaseProgress: 0.32, centerDragPenalty: 1.35 });
+  }
+
+  next() { if (!this.anim && this.i < this.book.pages.length - 1) this.animateTo(1, this.syntheticDrag(1)); }
+  prev() { if (!this.anim && this.i > 0) this.animateTo(1, this.syntheticDrag(-1)); }
+  goTo(index) {
+    const target = clamp(index, 0, this.book.pages.length - 1);
+    this.i = target;
+    this.trimCache();
+    this.renderStatic();
+  }
+
+  syntheticDrag(dir) {
+    return { dir, progress: 0, touchY: 0.5, startedAt: performance.now(), fromCenter: false };
   }
 
   pageAt(index) {
@@ -90,12 +118,8 @@ export class FadhilEBookLite {
     this.renderStatic();
   }
 
-  setOptions(nextOptions = {}) {
-    this.options = { ...this.options, ...nextOptions };
-    this.adaptiveSegments = this.options.meshSegments;
-  }
-
   resize() {
+    if (!this.ctx || !this.frame || !this.canvas) return;
     const rect = this.frame.getBoundingClientRect();
     this.dpr = clamp(window.devicePixelRatio || 1, 1, 2.5);
     this.width = Math.max(1, Math.round(rect.width));
@@ -112,16 +136,21 @@ export class FadhilEBookLite {
   }
 
   bindGestures() {
+    if (!this.frame) return;
+
     this.frame.addEventListener('pointerdown', (event) => {
+      if (this.anim) return;
       const rect = this.frame.getBoundingClientRect();
       const x = clamp(event.clientX - rect.left, 0, rect.width);
       const y = clamp(event.clientY - rect.top, 0, rect.height);
       const edge = rect.width * clamp(this.options.edgeStartRatio, 0.1, 0.26);
 
       let dir = 0;
+      let fromCenter = false;
       if (x >= rect.width - edge && this.i < this.book.pages.length - 1) dir = 1;
       else if (x <= edge && this.i > 0) dir = -1;
-      if (!dir || this.anim) return;
+      else if (this.options.centerStartEnabled) fromCenter = true;
+      if (!dir && !fromCenter) return;
 
       event.preventDefault();
       this.drag = {
@@ -136,8 +165,10 @@ export class FadhilEBookLite {
         active: false,
         progress: 0,
         startedAt: performance.now(),
-        lastX: x
+        lastX: x,
+        fromCenter
       };
+
       this.velocityX = 0;
       this.lastMoveTs = this.drag.startedAt;
       this.frame.setPointerCapture(event.pointerId);
@@ -160,11 +191,22 @@ export class FadhilEBookLite {
 
       const dx = x - this.drag.startX;
       const dy = y - this.drag.startY;
+
+      if (!this.drag.dir && this.drag.fromCenter) {
+        const intentDistance = Math.abs(dx);
+        if (intentDistance < this.options.minDragDistance) return;
+        if (Math.abs(dx) <= Math.abs(dy) * 1.1) return;
+        if (dx < 0 && this.i < this.book.pages.length - 1) this.drag.dir = 1;
+        else if (dx > 0 && this.i > 0) this.drag.dir = -1;
+        if (!this.drag.dir) return;
+      }
+
       const dragDistance = this.drag.dir > 0 ? -dx : dx;
+      const minDistance = this.options.minDragDistance * (this.drag.fromCenter ? this.options.centerDragPenalty : 1);
 
       if (!this.drag.active) {
         if (Math.abs(dx) <= Math.abs(dy) * 1.15) return;
-        if (dragDistance < this.options.minDragDistance) return;
+        if (dragDistance < minDistance) return;
         this.drag.active = true;
       }
 
@@ -177,7 +219,7 @@ export class FadhilEBookLite {
 
       const drag = this.drag;
       this.drag = null;
-      if (!drag.active) {
+      if (!drag.active || !drag.dir) {
         this.renderStatic();
         return;
       }
@@ -185,7 +227,8 @@ export class FadhilEBookLite {
       const heldMs = performance.now() - drag.startedAt;
       const flingForward = drag.dir > 0 && this.velocityX < -this.options.velocityThreshold;
       const flingBackward = drag.dir < 0 && this.velocityX > this.options.velocityThreshold;
-      const complete = heldMs >= this.options.minHoldMs && (drag.progress >= this.options.releaseProgress || flingForward || flingBackward);
+      const fairProgress = this.options.releaseProgress * (drag.fromCenter ? 1.1 : 1);
+      const complete = heldMs >= this.options.minHoldMs && (drag.progress >= fairProgress || flingForward || flingBackward);
       this.animateTo(complete ? 1 : 0, drag);
     };
 
@@ -226,7 +269,7 @@ export class FadhilEBookLite {
 
     requestAnimationFrame((now) => {
       this.renderQueued = false;
-      if (!this.drag) return;
+      if (!this.drag || !this.drag.dir) return;
 
       const frameMs = now - this.lastFrameTs;
       this.lastFrameTs = now;
@@ -279,8 +322,17 @@ export class FadhilEBookLite {
     return cvs;
   }
 
+  cancelIdleWarm() {
+    if (!this.idleWarm) return;
+    if (this.idleWarm.kind === 'ric') window.cancelIdleCallback(this.idleWarm.id);
+    else clearTimeout(this.idleWarm.id);
+    this.idleWarm = null;
+  }
+
   prewarmNeighbors() {
+    this.cancelIdleWarm();
     const warm = () => {
+      this.idleWarm = null;
       for (let d = -1; d <= 1; d++) {
         const idx = this.i + d;
         if (idx < 0 || idx >= this.book.pages.length) continue;
@@ -289,8 +341,13 @@ export class FadhilEBookLite {
       }
     };
 
-    if ('requestIdleCallback' in window) window.requestIdleCallback(warm, { timeout: 80 });
-    else setTimeout(warm, 16);
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(warm, { timeout: 80 });
+      this.idleWarm = { kind: 'ric', id };
+    } else {
+      const id = setTimeout(warm, 16);
+      this.idleWarm = { kind: 'to', id };
+    }
   }
 
   trimCache() {
@@ -320,6 +377,7 @@ export class FadhilEBookLite {
   }
 
   drawFlip(progress, dir, touchY = 0.5) {
+    if (!this.ctx) return;
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
@@ -329,7 +387,7 @@ export class FadhilEBookLite {
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(target, 0, 0, w, h);
 
-    const foldX = dir > 0 ? w * (1 - progress) : w * progress;
+    const foldX = clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w);
     const staticStart = dir > 0 ? 0 : foldX;
     const staticWidth = dir > 0 ? foldX : w - foldX;
 

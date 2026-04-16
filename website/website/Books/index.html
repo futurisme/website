@@ -14,7 +14,7 @@
       </header>
 
       <section class="bookstage" aria-label="Book viewer">
-        <p class="book-hint">Canvas flipbook GPU-friendly: hold+swipe kanan→kiri untuk next, kiri→kanan untuk previous.</p>
+        <p class="book-hint">Canvas flipbook: swipe-hold bisa dari tengah atau tepi. Kanan→kiri next, kiri→kanan previous.</p>
         <div class="page-frame" data-slot="page-frame">
           <canvas class="book-canvas" data-slot="book-canvas" aria-label="Canvas flipbook"></canvas>
         </div>
@@ -32,6 +32,8 @@
         duration: 240,
         edgeStartRatio: 0.16,
         minDragDistance: 14,
+        centerStartEnabled: true,
+        centerDragPenalty: 1.35,
         releaseProgress: 0.32,
         velocityThreshold: 0.48,
         meshSegments: 30
