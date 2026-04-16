@@ -8,4 +8,6 @@ header { display: flex; justify-content: space-between; align-items: center; gap
 input, textarea { width: 100%; border-radius: 10px; border: 1px solid #334155; background: #0b1224; color: #e2e8f0; padding: 10px; }
 textarea { min-height: 340px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9rem; }
 .btn { border: 1px solid #334155; border-radius: 12px; background: #0b1224; color: #dbeafe; padding: 10px 14px; text-decoration: none; cursor: pointer; }
-.actions { display: flex; justify-content: flex-end; }
+.btn-primary { border-color: #0ea5e9; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.hint { margin: 0; opacity: .74; font-size: .9rem; }

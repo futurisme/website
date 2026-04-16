@@ -3,6 +3,7 @@ import { loadBook, saveBook } from '/Books/lib/fadhilebooklib.browser.js';
 const titleInput = document.getElementById('book-title');
 const pagesInput = document.getElementById('book-pages');
 const saveButton = document.getElementById('save-book');
+const formatButton = document.getElementById('format-json');
 
 const state = loadBook();
 titleInput.value = state.title || '';
@@ -15,11 +16,24 @@ const normalizePage = (page, i, total) => ({
   content: String(page.content || '')
 });
 
+const parsePages = () => {
+  const parsed = JSON.parse(pagesInput.value);
+  if (!Array.isArray(parsed) || parsed.length < 2) throw new Error('Minimal 2 halaman.');
+  return parsed.map((page, i) => normalizePage(page || {}, i, parsed.length));
+};
+
+formatButton.addEventListener('click', () => {
+  try {
+    const pages = parsePages();
+    pagesInput.value = JSON.stringify(pages, null, 2);
+  } catch (error) {
+    alert(`Gagal memformat JSON: ${error.message}`);
+  }
+});
+
 saveButton.addEventListener('click', () => {
   try {
-    const parsed = JSON.parse(pagesInput.value);
-    if (!Array.isArray(parsed) || parsed.length < 2) throw new Error('Minimal 2 halaman.');
-    const pages = parsed.map((page, i) => normalizePage(page || {}, i, parsed.length));
+    const pages = parsePages();
     saveBook({ title: titleInput.value.trim() || 'Untitled Book', pages });
     window.location.href = '/Books';
   } catch (error) {
