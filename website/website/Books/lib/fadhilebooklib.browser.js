@@ -10,13 +10,14 @@ const DEFAULT_BOOK = {
 };
 
 const DEFAULT_OPTIONS = {
-  duration: 260,
-  edgeStartRatio: 0.18,
-  minDragDistance: 14,
-  releaseProgress: 0.34,
-  velocityThreshold: 0.52,
+  duration: 270,
+  edgeStartRatio: 0.16,
+  minDragDistance: 18,
+  minHoldMs: 70,
+  releaseProgress: 0.36,
+  velocityThreshold: 0.56,
   maxTilt: 7,
-  pageResistance: 0.86
+  pageResistance: 0.84
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -51,14 +52,12 @@ export class FadhilEBookLite {
     this.frame = root.querySelector('[data-slot="page-frame"]');
 
     this.drag = null;
-    this.lastX = 0;
     this.lastY = 0;
     this.lastMoveTs = 0;
     this.velocityX = 0;
     this.rafId = 0;
 
     this.bindGestures();
-    this.bindDesktopDragAssist();
     this.render();
   }
 
@@ -91,13 +90,6 @@ export class FadhilEBookLite {
     return !this.busy && target >= 0 && target < this.book.pages.length;
   }
 
-  bindDesktopDragAssist() {
-    window.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowRight' && this.canStep(1)) this.autoDrag(1);
-      else if (event.key === 'ArrowLeft' && this.canStep(-1)) this.autoDrag(-1);
-    });
-  }
-
   bindGestures() {
     if (!this.frame) return;
 
@@ -107,11 +99,11 @@ export class FadhilEBookLite {
       const rect = this.frame.getBoundingClientRect();
       const x = clamp(event.clientX - rect.left, 0, rect.width);
       const y = clamp(event.clientY - rect.top, 0, rect.height);
-      const edge = rect.width * clamp(this.options.edgeStartRatio, 0.12, 0.28);
+      const edge = rect.width * clamp(this.options.edgeStartRatio, 0.1, 0.24);
 
       let dir = 0;
-      if (x >= rect.width - edge && this.canStep(1)) dir = 1; // kanan -> kiri = next
-      else if (x <= edge && this.canStep(-1)) dir = -1; // kiri -> kanan = previous
+      if (x >= rect.width - edge && this.canStep(1)) dir = 1;
+      else if (x <= edge && this.canStep(-1)) dir = -1;
       if (!dir) return;
 
       event.preventDefault();
@@ -123,16 +115,16 @@ export class FadhilEBookLite {
         startY: y,
         progress: 0,
         moved: false,
-        active: true
+        active: false,
+        startedAt: performance.now(),
+        lastX: x
       };
 
-      this.lastX = x;
       this.lastY = y;
-      this.lastMoveTs = performance.now();
+      this.lastMoveTs = this.drag.startedAt;
       this.velocityX = 0;
       this.frame.setPointerCapture(event.pointerId);
-      this.prepareDrag(dir);
-      this.emit('dragstart', { index: this.i, dir });
+      this.emit('dragarm', { index: this.i, dir });
     }, { passive: false });
 
     this.frame.addEventListener('pointermove', (event) => {
@@ -143,52 +135,52 @@ export class FadhilEBookLite {
       const x = clamp(event.clientX - rect.left, 0, rect.width);
       const y = clamp(event.clientY - rect.top, 0, rect.height);
 
-      const dx = x - this.lastX;
       const dt = Math.max(16, now - this.lastMoveTs);
-      this.velocityX = dx / dt;
-      this.lastX = x;
+      this.velocityX = (x - this.drag.lastX) / dt;
+      this.drag.lastX = x;
       this.lastY = y;
       this.lastMoveTs = now;
 
-      const movedX = Math.abs(x - this.drag.startX);
-      const movedY = Math.abs(y - this.drag.startY);
-      if (movedX > this.options.minDragDistance || movedY > 4) this.drag.moved = true;
+      const dx = x - this.drag.startX;
+      const dy = y - this.drag.startY;
+      const dirDistance = this.drag.dir > 0 ? -dx : dx;
 
-      this.updateDrag(x, y);
+      if (!this.drag.active) {
+        const horizontalIntent = Math.abs(dx) > Math.abs(dy) * 1.15;
+        if (!horizontalIntent || dirDistance < this.options.minDragDistance) return;
+
+        this.drag.active = true;
+        this.drag.moved = true;
+        this.prepareDrag(this.drag.dir);
+        this.emit('dragstart', { index: this.i, dir: this.drag.dir });
+      }
+
+      this.updateDrag(dirDistance, y);
     }, { passive: true });
 
     const release = (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
 
       const drag = this.drag;
+      if (!drag.active) {
+        this.drag = null;
+        return;
+      }
+
+      const heldMs = performance.now() - drag.startedAt;
       const speed = clamp(this.options.velocityThreshold, 0.24, 1.2);
       const flingForward = drag.dir > 0 && this.velocityX < -speed;
       const flingBackward = drag.dir < 0 && this.velocityX > speed;
-      const movedEnough = drag.moved && Math.abs(this.lastX - drag.startX) >= this.options.minDragDistance;
-      const shouldTurn = movedEnough && (drag.progress >= clamp(this.options.releaseProgress, 0.2, 0.55) || flingForward || flingBackward);
+      const movedEnough = drag.moved && drag.progress >= 0.02;
+      const shouldTurn = movedEnough && heldMs >= this.options.minHoldMs && (
+        drag.progress >= clamp(this.options.releaseProgress, 0.2, 0.6) || flingForward || flingBackward
+      );
 
       this.finishDrag(shouldTurn);
     };
 
     this.frame.addEventListener('pointerup', release);
     this.frame.addEventListener('pointercancel', release);
-  }
-
-  autoDrag(dir) {
-    if (!this.canStep(dir)) return;
-    this.prepareDrag(dir);
-    this.drag = {
-      pointerId: -1,
-      dir,
-      rect: this.frame.getBoundingClientRect(),
-      startX: 0,
-      startY: 0,
-      progress: 0.28,
-      moved: true,
-      active: false
-    };
-    this.lastY = this.drag.rect.height * 0.5;
-    this.finishDrag(true);
   }
 
   prepareDrag(dir) {
@@ -202,12 +194,11 @@ export class FadhilEBookLite {
     this.frame.dataset.dragging = '1';
   }
 
-  updateDrag(x, y) {
-    if (!this.drag?.dir) return;
+  updateDrag(dirDistance, y) {
+    if (!this.drag?.dir || !this.drag.active) return;
     const { rect, dir } = this.drag;
 
-    const edgeDistance = dir > 0 ? rect.width - x : x;
-    const linear = clamp(1 - edgeDistance / rect.width, 0, 1);
+    const linear = clamp(dirDistance / (rect.width * 0.92), 0, 1);
     const easedProgress = 1 - Math.pow(1 - linear, this.options.pageResistance);
     const yFactor = (y / rect.height - 0.5) * 2;
 
