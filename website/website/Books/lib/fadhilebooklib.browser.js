@@ -66,9 +66,10 @@ export class FadhilEBookLite {
     this.velocityX = 0;
     this.lastMoveTs = 0;
     this.renderQueued = false;
-    this.lastFrameTs = performance.now();
-    this.adaptiveSegments = this.options.meshSegments;
+    this.meshSegments = this.options.meshSegments;
     this.idleWarm = null;
+    this.foldCanvas = document.createElement('canvas');
+    this.foldCtx = this.foldCanvas.getContext('2d', { alpha: true, desynchronized: true });
 
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -87,7 +88,7 @@ export class FadhilEBookLite {
 
   setOptions(nextOptions = {}) {
     this.options = { ...this.options, ...nextOptions };
-    this.adaptiveSegments = this.options.meshSegments;
+    this.meshSegments = this.options.meshSegments;
   }
 
   setInteractionProfile(profile = 'balanced') {
@@ -130,9 +131,14 @@ export class FadhilEBookLite {
     this.pixelHeight = Math.max(1, Math.round(this.height * this.dpr));
     this.canvas.width = this.pixelWidth;
     this.canvas.height = this.pixelHeight;
+    this.foldCanvas.width = this.pixelWidth;
+    this.foldCanvas.height = this.pixelHeight;
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     this.ctx.imageSmoothingEnabled = true;
     this.ctx.imageSmoothingQuality = 'high';
+    this.foldCtx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.foldCtx.imageSmoothingEnabled = true;
+    this.foldCtx.imageSmoothingQuality = 'high';
     this.pageCache.clear();
     this.renderStatic();
   }
@@ -277,11 +283,6 @@ export class FadhilEBookLite {
       this.renderQueued = false;
       if (!this.drag || !this.drag.dir) return;
 
-      const frameMs = now - this.lastFrameTs;
-      this.lastFrameTs = now;
-      if (frameMs > 20) this.adaptiveSegments = Math.max(14, this.adaptiveSegments - 2);
-      else this.adaptiveSegments = Math.min(this.options.meshSegments, this.adaptiveSegments + 1);
-
       this.drawFlip(this.drag.smoothProgress, this.drag.dir, this.drag.smoothTouchY);
     });
   }
@@ -411,17 +412,18 @@ export class FadhilEBookLite {
   }
 
   drawMeshFold(pageCanvas, foldX, dir, progress, touchY) {
-    const ctx = this.ctx;
+    const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
-    const seg = clamp(this.adaptiveSegments | 0, 12, 44);
+    const seg = clamp(this.meshSegments | 0, 12, 44);
     const flapStart = dir > 0 ? foldX : 0;
     const flapEnd = dir > 0 ? w : foldX;
     const flapWidth = Math.max(0, flapEnd - flapStart);
     if (flapWidth < 1) return;
 
+    ctx.clearRect(0, 0, w, h);
     const bend = progress * this.options.curveStrength;
-    const touchInfluence = clamp((touchY - 0.5) * 1.25, -0.85, 0.85);
+    const touchInfluence = clamp((touchY - 0.5) * 1.1, -0.72, 0.72);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -433,10 +435,12 @@ export class FadhilEBookLite {
       const dy = curve * touchInfluence;
       const dx = dir > 0 ? foldX - (sx - foldX) - sw : foldX + (foldX - sx) - sw;
 
-      const x0 = Math.round(dx * 2) / 2;
+      const x0 = Math.round(dx);
       const w0 = Math.ceil(sw) + 2;
-      ctx.drawImage(pageCanvas, sx, 0, sw + 0.5, h, x0 - 1, dy, w0, h);
+      ctx.drawImage(pageCanvas, sx, 0, sw + 0.5, h, x0 - 1, Math.round(dy), w0, h);
     }
+
+    this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
   }
 
   drawFoldShadow(foldX, dir, progress) {
