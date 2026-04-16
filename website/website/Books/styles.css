@@ -2,7 +2,6 @@
   color-scheme: dark;
   --bg: #020617;
   --text: #dbeafe;
-  --accent: #38bdf8;
 }
 
 * { box-sizing: border-box; }
@@ -65,70 +64,16 @@ body {
   overflow: hidden;
   border-radius: 18px;
   border: 1px solid #334155;
-  perspective: 1800px;
-  transform-style: preserve-3d;
-  touch-action: pan-y pinch-zoom;
-  user-select: none;
-  contain: content;
   background: #0b1224;
+  touch-action: none;
+  user-select: none;
+  contain: strict;
 }
 
-.page {
-  --page-shadow: .12;
-  --shine: .08;
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  background: linear-gradient(160deg, #111c34, #0b1224);
-  padding: clamp(14px, 3.2vw, 34px);
-  box-shadow: 0 24px 44px rgba(2, 6, 23, .42);
-  overflow: hidden;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-}
-
-.page::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 7px;
-  background: var(--accent);
-}
-
-.page::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(100deg, rgba(255, 255, 255, 0) calc(58% - var(--curl, 0) * 12%), rgba(255, 255, 255, var(--shine)) 100%),
-    radial-gradient(circle at calc(var(--touch-x, .5) * 100%) calc(var(--touch-y, .5) * 100%), rgba(255,255,255,calc(var(--curl,0) * .12)), rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
-}
-
-.page h2 {
-  margin: 0 0 10px;
-  font-size: clamp(1rem, 3.8vw, 2rem);
-}
-
-.page p {
-  margin: 0;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  font-size: clamp(.92rem, 2.45vw, 1.18rem);
-}
-
-.page-current {
-  box-shadow:
-    0 24px 44px rgba(2, 6, 23, .42),
-    inset -28px 0 36px rgba(2, 6, 23, var(--page-shadow));
-}
-
-.page-flip {
-  transform-origin: left center;
-  will-change: transform;
-  transform: rotateY(0deg) rotateZ(0deg) skewY(var(--micro-bend, 0deg));
-  box-shadow: inset calc(var(--curl, 0) * -18px) 0 calc(var(--curl, 0) * 22px) rgba(15, 23, 42, .22);
+.book-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .counter {
