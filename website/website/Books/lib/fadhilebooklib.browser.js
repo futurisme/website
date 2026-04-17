@@ -54,6 +54,16 @@ export const loadBook = () => {
 };
 
 export const saveBook = (book) => localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
+export const DEFAULT_VIEWER_OPTIONS = {
+  duration: 240,
+  edgeStartRatio: 0.16,
+  minDragDistance: 14,
+  centerStartEnabled: true,
+  centerDragPenalty: 1.35,
+  releaseProgress: 0.32,
+  velocityThreshold: 0.48,
+  meshSegments: 30
+};
 
 export class FadhilEBookLite {
   constructor(root, book = loadBook(), options = {}) {
@@ -550,3 +560,17 @@ export class FadhilEBookLite {
     if (this.titleNode) this.titleNode.textContent = this.book.title || 'Untitled';
   }
 }
+
+export const createBooksApp = (root, options = {}) => {
+  const engine = new FadhilEBookLite(root, loadBook(), { ...DEFAULT_VIEWER_OPTIONS, ...options });
+  const onStorage = () => engine.setBook(loadBook());
+  window.addEventListener('storage', onStorage);
+
+  return {
+    engine,
+    destroy() {
+      window.removeEventListener('storage', onStorage);
+      engine.destroy();
+    }
+  };
+};
