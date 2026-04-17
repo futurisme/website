@@ -535,10 +535,13 @@ export class FadhilEBookLite {
 
     const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
     const rtl = dir > 0;
-    const contactSpreadBase = rtl ? (0.008 + progress * 0.012) : (0.012 + progress * 0.018);
-    const castSpreadBase = rtl ? (spreadRatio * (0.14 + progress * 0.2)) : (spreadRatio * (0.2 + progress * 0.32));
-    const contactSpread = clamp(w * contactSpreadBase, rtl ? 4 : 6, rtl ? 11 : 16);
-    const castSpread = clamp(w * castSpreadBase, rtl ? 5 : 8, rtl ? 16 : 30);
+    // Keep RTL shadow tight near fold seam. As progress increases, shadow width
+    // should not keep expanding toward the page edge.
+    const rtlFalloff = 1 - clamp(progress, 0, 1);
+    const contactSpreadBase = rtl ? (0.006 + rtlFalloff * 0.008) : (0.012 + progress * 0.018);
+    const castSpreadBase = rtl ? (spreadRatio * (0.1 + rtlFalloff * 0.11)) : (spreadRatio * (0.2 + progress * 0.32));
+    const contactSpread = clamp(w * contactSpreadBase, rtl ? 3.5 : 6, rtl ? 7.5 : 16);
+    const castSpread = clamp(w * castSpreadBase, rtl ? 4 : 8, rtl ? 11 : 30);
     const contactDarkness = clamp(
       0.002 + progress * this.options.shadowContactOpacityMax * (rtl ? 0.42 : 1),
       0.0015,
@@ -554,7 +557,7 @@ export class FadhilEBookLite {
     // (left side of the fold) so next-page text is not covered.
     const clipStart = rtl ? Math.max(0, foldX - contactSpread * 1.8) : 0;
     const clipWidthRaw = rtl ? (foldX - clipStart) : foldX;
-    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 1.8) : clipWidthRaw;
+    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 1.2) : clipWidthRaw;
     if (clipWidth <= 0.5) return;
 
     ctx.save();
