@@ -460,31 +460,23 @@ export class FadhilEBookLite {
     const flapStart = dir > 0 ? (foldX - flapWidth) : foldX;
     const flapWidthClamped = clamp(flapWidth, 0, w);
 
-    if (ALWAYS_SOLID_FLIPPING_PAGE) {
+    if (ALWAYS_SOLID_FLIPPING_PAGE && dir < 0) {
       ctx.fillStyle = this.options.paperColor;
       ctx.fillRect(clamp(flapStart - overscan, 0, w), 0, clamp(flapWidthClamped + overscan * 2, 0, w), h);
     }
 
     if (dir > 0) {
-      const dstX = foldX - flapWidth;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
-      ctx.clip();
-
-      // Right->left flip shows backside of current sheet.
-      // Keep it fully solid to avoid front-text duplication/ghosting artifacts.
-      ctx.fillStyle = this.options.paperColor;
-      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
-
-      const backside = ctx.createLinearGradient(dstX, 0, foldX, 0);
-      // Keep backside opaque while still giving subtle curvature shading.
-      backside.addColorStop(0, 'rgba(242,244,247,0.92)');
-      backside.addColorStop(0.45, 'rgba(250,251,252,0.95)');
-      backside.addColorStop(1, 'rgba(224,227,232,0.9)');
-      ctx.fillStyle = backside;
-      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
-      ctx.restore();
+      // Total fix for RTL overlap: do not paint the whole turned flap surface.
+      // Only render a narrow seam highlight/shade near foldX so target text
+      // stays readable during hold/drag.
+      const seamBand = clamp(Math.max(16, flapWidth * 0.12), 12, w * 0.12);
+      const seamStart = foldX - seamBand;
+      const seamGrad = ctx.createLinearGradient(seamStart, 0, foldX, 0);
+      seamGrad.addColorStop(0, `rgba(255,255,255,${foldHighlight * 0.3})`);
+      seamGrad.addColorStop(0.52, `rgba(0,0,0,${foldShade * 0.08})`);
+      seamGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
+      ctx.fillStyle = seamGrad;
+      ctx.fillRect(clamp(seamStart, 0, w), 0, clamp(seamBand, 0, w), h);
     } else {
       const dstX = foldX;
       ctx.save();
@@ -500,22 +492,16 @@ export class FadhilEBookLite {
       ctx.restore();
     }
 
-    const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
-    if (dir > 0) {
-      flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.18})`);
-      flapGrad.addColorStop(0.32, `rgba(0,0,0,${foldShade * 0.06})`);
-      flapGrad.addColorStop(0.56, `rgba(255,255,255,${foldHighlight * 0.62})`);
-      flapGrad.addColorStop(0.78, `rgba(255,255,255,${foldHighlight * 0.24})`);
-      flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.5})`);
-    } else {
+    if (dir < 0) {
+      const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
       flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.5})`);
       flapGrad.addColorStop(0.22, `rgba(255,255,255,${foldHighlight * 0.24})`);
       flapGrad.addColorStop(0.46, `rgba(255,255,255,${foldHighlight * 0.62})`);
       flapGrad.addColorStop(0.68, `rgba(0,0,0,${foldShade * 0.06})`);
       flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
+      ctx.fillStyle = flapGrad;
+      ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
     }
-    ctx.fillStyle = flapGrad;
-    ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
