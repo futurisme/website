@@ -42,7 +42,7 @@ const DEFAULT_OPTIONS = {
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 const cubicOut = (t) => 1 - Math.pow(1 - t, 3);
 const clone = (v) => JSON.parse(JSON.stringify(v));
-const ALWAYS_SOLID_FOLD = true;
+const ALWAYS_SOLID_FLIPPING_PAGE = true;
 
 export const loadBook = () => {
   try {
@@ -458,7 +458,7 @@ export class FadhilEBookLite {
     const flapStart = dir > 0 ? (foldX - flapWidth) : foldX;
     const flapWidthClamped = clamp(flapWidth, 0, w);
 
-    if (ALWAYS_SOLID_FOLD) {
+    if (ALWAYS_SOLID_FLIPPING_PAGE) {
       ctx.fillStyle = this.options.paperColor;
       ctx.fillRect(clamp(flapStart - overscan, 0, w), 0, clamp(flapWidthClamped + overscan * 2, 0, w), h);
     }
@@ -466,6 +466,7 @@ export class FadhilEBookLite {
     if (dir > 0) {
       const dstX = foldX - flapWidth;
       ctx.save();
+      if (ALWAYS_SOLID_FLIPPING_PAGE) ctx.globalCompositeOperation = 'source-atop';
       ctx.beginPath();
       ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
       ctx.clip();
@@ -476,6 +477,7 @@ export class FadhilEBookLite {
     } else {
       const dstX = foldX;
       ctx.save();
+      if (ALWAYS_SOLID_FLIPPING_PAGE) ctx.globalCompositeOperation = 'source-atop';
       ctx.beginPath();
       ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
       ctx.clip();
@@ -501,15 +503,6 @@ export class FadhilEBookLite {
     }
     ctx.fillStyle = flapGrad;
     ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
-
-    if (ALWAYS_SOLID_FOLD) {
-      const sealGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
-      sealGrad.addColorStop(0, 'rgba(255,255,255,0.085)');
-      sealGrad.addColorStop(0.5, 'rgba(255,255,255,0.035)');
-      sealGrad.addColorStop(1, 'rgba(255,255,255,0.07)');
-      ctx.fillStyle = sealGrad;
-      ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
-    }
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
