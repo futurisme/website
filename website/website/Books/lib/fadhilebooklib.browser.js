@@ -34,7 +34,10 @@ const DEFAULT_OPTIONS = {
   foldWidthRatio: 0.94,
   foldLiftPx: 10,
   foldStiffness: 0.72,
-  shadowOpacityMax: 0.18
+  shadowOpacityMax: 0.18,
+  backfaceBleed: 0.2,
+  backfaceContrast: 0.9,
+  foldSpecular: 0.14
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -420,11 +423,12 @@ export class FadhilEBookLite {
       ctx.restore();
     }
 
-    this.drawMeshFold(current, foldX, dir, progress, touchY);
+    this.drawMeshFold(current, target, foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
+    this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawMeshFold(pageCanvas, foldX, dir, progress, touchY) {
+  drawMeshFold(pageCanvas, nextCanvas, foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
@@ -446,6 +450,7 @@ export class FadhilEBookLite {
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
     const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
     const foldAnchor = dir > 0 ? flapEnd : flapStart;
+    const bleed = clamp(this.options.backfaceBleed * progress, 0, 0.35);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -466,6 +471,15 @@ export class FadhilEBookLite {
       const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
       const dstX = Math.round(dx - overscan);
       ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
+
+      if (bleed > 0.001) {
+        const edgeFade = Math.sin(center * Math.PI);
+        ctx.save();
+        ctx.globalAlpha = bleed * edgeFade;
+        ctx.filter = `contrast(${this.options.backfaceContrast})`;
+        ctx.drawImage(nextCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
+        ctx.restore();
+      }
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
@@ -489,6 +503,27 @@ export class FadhilEBookLite {
     }
 
     ctx.fillStyle = shadow;
+    ctx.fillRect(clamp(foldX - spread, 0, w), 0, spread * 2, h);
+  }
+
+  drawFoldSpecular(foldX, dir, progress) {
+    const ctx = this.ctx;
+    const w = this.width;
+    const h = this.height;
+    const strength = clamp(progress * this.options.foldSpecular, 0, 0.2);
+    if (strength <= 0.001) return;
+
+    const spread = clamp(10 + progress * 16, 8, 28);
+    const specular = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
+    if (dir > 0) {
+      specular.addColorStop(0, `rgba(255,255,255,${strength})`);
+      specular.addColorStop(1, 'rgba(255,255,255,0)');
+    } else {
+      specular.addColorStop(0, 'rgba(255,255,255,0)');
+      specular.addColorStop(1, `rgba(255,255,255,${strength})`);
+    }
+
+    ctx.fillStyle = specular;
     ctx.fillRect(clamp(foldX - spread, 0, w), 0, spread * 2, h);
   }
 
