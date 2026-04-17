@@ -439,10 +439,6 @@ export class FadhilEBookLite {
     ctx.clearRect(0, 0, w, h);
     const tension = 1 - Math.pow(1 - progress, 2);
     const bend = tension * this.options.curveStrength * this.options.foldStiffness;
-    const rawTouchInfluence = clamp((touchY - 0.5) * 1.1, -0.72, 0.72);
-    const touchInfluence = this.isTouchDevice
-      ? rawTouchInfluence * clamp(this.options.touchCurveDamping, 0.1, 1)
-      : rawTouchInfluence;
 
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
     const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
@@ -455,18 +451,17 @@ export class FadhilEBookLite {
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
       const spineCurve = Math.sin(center * Math.PI);
-      const curve = spineCurve * bend;
-      const lift = this.options.foldLiftPx * tension * spineCurve;
-      const dy = Math.round(((curve * touchInfluence) - lift) * 4) / 4;
+      const curveInset = spineCurve * bend;
 
       const distanceFromFold = dir > 0 ? (flapEnd - sx) : (sx - flapStart);
-      const mirrored = foldAnchor + (dir > 0 ? -1 : 1) * (distanceFromFold * (foldWidth / flapWidth));
+      const mirroredDistance = Math.max(0, (distanceFromFold * (foldWidth / flapWidth)) - curveInset);
+      const mirrored = foldAnchor + (dir > 0 ? -1 : 1) * mirroredDistance;
       const dx = mirrored - sw;
 
       const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
       const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
       const dstX = Math.round(dx - overscan);
-      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
+      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, 0, srcW, h);
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
