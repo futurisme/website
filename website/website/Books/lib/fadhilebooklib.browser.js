@@ -36,6 +36,9 @@ const DEFAULT_OPTIONS = {
   paperThicknessPx: 1.1,
   foldStiffness: 0.72,
   foldSpecular: 0.1,
+  foldTextureOpacity: 0.06,
+  foldMicroShadowOpacity: 0.045,
+  foldAmbientOcclusionOpacity: 0.08,
   shadowContactOpacityMax: 0.018,
   shadowCastOpacityMax: 0.01,
   shadowSpreadRatio: 0.14
@@ -459,6 +462,11 @@ export class FadhilEBookLite {
     const foldHighlight = clamp(0.028 + tension * 0.07, 0, 0.11);
     const flapStart = dir > 0 ? (foldX - flapWidth) : foldX;
     const flapWidthClamped = clamp(flapWidth, 0, w);
+    const textureStrength = clamp(
+      this.options.foldTextureOpacity * (0.55 + tension * 0.85),
+      0,
+      0.16
+    );
 
     if (ALWAYS_SOLID_FLIPPING_PAGE && dir < 0) {
       ctx.fillStyle = this.options.paperColor;
@@ -490,6 +498,8 @@ export class FadhilEBookLite {
     flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
     ctx.fillStyle = flapGrad;
     ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
+    this.drawFlapPaperTexture(ctx, flapStart, flapWidthClamped, h, foldX, dir, tension, textureStrength);
+    this.drawFlapAmbientOcclusion(ctx, flapStart, flapWidthClamped, h, foldX, dir, tension);
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
@@ -500,6 +510,65 @@ export class FadhilEBookLite {
     ctx.fillRect(spineX, 0, thickness * 2, h);
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
+  }
+
+  drawFlapPaperTexture(ctx, flapStart, flapWidth, h, foldX, dir, tension, textureStrength) {
+    if (flapWidth <= 1 || textureStrength <= 0.002) return;
+    const stripes = Math.max(8, Math.round(12 + tension * 18));
+    const bandWidth = flapWidth / stripes;
+    for (let i = 0; i < stripes; i++) {
+      const x = flapStart + i * bandWidth;
+      const t = i / Math.max(1, stripes - 1);
+      const wave = Math.sin((t + tension * 0.9) * Math.PI * 2.2);
+      const alpha = textureStrength * (0.35 + Math.abs(wave) * 0.65);
+      const isDarkBand = i % 2 === 0;
+      ctx.fillStyle = isDarkBand
+        ? `rgba(0,0,0,${alpha * 0.28})`
+        : `rgba(255,255,255,${alpha * 0.42})`;
+      ctx.fillRect(clamp(x, 0, this.width), 0, Math.max(0.8, bandWidth + 0.5), h);
+    }
+
+    const grainStrength = textureStrength * 0.35;
+    const grain = ctx.createRadialGradient(
+      dir > 0 ? foldX - flapWidth * 0.65 : foldX + flapWidth * 0.65,
+      h * 0.5,
+      2,
+      foldX,
+      h * 0.5,
+      Math.max(8, flapWidth * 0.92)
+    );
+    grain.addColorStop(0, `rgba(255,255,255,${grainStrength * 0.75})`);
+    grain.addColorStop(0.58, `rgba(255,255,255,${grainStrength * 0.35})`);
+    grain.addColorStop(1, `rgba(0,0,0,${grainStrength * 0.22})`);
+    ctx.fillStyle = grain;
+    ctx.fillRect(clamp(flapStart, 0, this.width), 0, flapWidth, h);
+  }
+
+  drawFlapAmbientOcclusion(ctx, flapStart, flapWidth, h, foldX, dir, tension) {
+    if (flapWidth <= 1) return;
+    const aoStrength = clamp(
+      this.options.foldAmbientOcclusionOpacity * (0.4 + tension * 0.9),
+      0,
+      0.18
+    );
+    const aoSpread = clamp(flapWidth * (0.34 + tension * 0.15), 6, this.width * 0.42);
+    const ao = ctx.createLinearGradient(
+      dir > 0 ? foldX - aoSpread : foldX,
+      0,
+      dir > 0 ? foldX : foldX + aoSpread,
+      0
+    );
+    if (dir > 0) {
+      ao.addColorStop(0, 'rgba(0,0,0,0)');
+      ao.addColorStop(0.7, `rgba(0,0,0,${aoStrength * 0.55})`);
+      ao.addColorStop(1, `rgba(0,0,0,${aoStrength})`);
+    } else {
+      ao.addColorStop(0, `rgba(0,0,0,${aoStrength})`);
+      ao.addColorStop(0.3, `rgba(0,0,0,${aoStrength * 0.55})`);
+      ao.addColorStop(1, 'rgba(0,0,0,0)');
+    }
+    ctx.fillStyle = ao;
+    ctx.fillRect(clamp(flapStart, 0, this.width), 0, flapWidth, h);
   }
 
   drawFoldShadow(foldX, dir, progress) {
@@ -520,6 +589,11 @@ export class FadhilEBookLite {
       0.001 + progress * this.options.shadowCastOpacityMax,
       0.0008,
       0.012
+    );
+    const microShadowStrength = clamp(
+      progress * this.options.foldMicroShadowOpacity,
+      0.002,
+      0.09
     );
 
     const clipStart = dir > 0 ? foldX : 0;
@@ -560,6 +634,20 @@ export class FadhilEBookLite {
     }
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
+
+    const microSpread = clamp(4 + progress * 8, 4, 14);
+    const micro = ctx.createLinearGradient(foldX - microSpread, 0, foldX + microSpread, 0);
+    if (dir > 0) {
+      micro.addColorStop(0, `rgba(0,0,0,${microShadowStrength * 0.95})`);
+      micro.addColorStop(0.4, `rgba(0,0,0,${microShadowStrength * 0.55})`);
+      micro.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      micro.addColorStop(0, 'rgba(0,0,0,0)');
+      micro.addColorStop(0.6, `rgba(0,0,0,${microShadowStrength * 0.55})`);
+      micro.addColorStop(1, `rgba(0,0,0,${microShadowStrength * 0.95})`);
+    }
+    ctx.fillStyle = micro;
+    ctx.fillRect(clamp(foldX - microSpread, 0, w), 0, microSpread * 2, h);
 
     ctx.restore();
   }
