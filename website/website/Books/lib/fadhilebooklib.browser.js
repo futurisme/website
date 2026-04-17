@@ -28,7 +28,13 @@ const DEFAULT_OPTIONS = {
   foldOverscanPx: 1.5,
   mobileDprCap: 2,
   touchCurveDamping: 0.38,
-  touchMeshSegments: 22
+  touchMeshSegments: 22,
+  paperColor: '#ffffff',
+  paperInk: '#111111',
+  foldWidthRatio: 0.94,
+  foldLiftPx: 10,
+  foldStiffness: 0.72,
+  shadowOpacityMax: 0.18
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -265,7 +271,9 @@ export class FadhilEBookLite {
     const from = dragState.smoothProgress ?? dragState.progress;
     const dir = dragState.dir;
     const start = performance.now();
-    const duration = clamp(this.options.duration * (0.45 + Math.abs(targetProgress - from)), 100, 250);
+    const speed = clamp(Math.abs(this.velocityX), 0, 2.2);
+    const responsiveFactor = 1 - speed * 0.17;
+    const duration = clamp(this.options.duration * (0.44 + Math.abs(targetProgress - from)) * responsiveFactor, 90, 260);
 
     const tick = (now) => {
       const t = clamp((now - start) / duration, 0, 1);
@@ -314,25 +322,16 @@ export class FadhilEBookLite {
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    ctx.fillStyle = '#0b1224';
+    ctx.fillStyle = this.options.paperColor;
     ctx.fillRect(0, 0, this.width, this.height);
-
-    const grad = ctx.createLinearGradient(0, 0, this.width, this.height);
-    grad.addColorStop(0, '#111c34');
-    grad.addColorStop(1, '#0b1224');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, this.width, this.height);
-
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillRect(0, 0, 7, this.height);
 
     const pad = Math.max(14, this.width * 0.04);
-    ctx.fillStyle = '#dbeafe';
+    ctx.fillStyle = this.options.paperInk;
     ctx.textBaseline = 'top';
     ctx.font = `700 ${Math.max(18, this.width * 0.05)}px Inter, system-ui, sans-serif`;
     this.wrapText(ctx, page.title || '', pad, pad, this.width - pad * 2, Math.max(24, this.width * 0.06));
 
-    ctx.fillStyle = '#d1defa';
+    ctx.fillStyle = '#2a2a2a';
     ctx.font = `${Math.max(14, this.width * 0.032)}px Inter, system-ui, sans-serif`;
     this.wrapText(ctx, page.content || '', pad, pad + Math.max(52, this.width * 0.09), this.width - pad * 2, Math.max(20, this.width * 0.043));
 
@@ -406,8 +405,9 @@ export class FadhilEBookLite {
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(target, 0, 0, w, h);
 
-    const q = Math.max(0.5, this.options.quantizeFoldPx || 1);
-    const foldX = Math.round(clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w) / q) * q;
+    const q = Math.max(0.25, this.options.quantizeFoldPx || 1);
+    const foldBase = dir > 0 ? w * (1 - progress) : w * progress;
+    const foldX = Math.round(clamp(foldBase, 0, w) / q) * q;
     const staticStart = dir > 0 ? 0 : foldX;
     const staticWidth = dir > 0 ? foldX : w - foldX;
 
@@ -436,13 +436,16 @@ export class FadhilEBookLite {
     if (flapWidth < 1) return;
 
     ctx.clearRect(0, 0, w, h);
-    const bend = progress * this.options.curveStrength;
+    const tension = 1 - Math.pow(1 - progress, 2);
+    const bend = tension * this.options.curveStrength * this.options.foldStiffness;
     const rawTouchInfluence = clamp((touchY - 0.5) * 1.1, -0.72, 0.72);
     const touchInfluence = this.isTouchDevice
       ? rawTouchInfluence * clamp(this.options.touchCurveDamping, 0.1, 1)
       : rawTouchInfluence;
 
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
+    const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
+    const foldAnchor = dir > 0 ? flapEnd : flapStart;
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -450,9 +453,14 @@ export class FadhilEBookLite {
       const sx = flapStart + flapWidth * t0;
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
-      const curve = Math.sin(center * Math.PI) * bend;
-      const dy = Math.round((curve * touchInfluence) * 4) / 4;
-      const dx = (2 * foldX) - sx - sw;
+      const spineCurve = Math.sin(center * Math.PI);
+      const curve = spineCurve * bend;
+      const lift = this.options.foldLiftPx * tension * spineCurve;
+      const dy = Math.round(((curve * touchInfluence) - lift) * 4) / 4;
+
+      const distanceFromFold = dir > 0 ? (flapEnd - sx) : (sx - flapStart);
+      const mirrored = foldAnchor + (dir > 0 ? -1 : 1) * (distanceFromFold * (foldWidth / flapWidth));
+      const dx = mirrored - sw;
 
       const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
       const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
@@ -468,16 +476,16 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spread = clamp(24 + progress * 44, 18, 72);
-    const dark = clamp(0.1 + progress * 0.24, 0, 0.34);
+    const spread = clamp(18 + progress * 36, 14, 58);
+    const dark = clamp(0.04 + progress * this.options.shadowOpacityMax, 0, this.options.shadowOpacityMax);
 
     const shadow = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
     if (dir > 0) {
-      shadow.addColorStop(0, `rgba(2,6,23,${dark})`);
-      shadow.addColorStop(1, 'rgba(2,6,23,0)');
+      shadow.addColorStop(0, `rgba(0,0,0,${dark})`);
+      shadow.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
-      shadow.addColorStop(0, 'rgba(2,6,23,0)');
-      shadow.addColorStop(1, `rgba(2,6,23,${dark})`);
+      shadow.addColorStop(0, 'rgba(0,0,0,0)');
+      shadow.addColorStop(1, `rgba(0,0,0,${dark})`);
     }
 
     ctx.fillStyle = shadow;

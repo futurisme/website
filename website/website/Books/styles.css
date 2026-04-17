@@ -63,8 +63,8 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-  border: 1px solid #334155;
-  background: #0b1224;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
   touch-action: none;
   overscroll-behavior: contain;
   user-select: none;
