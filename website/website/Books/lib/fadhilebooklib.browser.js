@@ -35,8 +35,10 @@ const DEFAULT_OPTIONS = {
   foldLiftPx: 4,
   paperThicknessPx: 1.1,
   foldStiffness: 0.72,
-  shadowOpacityMax: 0.13,
-  foldSpecular: 0.1
+  foldSpecular: 0.1,
+  shadowContactOpacityMax: 0.018,
+  shadowCastOpacityMax: 0.01,
+  shadowSpreadRatio: 0.14
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -528,9 +530,11 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const contactSpread = clamp(14 + progress * 14, 12, 30);
-    const castSpread = clamp(30 + progress * 30, 26, 72);
-    const darkness = clamp((0.012 + progress * this.options.shadowOpacityMax * 0.44), 0.009, 0.055);
+    const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
+    const contactSpread = clamp(w * (0.012 + progress * 0.018), 6, 16);
+    const castSpread = clamp(w * (spreadRatio * (0.2 + progress * 0.32)), 8, 30);
+    const contactDarkness = clamp(0.003 + progress * this.options.shadowContactOpacityMax, 0.002, 0.02);
+    const castDarkness = clamp(0.0015 + progress * this.options.shadowCastOpacityMax, 0.001, 0.012);
 
     const clipStart = dir > 0 ? foldX : 0;
     const clipWidth = dir > 0 ? (w - foldX) : foldX;
@@ -543,25 +547,31 @@ export class FadhilEBookLite {
 
     const contact = ctx.createLinearGradient(foldX - contactSpread, 0, foldX + contactSpread, 0);
     if (dir > 0) {
-      contact.addColorStop(0, `rgba(0,0,0,${darkness * 0.32})`);
-      contact.addColorStop(0.3, `rgba(0,0,0,${darkness * 0.22})`);
-      contact.addColorStop(0.62, `rgba(0,0,0,${darkness * 0.08})`);
+      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.45})`);
+      contact.addColorStop(0.36, `rgba(0,0,0,${contactDarkness * 0.26})`);
+      contact.addColorStop(0.68, `rgba(0,0,0,${contactDarkness * 0.1})`);
       contact.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       contact.addColorStop(0, 'rgba(0,0,0,0)');
-      contact.addColorStop(0.38, `rgba(0,0,0,${darkness * 0.08})`);
-      contact.addColorStop(0.7, `rgba(0,0,0,${darkness * 0.22})`);
-      contact.addColorStop(1, `rgba(0,0,0,${darkness * 0.32})`);
+      contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
+      contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
+      contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
     }
     ctx.fillStyle = contact;
     ctx.fillRect(clamp(foldX - contactSpread, 0, w), 0, contactSpread * 2, h);
 
     const cast = ctx.createLinearGradient(foldX - castSpread, 0, foldX + castSpread, 0);
-    cast.addColorStop(0, 'rgba(0,0,0,0)');
-    cast.addColorStop(0.24, `rgba(0,0,0,${darkness * 0.045})`);
-    cast.addColorStop(0.5, `rgba(0,0,0,${darkness * 0.075})`);
-    cast.addColorStop(0.76, `rgba(0,0,0,${darkness * 0.045})`);
-    cast.addColorStop(1, 'rgba(0,0,0,0)');
+    if (dir > 0) {
+      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.16})`);
+      cast.addColorStop(0.24, `rgba(0,0,0,${castDarkness * 0.1})`);
+      cast.addColorStop(0.52, `rgba(0,0,0,${castDarkness * 0.04})`);
+      cast.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      cast.addColorStop(0, 'rgba(0,0,0,0)');
+      cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
+      cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
+      cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
+    }
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
 
