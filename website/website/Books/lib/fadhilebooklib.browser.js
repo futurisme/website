@@ -534,30 +534,27 @@ export class FadhilEBookLite {
     const h = this.height;
 
     const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
-    const rtl = dir > 0;
-    // Keep RTL shadow tight near fold seam. As progress increases, shadow width
-    // should not keep expanding toward the page edge.
-    const rtlFalloff = 1 - clamp(progress, 0, 1);
-    const contactSpreadBase = rtl ? (0.006 + rtlFalloff * 0.008) : (0.012 + progress * 0.018);
-    const castSpreadBase = rtl ? (spreadRatio * (0.1 + rtlFalloff * 0.11)) : (spreadRatio * (0.2 + progress * 0.32));
-    const contactSpread = clamp(w * contactSpreadBase, rtl ? 3.5 : 6, rtl ? 7.5 : 16);
-    const castSpread = clamp(w * castSpreadBase, rtl ? 4 : 8, rtl ? 11 : 30);
+    // Disable broad cast/contact shadow on right->left drag.
+    // Prediction from reported artifact: any progressive RTL shadow spread can
+    // eventually overlap and obscure next-page text, so we keep only flap/spine
+    // shading from drawFoldedFlap for this direction.
+    if (dir > 0) return;
+
+    const contactSpread = clamp(w * (0.012 + progress * 0.018), 6, 16);
+    const castSpread = clamp(w * (spreadRatio * (0.2 + progress * 0.32)), 8, 30);
     const contactDarkness = clamp(
-      0.002 + progress * this.options.shadowContactOpacityMax * (rtl ? 0.42 : 1),
+      0.002 + progress * this.options.shadowContactOpacityMax,
       0.0015,
-      rtl ? 0.009 : 0.02
+      0.02
     );
     const castDarkness = clamp(
-      0.001 + progress * this.options.shadowCastOpacityMax * (rtl ? 0.35 : 1),
+      0.001 + progress * this.options.shadowCastOpacityMax,
       0.0008,
-      rtl ? 0.0055 : 0.012
+      0.012
     );
 
-    // For right->left drags, keep the shadow attached to the folded paper edge
-    // (left side of the fold) so next-page text is not covered.
-    const clipStart = rtl ? Math.max(0, foldX - contactSpread * 1.8) : 0;
-    const clipWidthRaw = rtl ? (foldX - clipStart) : foldX;
-    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 1.2) : clipWidthRaw;
+    const clipStart = 0;
+    const clipWidth = foldX;
     if (clipWidth <= 0.5) return;
 
     ctx.save();
@@ -566,30 +563,18 @@ export class FadhilEBookLite {
     ctx.clip();
 
     const contact = ctx.createLinearGradient(foldX - contactSpread, 0, foldX + contactSpread, 0);
-    if (rtl) {
-      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.52})`);
-      contact.addColorStop(0.62, `rgba(0,0,0,${contactDarkness * 0.18})`);
-      contact.addColorStop(1, 'rgba(0,0,0,0)');
-    } else {
-      contact.addColorStop(0, 'rgba(0,0,0,0)');
-      contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
-      contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
-      contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
-    }
+    contact.addColorStop(0, 'rgba(0,0,0,0)');
+    contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
+    contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
+    contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
     ctx.fillStyle = contact;
     ctx.fillRect(clamp(foldX - contactSpread, 0, w), 0, contactSpread * 2, h);
 
     const cast = ctx.createLinearGradient(foldX - castSpread, 0, foldX + castSpread, 0);
-    if (rtl) {
-      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.14})`);
-      cast.addColorStop(0.54, `rgba(0,0,0,${castDarkness * 0.06})`);
-      cast.addColorStop(1, 'rgba(0,0,0,0)');
-    } else {
-      cast.addColorStop(0, 'rgba(0,0,0,0)');
-      cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
-      cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
-      cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
-    }
+    cast.addColorStop(0, 'rgba(0,0,0,0)');
+    cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
+    cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
+    cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
 
