@@ -22,7 +22,13 @@ const DEFAULT_OPTIONS = {
   curveStrength: 20,
   maxCacheDistance: 1,
   smoothing: 0.22,
-  touchSmoothing: 0.18
+  touchSmoothing: 0.18,
+  velocitySmoothing: 0.24,
+  quantizeFoldPx: 1,
+  foldOverscanPx: 1.5,
+  mobileDprCap: 2,
+  touchCurveDamping: 0.38,
+  touchMeshSegments: 22
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -50,7 +56,7 @@ export class FadhilEBookLite {
 
     this.frame = root.querySelector('[data-slot="page-frame"]');
     this.canvas = root.querySelector('[data-slot="book-canvas"]');
-    this.ctx = this.canvas?.getContext('2d', { alpha: false, desynchronized: true }) || null;
+    this.ctx = this.canvas?.getContext('2d', { alpha: false }) || null;
     this.counter = root.querySelector('[data-slot="page-number"]');
     this.titleNode = root.querySelector('[data-slot="book-title"]');
 
@@ -69,7 +75,8 @@ export class FadhilEBookLite {
     this.meshSegments = this.options.meshSegments;
     this.idleWarm = null;
     this.foldCanvas = document.createElement('canvas');
-    this.foldCtx = this.foldCanvas.getContext('2d', { alpha: true, desynchronized: true });
+    this.foldCtx = this.foldCanvas.getContext('2d', { alpha: true });
+    this.isTouchDevice = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize, { passive: true });
@@ -124,7 +131,8 @@ export class FadhilEBookLite {
   resize() {
     if (!this.ctx || !this.frame || !this.canvas) return;
     const rect = this.frame.getBoundingClientRect();
-    this.dpr = clamp(window.devicePixelRatio || 1, 1, 2.5);
+    const dprCap = this.isTouchDevice ? this.options.mobileDprCap : 2.5;
+    this.dpr = clamp(window.devicePixelRatio || 1, 1, dprCap);
     this.width = Math.max(1, Math.round(rect.width));
     this.height = Math.max(1, Math.round(rect.height));
     this.pixelWidth = Math.max(1, Math.round(this.width * this.dpr));
@@ -186,13 +194,16 @@ export class FadhilEBookLite {
 
     this.frame.addEventListener('pointermove', (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
+      if (this.drag.active) event.preventDefault();
 
       const now = performance.now();
-      const x = clamp(event.clientX - this.drag.rect.left, 0, this.drag.rect.width);
-      const y = clamp(event.clientY - this.drag.rect.top, 0, this.drag.rect.height);
+      const latestEvent = event.getCoalescedEvents?.().at(-1) || event;
+      const x = clamp(latestEvent.clientX - this.drag.rect.left, 0, this.drag.rect.width);
+      const y = clamp(latestEvent.clientY - this.drag.rect.top, 0, this.drag.rect.height);
       const dt = Math.max(16, now - this.lastMoveTs);
 
-      this.velocityX = (x - this.drag.lastX) / dt;
+      const instantVelocityX = (x - this.drag.lastX) / dt;
+      this.velocityX += (instantVelocityX - this.velocityX) * this.options.velocitySmoothing;
       this.drag.lastX = x;
       this.drag.x = x;
       this.drag.y = y;
@@ -224,7 +235,7 @@ export class FadhilEBookLite {
       this.drag.progress = clamp(dragDistance / (this.drag.rect.width * 0.92), 0, 1);
       this.drag.smoothProgress += (this.drag.progress - this.drag.smoothProgress) * this.options.smoothing;
       this.queueRender();
-    }, { passive: true });
+    }, { passive: false });
 
     const onRelease = (event) => {
       if (!this.drag || event.pointerId !== this.drag.pointerId) return;
@@ -246,6 +257,7 @@ export class FadhilEBookLite {
 
     this.frame.addEventListener('pointerup', onRelease);
     this.frame.addEventListener('pointercancel', onRelease);
+    this.frame.addEventListener('lostpointercapture', onRelease);
   }
 
   animateTo(targetProgress, dragState) {
@@ -279,7 +291,7 @@ export class FadhilEBookLite {
     if (this.renderQueued || !this.drag) return;
     this.renderQueued = true;
 
-    requestAnimationFrame((now) => {
+    requestAnimationFrame(() => {
       this.renderQueued = false;
       if (!this.drag || !this.drag.dir) return;
 
@@ -297,7 +309,7 @@ export class FadhilEBookLite {
     const cvs = document.createElement('canvas');
     cvs.width = this.pixelWidth;
     cvs.height = this.pixelHeight;
-    const ctx = cvs.getContext('2d', { alpha: false, desynchronized: true });
+    const ctx = cvs.getContext('2d', { alpha: false });
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
@@ -394,7 +406,8 @@ export class FadhilEBookLite {
     ctx.clearRect(0, 0, w, h);
     ctx.drawImage(target, 0, 0, w, h);
 
-    const foldX = Math.round(clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w) * 2) / 2;
+    const q = Math.max(0.5, this.options.quantizeFoldPx || 1);
+    const foldX = Math.round(clamp(dir > 0 ? w * (1 - progress) : w * progress, 0, w) / q) * q;
     const staticStart = dir > 0 ? 0 : foldX;
     const staticWidth = dir > 0 ? foldX : w - foldX;
 
@@ -415,7 +428,8 @@ export class FadhilEBookLite {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
-    const seg = clamp(this.meshSegments | 0, 12, 44);
+    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
+    const seg = clamp(this.meshSegments | 0, 10, segmentCap);
     const flapStart = dir > 0 ? foldX : 0;
     const flapEnd = dir > 0 ? w : foldX;
     const flapWidth = Math.max(0, flapEnd - flapStart);
@@ -423,7 +437,12 @@ export class FadhilEBookLite {
 
     ctx.clearRect(0, 0, w, h);
     const bend = progress * this.options.curveStrength;
-    const touchInfluence = clamp((touchY - 0.5) * 1.1, -0.72, 0.72);
+    const rawTouchInfluence = clamp((touchY - 0.5) * 1.1, -0.72, 0.72);
+    const touchInfluence = this.isTouchDevice
+      ? rawTouchInfluence * clamp(this.options.touchCurveDamping, 0.1, 1)
+      : rawTouchInfluence;
+
+    const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -432,12 +451,13 @@ export class FadhilEBookLite {
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
       const curve = Math.sin(center * Math.PI) * bend;
-      const dy = curve * touchInfluence;
-      const dx = dir > 0 ? foldX - (sx - foldX) - sw : foldX + (foldX - sx) - sw;
+      const dy = Math.round((curve * touchInfluence) * 4) / 4;
+      const dx = (2 * foldX) - sx - sw;
 
-      const x0 = Math.round(dx);
-      const w0 = Math.ceil(sw) + 2;
-      ctx.drawImage(pageCanvas, sx, 0, sw + 0.5, h, x0 - 1, Math.round(dy), w0, h);
+      const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
+      const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
+      const dstX = Math.round(dx - overscan);
+      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
