@@ -534,13 +534,25 @@ export class FadhilEBookLite {
     const h = this.height;
 
     const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
-    const contactSpread = clamp(w * (0.012 + progress * 0.018), 6, 16);
-    const castSpread = clamp(w * (spreadRatio * (0.2 + progress * 0.32)), 8, 30);
-    const contactDarkness = clamp(0.003 + progress * this.options.shadowContactOpacityMax, 0.002, 0.02);
-    const castDarkness = clamp(0.0015 + progress * this.options.shadowCastOpacityMax, 0.001, 0.012);
+    const rtl = dir > 0;
+    const contactSpreadBase = rtl ? (0.008 + progress * 0.012) : (0.012 + progress * 0.018);
+    const castSpreadBase = rtl ? (spreadRatio * (0.14 + progress * 0.2)) : (spreadRatio * (0.2 + progress * 0.32));
+    const contactSpread = clamp(w * contactSpreadBase, rtl ? 4 : 6, rtl ? 11 : 16);
+    const castSpread = clamp(w * castSpreadBase, rtl ? 5 : 8, rtl ? 16 : 30);
+    const contactDarkness = clamp(
+      0.002 + progress * this.options.shadowContactOpacityMax * (rtl ? 0.42 : 1),
+      0.0015,
+      rtl ? 0.009 : 0.02
+    );
+    const castDarkness = clamp(
+      0.001 + progress * this.options.shadowCastOpacityMax * (rtl ? 0.35 : 1),
+      0.0008,
+      rtl ? 0.0055 : 0.012
+    );
 
     const clipStart = dir > 0 ? foldX : 0;
-    const clipWidth = dir > 0 ? (w - foldX) : foldX;
+    const clipWidthRaw = dir > 0 ? (w - foldX) : foldX;
+    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 2.4) : clipWidthRaw;
     if (clipWidth <= 0.5) return;
 
     ctx.save();
