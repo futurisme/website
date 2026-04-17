@@ -32,10 +32,11 @@ const DEFAULT_OPTIONS = {
   paperColor: '#ffffff',
   paperInk: '#111111',
   foldWidthRatio: 0.94,
-  foldLiftPx: 10,
+  foldLiftPx: 4,
+  paperThicknessPx: 1.1,
   foldStiffness: 0.72,
-  shadowOpacityMax: 0.18,
-  foldSpecular: 0.14
+  shadowOpacityMax: 0.13,
+  foldSpecular: 0.1
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -53,6 +54,16 @@ export const loadBook = () => {
 };
 
 export const saveBook = (book) => localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
+export const DEFAULT_VIEWER_OPTIONS = {
+  duration: 240,
+  edgeStartRatio: 0.16,
+  minDragDistance: 14,
+  centerStartEnabled: true,
+  centerDragPenalty: 1.35,
+  releaseProgress: 0.32,
+  velocityThreshold: 0.48,
+  meshSegments: 30
+};
 
 export class FadhilEBookLite {
   constructor(root, book = loadBook(), options = {}) {
@@ -420,20 +431,18 @@ export class FadhilEBookLite {
       ctx.restore();
     }
 
-    this.drawFoldedFlap(current, foldX, dir, progress, touchY);
+    this.drawFoldedFlap(foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
     this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawFoldedFlap(pageCanvas, foldX, dir, progress, touchY) {
+  drawFoldedFlap(foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
     const flapWidth = dir > 0 ? (w - foldX) : foldX;
     if (flapWidth < 1) return;
 
-    const flapSourceStart = dir > 0 ? foldX : 0;
-    const flapSourceEnd = dir > 0 ? w : foldX;
     const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
     const seg = clamp(this.meshSegments | 0, 12, segmentCap);
 
@@ -443,6 +452,17 @@ export class FadhilEBookLite {
     const yAnchor = clamp(touchY, 0, 1);
     const yCurveSign = yAnchor < 0.5 ? -1 : 1;
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
+    const thickness = clamp(this.options.paperThicknessPx || 1, 0.4, 2.2);
+
+    const projectedStart = dir > 0 ? (foldX - flapWidth - bend * 0.2) : foldX;
+    const projectedEnd = dir > 0 ? foldX : (foldX + flapWidth + bend * 0.2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
+    ctx.clip();
+    ctx.fillStyle = this.options.paperColor;
+    ctx.fillRect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
+    ctx.restore();
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -450,22 +470,36 @@ export class FadhilEBookLite {
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
       const foldCurve = Math.sin(center * Math.PI) * bend;
-      const srcProgress = dir > 0 ? t0 : (1 - t1);
-      const sx = flapSourceStart + (flapSourceEnd - flapSourceStart) * srcProgress;
       const distanceFromFold = center * flapWidth;
       const mirroredDistance = Math.max(0, distanceFromFold - foldCurve);
       const stripStart = dir > 0 ? (foldX - mirroredDistance - sw) : (foldX + mirroredDistance);
-      const verticalLift = yCurveSign * Math.sin((center + yAnchor * 0.5) * Math.PI) * this.options.foldLiftPx * tension;
-
-      const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
-      const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
+      const verticalLift = yCurveSign * Math.sin((center + yAnchor * 0.5) * Math.PI) * this.options.foldLiftPx * tension * 0.35;
+      const srcW = Math.ceil(sw + overscan * 2);
       const dstX = Math.round(stripStart - overscan);
-      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, verticalLift, srcW, h);
+      const shade = clamp(0.04 + (1 - center) * 0.16 * tension, 0, 0.2);
+      const highlight = clamp(0.03 + center * 0.08 * tension, 0, 0.12);
 
-      const stripShade = clamp(0.05 + (1 - center) * 0.22 * tension, 0, 0.28);
-      ctx.fillStyle = `rgba(0,0,0,${stripShade})`;
-      ctx.fillRect(dstX, 0, srcW, h);
+      const stripGrad = ctx.createLinearGradient(dstX, 0, dstX + srcW, 0);
+      if (dir > 0) {
+        stripGrad.addColorStop(0, `rgba(255,255,255,${highlight})`);
+        stripGrad.addColorStop(1, `rgba(0,0,0,${shade})`);
+      } else {
+        stripGrad.addColorStop(0, `rgba(0,0,0,${shade})`);
+        stripGrad.addColorStop(1, `rgba(255,255,255,${highlight})`);
+      }
+      ctx.fillStyle = this.options.paperColor;
+      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
+      ctx.fillStyle = stripGrad;
+      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
     }
+
+    const spineX = dir > 0 ? foldX - thickness : foldX;
+    const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.12)');
+    spineGrad.addColorStop(0.5, 'rgba(0,0,0,0.05)');
+    spineGrad.addColorStop(1, 'rgba(255,255,255,0.1)');
+    ctx.fillStyle = spineGrad;
+    ctx.fillRect(spineX, 0, thickness * 2, h);
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
   }
@@ -475,16 +509,18 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spread = clamp(18 + progress * 36, 14, 58);
+    const spread = clamp(20 + progress * 34, 16, 56);
     const dark = clamp(0.04 + progress * this.options.shadowOpacityMax, 0, this.options.shadowOpacityMax);
 
     const shadow = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
     if (dir > 0) {
-      shadow.addColorStop(0, `rgba(0,0,0,${dark})`);
+      shadow.addColorStop(0, `rgba(0,0,0,${dark * 0.95})`);
+      shadow.addColorStop(0.45, `rgba(0,0,0,${dark * 0.36})`);
       shadow.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       shadow.addColorStop(0, 'rgba(0,0,0,0)');
-      shadow.addColorStop(1, `rgba(0,0,0,${dark})`);
+      shadow.addColorStop(0.55, `rgba(0,0,0,${dark * 0.36})`);
+      shadow.addColorStop(1, `rgba(0,0,0,${dark * 0.95})`);
     }
 
     ctx.fillStyle = shadow;
@@ -524,3 +560,17 @@ export class FadhilEBookLite {
     if (this.titleNode) this.titleNode.textContent = this.book.title || 'Untitled';
   }
 }
+
+export const createBooksApp = (root, options = {}) => {
+  const engine = new FadhilEBookLite(root, loadBook(), { ...DEFAULT_VIEWER_OPTIONS, ...options });
+  const onStorage = () => engine.setBook(loadBook());
+  window.addEventListener('storage', onStorage);
+
+  return {
+    engine,
+    destroy() {
+      window.removeEventListener('storage', onStorage);
+      engine.destroy();
+    }
+  };
+};

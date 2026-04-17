@@ -26,19 +26,9 @@
     </main>
 
     <script type="module">
-      import { FadhilEBookLite, loadBook } from '/Books/lib/fadhilebooklib.browser.js';
+      import { createBooksApp } from '/Books/lib/fadhilebooklib.browser.js';
       const root = document.querySelector('.shell');
-      const engine = new FadhilEBookLite(root, loadBook(), {
-        duration: 240,
-        edgeStartRatio: 0.16,
-        minDragDistance: 14,
-        centerStartEnabled: true,
-        centerDragPenalty: 1.35,
-        releaseProgress: 0.32,
-        velocityThreshold: 0.48,
-        meshSegments: 30
-      });
-      window.addEventListener('storage', () => engine.setBook(loadBook()));
+      createBooksApp(root);
     </script>
   </body>
 </html>
