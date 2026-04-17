@@ -404,64 +404,67 @@ export class FadhilEBookLite {
     const target = this.getPageCanvas(this.i + dir);
 
     ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(current, 0, 0, w, h);
+    ctx.drawImage(target, 0, 0, w, h);
 
     const q = Math.max(0.25, this.options.quantizeFoldPx || 1);
     const foldBase = dir > 0 ? w * (1 - progress) : w * progress;
     const foldX = Math.round(clamp(foldBase, 0, w) / q) * q;
-    const openedStart = dir > 0 ? foldX : 0;
-    const openedWidth = dir > 0 ? w - foldX : foldX;
-    if (openedWidth > 0.5) {
+    const staticStart = dir > 0 ? 0 : foldX;
+    const staticWidth = dir > 0 ? foldX : w - foldX;
+    if (staticWidth > 0.5) {
       ctx.save();
       ctx.beginPath();
-      ctx.rect(openedStart, 0, openedWidth, h);
+      ctx.rect(staticStart, 0, staticWidth, h);
       ctx.clip();
-      ctx.drawImage(target, 0, 0, w, h);
+      ctx.drawImage(current, 0, 0, w, h);
       ctx.restore();
     }
 
-    this.drawMeshFold(current, foldX, dir, progress, touchY);
+    this.drawFoldedFlap(current, foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
     this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawMeshFold(pageCanvas, foldX, dir, progress, touchY) {
+  drawFoldedFlap(pageCanvas, foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
-    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
-    const seg = clamp(this.meshSegments | 0, 10, segmentCap);
-    const flapStart = dir > 0 ? foldX : 0;
-    const flapEnd = dir > 0 ? w : foldX;
-    const flapWidth = Math.max(0, flapEnd - flapStart);
+    const flapWidth = dir > 0 ? (w - foldX) : foldX;
     if (flapWidth < 1) return;
 
-    ctx.clearRect(0, 0, w, h);
-    const tension = 1 - Math.pow(1 - progress, 2);
-    const bend = tension * this.options.curveStrength * this.options.foldStiffness;
+    const flapSourceStart = dir > 0 ? foldX : 0;
+    const flapSourceEnd = dir > 0 ? w : foldX;
+    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
+    const seg = clamp(this.meshSegments | 0, 12, segmentCap);
 
+    ctx.clearRect(0, 0, w, h);
+    const tension = clamp(progress, 0, 1);
+    const bend = (1 - Math.pow(1 - tension, 2)) * this.options.curveStrength * this.options.foldStiffness;
+    const yAnchor = clamp(touchY, 0, 1);
+    const yCurveSign = yAnchor < 0.5 ? -1 : 1;
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
-    const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
-    const foldAnchor = dir > 0 ? flapEnd : flapStart;
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
       const t1 = (i + 1) / seg;
-      const sx = flapStart + flapWidth * t0;
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
-      const spineCurve = Math.sin(center * Math.PI);
-      const curveInset = spineCurve * bend;
-
-      const distanceFromFold = dir > 0 ? (flapEnd - sx) : (sx - flapStart);
-      const mirroredDistance = Math.max(0, (distanceFromFold * (foldWidth / flapWidth)) - curveInset);
-      const mirrored = foldAnchor + (dir > 0 ? -1 : 1) * mirroredDistance;
-      const dx = mirrored - sw;
+      const foldCurve = Math.sin(center * Math.PI) * bend;
+      const srcProgress = dir > 0 ? t0 : (1 - t1);
+      const sx = flapSourceStart + (flapSourceEnd - flapSourceStart) * srcProgress;
+      const distanceFromFold = center * flapWidth;
+      const mirroredDistance = Math.max(0, distanceFromFold - foldCurve);
+      const stripStart = dir > 0 ? (foldX - mirroredDistance - sw) : (foldX + mirroredDistance);
+      const verticalLift = yCurveSign * Math.sin((center + yAnchor * 0.5) * Math.PI) * this.options.foldLiftPx * tension;
 
       const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
       const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
-      const dstX = Math.round(dx - overscan);
-      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, 0, srcW, h);
+      const dstX = Math.round(stripStart - overscan);
+      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, verticalLift, srcW, h);
+
+      const stripShade = clamp(0.05 + (1 - center) * 0.22 * tension, 0, 0.28);
+      ctx.fillStyle = `rgba(0,0,0,${stripShade})`;
+      ctx.fillRect(dstX, 0, srcW, h);
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
