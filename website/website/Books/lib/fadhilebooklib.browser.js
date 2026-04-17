@@ -455,8 +455,8 @@ export class FadhilEBookLite {
     const verticalLift = yCurveSign * this.options.foldLiftPx * tension * 0.18;
     const drawY = -Math.abs(verticalLift);
     const drawH = h + Math.abs(verticalLift) * 2;
-    const foldShade = clamp(0.035 + tension * 0.085, 0, 0.125);
-    const foldHighlight = clamp(0.03 + tension * 0.075, 0, 0.12);
+    const foldShade = clamp(0.04 + tension * 0.085, 0, 0.13);
+    const foldHighlight = clamp(0.028 + tension * 0.07, 0, 0.11);
     const flapStart = dir > 0 ? (foldX - flapWidth) : foldX;
     const flapWidthClamped = clamp(flapWidth, 0, w);
 
@@ -478,19 +478,22 @@ export class FadhilEBookLite {
       ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
 
       const backside = ctx.createLinearGradient(dstX, 0, foldX, 0);
-      backside.addColorStop(0, 'rgba(255,255,255,0.10)');
-      backside.addColorStop(0.45, 'rgba(255,255,255,0.03)');
-      backside.addColorStop(1, 'rgba(0,0,0,0.06)');
+      // Keep backside opaque while still giving subtle curvature shading.
+      backside.addColorStop(0, 'rgba(242,244,247,0.92)');
+      backside.addColorStop(0.45, 'rgba(250,251,252,0.95)');
+      backside.addColorStop(1, 'rgba(224,227,232,0.9)');
       ctx.fillStyle = backside;
       ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
       ctx.restore();
     } else {
       const dstX = foldX;
       ctx.save();
-      if (ALWAYS_SOLID_FLIPPING_PAGE) ctx.globalCompositeOperation = 'source-atop';
       ctx.beginPath();
       ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
       ctx.clip();
+      // Lay down an opaque paper base first so the flap never looks transparent.
+      ctx.fillStyle = this.options.paperColor;
+      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
       ctx.translate(foldX, 0);
       ctx.scale(-1, 1);
       ctx.drawImage(pageCanvas, 0, 0, flapWidth, h, -flapWidth, drawY, flapWidth, drawH);
