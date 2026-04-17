@@ -36,12 +36,12 @@ const DEFAULT_OPTIONS = {
   paperThicknessPx: 1.1,
   foldStiffness: 0.72,
   foldSpecular: 0.1,
-  foldTextureOpacity: 0.06,
-  foldMicroShadowOpacity: 0.045,
-  foldAmbientOcclusionOpacity: 0.08,
-  shadowContactOpacityMax: 0.018,
-  shadowCastOpacityMax: 0.01,
-  shadowSpreadRatio: 0.14
+  foldTextureOpacity: 0.032,
+  foldMicroShadowOpacity: 0.02,
+  foldAmbientOcclusionOpacity: 0.055,
+  shadowContactOpacityMax: 0.01,
+  shadowCastOpacityMax: 0.0048,
+  shadowSpreadRatio: 0.085
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -514,21 +514,23 @@ export class FadhilEBookLite {
 
   drawFlapPaperTexture(ctx, flapStart, flapWidth, h, foldX, dir, tension, textureStrength) {
     if (flapWidth <= 1 || textureStrength <= 0.002) return;
-    const stripes = Math.max(8, Math.round(12 + tension * 18));
+    const stripes = Math.max(22, Math.round(28 + tension * 26));
     const bandWidth = flapWidth / stripes;
     for (let i = 0; i < stripes; i++) {
       const x = flapStart + i * bandWidth;
       const t = i / Math.max(1, stripes - 1);
-      const wave = Math.sin((t + tension * 0.9) * Math.PI * 2.2);
-      const alpha = textureStrength * (0.35 + Math.abs(wave) * 0.65);
-      const isDarkBand = i % 2 === 0;
-      ctx.fillStyle = isDarkBand
-        ? `rgba(0,0,0,${alpha * 0.28})`
-        : `rgba(255,255,255,${alpha * 0.42})`;
-      ctx.fillRect(clamp(x, 0, this.width), 0, Math.max(0.8, bandWidth + 0.5), h);
+      const phase = (dir > 0 ? 1 : -1) * 0.42;
+      const wave = Math.sin((t * 1.2 + tension * 0.55 + phase) * Math.PI * 2.0);
+      const alpha = textureStrength * (0.16 + Math.abs(wave) * 0.2);
+      const soft = ctx.createLinearGradient(x, 0, x + bandWidth * 1.35, 0);
+      soft.addColorStop(0, `rgba(255,255,255,${alpha * 0.55})`);
+      soft.addColorStop(0.5, `rgba(0,0,0,${alpha * 0.35})`);
+      soft.addColorStop(1, `rgba(255,255,255,${alpha * 0.48})`);
+      ctx.fillStyle = soft;
+      ctx.fillRect(clamp(x, 0, this.width), 0, Math.max(0.9, bandWidth * 1.35), h);
     }
 
-    const grainStrength = textureStrength * 0.35;
+    const grainStrength = textureStrength * 0.24;
     const grain = ctx.createRadialGradient(
       dir > 0 ? foldX - flapWidth * 0.65 : foldX + flapWidth * 0.65,
       h * 0.5,
@@ -537,9 +539,9 @@ export class FadhilEBookLite {
       h * 0.5,
       Math.max(8, flapWidth * 0.92)
     );
-    grain.addColorStop(0, `rgba(255,255,255,${grainStrength * 0.75})`);
-    grain.addColorStop(0.58, `rgba(255,255,255,${grainStrength * 0.35})`);
-    grain.addColorStop(1, `rgba(0,0,0,${grainStrength * 0.22})`);
+    grain.addColorStop(0, `rgba(255,255,255,${grainStrength * 0.72})`);
+    grain.addColorStop(0.58, `rgba(255,255,255,${grainStrength * 0.33})`);
+    grain.addColorStop(1, `rgba(0,0,0,${grainStrength * 0.16})`);
     ctx.fillStyle = grain;
     ctx.fillRect(clamp(flapStart, 0, this.width), 0, flapWidth, h);
   }
@@ -576,24 +578,24 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
+    const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.085, 0.05, 0.14);
 
-    const contactSpread = clamp(w * (0.012 + progress * 0.018), 6, 16);
-    const castSpread = clamp(w * (spreadRatio * (0.2 + progress * 0.32)), 8, 30);
+    const contactSpread = clamp(w * (0.006 + progress * 0.009), 3, 9);
+    const castSpread = clamp(w * (spreadRatio * (0.12 + progress * 0.18)), 4, 14);
     const contactDarkness = clamp(
       0.002 + progress * this.options.shadowContactOpacityMax,
-      0.0015,
-      0.02
+      0.001,
+      0.012
     );
     const castDarkness = clamp(
       0.001 + progress * this.options.shadowCastOpacityMax,
-      0.0008,
-      0.012
+      0.0005,
+      0.006
     );
     const microShadowStrength = clamp(
       progress * this.options.foldMicroShadowOpacity,
-      0.002,
-      0.09
+      0.001,
+      0.028
     );
 
     const clipStart = dir > 0 ? foldX : 0;
@@ -635,7 +637,7 @@ export class FadhilEBookLite {
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
 
-    const microSpread = clamp(4 + progress * 8, 4, 14);
+    const microSpread = clamp(2.2 + progress * 3.8, 2, 6.5);
     const micro = ctx.createLinearGradient(foldX - microSpread, 0, foldX + microSpread, 0);
     if (dir > 0) {
       micro.addColorStop(0, `rgba(0,0,0,${microShadowStrength * 0.95})`);
