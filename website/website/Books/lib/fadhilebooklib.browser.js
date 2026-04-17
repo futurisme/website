@@ -500,22 +500,27 @@ export class FadhilEBookLite {
       ctx.restore();
     }
 
-    const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
     if (dir > 0) {
-      flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.18})`);
-      flapGrad.addColorStop(0.32, `rgba(0,0,0,${foldShade * 0.06})`);
-      flapGrad.addColorStop(0.56, `rgba(255,255,255,${foldHighlight * 0.62})`);
-      flapGrad.addColorStop(0.78, `rgba(255,255,255,${foldHighlight * 0.24})`);
-      flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.5})`);
+      // Keep RTL fold shading close to the fold seam only; avoid a long dark veil
+      // that can visually overlap and obscure next-page text while dragging.
+      const seamBand = clamp(Math.max(18, flapWidth * 0.28), 18, w * 0.24);
+      const seamStart = foldX - seamBand;
+      const seamGrad = ctx.createLinearGradient(seamStart, 0, foldX, 0);
+      seamGrad.addColorStop(0, `rgba(255,255,255,${foldHighlight * 0.22})`);
+      seamGrad.addColorStop(0.55, `rgba(0,0,0,${foldShade * 0.1})`);
+      seamGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.26})`);
+      ctx.fillStyle = seamGrad;
+      ctx.fillRect(clamp(seamStart, 0, w), 0, clamp(seamBand, 0, w), h);
     } else {
+      const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
       flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.5})`);
       flapGrad.addColorStop(0.22, `rgba(255,255,255,${foldHighlight * 0.24})`);
       flapGrad.addColorStop(0.46, `rgba(255,255,255,${foldHighlight * 0.62})`);
       flapGrad.addColorStop(0.68, `rgba(0,0,0,${foldShade * 0.06})`);
       flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
+      ctx.fillStyle = flapGrad;
+      ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
     }
-    ctx.fillStyle = flapGrad;
-    ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
