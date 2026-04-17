@@ -35,9 +35,8 @@ const DEFAULT_OPTIONS = {
   foldLiftPx: 10,
   foldStiffness: 0.72,
   shadowOpacityMax: 0.18,
-  backfaceBleed: 0.2,
   foldSpecular: 0.14,
-  foldTranslucency: 0.24
+  foldTranslucency: 0.12
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -406,29 +405,28 @@ export class FadhilEBookLite {
     const target = this.getPageCanvas(this.i + dir);
 
     ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(target, 0, 0, w, h);
+    ctx.drawImage(current, 0, 0, w, h);
 
     const q = Math.max(0.25, this.options.quantizeFoldPx || 1);
     const foldBase = dir > 0 ? w * (1 - progress) : w * progress;
     const foldX = Math.round(clamp(foldBase, 0, w) / q) * q;
-    const staticStart = dir > 0 ? 0 : foldX;
-    const staticWidth = dir > 0 ? foldX : w - foldX;
-
-    if (staticWidth > 0.5) {
+    const openedStart = dir > 0 ? foldX : 0;
+    const openedWidth = dir > 0 ? w - foldX : foldX;
+    if (openedWidth > 0.5) {
       ctx.save();
       ctx.beginPath();
-      ctx.rect(staticStart, 0, staticWidth, h);
+      ctx.rect(openedStart, 0, openedWidth, h);
       ctx.clip();
-      ctx.drawImage(current, 0, 0, w, h);
+      ctx.drawImage(target, 0, 0, w, h);
       ctx.restore();
     }
 
-    this.drawMeshFold(current, target, foldX, dir, progress, touchY);
+    this.drawMeshFold(current, foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
     this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawMeshFold(pageCanvas, nextCanvas, foldX, dir, progress, touchY) {
+  drawMeshFold(pageCanvas, foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
@@ -450,8 +448,7 @@ export class FadhilEBookLite {
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
     const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
     const foldAnchor = dir > 0 ? flapEnd : flapStart;
-    const translucency = clamp(this.options.foldTranslucency * progress, 0, 0.34);
-    const bleed = clamp(this.options.backfaceBleed * progress, 0, 0.35);
+    const translucency = clamp(this.options.foldTranslucency * progress, 0, 0.2);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -475,16 +472,6 @@ export class FadhilEBookLite {
       ctx.globalAlpha = 1 - translucency;
       ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
       ctx.restore();
-
-      if (bleed > 0.001) {
-        const edgeFade = Math.sin(center * Math.PI);
-        const exposureCenter = clamp((dstX + srcW * 0.5) / w, 0, 1);
-        const targetSampleX = clamp(Math.floor((exposureCenter * w) - (srcW * 0.5)), 0, Math.max(0, w - srcW));
-        ctx.save();
-        ctx.globalAlpha = bleed * edgeFade * 0.7;
-        ctx.drawImage(nextCanvas, targetSampleX, 0, srcW, h, dstX, dy, srcW, h);
-        ctx.restore();
-      }
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
