@@ -32,10 +32,11 @@ const DEFAULT_OPTIONS = {
   paperColor: '#ffffff',
   paperInk: '#111111',
   foldWidthRatio: 0.94,
-  foldLiftPx: 10,
+  foldLiftPx: 4,
+  paperThicknessPx: 1.1,
   foldStiffness: 0.72,
-  shadowOpacityMax: 0.18,
-  foldSpecular: 0.14
+  shadowOpacityMax: 0.13,
+  foldSpecular: 0.1
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -404,65 +405,91 @@ export class FadhilEBookLite {
     const target = this.getPageCanvas(this.i + dir);
 
     ctx.clearRect(0, 0, w, h);
-    ctx.drawImage(current, 0, 0, w, h);
+    ctx.drawImage(target, 0, 0, w, h);
 
     const q = Math.max(0.25, this.options.quantizeFoldPx || 1);
     const foldBase = dir > 0 ? w * (1 - progress) : w * progress;
     const foldX = Math.round(clamp(foldBase, 0, w) / q) * q;
-    const openedStart = dir > 0 ? foldX : 0;
-    const openedWidth = dir > 0 ? w - foldX : foldX;
-    if (openedWidth > 0.5) {
+    const staticStart = dir > 0 ? 0 : foldX;
+    const staticWidth = dir > 0 ? foldX : w - foldX;
+    if (staticWidth > 0.5) {
       ctx.save();
       ctx.beginPath();
-      ctx.rect(openedStart, 0, openedWidth, h);
+      ctx.rect(staticStart, 0, staticWidth, h);
       ctx.clip();
-      ctx.drawImage(target, 0, 0, w, h);
+      ctx.drawImage(current, 0, 0, w, h);
       ctx.restore();
     }
 
-    this.drawMeshFold(current, foldX, dir, progress, touchY);
+    this.drawFoldedFlap(foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
     this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawMeshFold(pageCanvas, foldX, dir, progress, touchY) {
+  drawFoldedFlap(foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
-    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
-    const seg = clamp(this.meshSegments | 0, 10, segmentCap);
-    const flapStart = dir > 0 ? foldX : 0;
-    const flapEnd = dir > 0 ? w : foldX;
-    const flapWidth = Math.max(0, flapEnd - flapStart);
+    const flapWidth = dir > 0 ? (w - foldX) : foldX;
     if (flapWidth < 1) return;
 
-    ctx.clearRect(0, 0, w, h);
-    const tension = 1 - Math.pow(1 - progress, 2);
-    const bend = tension * this.options.curveStrength * this.options.foldStiffness;
+    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
+    const seg = clamp(this.meshSegments | 0, 12, segmentCap);
 
+    ctx.clearRect(0, 0, w, h);
+    const tension = clamp(progress, 0, 1);
+    const bend = (1 - Math.pow(1 - tension, 2)) * this.options.curveStrength * this.options.foldStiffness;
+    const yAnchor = clamp(touchY, 0, 1);
+    const yCurveSign = yAnchor < 0.5 ? -1 : 1;
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
-    const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
-    const foldAnchor = dir > 0 ? flapEnd : flapStart;
+    const thickness = clamp(this.options.paperThicknessPx || 1, 0.4, 2.2);
+
+    const projectedStart = dir > 0 ? (foldX - flapWidth - bend * 0.2) : foldX;
+    const projectedEnd = dir > 0 ? foldX : (foldX + flapWidth + bend * 0.2);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
+    ctx.clip();
+    ctx.fillStyle = this.options.paperColor;
+    ctx.fillRect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
+    ctx.restore();
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
       const t1 = (i + 1) / seg;
-      const sx = flapStart + flapWidth * t0;
       const sw = Math.max(1, flapWidth * (t1 - t0));
       const center = (t0 + t1) * 0.5;
-      const spineCurve = Math.sin(center * Math.PI);
-      const curveInset = spineCurve * bend;
+      const foldCurve = Math.sin(center * Math.PI) * bend;
+      const distanceFromFold = center * flapWidth;
+      const mirroredDistance = Math.max(0, distanceFromFold - foldCurve);
+      const stripStart = dir > 0 ? (foldX - mirroredDistance - sw) : (foldX + mirroredDistance);
+      const verticalLift = yCurveSign * Math.sin((center + yAnchor * 0.5) * Math.PI) * this.options.foldLiftPx * tension * 0.35;
+      const srcW = Math.ceil(sw + overscan * 2);
+      const dstX = Math.round(stripStart - overscan);
+      const shade = clamp(0.04 + (1 - center) * 0.16 * tension, 0, 0.2);
+      const highlight = clamp(0.03 + center * 0.08 * tension, 0, 0.12);
 
-      const distanceFromFold = dir > 0 ? (flapEnd - sx) : (sx - flapStart);
-      const mirroredDistance = Math.max(0, (distanceFromFold * (foldWidth / flapWidth)) - curveInset);
-      const mirrored = foldAnchor + (dir > 0 ? -1 : 1) * mirroredDistance;
-      const dx = mirrored - sw;
-
-      const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
-      const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
-      const dstX = Math.round(dx - overscan);
-      ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, 0, srcW, h);
+      const stripGrad = ctx.createLinearGradient(dstX, 0, dstX + srcW, 0);
+      if (dir > 0) {
+        stripGrad.addColorStop(0, `rgba(255,255,255,${highlight})`);
+        stripGrad.addColorStop(1, `rgba(0,0,0,${shade})`);
+      } else {
+        stripGrad.addColorStop(0, `rgba(0,0,0,${shade})`);
+        stripGrad.addColorStop(1, `rgba(255,255,255,${highlight})`);
+      }
+      ctx.fillStyle = this.options.paperColor;
+      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
+      ctx.fillStyle = stripGrad;
+      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
     }
+
+    const spineX = dir > 0 ? foldX - thickness : foldX;
+    const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.12)');
+    spineGrad.addColorStop(0.5, 'rgba(0,0,0,0.05)');
+    spineGrad.addColorStop(1, 'rgba(255,255,255,0.1)');
+    ctx.fillStyle = spineGrad;
+    ctx.fillRect(spineX, 0, thickness * 2, h);
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
   }
@@ -472,16 +499,18 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spread = clamp(18 + progress * 36, 14, 58);
+    const spread = clamp(20 + progress * 34, 16, 56);
     const dark = clamp(0.04 + progress * this.options.shadowOpacityMax, 0, this.options.shadowOpacityMax);
 
     const shadow = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
     if (dir > 0) {
-      shadow.addColorStop(0, `rgba(0,0,0,${dark})`);
+      shadow.addColorStop(0, `rgba(0,0,0,${dark * 0.95})`);
+      shadow.addColorStop(0.45, `rgba(0,0,0,${dark * 0.36})`);
       shadow.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       shadow.addColorStop(0, 'rgba(0,0,0,0)');
-      shadow.addColorStop(1, `rgba(0,0,0,${dark})`);
+      shadow.addColorStop(0.55, `rgba(0,0,0,${dark * 0.36})`);
+      shadow.addColorStop(1, `rgba(0,0,0,${dark * 0.95})`);
     }
 
     ctx.fillStyle = shadow;
