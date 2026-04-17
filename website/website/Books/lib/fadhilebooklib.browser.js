@@ -465,43 +465,31 @@ export class FadhilEBookLite {
       ctx.fillRect(clamp(flapStart - overscan, 0, w), 0, clamp(flapWidthClamped + overscan * 2, 0, w), h);
     }
 
+    const dstX = dir > 0 ? foldX - flapWidth : foldX;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
+    ctx.clip();
+    // Uniform flip technique: both directions render the same full opaque flap.
+    ctx.fillStyle = this.options.paperColor;
+    ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
+    ctx.translate(foldX, 0);
+    ctx.scale(-1, 1);
     if (dir > 0) {
-      // Total fix for RTL overlap: do not paint the whole turned flap surface.
-      // Only render a narrow seam highlight/shade near foldX so target text
-      // stays readable during hold/drag.
-      const seamBand = clamp(Math.max(16, flapWidth * 0.12), 12, w * 0.12);
-      const seamStart = foldX - seamBand;
-      const seamGrad = ctx.createLinearGradient(seamStart, 0, foldX, 0);
-      seamGrad.addColorStop(0, `rgba(255,255,255,${foldHighlight * 0.3})`);
-      seamGrad.addColorStop(0.52, `rgba(0,0,0,${foldShade * 0.08})`);
-      seamGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
-      ctx.fillStyle = seamGrad;
-      ctx.fillRect(clamp(seamStart, 0, w), 0, clamp(seamBand, 0, w), h);
+      ctx.drawImage(pageCanvas, w - flapWidth, 0, flapWidth, h, 0, drawY, flapWidth, drawH);
     } else {
-      const dstX = foldX;
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
-      ctx.clip();
-      // Lay down an opaque paper base first so the flap never looks transparent.
-      ctx.fillStyle = this.options.paperColor;
-      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
-      ctx.translate(foldX, 0);
-      ctx.scale(-1, 1);
       ctx.drawImage(pageCanvas, 0, 0, flapWidth, h, -flapWidth, drawY, flapWidth, drawH);
-      ctx.restore();
     }
+    ctx.restore();
 
-    if (dir < 0) {
-      const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
-      flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.5})`);
-      flapGrad.addColorStop(0.22, `rgba(255,255,255,${foldHighlight * 0.24})`);
-      flapGrad.addColorStop(0.46, `rgba(255,255,255,${foldHighlight * 0.62})`);
-      flapGrad.addColorStop(0.68, `rgba(0,0,0,${foldShade * 0.06})`);
-      flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
-      ctx.fillStyle = flapGrad;
-      ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
-    }
+    const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
+    flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.5})`);
+    flapGrad.addColorStop(0.22, `rgba(255,255,255,${foldHighlight * 0.24})`);
+    flapGrad.addColorStop(0.46, `rgba(255,255,255,${foldHighlight * 0.62})`);
+    flapGrad.addColorStop(0.68, `rgba(0,0,0,${foldShade * 0.06})`);
+    flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.18})`);
+    ctx.fillStyle = flapGrad;
+    ctx.fillRect(clamp(flapStart, 0, w), 0, flapWidthClamped, h);
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
@@ -520,11 +508,6 @@ export class FadhilEBookLite {
     const h = this.height;
 
     const spreadRatio = clamp(this.options.shadowSpreadRatio || 0.14, 0.08, 0.22);
-    // Disable broad cast/contact shadow on right->left drag.
-    // Prediction from reported artifact: any progressive RTL shadow spread can
-    // eventually overlap and obscure next-page text, so we keep only flap/spine
-    // shading from drawFoldedFlap for this direction.
-    if (dir > 0) return;
 
     const contactSpread = clamp(w * (0.012 + progress * 0.018), 6, 16);
     const castSpread = clamp(w * (spreadRatio * (0.2 + progress * 0.32)), 8, 30);
@@ -539,8 +522,8 @@ export class FadhilEBookLite {
       0.012
     );
 
-    const clipStart = 0;
-    const clipWidth = foldX;
+    const clipStart = dir > 0 ? foldX : 0;
+    const clipWidth = dir > 0 ? w - foldX : foldX;
     if (clipWidth <= 0.5) return;
 
     ctx.save();
@@ -549,18 +532,32 @@ export class FadhilEBookLite {
     ctx.clip();
 
     const contact = ctx.createLinearGradient(foldX - contactSpread, 0, foldX + contactSpread, 0);
-    contact.addColorStop(0, 'rgba(0,0,0,0)');
-    contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
-    contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
-    contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
+    if (dir > 0) {
+      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.45})`);
+      contact.addColorStop(0.36, `rgba(0,0,0,${contactDarkness * 0.26})`);
+      contact.addColorStop(0.68, `rgba(0,0,0,${contactDarkness * 0.1})`);
+      contact.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      contact.addColorStop(0, 'rgba(0,0,0,0)');
+      contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
+      contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
+      contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
+    }
     ctx.fillStyle = contact;
     ctx.fillRect(clamp(foldX - contactSpread, 0, w), 0, contactSpread * 2, h);
 
     const cast = ctx.createLinearGradient(foldX - castSpread, 0, foldX + castSpread, 0);
-    cast.addColorStop(0, 'rgba(0,0,0,0)');
-    cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
-    cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
-    cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
+    if (dir > 0) {
+      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.16})`);
+      cast.addColorStop(0.24, `rgba(0,0,0,${castDarkness * 0.1})`);
+      cast.addColorStop(0.52, `rgba(0,0,0,${castDarkness * 0.04})`);
+      cast.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      cast.addColorStop(0, 'rgba(0,0,0,0)');
+      cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
+      cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
+      cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
+    }
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
 
