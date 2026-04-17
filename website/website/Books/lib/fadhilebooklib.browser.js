@@ -37,10 +37,10 @@ const DEFAULT_OPTIONS = {
   foldStiffness: 0.72,
   foldSpecular: 0.1,
   foldTextureOpacity: 0.032,
-  foldMicroShadowOpacity: 0.02,
+  foldMicroShadowOpacity: 0.01,
   foldAmbientOcclusionOpacity: 0.055,
-  shadowContactOpacityMax: 0.01,
-  shadowCastOpacityMax: 0.0048,
+  shadowContactOpacityMax: 0.005,
+  shadowCastOpacityMax: 0.0024,
   shadowSpreadRatio: 0.085
 };
 
@@ -583,14 +583,14 @@ export class FadhilEBookLite {
     const contactSpread = clamp(w * (0.006 + progress * 0.009), 3, 9);
     const castSpread = clamp(w * (spreadRatio * (0.12 + progress * 0.18)), 4, 14);
     const contactDarkness = clamp(
-      0.002 + progress * this.options.shadowContactOpacityMax,
-      0.001,
-      0.012
+      0.0008 + progress * this.options.shadowContactOpacityMax,
+      0.0004,
+      0.006
     );
     const castDarkness = clamp(
-      0.001 + progress * this.options.shadowCastOpacityMax,
-      0.0005,
-      0.006
+      0.0004 + progress * this.options.shadowCastOpacityMax,
+      0.0002,
+      0.003
     );
     const microShadowStrength = clamp(
       progress * this.options.foldMicroShadowOpacity,
@@ -609,30 +609,30 @@ export class FadhilEBookLite {
 
     const contact = ctx.createLinearGradient(foldX - contactSpread, 0, foldX + contactSpread, 0);
     if (dir > 0) {
-      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.45})`);
-      contact.addColorStop(0.36, `rgba(0,0,0,${contactDarkness * 0.26})`);
-      contact.addColorStop(0.68, `rgba(0,0,0,${contactDarkness * 0.1})`);
+      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.28})`);
+      contact.addColorStop(0.36, `rgba(0,0,0,${contactDarkness * 0.16})`);
+      contact.addColorStop(0.68, `rgba(0,0,0,${contactDarkness * 0.06})`);
       contact.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       contact.addColorStop(0, 'rgba(0,0,0,0)');
-      contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.1})`);
-      contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.26})`);
-      contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.45})`);
+      contact.addColorStop(0.32, `rgba(0,0,0,${contactDarkness * 0.06})`);
+      contact.addColorStop(0.64, `rgba(0,0,0,${contactDarkness * 0.16})`);
+      contact.addColorStop(1, `rgba(0,0,0,${contactDarkness * 0.28})`);
     }
     ctx.fillStyle = contact;
     ctx.fillRect(clamp(foldX - contactSpread, 0, w), 0, contactSpread * 2, h);
 
     const cast = ctx.createLinearGradient(foldX - castSpread, 0, foldX + castSpread, 0);
     if (dir > 0) {
-      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.16})`);
-      cast.addColorStop(0.24, `rgba(0,0,0,${castDarkness * 0.1})`);
-      cast.addColorStop(0.52, `rgba(0,0,0,${castDarkness * 0.04})`);
+      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.1})`);
+      cast.addColorStop(0.24, `rgba(0,0,0,${castDarkness * 0.06})`);
+      cast.addColorStop(0.52, `rgba(0,0,0,${castDarkness * 0.025})`);
       cast.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       cast.addColorStop(0, 'rgba(0,0,0,0)');
-      cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.04})`);
-      cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.1})`);
-      cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.16})`);
+      cast.addColorStop(0.48, `rgba(0,0,0,${castDarkness * 0.025})`);
+      cast.addColorStop(0.76, `rgba(0,0,0,${castDarkness * 0.06})`);
+      cast.addColorStop(1, `rgba(0,0,0,${castDarkness * 0.1})`);
     }
     ctx.fillStyle = cast;
     ctx.fillRect(clamp(foldX - castSpread, 0, w), 0, castSpread * 2, h);
@@ -640,13 +640,13 @@ export class FadhilEBookLite {
     const microSpread = clamp(2.2 + progress * 3.8, 2, 6.5);
     const micro = ctx.createLinearGradient(foldX - microSpread, 0, foldX + microSpread, 0);
     if (dir > 0) {
-      micro.addColorStop(0, `rgba(0,0,0,${microShadowStrength * 0.95})`);
-      micro.addColorStop(0.4, `rgba(0,0,0,${microShadowStrength * 0.55})`);
+      micro.addColorStop(0, `rgba(0,0,0,${microShadowStrength * 0.55})`);
+      micro.addColorStop(0.4, `rgba(0,0,0,${microShadowStrength * 0.32})`);
       micro.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       micro.addColorStop(0, 'rgba(0,0,0,0)');
-      micro.addColorStop(0.6, `rgba(0,0,0,${microShadowStrength * 0.55})`);
-      micro.addColorStop(1, `rgba(0,0,0,${microShadowStrength * 0.95})`);
+      micro.addColorStop(0.6, `rgba(0,0,0,${microShadowStrength * 0.32})`);
+      micro.addColorStop(1, `rgba(0,0,0,${microShadowStrength * 0.55})`);
     }
     ctx.fillStyle = micro;
     ctx.fillRect(clamp(foldX - microSpread, 0, w), 0, microSpread * 2, h);
