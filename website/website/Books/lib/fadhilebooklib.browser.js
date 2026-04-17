@@ -550,9 +550,11 @@ export class FadhilEBookLite {
       rtl ? 0.0055 : 0.012
     );
 
-    const clipStart = dir > 0 ? foldX : 0;
-    const clipWidthRaw = dir > 0 ? (w - foldX) : foldX;
-    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 2.4) : clipWidthRaw;
+    // For right->left drags, keep the shadow attached to the folded paper edge
+    // (left side of the fold) so next-page text is not covered.
+    const clipStart = rtl ? Math.max(0, foldX - contactSpread * 1.8) : 0;
+    const clipWidthRaw = rtl ? (foldX - clipStart) : foldX;
+    const clipWidth = rtl ? Math.min(clipWidthRaw, contactSpread * 1.8) : clipWidthRaw;
     if (clipWidth <= 0.5) return;
 
     ctx.save();
@@ -561,10 +563,9 @@ export class FadhilEBookLite {
     ctx.clip();
 
     const contact = ctx.createLinearGradient(foldX - contactSpread, 0, foldX + contactSpread, 0);
-    if (dir > 0) {
-      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.45})`);
-      contact.addColorStop(0.36, `rgba(0,0,0,${contactDarkness * 0.26})`);
-      contact.addColorStop(0.68, `rgba(0,0,0,${contactDarkness * 0.1})`);
+    if (rtl) {
+      contact.addColorStop(0, `rgba(0,0,0,${contactDarkness * 0.52})`);
+      contact.addColorStop(0.62, `rgba(0,0,0,${contactDarkness * 0.18})`);
       contact.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       contact.addColorStop(0, 'rgba(0,0,0,0)');
@@ -576,10 +577,9 @@ export class FadhilEBookLite {
     ctx.fillRect(clamp(foldX - contactSpread, 0, w), 0, contactSpread * 2, h);
 
     const cast = ctx.createLinearGradient(foldX - castSpread, 0, foldX + castSpread, 0);
-    if (dir > 0) {
-      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.16})`);
-      cast.addColorStop(0.24, `rgba(0,0,0,${castDarkness * 0.1})`);
-      cast.addColorStop(0.52, `rgba(0,0,0,${castDarkness * 0.04})`);
+    if (rtl) {
+      cast.addColorStop(0, `rgba(0,0,0,${castDarkness * 0.14})`);
+      cast.addColorStop(0.54, `rgba(0,0,0,${castDarkness * 0.06})`);
       cast.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       cast.addColorStop(0, 'rgba(0,0,0,0)');
