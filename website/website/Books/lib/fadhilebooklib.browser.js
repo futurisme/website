@@ -431,73 +431,73 @@ export class FadhilEBookLite {
       ctx.restore();
     }
 
-    this.drawFoldedFlap(foldX, dir, progress, touchY);
+    this.drawFoldedFlap(current, foldX, dir, progress, touchY);
     this.drawFoldShadow(foldX, dir, progress);
     this.drawFoldSpecular(foldX, dir, progress);
   }
 
-  drawFoldedFlap(foldX, dir, progress, touchY) {
+  drawFoldedFlap(pageCanvas, foldX, dir, progress, touchY) {
     const ctx = this.foldCtx;
     const w = this.width;
     const h = this.height;
     const flapWidth = dir > 0 ? (w - foldX) : foldX;
     if (flapWidth < 1) return;
 
-    const segmentCap = this.isTouchDevice ? this.options.touchMeshSegments : 44;
-    const seg = clamp(this.meshSegments | 0, 12, segmentCap);
-
     ctx.clearRect(0, 0, w, h);
     const tension = clamp(progress, 0, 1);
-    const bend = (1 - Math.pow(1 - tension, 2)) * this.options.curveStrength * this.options.foldStiffness;
     const yAnchor = clamp(touchY, 0, 1);
     const yCurveSign = yAnchor < 0.5 ? -1 : 1;
-    const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
+    const overscan = Math.max(1, this.options.foldOverscanPx || 1);
     const thickness = clamp(this.options.paperThicknessPx || 1, 0.4, 2.2);
+    const verticalLift = yCurveSign * this.options.foldLiftPx * tension * 0.18;
+    const drawY = -Math.abs(verticalLift);
+    const drawH = h + Math.abs(verticalLift) * 2;
+    const foldShade = clamp(0.06 + tension * 0.14, 0, 0.22);
+    const foldHighlight = clamp(0.04 + tension * 0.1, 0, 0.16);
 
-    const projectedStart = dir > 0 ? (foldX - flapWidth - bend * 0.2) : foldX;
-    const projectedEnd = dir > 0 ? foldX : (foldX + flapWidth + bend * 0.2);
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
-    ctx.clip();
-    ctx.fillStyle = this.options.paperColor;
-    ctx.fillRect(clamp(projectedStart, 0, w), 0, clamp(projectedEnd - projectedStart, 0, w), h);
-    ctx.restore();
-
-    for (let i = 0; i < seg; i++) {
-      const t0 = i / seg;
-      const t1 = (i + 1) / seg;
-      const sw = Math.max(1, flapWidth * (t1 - t0));
-      const center = (t0 + t1) * 0.5;
-      const foldCurve = Math.sin(center * Math.PI) * bend;
-      const distanceFromFold = center * flapWidth;
-      const mirroredDistance = Math.max(0, distanceFromFold - foldCurve);
-      const stripStart = dir > 0 ? (foldX - mirroredDistance - sw) : (foldX + mirroredDistance);
-      const verticalLift = yCurveSign * Math.sin((center + yAnchor * 0.5) * Math.PI) * this.options.foldLiftPx * tension * 0.35;
-      const srcW = Math.ceil(sw + overscan * 2);
-      const dstX = Math.round(stripStart - overscan);
-      const shade = clamp(0.04 + (1 - center) * 0.16 * tension, 0, 0.2);
-      const highlight = clamp(0.03 + center * 0.08 * tension, 0, 0.12);
-
-      const stripGrad = ctx.createLinearGradient(dstX, 0, dstX + srcW, 0);
-      if (dir > 0) {
-        stripGrad.addColorStop(0, `rgba(255,255,255,${highlight})`);
-        stripGrad.addColorStop(1, `rgba(0,0,0,${shade})`);
-      } else {
-        stripGrad.addColorStop(0, `rgba(0,0,0,${shade})`);
-        stripGrad.addColorStop(1, `rgba(255,255,255,${highlight})`);
-      }
-      ctx.fillStyle = this.options.paperColor;
-      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
-      ctx.fillStyle = stripGrad;
-      ctx.fillRect(dstX, -Math.abs(verticalLift), srcW, h + Math.abs(verticalLift) * 2);
+    if (dir > 0) {
+      const dstX = foldX - flapWidth;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
+      ctx.clip();
+      ctx.translate(foldX, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(pageCanvas, foldX, 0, flapWidth, h, 0, drawY, flapWidth, drawH);
+      ctx.restore();
+    } else {
+      const dstX = foldX;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
+      ctx.clip();
+      ctx.translate(foldX, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(pageCanvas, 0, 0, flapWidth, h, -flapWidth, drawY, flapWidth, drawH);
+      ctx.restore();
     }
+
+    const flapStart = dir > 0 ? (foldX - flapWidth) : foldX;
+    const flapGrad = ctx.createLinearGradient(flapStart, 0, flapStart + flapWidth, 0);
+    if (dir > 0) {
+      flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade * 0.5})`);
+      flapGrad.addColorStop(0.35, 'rgba(0,0,0,0)');
+      flapGrad.addColorStop(0.7, `rgba(255,255,255,${foldHighlight})`);
+      flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade})`);
+    } else {
+      flapGrad.addColorStop(0, `rgba(0,0,0,${foldShade})`);
+      flapGrad.addColorStop(0.3, `rgba(255,255,255,${foldHighlight})`);
+      flapGrad.addColorStop(0.65, 'rgba(0,0,0,0)');
+      flapGrad.addColorStop(1, `rgba(0,0,0,${foldShade * 0.5})`);
+    }
+    ctx.fillStyle = flapGrad;
+    ctx.fillRect(clamp(flapStart, 0, w), 0, Math.min(flapWidth, w), h);
 
     const spineX = dir > 0 ? foldX - thickness : foldX;
     const spineGrad = ctx.createLinearGradient(spineX, 0, spineX + thickness * 2, 0);
-    spineGrad.addColorStop(0, 'rgba(0,0,0,0.12)');
-    spineGrad.addColorStop(0.5, 'rgba(0,0,0,0.05)');
-    spineGrad.addColorStop(1, 'rgba(255,255,255,0.1)');
+    spineGrad.addColorStop(0, 'rgba(0,0,0,0.14)');
+    spineGrad.addColorStop(0.45, 'rgba(0,0,0,0.05)');
+    spineGrad.addColorStop(1, 'rgba(255,255,255,0.12)');
     ctx.fillStyle = spineGrad;
     ctx.fillRect(spineX, 0, thickness * 2, h);
 
@@ -509,18 +509,20 @@ export class FadhilEBookLite {
     const w = this.width;
     const h = this.height;
 
-    const spread = clamp(20 + progress * 34, 16, 56);
+    const spread = clamp(24 + progress * 34, 18, 62);
     const dark = clamp(0.04 + progress * this.options.shadowOpacityMax, 0, this.options.shadowOpacityMax);
 
     const shadow = ctx.createLinearGradient(foldX - spread, 0, foldX + spread, 0);
     if (dir > 0) {
-      shadow.addColorStop(0, `rgba(0,0,0,${dark * 0.95})`);
-      shadow.addColorStop(0.45, `rgba(0,0,0,${dark * 0.36})`);
+      shadow.addColorStop(0, `rgba(0,0,0,${dark * 0.85})`);
+      shadow.addColorStop(0.3, `rgba(0,0,0,${dark * 0.52})`);
+      shadow.addColorStop(0.58, `rgba(0,0,0,${dark * 0.2})`);
       shadow.addColorStop(1, 'rgba(0,0,0,0)');
     } else {
       shadow.addColorStop(0, 'rgba(0,0,0,0)');
-      shadow.addColorStop(0.55, `rgba(0,0,0,${dark * 0.36})`);
-      shadow.addColorStop(1, `rgba(0,0,0,${dark * 0.95})`);
+      shadow.addColorStop(0.42, `rgba(0,0,0,${dark * 0.2})`);
+      shadow.addColorStop(0.7, `rgba(0,0,0,${dark * 0.52})`);
+      shadow.addColorStop(1, `rgba(0,0,0,${dark * 0.85})`);
     }
 
     ctx.fillStyle = shadow;
