@@ -466,13 +466,21 @@ export class FadhilEBookLite {
     if (dir > 0) {
       const dstX = foldX - flapWidth;
       ctx.save();
-      if (ALWAYS_SOLID_FLIPPING_PAGE) ctx.globalCompositeOperation = 'source-atop';
       ctx.beginPath();
       ctx.rect(clamp(dstX - overscan, 0, w), 0, clamp(flapWidth + overscan * 2, 0, w), h);
       ctx.clip();
-      ctx.translate(foldX, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(pageCanvas, foldX, 0, flapWidth, h, 0, drawY, flapWidth, drawH);
+
+      // Right->left flip shows backside of current sheet.
+      // Keep it fully solid to avoid front-text duplication/ghosting artifacts.
+      ctx.fillStyle = this.options.paperColor;
+      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
+
+      const backside = ctx.createLinearGradient(dstX, 0, foldX, 0);
+      backside.addColorStop(0, 'rgba(255,255,255,0.10)');
+      backside.addColorStop(0.45, 'rgba(255,255,255,0.03)');
+      backside.addColorStop(1, 'rgba(0,0,0,0.06)');
+      ctx.fillStyle = backside;
+      ctx.fillRect(dstX - overscan, drawY, flapWidth + overscan * 2, drawH);
       ctx.restore();
     } else {
       const dstX = foldX;
