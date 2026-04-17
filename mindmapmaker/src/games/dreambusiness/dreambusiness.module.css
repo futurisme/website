@@ -1,0 +1,18 @@
+.shell { padding: 24px; color: #e8eefc; background: radial-gradient(circle at top, #12203b, #090f1f 60%); min-height: 100vh; }
+.header h1 { margin: 0; font-size: 2rem; }
+.header p { margin-top: 6px; color: #a8b3cf; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.actions button { background: #1d2f58; border: 1px solid #3b4d78; color: #f4f7ff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.stats { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stats article { background: rgba(15, 25, 47, 0.9); border: 1px solid #2b3f67; border-radius: 10px; padding: 12px; }
+.stats h2 { margin: 0; font-size: 0.85rem; color: #95a6d1; font-weight: 600; }
+.stats strong { display: block; margin-top: 6px; font-size: 1.2rem; }
+.stats small { color: #92a4d6; }
+.grid { margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.card { background: rgba(12, 20, 37, 0.95); border: 1px solid #2d406a; border-radius: 10px; padding: 12px; }
+.card h2 { margin: 0 0 10px; font-size: 1rem; }
+.card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.card li { border: 1px solid #203258; border-radius: 8px; padding: 9px; display: grid; gap: 4px; }
+.card li div { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.card small { color: #91a1c8; }
+.card span { color: #c9d6f7; font-size: 0.9rem; }

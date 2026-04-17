@@ -41,3 +41,5 @@ export * from './fadhilailib';
 export * from './fadhilmindmaplib';
 
 export * from './fadhilebooklib';
+
+export * from './fadhilwebgamelib';
