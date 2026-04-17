@@ -56,6 +56,20 @@
       "dest": "/website/portfolio/index.html"
     },
     {
+      "src": "/games/dreambusiness",
+      "status": 308,
+      "headers": {
+        "Location": "/mindmapmaker"
+      }
+    },
+    {
+      "src": "/games/dreambusiness/",
+      "status": 308,
+      "headers": {
+        "Location": "/mindmapmaker"
+      }
+    },
+    {
       "src": "/home",
       "dest": "/website/home/index.html"
     },
