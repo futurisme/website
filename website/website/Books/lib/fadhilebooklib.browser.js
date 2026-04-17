@@ -35,8 +35,7 @@ const DEFAULT_OPTIONS = {
   foldLiftPx: 10,
   foldStiffness: 0.72,
   shadowOpacityMax: 0.18,
-  foldSpecular: 0.14,
-  foldTranslucency: 0.12
+  foldSpecular: 0.14
 };
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -448,7 +447,6 @@ export class FadhilEBookLite {
     const overscan = Math.max(0.5, this.options.foldOverscanPx || 1);
     const foldWidth = clamp(flapWidth * this.options.foldWidthRatio, 1, w);
     const foldAnchor = dir > 0 ? flapEnd : flapStart;
-    const translucency = clamp(this.options.foldTranslucency * progress, 0, 0.2);
 
     for (let i = 0; i < seg; i++) {
       const t0 = i / seg;
@@ -468,10 +466,7 @@ export class FadhilEBookLite {
       const srcX = clamp(Math.floor(sx - overscan), 0, w - 1);
       const srcW = clamp(Math.ceil(sw + overscan * 2), 1, w - srcX);
       const dstX = Math.round(dx - overscan);
-      ctx.save();
-      ctx.globalAlpha = 1 - translucency;
       ctx.drawImage(pageCanvas, srcX, 0, srcW, h, dstX, dy, srcW, h);
-      ctx.restore();
     }
 
     this.ctx.drawImage(this.foldCanvas, 0, 0, w, h);
