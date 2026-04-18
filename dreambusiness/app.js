@@ -77,6 +77,7 @@ const rankingCache = {
   richest: null,
   products: null,
 };
+const upgradeBaselineByCompany = {};
 
 function isPlanOpenFunding(plan) {
   if (!plan || plan.isEstablished) return false;
@@ -427,6 +428,7 @@ function updateInvestmentActionState() {
 }
 
 function render() {
+  Object.values(game.companies).forEach((company) => ensureCompanyUpgradeBaseline(company));
   const displayCompanies = getDisplayCompanies(game).filter((item) => isCompanyVisibleInUi(item.key));
   if (!companySelect.options.length || companySelect.options.length !== displayCompanies.length) {
     companySelect.innerHTML = displayCompanies
@@ -547,13 +549,13 @@ function toTitleCase(value) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-const UPGRADE_BASELINE_HINT = {
-  architecture: 20,
-  clockSpeed: 1.4,
-  coreDesign: 2,
-  cacheStack: 768,
-  lithography: 160,
-  powerEfficiency: 90,
+const UPGRADE_BASELINE_DEFAULTS = {
+  architecture: 2,
+  clockSpeed: 1.5,
+  coreDesign: 1,
+  cacheStack: 512,
+  lithography: 180,
+  powerEfficiency: 98,
 };
 
 function getUpgradeSpecLabel(key, value) {
@@ -566,8 +568,20 @@ function getUpgradeSpecLabel(key, value) {
   return `${value.toFixed(2)}`;
 }
 
-function estimateUpgradeTierAndCost(key, upgrade) {
-  const baseline = UPGRADE_BASELINE_HINT[key] ?? upgrade.value;
+function ensureCompanyUpgradeBaseline(company) {
+  if (!company?.key || upgradeBaselineByCompany[company.key]) return;
+  const baseline = {};
+  Object.entries(company.upgrades ?? {}).forEach(([upgradeKey, upgrade]) => {
+    const fallback = UPGRADE_BASELINE_DEFAULTS[upgradeKey];
+    baseline[upgradeKey] = Number.isFinite(fallback) ? fallback : Number(upgrade?.value ?? 0);
+  });
+  upgradeBaselineByCompany[company.key] = baseline;
+}
+
+function estimateUpgradeTierAndCost(companyKey, key, upgrade) {
+  const baseline = upgradeBaselineByCompany[companyKey]?.[key]
+    ?? UPGRADE_BASELINE_DEFAULTS[key]
+    ?? upgrade.value;
   const step = Math.max(0.0001, Math.abs(Number(upgrade.step ?? 1)));
   const prefersLowerValue = key === 'lithography' || key === 'powerEfficiency';
   const delta = prefersLowerValue ? baseline - upgrade.value : upgrade.value - baseline;
@@ -585,6 +599,7 @@ function renderCompanyDetail() {
     companyDetailBody.innerHTML = '<p>Company not found.</p>';
     return;
   }
+  ensureCompanyUpgradeBaseline(company);
 
   const boardMembers = Object.entries(company.investors ?? {})
     .filter(([, shares]) => Number.isFinite(shares) && shares > 0)
@@ -618,7 +633,7 @@ function renderCompanyDetail() {
   const technologyRows = Object.entries(upgrades)
     .map(([upgradeKey, upgrade]) => {
       const value = Number(upgrade?.value ?? 0);
-      const { tier, nextTierCost } = estimateUpgradeTierAndCost(upgradeKey, upgrade);
+      const { tier, nextTierCost } = estimateUpgradeTierAndCost(company.key, upgradeKey, upgrade);
       return {
         name: toTitleCase(upgradeKey),
         spec: getUpgradeSpecLabel(upgradeKey, value),
@@ -889,6 +904,11 @@ document.getElementById('reset').addEventListener('click', () => {
   timer = null;
   companySelect.innerHTML = '';
   previousSharePrices = {};
+  Object.keys(upgradeBaselineByCompany).forEach((key) => delete upgradeBaselineByCompany[key]);
+  rankingCache.tick = -1;
+  rankingCache.companies = null;
+  rankingCache.richest = null;
+  rankingCache.products = null;
   sliderMode = 'invest';
   sliderPercentByMode.invest = 25;
   sliderPercentByMode.sell = 25;
