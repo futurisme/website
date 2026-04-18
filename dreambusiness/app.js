@@ -13,11 +13,14 @@ import {
   investInCommunityPlan,
   investInCompanyPlan,
   requestAppStoreLicense,
+  buildProductRankingRows,
+  buildRichestPeopleRows,
+  buildTopCompanyRankingRows,
   runTicksBatched,
   simulateTick,
   transactShares,
   withGameAction,
-  getCompanySelectOptions,
+  getDisplayCompanies,
   getTopCompaniesSnapshot,
 } from '/dreambusiness/dream-engine.bundle.js';
 
@@ -54,17 +57,6 @@ let frame = 'main';
 let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
 
-function getDisplayCompanies(state) {
-  return getCompanySelectOptions(state)
-    .slice(0, 10)
-    .map((item, index) => ({
-      key: item.key,
-      slotId: String(index + 1),
-      name: state.companies[item.key].name,
-      company: state.companies[item.key],
-    }));
-}
-
 function selectedCompanyKey() {
   return companySelect.value || COMPANY_KEYS[0];
 }
@@ -83,7 +75,7 @@ function render() {
   const displayCompanies = getDisplayCompanies(game);
   if (!companySelect.options.length || companySelect.options.length !== displayCompanies.length) {
     companySelect.innerHTML = displayCompanies
-      .map((item) => `<option value="${item.key}">ID ${item.slotId} • ${item.name}</option>`)
+      .map((item) => `<option value="${item.key}">${item.name}</option>`)
       .join('');
   }
 
@@ -114,12 +106,9 @@ function renderFrameVisibility() {
 
 function renderCompanyFrames() {
   const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 10);
-  const slots = getDisplayCompanies(game);
-  const slotMap = new Map(slots.map((item) => [item.key, item.slotId]));
   companyFrameList.innerHTML = snapshots
     .map((company) => `
       <button class="company-card-btn" data-company-card="${company.key}">
-        <small>ID ${slotMap.get(company.key) ?? '-'}</small><br />
         <strong>${company.name}</strong><br />
         <span>Valuation ${formatMoneyCompact(company.valuation)}</span><br />
         <span>Share $${company.sharePrice.toFixed(2)} | MS ${company.marketShare.toFixed(1)}%</span>
@@ -130,77 +119,39 @@ function renderCompanyFrames() {
 }
 
 function renderRankingFrame() {
-  const slots = getDisplayCompanies(game);
-  const slotMap = new Map(slots.map((item) => [item.key, item.slotId]));
-
   if (rankingMode === 'companies') {
-    const rows = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 10);
+    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 10);
     rankingList.innerHTML = rows
-      .map((row, index) => `<li>#${index + 1} • ID ${slotMap.get(row.key) ?? '-'} • ${row.name} — Valuation ${formatMoneyCompact(row.valuation)} | Share $${row.sharePrice.toFixed(2)} | MS ${row.marketShare.toFixed(1)}%</li>`)
+      .map((row) => `<li>#${row.rank} • ${row.name} — Valuation ${formatMoneyCompact(row.valuation)} | Share $${row.sharePrice.toFixed(2)} | MS ${row.marketShare.toFixed(1)}%</li>`)
       .join('');
     return;
   }
 
   if (rankingMode === 'richest') {
-    const investors = [
-      { id: game.player.id, name: game.player.name },
-      ...game.npcs.map((npc) => ({ id: npc.id, name: npc.name })),
-    ]
-      .map((investor) => {
-        const holdings = getInvestorHoldingsValue(game, investor.id);
-        const cash = investor.id === game.player.id ? game.player.cash : (game.npcs.find((npc) => npc.id === investor.id)?.cash ?? 0);
-        return {
-          ...investor,
-          holdings,
-          cash,
-          total: holdings + cash,
-        };
-      })
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 10);
+    const investors = buildRichestPeopleRows(game, getInvestorHoldingsValue, 10);
     rankingList.innerHTML = investors
-      .map((row, index) => `<li>#${index + 1} • ${row.name} — Net Worth ${formatMoneyCompact(row.total)} (Cash ${formatMoneyCompact(row.cash)}, Holdings ${formatMoneyCompact(row.holdings)})</li>`)
+      .map((row) => `<li>#${row.rank} • ${row.name} — Net Worth ${formatMoneyCompact(row.total)} (Cash ${formatMoneyCompact(row.cash)}, Holdings ${formatMoneyCompact(row.holdings)})</li>`)
       .join('');
     return;
   }
 
-  const productRows = slots
-    .map((slot) => {
-      const company = slot.company;
-      const score = (
-        getCompanyValuation(company) * 0.25
-        + company.marketShare * 20
-        + company.reputation * 8
-        + company.releaseCount * 40
-        + company.researchPerDay * 30
-      );
-      return {
-        slotId: slot.slotId,
-        name: company.name,
-        score,
-        releaseCount: company.releaseCount,
-        reputation: company.reputation,
-      };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
+  const productRows = buildProductRankingRows(game, getCompanyValuation, 10);
   rankingList.innerHTML = productRows
-    .map((row, index) => `<li>#${index + 1} • ID ${row.slotId} • ${row.name} — Product Score ${row.score.toFixed(1)} (release ${row.releaseCount}, reputation ${row.reputation.toFixed(1)})</li>`)
+    .map((row) => `<li>#${row.rank} • ${row.name} — Product Score ${row.score.toFixed(1)} (release ${row.releaseCount}, reputation ${row.reputation.toFixed(1)})</li>`)
     .join('');
 }
 
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
-  const slot = getDisplayCompanies(game).find((item) => item.key === key);
   if (!company) {
     companyDetailTitle.textContent = 'Company Subfullframe';
     companyDetailBody.innerHTML = '<p>Company tidak ditemukan.</p>';
     return;
   }
-  companyDetailTitle.textContent = `ID ${slot?.slotId ?? '-'} • ${company.name} • Subfullframe`;
+  companyDetailTitle.textContent = `${company.name} • Subfullframe`;
   companyDetailBody.innerHTML = `
-    <article class="detail-tile"><h3>Identity</h3><p>Key: ${company.key}</p><p>Founder: ${company.founder}</p><p>Field: ${company.field}</p></article>
+    <article class="detail-tile"><h3>Identity</h3><p>Founder: ${company.founder}</p><p>Field: ${company.field}</p></article>
     <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p></article>
     <article class="detail-tile"><h3>Operation</h3><p>Research/day: ${company.researchPerDay.toFixed(2)}</p><p>Revenue/day: ${formatMoneyCompact(company.revenuePerDay)}</p><p>Market Share: ${company.marketShare.toFixed(1)}%</p></article>
     <article class="detail-tile"><h3>Game State</h3><p>Release Count: ${company.releaseCount}</p><p>Reputation: ${company.reputation.toFixed(1)}</p><p>Established: ${company.isEstablished ? 'Yes' : 'No'}</p></article>

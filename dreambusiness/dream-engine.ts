@@ -15,11 +15,15 @@ export {
   requestAppStoreLicense,
   simulateTick,
   transactShares,
-} from '../mindmapmaker/src/features/gameplay/simulation-engine';
+} from '../library/fadhilweblib/fadhilwebgamelib';
 
 export {
+  buildProductRankingRows,
+  buildRichestPeopleRows,
+  buildTopCompanyRankingRows,
+  getDisplayCompanies,
   getCompanySelectOptions,
   getTopCompaniesSnapshot,
   runTicksBatched,
   withGameAction,
-} from '../library/fadhilweblib/fadhilwebgamelib/runtime-kit';
+} from '../library/fadhilweblib/fadhilwebgamelib';

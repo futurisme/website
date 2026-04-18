@@ -166,7 +166,7 @@ function generateCatalogCompanyName(params) {
   return `${fallbackPrimary} ${Math.floor(random() * 900 + 100)}`;
 }
 
-// mindmapmaker/src/features/gameplay/simulation-engine.ts
+// library/fadhilweblib/fadhilwebgamelib/business-engine.ts
 var TICK_MS = 200;
 var START_DATE_UTC = Date.UTC(2e3, 0, 1);
 var NPC_ACTION_EVERY_TICKS = 10;
@@ -3741,6 +3741,54 @@ function getCompanySelectOptions(game) {
     label: `${company.name} (${company.key})`
   }));
 }
+function getDisplayCompanies(game, maxSlots = 10) {
+  return getCompanySelectOptions(game).slice(0, Math.max(1, maxSlots)).map((item, index) => ({
+    key: item.key,
+    slotId: String(index + 1),
+    name: game.companies[item.key].name,
+    company: game.companies[item.key]
+  }));
+}
+function buildTopCompanyRankingRows(game, getCompanyValuation2, getSharePrice2, maxRows = 10) {
+  return getTopCompaniesSnapshot(game, getCompanyValuation2, getSharePrice2, maxRows).map((row, index) => ({
+    rank: index + 1,
+    name: row.name,
+    valuation: row.valuation,
+    sharePrice: row.sharePrice,
+    marketShare: row.marketShare,
+    key: row.key
+  }));
+}
+function buildRichestPeopleRows(game, getInvestorHoldingsValue2, maxRows = 10) {
+  return [
+    { id: game.player.id, name: game.player.name },
+    ...game.npcs.map((npc) => ({ id: npc.id, name: npc.name }))
+  ].map((investor) => {
+    const holdings = getInvestorHoldingsValue2(game, investor.id);
+    const cash = investor.id === game.player.id ? game.player.cash : game.npcs.find((npc) => npc.id === investor.id)?.cash ?? 0;
+    return {
+      rank: 0,
+      name: investor.name,
+      holdings,
+      cash,
+      total: holdings + cash
+    };
+  }).sort((a, b) => b.total - a.total).slice(0, Math.max(1, maxRows)).map((row, index) => ({ ...row, rank: index + 1 }));
+}
+function buildProductRankingRows(game, getCompanyValuation2, maxRows = 10) {
+  return getDisplayCompanies(game, maxRows).map((slot) => {
+    const company = slot.company;
+    const score = getCompanyValuation2(company) * 0.25 + company.marketShare * 20 + company.reputation * 8 + company.releaseCount * 40 + company.researchPerDay * 30;
+    return {
+      rank: 0,
+      name: company.name,
+      score,
+      releaseCount: company.releaseCount,
+      reputation: company.reputation,
+      key: company.key
+    };
+  }).sort((a, b) => b.score - a.score).slice(0, Math.max(1, maxRows)).map((row, index) => ({ ...row, rank: index + 1 }));
+}
 function withGameAction(game, action, onSuccess, onNoop) {
   const next = action(game);
   if (next === game) return onNoop();
@@ -3749,12 +3797,16 @@ function withGameAction(game, action, onSuccess, onNoop) {
 export {
   COMPANY_KEYS,
   DEFAULT_PROFILE_DRAFT,
+  buildProductRankingRows,
+  buildRichestPeopleRows,
+  buildTopCompanyRankingRows,
   createCommunityCompanyPlan,
   createInitialGameState,
   formatDateFromDays,
   formatMoneyCompact,
   getCompanySelectOptions,
   getCompanyValuation,
+  getDisplayCompanies,
   getInvestorHoldingsValue,
   getInvestorWeeklyIncomeEstimate,
   getSharePrice,
