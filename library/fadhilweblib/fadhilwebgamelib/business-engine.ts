@@ -1,5 +1,5 @@
 import { generateCatalogCompanyName } from '@/features/cpu-foundry/company-name-catalog';
-import { GAME_RELEASE_SYNTAX_PROFILE } from './custom-syntax';
+import { GAME_MATH_EXPRESSIONS, GAME_RELEASE_SYNTAX_PROFILE, evaluateGameMathExpression } from './custom-syntax';
 
 export type UpgradeKey = 'architecture' | 'lithography' | 'clockSpeed' | 'coreDesign' | 'cacheStack' | 'powerEfficiency';
 export type TeamKey = 'researchers' | 'marketing' | 'fabrication';
@@ -587,12 +587,20 @@ function computeReleasedProductScore(
   releaseRating: { rating: number },
   priceIndex: number
 ) {
-  const innovationSignal = cpuScore * GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight + (company.researchPerDay * GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight);
-  const executionSignal = releaseRating.rating * GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight
-    + company.teams.fabrication.count * GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight
-    + company.teams.marketing.count * GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight;
   const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
-  return Math.max(1, innovationSignal + executionSignal + priceDiscipline);
+  return evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releasedProductScore, {
+    cpuScore,
+    researchPerDay: company.researchPerDay,
+    releaseRating: releaseRating.rating,
+    fabricationCount: company.teams.fabrication.count,
+    marketingCount: company.teams.marketing.count,
+    priceDiscipline,
+    scoreInnovationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight,
+    scoreResearchWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight,
+    scoreReleaseRatingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight,
+    scoreFabricationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight,
+    scoreMarketingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight,
+  });
 }
 
 function hasCompanyWordCollision(game: GameState, candidateName: string) {
@@ -3996,24 +4004,24 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
   const urgentCashPressure = Math.max(cashEmergency, cashReserveGap * 0.9);
   const crisisBoost = canForceRelease ? 9 + Math.max(0, 1.6 - company.cash) * 0.7 : 0;
   const normalCadenceBoost = inNormalCadenceMode ? clamp((daysSinceRelease - 28) / 32, 0, 1.8) : 0;
-  const score = (
-    urgentCashPressure * 7.6
-    + cpuDelta * 0.042
-    + staleness * 1.65
-    + releaseCadencePressure * 2.1
-    + normalCadenceBoost * 1.6
-    + upgradeMomentumPressure * 1.7
-    + marketNeed * 1.4
-    + reputationNeed * 0.8
-    + management.researchOverflow * 0.32
-    + npc.intelligence * 0.44
-    + launchRevenueSignal * 0.9
-    + releaseRating.rating * 0.035
-    + crisisBoost
-    - qualityGatePenalty
-    - staleSpecPenalty
-    - repeatedSpecPenalty
-  );
+  const score = evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releaseActionScore, {
+    urgentCashPressure,
+    cpuDelta,
+    staleness,
+    releaseCadencePressure,
+    normalCadenceBoost,
+    upgradeMomentumPressure,
+    marketNeed,
+    reputationNeed,
+    researchOverflow: management.researchOverflow,
+    npcIntelligence: npc.intelligence,
+    launchRevenueSignal,
+    releaseRating: releaseRating.rating,
+    crisisBoost,
+    qualityGatePenalty,
+    staleSpecPenalty,
+    repeatedSpecPenalty,
+  });
 
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === 'game' ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;

@@ -1,5 +1,5 @@
 import type { CompanyKey, GameState } from './business-engine';
-import { GAME_RELEASE_SYNTAX_PROFILE } from './custom-syntax';
+import { GAME_MATH_EXPRESSIONS, GAME_RELEASE_SYNTAX_PROFILE, evaluateGameMathExpression } from './custom-syntax';
 
 export type CompanySnapshot = {
   key: CompanyKey;
@@ -114,13 +114,19 @@ export function buildProductRankingRows(
       const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
       const score = Number.isFinite(company.lastProductScore)
         ? company.lastProductScore
-        : (
-          getCompanyValuation(company) * 0.25
-          + company.marketShare * 20
-          + company.reputation * 8
-          + company.releaseCount * (GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight + 12)
-          + company.researchPerDay * GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight
-        );
+        : evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releasedProductScore, {
+          cpuScore: Math.max(1, company.bestCpuScore),
+          researchPerDay: company.researchPerDay,
+          releaseRating: company.releaseCount * (GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight / 2.2),
+          fabricationCount: company.teams.fabrication.count,
+          marketingCount: company.teams.marketing.count,
+          priceDiscipline: 4,
+          scoreInnovationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight,
+          scoreResearchWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight,
+          scoreReleaseRatingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight,
+          scoreFabricationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight,
+          scoreMarketingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight,
+        });
       return {
         rank: 0,
         name: productName,
