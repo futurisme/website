@@ -547,6 +547,36 @@ function toTitleCase(value) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+const UPGRADE_BASELINE_HINT = {
+  architecture: 20,
+  clockSpeed: 1.4,
+  coreDesign: 2,
+  cacheStack: 768,
+  lithography: 160,
+  powerEfficiency: 90,
+};
+
+function getUpgradeSpecLabel(key, value) {
+  if (key === 'architecture') return `Gen ${value.toFixed(0)} architecture`;
+  if (key === 'clockSpeed') return `${value.toFixed(2)} GHz boost clock`;
+  if (key === 'coreDesign') return `${value.toFixed(0)} cores`;
+  if (key === 'cacheStack') return value >= 1024 ? `${(value / 1024).toFixed(2)} MB L3 cache` : `${value.toFixed(0)} KB L3 cache`;
+  if (key === 'lithography') return `${value.toFixed(0)} nm node process`;
+  if (key === 'powerEfficiency') return `${value.toFixed(0)} W TDP profile`;
+  return `${value.toFixed(2)}`;
+}
+
+function estimateUpgradeTierAndCost(key, upgrade) {
+  const baseline = UPGRADE_BASELINE_HINT[key] ?? upgrade.value;
+  const step = Math.max(0.0001, Math.abs(Number(upgrade.step ?? 1)));
+  const prefersLowerValue = key === 'lithography' || key === 'powerEfficiency';
+  const delta = prefersLowerValue ? baseline - upgrade.value : upgrade.value - baseline;
+  const tier = Math.max(0, Math.round(delta / step));
+  const premiumGrowth = Math.max(1.03, Number(upgrade.costGrowth ?? 1.12) * 1.12);
+  const nextTierCost = Math.round(Number(upgrade.baseCost ?? 1000) * Math.pow(premiumGrowth, tier + 1));
+  return { tier, nextTierCost };
+}
+
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
@@ -576,9 +606,27 @@ function renderCompanyDetail() {
     { role: 'CFO', name: formatPersonNameByInvestorId(company.executives?.cfo?.occupantId ?? null) },
   ];
 
-  const technologyRows = Object.entries(company.upgrades ?? {})
-    .map(([upgradeKey, upgrade]) => ({ name: toTitleCase(upgradeKey), value: Number(upgrade?.value ?? 0) }))
-    .sort((a, b) => b.value - a.value);
+  const upgrades = company.upgrades ?? {};
+  const cpuScore =
+    (Number(upgrades.architecture?.value ?? 0) * 120)
+    + (Number(upgrades.clockSpeed?.value ?? 0) * 90)
+    + (Number(upgrades.coreDesign?.value ?? 0) * 88)
+    + ((Number(upgrades.cacheStack?.value ?? 0) / 1024) * 60)
+    + ((220 / Math.max(1, Number(upgrades.lithography?.value ?? 1))) * 82)
+    + ((110 / Math.max(1, Number(upgrades.powerEfficiency?.value ?? 1))) * 75);
+
+  const technologyRows = Object.entries(upgrades)
+    .map(([upgradeKey, upgrade]) => {
+      const value = Number(upgrade?.value ?? 0);
+      const { tier, nextTierCost } = estimateUpgradeTierAndCost(upgradeKey, upgrade);
+      return {
+        name: toTitleCase(upgradeKey),
+        spec: getUpgradeSpecLabel(upgradeKey, value),
+        tier,
+        nextTierCost,
+      };
+    })
+    .sort((a, b) => b.tier - a.tier || b.nextTierCost - a.nextTierCost);
 
   const buildingRows = Object.entries(company.teams ?? {})
     .map(([teamKey, team]) => ({ name: toTitleCase(teamKey), count: Number(team?.count ?? 0) }))
@@ -595,7 +643,10 @@ function renderCompanyDetail() {
       : boardMembers.map((member) => `<p>#${member.rank} ${member.name} • ${member.shares.toFixed(2)} saham (${member.ownership.toFixed(2)}%)</p>`).join('')}</div></details>
     <details class="detail-tile"><summary>Executives</summary><div class="detail-expand-content">${executiveRows.map((entry) => `<p>${entry.role}: ${entry.name}</p>`).join('')}</div></details>
     <details class="detail-tile"><summary>Assets</summary><div class="detail-expand-content">
-      <details><summary>Technology</summary><div>${technologyRows.map((entry) => `<p>${entry.name}: Lv ${entry.value.toFixed(2)}</p>`).join('')}</div></details>
+      <details><summary>Technology</summary><div>
+        <p>CPU Performance Score: ${cpuScore.toFixed(2)}</p>
+        ${technologyRows.map((entry) => `<p>${entry.name}: ${entry.spec} • Tier ${entry.tier} • Next Upgrade ${formatMoneyCompact(entry.nextTierCost)}</p>`).join('')}
+      </div></details>
       <details><summary>Buildings</summary><div>${buildingRows.map((entry) => `<p>${entry.name}: ${entry.count}</p>`).join('')}</div></details>
     </div></details>
   `;
