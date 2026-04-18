@@ -58,6 +58,15 @@ let frame = 'main';
 let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function isValidGameState(candidate) {
   return Boolean(
     candidate
@@ -202,26 +211,45 @@ function renderCompanyFrames() {
 }
 
 function renderRankingFrame() {
+  const renderRankingCards = (rows, formatter) => {
+    rankingList.innerHTML = rows
+      .map((row) => `
+        <li class="ranking-item">
+          <article class="ranking-card">
+            <header class="ranking-card-head">
+              <span class="ranking-badge">#${row.rank}</span>
+              <strong class="ranking-name">${escapeHtml(row.name)}</strong>
+            </header>
+            <p class="ranking-meta">${formatter(row)}</p>
+          </article>
+        </li>
+      `)
+      .join('');
+  };
+
   if (rankingMode === 'companies') {
     const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 10);
-    rankingList.innerHTML = rows
-      .map((row) => `<li>#${row.rank} • ${row.name} — Valuation ${formatMoneyCompact(row.valuation)} | Share $${row.sharePrice.toFixed(2)} | MS ${row.marketShare.toFixed(1)}%</li>`)
-      .join('');
+    renderRankingCards(
+      rows,
+      (row) => `Valuation ${formatMoneyCompact(row.valuation)} • Share $${row.sharePrice.toFixed(2)} • MS ${row.marketShare.toFixed(1)}%`
+    );
     return;
   }
 
   if (rankingMode === 'richest') {
     const investors = buildRichestPeopleRows(game, getInvestorHoldingsValue, 10);
-    rankingList.innerHTML = investors
-      .map((row) => `<li>#${row.rank} • ${row.name} — Net Worth ${formatMoneyCompact(row.total)} (Cash ${formatMoneyCompact(row.cash)}, Holdings ${formatMoneyCompact(row.holdings)})</li>`)
-      .join('');
+    renderRankingCards(
+      investors,
+      (row) => `Net Worth ${formatMoneyCompact(row.total)} • Cash ${formatMoneyCompact(row.cash)} • Holdings ${formatMoneyCompact(row.holdings)}`
+    );
     return;
   }
 
   const productRows = buildProductRankingRows(game, getCompanyValuation, 10);
-  rankingList.innerHTML = productRows
-    .map((row) => `<li>#${row.rank} • ${row.name} — Product Score ${row.score.toFixed(1)} (release ${row.releaseCount}, reputation ${row.reputation.toFixed(1)})</li>`)
-    .join('');
+  renderRankingCards(
+    productRows,
+    (row) => `Product Score ${row.score.toFixed(1)} • Release ${row.releaseCount} • Reputation ${row.reputation.toFixed(1)}`
+  );
 }
 
 function renderCompanyDetail() {
