@@ -28,7 +28,9 @@ const statsEl = document.getElementById('stats');
 const feedEl = document.getElementById('feed');
 const autoBtn = document.getElementById('auto');
 const companySelect = document.getElementById('companySelect');
-const tradeAmountInput = document.getElementById('tradeAmount');
+const investSlider = document.getElementById('investSlider');
+const sliderValueLabel = document.getElementById('sliderValueLabel');
+const sharePercentPreview = document.getElementById('sharePercentPreview');
 const actionStatus = document.getElementById('actionStatus');
 const frameMain = document.getElementById('frameMain');
 const frameFull = document.getElementById('frameFull');
@@ -62,13 +64,48 @@ function selectedCompanyKey() {
 }
 
 function selectedTradeAmount() {
-  const raw = Number(tradeAmountInput.value);
-  return Number.isFinite(raw) && raw > 0 ? raw : 1;
+  const raw = Number(investSlider.value);
+  return Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
 }
 
 function setStatus(message, isError = false) {
   actionStatus.textContent = message;
   actionStatus.style.color = isError ? '#f1a0a0' : '#9ad7a8';
+}
+
+function getPlayerContext(company) {
+  const investorCash = game.player.cash;
+  const currentShares = Number(company.investors[game.player.id] ?? 0);
+  const sharePrice = getSharePrice(company);
+  const holdingValue = currentShares * sharePrice;
+  return { investorCash, currentShares, holdingValue };
+}
+
+function getRequestedTradeValue(mode, context) {
+  const sliderPercent = selectedTradeAmount() / 100;
+  if (mode === 'buy') return context.investorCash * sliderPercent;
+  return context.holdingValue * sliderPercent;
+}
+
+function updateSliderPreview() {
+  const key = selectedCompanyKey();
+  const company = game.companies[key];
+  if (!company) return;
+  const context = getPlayerContext(company);
+  const sliderPercent = selectedTradeAmount();
+  const requestedValue = getRequestedTradeValue('buy', context);
+  const preview = getTradePreview(
+    game,
+    company,
+    game.player.id,
+    context.investorCash,
+    context.currentShares,
+    'buy',
+    requestedValue,
+    'auto'
+  );
+  sliderValueLabel.textContent = `Invest ${sliderPercent.toFixed(0)}% cash = ${formatMoneyCompact(requestedValue, 2)}`;
+  sharePercentPreview.textContent = `Estimasi kepemilikan setelah buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
 }
 
 function render() {
@@ -91,6 +128,7 @@ function render() {
   const feed = game.activityFeed.slice(-8).reverse();
   feedEl.innerHTML = (feed.length ? feed : ['Belum ada activity.']).map((item) => `<li>${item}</li>`).join('');
 
+  updateSliderPreview();
   renderCompanyFrames();
   renderRankingFrame();
   renderFrameVisibility();
@@ -165,16 +203,26 @@ function runTick(n = 1) {
 
 function handleTrade(mode) {
   const key = selectedCompanyKey();
-  const amount = selectedTradeAmount();
   const company = game.companies[key];
   if (!company) {
     setStatus('Company tidak ditemukan.', true);
     return;
   }
+  const context = getPlayerContext(company);
+  const amount = getRequestedTradeValue(mode, context);
 
-  const preview = getTradePreview(game, company, game.player.id, mode, amount, 'auto');
-  if (!preview.canTransact) {
-    setStatus(`Trade gagal: ${preview.reason ?? 'unknown'}`, true);
+  const preview = getTradePreview(
+    game,
+    company,
+    game.player.id,
+    context.investorCash,
+    context.currentShares,
+    mode,
+    amount,
+    'auto'
+  );
+  if (preview.grossTradeValue <= 0) {
+    setStatus('Trade gagal: likuiditas atau dana tidak cukup.', true);
     return;
   }
   withGameAction(
@@ -191,7 +239,10 @@ function handleTrade(mode) {
 
 function handleInvestCompanyPlan() {
   const key = selectedCompanyKey();
-  const amount = Math.max(1, selectedTradeAmount());
+  const company = game.companies[key];
+  if (!company) return;
+  const context = getPlayerContext(company);
+  const amount = Math.max(1, getRequestedTradeValue('buy', context));
   withGameAction(
     game,
     (state) => investInCompanyPlan(state, state.player.id, key, amount),
@@ -232,9 +283,10 @@ function handleLicenseRequest() {
 
 function handleCommunityPlanSeed() {
   const key = selectedCompanyKey();
-  const amount = Math.max(6, selectedTradeAmount());
   const company = game.companies[key];
   if (!company) return;
+  const context = getPlayerContext(company);
+  const amount = Math.max(6, getRequestedTradeValue('buy', context));
   const planName = `${company.name} Labs`;
   const next = createCommunityCompanyPlan(game, game.player.id, planName, amount, company.field, company.softwareSpecialization ?? undefined);
   if (next === game) {
@@ -257,6 +309,8 @@ document.getElementById('sellBtn').addEventListener('click', () => handleTrade('
 document.getElementById('investPlanBtn').addEventListener('click', handleInvestCompanyPlan);
 document.getElementById('licenseBtn').addEventListener('click', handleLicenseRequest);
 document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
+investSlider.addEventListener('input', updateSliderPreview);
+companySelect.addEventListener('change', updateSliderPreview);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
 toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderFrameVisibility(); });

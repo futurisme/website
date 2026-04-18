@@ -20,6 +20,8 @@ li { margin: 4px 0; }
 .control-grid { display: grid; gap: 8px; }
 .control-grid label { display:block; margin-bottom: 6px; color: var(--fwlb-text-muted); font-size: .8rem; }
 select, input { width: 100%; background: var(--fwlb-control-bg); color: var(--fwlb-control-text); border: 1px solid var(--fwlb-control-border); border-radius: var(--fwlb-radius-control-input); padding: 6px 8px; font-size: .9rem; }
+input[type='range'] { padding: 0; accent-color: var(--fwlb-brand-500); }
+small { color: var(--fwlb-text-muted); font-size: .76rem; }
 .button-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .status { min-height: 1.3em; color: #9ad7a8; }
 .frame { display: none; }
