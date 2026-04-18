@@ -128,6 +128,7 @@ export type CompanyState = {
   revenuePerDay: number;
   researchPerDay: number;
   lastProductName: string;
+  lastProductScore: number;
   lastRelease: string;
   focus: string;
   lastReleaseDay: number;
@@ -548,7 +549,7 @@ function normalizeCompanyNameWords(value: string) {
     .filter(Boolean);
 }
 
-function createProductName(company: CompanyState, releaseNumber: number) {
+function createProductName(company: CompanyState, releaseNumber: number, qualitySignal = 0) {
   const companyToken = company.name
     .trim()
     .split(/\s+/)
@@ -564,8 +565,31 @@ function createProductName(company: CompanyState, releaseNumber: number) {
     .split('')
     .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
-  const categoryToken = company.field === 'game' ? 'Game' : company.field === 'software' ? 'App' : 'Chip';
-  return `${companyToken} ${seriesToken} ${categoryToken} ${releaseNumber}`;
+  const baseName = `${companyToken} ${seriesToken} ${releaseNumber}`;
+  const variantTokens = ['Pro', 'Ultra', 'Max'];
+  const variantSeed = `${company.name}-${company.key}-${releaseNumber}-variant`
+    .split('')
+    .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const variantChance = variantSeed % 100;
+  const shouldAddVariant = qualitySignal >= 72
+    ? variantChance < 32
+    : qualitySignal >= 56
+      ? variantChance < 20
+      : variantChance < 10;
+  if (!shouldAddVariant) return baseName;
+  return `${baseName} ${variantTokens[variantSeed % variantTokens.length]}`;
+}
+
+function computeReleasedProductScore(
+  company: CompanyState,
+  cpuScore: number,
+  releaseRating: { rating: number },
+  priceIndex: number
+) {
+  const innovationSignal = cpuScore * 0.52 + (company.researchPerDay * 18);
+  const executionSignal = releaseRating.rating * 28 + company.teams.fabrication.count * 12 + company.teams.marketing.count * 9;
+  const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
+  return Math.max(1, innovationSignal + executionSignal + priceDiscipline);
 }
 
 function hasCompanyWordCollision(game: GameState, candidateName: string) {
@@ -1872,6 +1896,7 @@ export function createCompany(config: {
       revenuePerDay,
       researchPerDay,
       lastProductName: initialProductName,
+      lastProductScore: calculateCpuScore(config.upgrades) * 0.5 + researchPerDay * 18 + config.marketShare * 8 + config.reputation * 5,
       lastRelease: config.lastRelease,
       focus: config.focus,
       lastReleaseDay: 0,
@@ -2628,6 +2653,7 @@ export function progressCompanyPlans(game: GameState) {
       reputation: Math.max(8, 6 + plan.pledgedCapital / 12),
       releaseCount: 1,
       lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === 'game' ? 'Game' : plan.field === 'software' ? 'App' : 'Chip'} 1`,
+      lastProductScore: Math.max(1, plan.pledgedCapital * 2.1),
       revenuePerDay: Math.max(2.2, plan.pledgedCapital / 18),
       researchPerDay: Math.max(1.4, plan.pledgedCapital / 28),
       payoutRatio: 0.1,
@@ -2937,6 +2963,7 @@ export function progressCommunityPlans(game: GameState) {
         reputation: clamp(8 + plan.pledgedCapital / 18, 8, 34),
         releaseCount: 1,
         lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === 'game' ? 'Game' : plan.field === 'software' ? 'App' : 'Chip'} 1`,
+        lastProductScore: Math.max(1, plan.pledgedCapital * 2),
         bestCpuScore: calculateCpuScore(seededUpgrades),
         revenuePerDay: Math.max(1.8, plan.pledgedCapital / 24),
         researchPerDay: Math.max(1.1, plan.pledgedCapital / 34),
@@ -3954,6 +3981,9 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
   const launchRevenueSignal = Math.log10(1 + Math.max(0, launchRevenue));
   const releaseCadencePressure = clamp((daysSinceRelease - releaseWindow) / Math.max(8, releaseWindow), 0, 2.4);
   const upgradeMomentumPressure = clamp((releaseCadenceTarget - daysSinceRelease) / Math.max(6, releaseCadenceTarget), 0, 1.2) * (cpuDelta > 6 ? 1 : 0);
+  const qualitySignal = releaseRating.rating + cpuDelta * 0.18 + company.researchPerDay * 1.4;
+  const qualityGatePenalty = !canForceRelease && qualitySignal < 58 ? (58 - qualitySignal) * 0.52 : 0;
+  const staleSpecPenalty = !canForceRelease && daysSinceRelease < 24 && cpuDelta < 6 ? 3.2 : 0;
   const urgentCashPressure = Math.max(cashEmergency, cashReserveGap * 0.9);
   const crisisBoost = canForceRelease ? 9 + Math.max(0, 1.6 - company.cash) * 0.7 : 0;
   const normalCadenceBoost = inNormalCadenceMode ? clamp((daysSinceRelease - 28) / 32, 0, 1.8) : 0;
@@ -3971,12 +4001,14 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
     + launchRevenueSignal * 0.9
     + releaseRating.rating * 0.035
     + crisisBoost
+    - qualityGatePenalty
+    - staleSpecPenalty
     - repeatedSpecPenalty
   );
 
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === 'game' ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;
-  const productName = createProductName(company, releaseNumber);
+  const productName = createProductName(company, releaseNumber, qualitySignal);
 
   return {
     type: 'release',
@@ -4034,7 +4066,9 @@ export function applyNpcCompanyAction(game: GameState, companyKey: CompanyKey, a
       : (nextCash > 10 ? null : company.lastEmergencyReleaseDay);
     const reputationGain = Math.max(0.8, (cpuScore / 240 + company.teams.marketing.count * 0.7 + pricePreset.reputationBonus) * releaseRating.reputationMultiplier);
     const marketShareGain = Math.min(5.5, (cpuScore / 500 + company.teams.fabrication.count * 0.16 + pricePreset.marketBonus) * releaseRating.marketShareMultiplier);
-    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1);
+    const qualitySignal = releaseRating.rating + (cpuScore - company.lastReleaseCpuScore) * 0.18 + company.researchPerDay * 1.4;
+    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1, qualitySignal);
+    const productScoreAtRelease = computeReleasedProductScore(company, cpuScore, releaseRating, priceIndex);
     const productLabel = company.field === 'game' ? 'game' : company.field === 'software' ? 'software' : 'CPU';
     const nextLicenseRequests = selectedStoreLicense
       ? game.appStoreLicenseRequests.map((request) => {
@@ -4066,6 +4100,7 @@ export function applyNpcCompanyAction(game: GameState, companyKey: CompanyKey, a
           lastReleaseCpuScore: cpuScore,
           lastReleasePriceIndex: priceIndex,
           lastProductName: series,
+          lastProductScore: productScoreAtRelease,
           emergencyReleaseAnchorDay: emergencyAnchorDay,
           emergencyReleaseCount: emergencyReleaseCount,
           lastEmergencyReleaseDay: lastEmergencyReleaseDay,

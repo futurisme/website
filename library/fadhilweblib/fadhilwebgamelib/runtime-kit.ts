@@ -111,13 +111,15 @@ export function buildProductRankingRows(
     .filter((company) => company.isEstablished)
     .map((company) => {
       const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
-      const score = (
-        getCompanyValuation(company) * 0.25
-        + company.marketShare * 20
-        + company.reputation * 8
-        + company.releaseCount * 40
-        + company.researchPerDay * 30
-      );
+      const score = Number.isFinite(company.lastProductScore)
+        ? company.lastProductScore
+        : (
+          getCompanyValuation(company) * 0.25
+          + company.marketShare * 20
+          + company.reputation * 8
+          + company.releaseCount * 40
+          + company.researchPerDay * 30
+        );
       return {
         rank: 0,
         name: productName,

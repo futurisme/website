@@ -3005,13 +3005,24 @@ function getNpcReleasePressure(game, npc, company) {
     gameExecutiveManaged
   };
 }
-function createProductName(company, releaseNumber) {
+function createProductName(company, releaseNumber, qualitySignal = 0) {
   const companyToken = company.name.trim().split(/\s+/).filter(Boolean).slice(0, 1).join("");
   const seriesSeeds = company.field === "game" ? ["Arena", "Quest", "Pulse", "Nova"] : company.field === "software" ? ["Suite", "Flow", "Sync", "Core"] : ["Core", "Fusion", "Vector", "Prime"];
   const seedNumber = `${company.key}-${releaseNumber}`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
-  const categoryToken = company.field === "game" ? "Game" : company.field === "software" ? "App" : "Chip";
-  return `${companyToken} ${seriesToken} ${categoryToken} ${releaseNumber}`;
+  const baseName = `${companyToken} ${seriesToken} ${releaseNumber}`;
+  const variantTokens = ["Pro", "Ultra", "Max"];
+  const variantSeed = `${company.name}-${company.key}-${releaseNumber}-variant`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const variantChance = variantSeed % 100;
+  const shouldAddVariant = qualitySignal >= 72 ? variantChance < 32 : qualitySignal >= 56 ? variantChance < 20 : variantChance < 10;
+  if (!shouldAddVariant) return baseName;
+  return `${baseName} ${variantTokens[variantSeed % variantTokens.length]}`;
+}
+function computeReleasedProductScore(company, cpuScore, releaseRating, priceIndex) {
+  const innovationSignal = cpuScore * 0.52 + company.researchPerDay * 18;
+  const executionSignal = releaseRating.rating * 28 + company.teams.fabrication.count * 12 + company.teams.marketing.count * 9;
+  const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
+  return Math.max(1, innovationSignal + executionSignal + priceDiscipline);
 }
 function scoreNpcReleaseAction(game, npc, company) {
   const pressure = getNpcReleasePressure(game, npc, company);
@@ -3049,13 +3060,16 @@ function scoreNpcReleaseAction(game, npc, company) {
   const launchRevenueSignal = Math.log10(1 + Math.max(0, launchRevenue));
   const releaseCadencePressure = clamp((daysSinceRelease - releaseWindow) / Math.max(8, releaseWindow), 0, 2.4);
   const upgradeMomentumPressure = clamp((releaseCadenceTarget - daysSinceRelease) / Math.max(6, releaseCadenceTarget), 0, 1.2) * (cpuDelta > 6 ? 1 : 0);
+  const qualitySignal = releaseRating.rating + cpuDelta * 0.18 + company.researchPerDay * 1.4;
+  const qualityGatePenalty = !canForceRelease && qualitySignal < 58 ? (58 - qualitySignal) * 0.52 : 0;
+  const staleSpecPenalty = !canForceRelease && daysSinceRelease < 24 && cpuDelta < 6 ? 3.2 : 0;
   const urgentCashPressure = Math.max(cashEmergency, cashReserveGap * 0.9);
   const crisisBoost = canForceRelease ? 9 + Math.max(0, 1.6 - company.cash) * 0.7 : 0;
   const normalCadenceBoost = inNormalCadenceMode ? clamp((daysSinceRelease - 28) / 32, 0, 1.8) : 0;
-  const score = urgentCashPressure * 7.6 + cpuDelta * 0.042 + staleness * 1.65 + releaseCadencePressure * 2.1 + normalCadenceBoost * 1.6 + upgradeMomentumPressure * 1.7 + marketNeed * 1.4 + reputationNeed * 0.8 + management.researchOverflow * 0.32 + npc.intelligence * 0.44 + launchRevenueSignal * 0.9 + releaseRating.rating * 0.035 + crisisBoost - repeatedSpecPenalty;
+  const score = urgentCashPressure * 7.6 + cpuDelta * 0.042 + staleness * 1.65 + releaseCadencePressure * 2.1 + normalCadenceBoost * 1.6 + upgradeMomentumPressure * 1.7 + marketNeed * 1.4 + reputationNeed * 0.8 + management.researchOverflow * 0.32 + npc.intelligence * 0.44 + launchRevenueSignal * 0.9 + releaseRating.rating * 0.035 + crisisBoost - qualityGatePenalty - staleSpecPenalty - repeatedSpecPenalty;
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === "game" ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;
-  const productName = createProductName(company, releaseNumber);
+  const productName = createProductName(company, releaseNumber, qualitySignal);
   return {
     type: "release",
     key: "release",
@@ -3095,7 +3109,9 @@ function applyNpcCompanyAction(game, companyKey, action) {
     const lastEmergencyReleaseDay = isEmergencyRelease ? game.elapsedDays : nextCash > 10 ? null : company.lastEmergencyReleaseDay;
     const reputationGain = Math.max(0.8, (cpuScore / 240 + company.teams.marketing.count * 0.7 + pricePreset.reputationBonus) * releaseRating.reputationMultiplier);
     const marketShareGain = Math.min(5.5, (cpuScore / 500 + company.teams.fabrication.count * 0.16 + pricePreset.marketBonus) * releaseRating.marketShareMultiplier);
-    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1);
+    const qualitySignal = releaseRating.rating + (cpuScore - company.lastReleaseCpuScore) * 0.18 + company.researchPerDay * 1.4;
+    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1, qualitySignal);
+    const productScoreAtRelease = computeReleasedProductScore(company, cpuScore, releaseRating, priceIndex);
     const productLabel = company.field === "game" ? "game" : company.field === "software" ? "software" : "CPU";
     const nextLicenseRequests = selectedStoreLicense ? game.appStoreLicenseRequests.map((request) => {
       if (request.id !== selectedStoreLicense.id) return request;
@@ -3125,6 +3141,7 @@ function applyNpcCompanyAction(game, companyKey, action) {
           lastReleaseCpuScore: cpuScore,
           lastReleasePriceIndex: priceIndex,
           lastProductName: series,
+          lastProductScore: productScoreAtRelease,
           emergencyReleaseAnchorDay: emergencyAnchorDay,
           emergencyReleaseCount,
           lastEmergencyReleaseDay,
@@ -3785,7 +3802,7 @@ function buildRichestPeopleRows(game, getInvestorHoldingsValue2, maxRows = 10) {
 function buildProductRankingRows(game, getCompanyValuation2, maxRows = 10) {
   return Object.values(game.companies).filter((company) => company.isEstablished).map((company) => {
     const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
-    const score = getCompanyValuation2(company) * 0.25 + company.marketShare * 20 + company.reputation * 8 + company.releaseCount * 40 + company.researchPerDay * 30;
+    const score = Number.isFinite(company.lastProductScore) ? company.lastProductScore : getCompanyValuation2(company) * 0.25 + company.marketShare * 20 + company.reputation * 8 + company.releaseCount * 40 + company.researchPerDay * 30;
     return {
       rank: 0,
       name: productName,
