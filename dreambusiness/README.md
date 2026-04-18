@@ -14,3 +14,11 @@ Folder ini adalah proyek game standalone di level root repository.
 
 Mekanisme simulasi tetap memakai engine existing (tanpa membuat mekanisme baru),
 hanya dipisahkan sebagai proyek game tersendiri di folder root `dreambusiness`.
+
+## Quality Check
+
+Untuk validasi cepat repository + DreamBusiness runtime, jalankan:
+
+```bash
+./scripts/quality-check.sh
+```
