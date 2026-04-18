@@ -3717,11 +3717,20 @@ function runNpcTurn(current) {
   return resolveGovernance(next);
 }
 export {
+  COMPANY_KEYS,
   DEFAULT_PROFILE_DRAFT,
+  createCommunityCompanyPlan,
   createInitialGameState,
   formatDateFromDays,
   formatMoneyCompact,
   getCompanyValuation,
+  getInvestorHoldingsValue,
+  getInvestorWeeklyIncomeEstimate,
   getSharePrice,
-  simulateTick
+  getTradePreview,
+  investInCommunityPlan,
+  investInCompanyPlan,
+  requestAppStoreLicense,
+  simulateTick,
+  transactShares
 };

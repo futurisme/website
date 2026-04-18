@@ -13,4 +13,10 @@ button { background: #182341; border: 1px solid #2c3f72; color: #e8eeff; padding
 .grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
 ul { margin: 0; padding-left: 18px; }
 li { margin: 6px 0; }
+.controls { margin-bottom: 12px; }
+.control-grid { display: grid; gap: 10px; }
+.control-grid label { display:block; margin-bottom: 6px; color: #9ab0df; font-size: .8rem; }
+select, input { width: 100%; background: #0b1430; color: #e8eeff; border: 1px solid #2c3f72; border-radius: 8px; padding: 8px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { min-height: 1.3em; color: #9ad7a8; }
 @media (max-width: 800px) { .stats, .grid { grid-template-columns: 1fr; } }
