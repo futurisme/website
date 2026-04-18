@@ -159,7 +159,7 @@ function updateSliderPreview() {
     'auto'
   );
   sliderValueLabel.textContent = `Invest ${sliderPercent.toFixed(0)}% cash = ${formatMoneyCompact(requestedValue, 2)}`;
-  sharePercentPreview.textContent = `Estimasi kepemilikan setelah buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
+  sharePercentPreview.textContent = `Estimated ownership after buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
 }
 
 function render() {
