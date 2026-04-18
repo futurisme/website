@@ -361,6 +361,22 @@ function onPointerMove(event) {
 }
 
 function beginHoldDrag(payload) {
+  if (payload.kind === 'folder') {
+    const folder = getActiveFolders()[payload.fromIndex];
+    if (folder && state.collapsedFolders[folder.id] === false) {
+      state.collapsedFolders[folder.id] = true;
+      folder.cards.forEach((card) => {
+        if (state.collapsedItems[card.id] === false) state.collapsedItems[card.id] = true;
+      });
+    }
+  } else if (payload.kind === 'card') {
+    const folder = getActiveFolders().find((entry) => entry.id === payload.folderId);
+    const card = folder?.cards?.[payload.fromIndex];
+    if (card && state.collapsedItems[card.id] === false) {
+      state.collapsedItems[card.id] = true;
+    }
+  }
+
   const slots = [...document.querySelectorAll(`[data-drag-kind="${payload.kind}"]`)]
     .filter((node) => payload.kind !== 'card' || node.dataset.folderId === payload.folderId)
     .map((node) => {
