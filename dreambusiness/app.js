@@ -78,6 +78,7 @@ const rankingCache = {
   products: null,
 };
 const upgradeBaselineByCompany = {};
+const rdFundByCompany = {};
 
 function isPlanOpenFunding(plan) {
   if (!plan || plan.isEstablished) return false;
@@ -607,6 +608,95 @@ function estimateUpgradeTierAndCost(companyKey, key, upgrade) {
   return { tier, nextTierCost };
 }
 
+function calculateResearchPerDayFromState(company) {
+  const researchers = Number(company.teams?.researchers?.count ?? 0);
+  const architecture = Number(company.upgrades?.architecture?.value ?? 0);
+  const lithography = Number(company.upgrades?.lithography?.value ?? 220);
+  return 4.2 + researchers * 2.2 + architecture * 0.8 + (220 - lithography) * 0.04;
+}
+
+function getRdMonthKey(elapsedDays) {
+  return Math.floor(Math.max(0, elapsedDays) / 30);
+}
+
+function ensureRdFund(company, elapsedDays) {
+  const monthKey = getRdMonthKey(elapsedDays);
+  const existing = rdFundByCompany[company.key];
+  if (existing?.monthKey === monthKey) return existing;
+  const monthlyBudget = Math.max(24, company.researchPerDay * 30 * 0.9);
+  const refreshed = { monthKey, monthlyBudget, spent: 0 };
+  rdFundByCompany[company.key] = refreshed;
+  return refreshed;
+}
+
+function getRdFundRemaining(company, elapsedDays) {
+  const entry = ensureRdFund(company, elapsedDays);
+  return Math.max(0, entry.monthlyBudget - entry.spent);
+}
+
+function applyNpcResearchCycle(state) {
+  let next = state;
+  const companies = { ...next.companies };
+  let changed = false;
+
+  Object.values(companies).forEach((company) => {
+    ensureCompanyUpgradeBaseline(company);
+    if (!company.isEstablished) return;
+    if (!company.ceoId || company.ceoId === next.player.id) return;
+
+    let workingCompany = company;
+    const fund = ensureRdFund(workingCompany, next.elapsedDays);
+
+    for (let round = 0; round < 2; round += 1) {
+      const upgradeOptions = Object.entries(workingCompany.upgrades ?? {})
+        .map(([upgradeKey, upgrade]) => {
+          const { nextTierCost } = estimateUpgradeTierAndCost(workingCompany.key, upgradeKey, upgrade);
+          return { upgradeKey, upgrade, nextTierCost };
+        })
+        .sort((a, b) => a.nextTierCost - b.nextTierCost);
+
+      const candidate = upgradeOptions.find((option) => {
+        const remainingFund = fund.monthlyBudget - fund.spent;
+        return remainingFund >= option.nextTierCost && workingCompany.research >= option.nextTierCost;
+      });
+      if (!candidate) break;
+
+      const current = workingCompany.upgrades[candidate.upgradeKey];
+      const nextValue = candidate.upgradeKey === 'lithography' || candidate.upgradeKey === 'powerEfficiency'
+        ? Math.max(candidate.upgradeKey === 'lithography' ? 5 : 28, current.value + current.step)
+        : current.value + current.step;
+
+      workingCompany = {
+        ...workingCompany,
+        research: Math.max(0, workingCompany.research - candidate.nextTierCost),
+        upgrades: {
+          ...workingCompany.upgrades,
+          [candidate.upgradeKey]: {
+            ...current,
+            value: nextValue,
+          },
+        },
+      };
+      workingCompany = {
+        ...workingCompany,
+        researchPerDay: calculateResearchPerDayFromState(workingCompany),
+      };
+      fund.spent += candidate.nextTierCost;
+      changed = true;
+    }
+
+    if (workingCompany !== company) {
+      companies[workingCompany.key] = workingCompany;
+    }
+  });
+
+  if (!changed) return next;
+  return {
+    ...next,
+    companies,
+  };
+}
+
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
@@ -691,11 +781,13 @@ function renderCompanyDetail() {
   const buildingRows = Object.entries(company.teams ?? {})
     .map(([teamKey, team]) => ({ name: toTitleCase(teamKey), count: Number(team?.count ?? 0) }))
     .sort((a, b) => b.count - a.count);
+  const rdFundRemaining = getRdFundRemaining(company, game.elapsedDays);
+  const rdFund = ensureRdFund(company, game.elapsedDays);
 
   companyDetailTitle.textContent = `${company.name} • Subfullframe`;
   companyDetailBody.innerHTML = `
     <article class="detail-tile"><h3>Identity</h3><p>Founder: ${company.founder}</p><p>CEO: ${formatPersonNameByInvestorId(company.ceoId)}</p><p>Field: ${company.field}</p></article>
-    <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p></article>
+    <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p><p>R&D Fund (Monthly Remaining): ${formatMoneyCompact(rdFundRemaining)} / ${formatMoneyCompact(rdFund.monthlyBudget)}</p></article>
     <article class="detail-tile"><h3>Operation</h3><p>Research/day: ${company.researchPerDay.toFixed(2)}</p><p>Revenue/day: ${formatMoneyCompact(company.revenuePerDay)}</p><p>Market Share: ${company.marketShare.toFixed(1)}%</p></article>
     <article class="detail-tile"><h3>Game State</h3><p>Release Count: ${company.releaseCount}</p><p>Reputation: ${company.reputation.toFixed(1)}</p><p>Established: ${company.isEstablished ? 'Yes' : 'No'}</p></article>
     <details class="detail-tile"><summary>Board of Directors</summary><div class="detail-expand-content">${boardMembers.length === 0
@@ -719,12 +811,13 @@ function renderCompanyDetail() {
 function runTick(n = 1) {
   try {
     const next = runTicksBatched(game, n, simulateTick);
-    if (!isValidGameState(next)) {
+    const withNpcResearch = applyNpcResearchCycle(next);
+    if (!isValidGameState(withNpcResearch)) {
       stopAutoIfRunning();
       setStatus('Tick failed: simulation produced an invalid game state.', true);
       return;
     }
-    game = next;
+    game = withNpcResearch;
     render();
   } catch (error) {
     stopAutoIfRunning();
@@ -921,6 +1014,7 @@ document.getElementById('reset').addEventListener('click', () => {
   companySelect.innerHTML = '';
   previousSharePrices = {};
   Object.keys(upgradeBaselineByCompany).forEach((key) => delete upgradeBaselineByCompany[key]);
+  Object.keys(rdFundByCompany).forEach((key) => delete rdFundByCompany[key]);
   rankingCache.tick = -1;
   rankingCache.companies = null;
   rankingCache.richest = null;
