@@ -43,12 +43,26 @@ select, input { width: 100%; background: var(--fwlb-control-bg); color: var(--fw
 input[type='range'] { padding: 0; accent-color: var(--fwlb-brand-500); }
 small { color: var(--fwlb-text-muted); font-size: .7rem; }
 .button-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.slider-switch-row { margin-bottom: 4px; }
+.slider-switch-row button { min-width: 70px; }
+.slider-switch-row button.switch-active {
+  border-color: #2e6aca;
+  background: #e9f0ff;
+  color: #16418b;
+}
 .status { min-height: 1.3em; color: #9ad7a8; }
 .frame { display: none; }
 .frame-active { display: block; animation: fadeIn .2s ease-out; width: 100vw; box-sizing: border-box; padding: 6px; position: relative; }
 .fullframe { min-height: 0; }
 .company-frame-list { display: grid; gap: 4px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 .company-card-btn { text-align: left; width: 100%; }
+.company-card-proposal {
+  border-style: dashed;
+  border-color: #b9852d;
+  background: #fff7e6;
+}
+.company-status-live { color: #2f9d54; font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.company-status-proposal { color: #a86b12; font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.03em; }
 .company-detail-body { display: grid; gap: 4px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .detail-tile { padding: 6px; border: 1px solid var(--fwlb-border-soft); border-radius: var(--fwlb-radius-md); background: var(--fwlb-surface-muted); }
 .ranking-list { margin: 5px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }

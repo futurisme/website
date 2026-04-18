@@ -29,6 +29,8 @@ const companySelect = document.getElementById('companySelect');
 const investSlider = document.getElementById('investSlider');
 const sliderValueLabel = document.getElementById('sliderValueLabel');
 const sharePercentPreview = document.getElementById('sharePercentPreview');
+const sliderModeInvestBtn = document.getElementById('sliderModeInvest');
+const sliderModeSellBtn = document.getElementById('sliderModeSell');
 const actionStatus = document.getElementById('actionStatus');
 const frameMain = document.getElementById('frameMain');
 const frameFull = document.getElementById('frameFull');
@@ -66,6 +68,8 @@ let frame = 'main';
 let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
 let previousSharePrices = {};
+let sliderMode = 'invest';
+const sliderPercentByMode = { invest: 25, sell: 25 };
 
 function parseFeedEntry(entry) {
   const [head, ...tail] = String(entry ?? '').split(':');
@@ -247,7 +251,12 @@ function selectedCompanyKey() {
 }
 
 function selectedTradeAmount() {
-  const raw = Number(investSlider.value);
+  const raw = sliderPercentByMode[sliderMode];
+  return Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
+}
+
+function selectedTradeAmountByMode(mode) {
+  const raw = sliderPercentByMode[mode];
   return Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
 }
 
@@ -265,9 +274,15 @@ function getPlayerContext(company) {
 }
 
 function getRequestedTradeValue(mode, context) {
-  const sliderPercent = selectedTradeAmount() / 100;
+  const sliderPercent = selectedTradeAmountByMode(mode === 'buy' ? 'invest' : 'sell') / 100;
   if (mode === 'buy') return context.investorCash * sliderPercent;
   return context.holdingValue * sliderPercent;
+}
+
+function syncSliderModeUI() {
+  sliderModeInvestBtn.classList.toggle('switch-active', sliderMode === 'invest');
+  sliderModeSellBtn.classList.toggle('switch-active', sliderMode === 'sell');
+  investSlider.value = String(selectedTradeAmount());
 }
 
 function updateSliderPreview() {
@@ -275,20 +290,27 @@ function updateSliderPreview() {
   const company = game.companies[key];
   if (!company) return;
   const context = getPlayerContext(company);
+  syncSliderModeUI();
+  const activeTradeMode = sliderMode === 'invest' ? 'buy' : 'sell';
   const sliderPercent = selectedTradeAmount();
-  const requestedValue = getRequestedTradeValue('buy', context);
+  const requestedValue = getRequestedTradeValue(activeTradeMode, context);
   const preview = getTradePreview(
     game,
     company,
     game.player.id,
     context.investorCash,
     context.currentShares,
-    'buy',
+    activeTradeMode,
     requestedValue,
     'auto'
   );
-  sliderValueLabel.textContent = `Invest ${sliderPercent.toFixed(0)}% cash = ${formatMoneyCompact(requestedValue, 2)}`;
-  sharePercentPreview.textContent = `Estimated ownership after buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
+  if (sliderMode === 'invest') {
+    sliderValueLabel.textContent = `Invest ${sliderPercent.toFixed(0)}% cash = ${formatMoneyCompact(requestedValue, 2)}`;
+    sharePercentPreview.textContent = `Estimated ownership after buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
+  } else {
+    sliderValueLabel.textContent = `Sell ${sliderPercent.toFixed(0)}% holdings = ${formatMoneyCompact(requestedValue, 2)}`;
+    sharePercentPreview.textContent = `Estimated ownership after sell: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
+  }
   updateInvestmentActionState();
 }
 
@@ -385,7 +407,14 @@ function updateInvestmentActionState() {
 }
 
 function render() {
-  const displayCompanies = getDisplayCompanies(game);
+  const displayCompanies = getDisplayCompanies(game).filter((item) => {
+    const company = game.companies[item.key];
+    const plan = game.plans[item.key];
+    if (company?.isEstablished) return true;
+    if (!plan || plan.isEstablished) return false;
+    const planStatus = String(plan.status ?? '').toLowerCase();
+    return planStatus === '' || planStatus === 'funding' || planStatus === 'open' || planStatus === 'active';
+  });
   if (!companySelect.options.length || companySelect.options.length !== displayCompanies.length) {
     companySelect.innerHTML = displayCompanies
       .map((item) => `<option value="${item.key}">${item.name}</option>`)
@@ -419,11 +448,19 @@ function renderFrameVisibility() {
 }
 
 function renderCompanyFrames() {
-  const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 10);
+  const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 12)
+    .filter((company) => {
+      if (company.isEstablished) return true;
+      const plan = game.plans[company.key];
+      if (!plan || plan.isEstablished) return false;
+      const planStatus = String(plan.status ?? '').toLowerCase();
+      return planStatus === '' || planStatus === 'funding' || planStatus === 'open' || planStatus === 'active';
+    });
   companyFrameList.innerHTML = snapshots
     .map((company) => `
-      <button class="company-card-btn" data-company-card="${company.key}">
+      <button class="company-card-btn ${company.isEstablished ? '' : 'company-card-proposal'}" data-company-card="${company.key}">
         <strong>${company.name}</strong><br />
+        ${company.isEstablished ? '<small class="company-status-live">Running</small><br />' : '<small class="company-status-proposal">Open Funding</small><br />'}
         <span>Valuation ${formatMoneyCompact(company.valuation)}</span><br />
         <span>Share $${company.sharePrice.toFixed(2)} | MS ${company.marketShare.toFixed(1)}%</span>
       </button>
@@ -450,7 +487,7 @@ function renderRankingFrame() {
   };
 
   if (rankingMode === 'companies') {
-    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 10);
+    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 12);
     renderRankingCards(
       rows,
       (row) => `Valuation ${formatMoneyCompact(row.valuation)} • Share $${row.sharePrice.toFixed(2)} • MS ${row.marketShare.toFixed(1)}%`
@@ -653,7 +690,19 @@ sellBtn.addEventListener('click', () => handleTrade('sell'));
 investPlanBtn.addEventListener('click', handleInvestCompanyPlan);
 licenseBtn.addEventListener('click', handleLicenseRequest);
 communityBtn.addEventListener('click', handleCommunityPlanSeed);
-investSlider.addEventListener('input', updateSliderPreview);
+sliderModeInvestBtn.addEventListener('click', () => {
+  sliderMode = 'invest';
+  updateSliderPreview();
+});
+sliderModeSellBtn.addEventListener('click', () => {
+  sliderMode = 'sell';
+  updateSliderPreview();
+});
+investSlider.addEventListener('input', () => {
+  const raw = Number(investSlider.value);
+  sliderPercentByMode[sliderMode] = Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
+  updateSliderPreview();
+});
 companySelect.addEventListener('change', updateSliderPreview);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
@@ -683,6 +732,9 @@ document.getElementById('reset').addEventListener('click', () => {
   timer = null;
   companySelect.innerHTML = '';
   previousSharePrices = {};
+  sliderMode = 'invest';
+  sliderPercentByMode.invest = 25;
+  sliderPercentByMode.sell = 25;
   setStatus('Game has been reset.');
   frame = 'main';
   selectedCompanyForDetail = null;
