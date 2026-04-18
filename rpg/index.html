@@ -144,7 +144,7 @@
 
     <script>
       window.__FWRPG_BOOT__ = {
-        libUrl: new URL('./fadhilwebrpglib.js', window.location.href).toString()
+        libUrl: new URL('/rpg/fadhilwebrpglib.js', window.location.origin).toString()
       };
       window.__FWRPG_BOOT__.onLibLoadError = function () {
         var payload = {
@@ -179,7 +179,7 @@
         document.body.appendChild(wrap);
       };
     </script>
-    <script src="./fadhilwebrpglib.js" onerror="window.__FWRPG_BOOT__ && window.__FWRPG_BOOT__.onLibLoadError && window.__FWRPG_BOOT__.onLibLoadError()"></script>
+    <script src="/rpg/fadhilwebrpglib.js" onerror="window.__FWRPG_BOOT__ && window.__FWRPG_BOOT__.onLibLoadError && window.__FWRPG_BOOT__.onLibLoadError()"></script>
     <script>
       var lib = window.fadhilwebrpglib;
       var debugAgent = null;
