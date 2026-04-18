@@ -71,6 +71,19 @@ let previousSharePrices = {};
 let sliderMode = 'invest';
 const sliderPercentByMode = { invest: 25, sell: 25 };
 
+function isPlanOpenFunding(plan) {
+  if (!plan || plan.isEstablished) return false;
+  const planStatus = String(plan.status ?? '').toLowerCase();
+  return planStatus === '' || planStatus === 'funding' || planStatus === 'open' || planStatus === 'active';
+}
+
+function isCompanyVisibleInUi(companyKey) {
+  const company = game.companies[companyKey];
+  if (!company) return false;
+  if (company.isEstablished) return true;
+  return isPlanOpenFunding(game.plans[companyKey]);
+}
+
 function parseFeedEntry(entry) {
   const [head, ...tail] = String(entry ?? '').split(':');
   if (tail.length === 0) {
@@ -407,18 +420,14 @@ function updateInvestmentActionState() {
 }
 
 function render() {
-  const displayCompanies = getDisplayCompanies(game).filter((item) => {
-    const company = game.companies[item.key];
-    const plan = game.plans[item.key];
-    if (company?.isEstablished) return true;
-    if (!plan || plan.isEstablished) return false;
-    const planStatus = String(plan.status ?? '').toLowerCase();
-    return planStatus === '' || planStatus === 'funding' || planStatus === 'open' || planStatus === 'active';
-  });
+  const displayCompanies = getDisplayCompanies(game).filter((item) => isCompanyVisibleInUi(item.key));
   if (!companySelect.options.length || companySelect.options.length !== displayCompanies.length) {
     companySelect.innerHTML = displayCompanies
       .map((item) => `<option value="${item.key}">${item.name}</option>`)
       .join('');
+  }
+  if (displayCompanies.length > 0 && !displayCompanies.some((item) => item.key === companySelect.value)) {
+    companySelect.value = displayCompanies[0].key;
   }
 
   const investorWorth = getInvestorHoldingsValue(game, game.player.id);
@@ -449,18 +458,12 @@ function renderFrameVisibility() {
 
 function renderCompanyFrames() {
   const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 12)
-    .filter((company) => {
-      if (company.isEstablished) return true;
-      const plan = game.plans[company.key];
-      if (!plan || plan.isEstablished) return false;
-      const planStatus = String(plan.status ?? '').toLowerCase();
-      return planStatus === '' || planStatus === 'funding' || planStatus === 'open' || planStatus === 'active';
-    });
+    .filter((company) => isCompanyVisibleInUi(company.key));
   companyFrameList.innerHTML = snapshots
     .map((company) => `
-      <button class="company-card-btn ${company.isEstablished ? '' : 'company-card-proposal'}" data-company-card="${company.key}">
+      <button class="company-card-btn ${game.companies[company.key]?.isEstablished ? '' : 'company-card-proposal'}" data-company-card="${company.key}">
         <strong>${company.name}</strong><br />
-        ${company.isEstablished ? '<small class="company-status-live">Running</small><br />' : '<small class="company-status-proposal">Open Funding</small><br />'}
+        ${game.companies[company.key]?.isEstablished ? '<small class="company-status-live">Running</small><br />' : '<small class="company-status-proposal">Open Funding</small><br />'}
         <span>Valuation ${formatMoneyCompact(company.valuation)}</span><br />
         <span>Share $${company.sharePrice.toFixed(2)} | MS ${company.marketShare.toFixed(1)}%</span>
       </button>
@@ -487,7 +490,10 @@ function renderRankingFrame() {
   };
 
   if (rankingMode === 'companies') {
-    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 12);
+    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 24)
+      .filter((row) => isCompanyVisibleInUi(row.key))
+      .slice(0, 12)
+      .map((row, index) => ({ ...row, rank: index + 1 }));
     renderRankingCards(
       rows,
       (row) => `Valuation ${formatMoneyCompact(row.valuation)} • Share $${row.sharePrice.toFixed(2)} • MS ${row.marketShare.toFixed(1)}%`
@@ -570,10 +576,10 @@ function handleTrade(mode) {
     return;
   }
   const changed = applyActionSafely(
-    (state) => transactShares(state, state.player.id, key, mode, amount, 'auto'),
+    (state) => transactShares(state, state.player.id, key, mode, amount, 'auto').next,
     {
       successMessage: `${mode === 'buy' ? 'Buy' : 'Sell'} ${key} completed. Gross ${formatMoneyCompact(preview.grossTradeValue)}.`,
-      noopMessage: 'Trade was not executed: funding/liquidity/rules were not satisfied.',
+      noopMessage: 'Trade tidak dieksekusi: likuiditas, kepemilikan, atau dana tidak memenuhi.',
       errorMessage: 'Trade processing failed',
     }
   );
