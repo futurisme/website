@@ -3,88 +3,153 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fadhil Web Text RPG 2026</title>
+    <title>Fadhil Web RPG Fullframe 2026</title>
     <style>
-      :root { color-scheme: dark; }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        background: #020617;
-        color: #dbeafe;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      :root {
+        color-scheme: dark;
+        --bg: #020617;
+        --panel: #0b1220;
+        --panel-soft: #111b30;
+        --border: #334155;
+        --text: #dbeafe;
+        --muted: #93a5be;
       }
-      .app { max-width: 1200px; margin: 0 auto; padding: 12px; display: grid; gap: 10px; }
-      .box { border: 1px solid #334155; border-radius: 8px; background: #0b1220; padding: 10px; }
-      .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-      .title { margin: 0; font-size: 1.1rem; }
-      button, select, input {
-        background: #111827;
-        color: #e2e8f0;
-        border: 1px solid #475569;
-        border-radius: 6px;
-        padding: 6px 10px;
-        font-family: inherit;
+      * { box-sizing: border-box; min-width: 0; }
+      html, body { margin: 0; width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
+      .shell { width: 100vw; min-height: 100dvh; }
+      .frame { display: none; width: 100%; padding: 10px; }
+      .frame-active { display: block; animation: fadeIn .18s ease-out; }
+      .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
+      .header h1 { margin: 0; font-size: clamp(1.2rem, 4vw, 1.8rem); }
+      .header p { margin: 6px 0 0; color: var(--muted); }
+      .actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+      button {
+        border: 1px solid #3f4c66;
+        border-radius: 10px;
+        background: #162136;
+        color: #e8f1ff;
+        min-height: 38px;
+        padding: 7px 12px;
+        font-weight: 650;
       }
-      button:hover { cursor: pointer; background: #1e293b; }
-      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      .pane { min-height: 180px; white-space: pre-wrap; font-size: 12px; line-height: 1.45; }
-      .terminal { min-height: 250px; max-height: 320px; overflow: auto; }
-      .status { font-size: 12px; line-height: 1.4; }
-      .map-wrap { display: none; overflow: hidden; height: 300px; position: relative; }
-      .map { position: absolute; inset: 0; background: linear-gradient(180deg, #082f49, #14532d); cursor: grab; }
-      .node {
-        position: absolute;
-        transform: translate(-50%, -50%);
-        border: 1px solid #0f172a;
-        border-radius: 999px;
-        padding: 4px 7px;
-        font-size: 11px;
-      }
-      .node.city { background: #1d4ed8; }
-      .node.village { background: #059669; }
-      .node.dungeon { background: #7e22ce; }
+      button:hover { cursor: pointer; background: #1e2b46; }
+      button.primary { background: linear-gradient(90deg,#4f46e5,#2563eb); border-color: transparent; }
+      .stats { margin-top: 10px; display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .stat { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 10px; padding: 8px; }
+      .stat label { font-size: .75rem; color: var(--muted); display:block; }
+      .stat strong { font-size: .95rem; }
+      .grid { margin-top: 10px; display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .line { border: 1px solid var(--border); border-radius: 8px; padding: 8px; background: #0a1326; font-size: .83rem; margin-bottom: 6px; }
+      .frame-back { position: sticky; top: 8px; float: right; border-radius: 999px; width: 34px; height: 34px; padding: 0; }
+      .section-title { margin: 0 0 8px; font-size: 1rem; }
+      .hero-tabs, .action-grid, .travel-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+      .hero-tabs button.active, .action-grid button.active { border-color: #60a5fa; background: #1d3356; }
+      .action-grid button[disabled], .travel-grid button[disabled] { opacity: .45; cursor: not-allowed; }
+      .battle-log { margin-top: 8px; background: #070c18; border: 1px solid var(--border); border-radius: 10px; min-height: 180px; max-height: 280px; overflow: auto; padding: 8px; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .8rem; }
+      .map-wrap { margin-top: 8px; border: 1px solid var(--border); border-radius: 12px; background: #081425; overflow: hidden; height: min(62dvh, 520px); position: relative; touch-action: none; }
+      .map-plane { position: absolute; width: 1280px; height: 900px; background: radial-gradient(circle at 35% 35%, #115e59, #0f172a 62%); transform-origin: 0 0; }
+      .map-link { position: absolute; height: 2px; background: rgba(148,163,184,.4); transform-origin: 0 0; pointer-events: none; }
+      .node { position:absolute; transform: translate(-50%, -50%); border-radius: 999px; border:1px solid #0f172a; padding: 5px 8px; font-size: 12px; }
+      .node.city { background:#2563eb; }
+      .node.village { background:#059669; }
+      .node.dungeon { background:#7c3aed; }
       .node.current { outline: 2px solid #fbbf24; }
-      .node.locked { opacity: 0.45; }
-      .help { opacity: 0.8; font-size: 11px; }
-      @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+      .node.locked { opacity: .45; }
+      .party-grid { display:grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); }
+      .unit-card { text-align:left; }
+      .unit-card small { color: var(--muted); display:block; }
+      .detail { display:grid; gap:8px; }
+      .meter { height:8px; background:#0f172a; border-radius:999px; overflow:hidden; }
+      .meter > span { display:block; height:100%; }
+      .hp { background:linear-gradient(90deg,#16a34a,#86efac); }
+      .mp { background:linear-gradient(90deg,#2563eb,#93c5fd); }
+      .tp { background:linear-gradient(90deg,#d97706,#fde68a); }
+      .break { background:linear-gradient(90deg,#9333ea,#f0abfc); }
+      .tiny { color: var(--muted); font-size: .78rem; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      @media (max-width: 820px) {
+        .stats { grid-template-columns: 1fr 1fr; }
+        .grid { grid-template-columns: 1fr; }
+        button { min-height: 36px; }
+      }
     </style>
   </head>
   <body>
-    <div class="app">
-      <div class="box">
-        <h1 class="title">FadhilWebRPGLib :: Text-Based JRPG 2026</h1>
-        <div class="help">Ringan & antilag: UI ini hanya terminal/render layer. Mekanik penuh dari fadhilwebrpglib.</div>
-      </div>
+    <main class="shell">
+      <section id="frameMain" class="frame frame-active">
+        <article class="card header">
+          <h1>FadhilWebRPGLib JRPG Fullframe</h1>
+          <p>Tanpa command input. Semua interaksi via tombol, fullframe, dan subfullframe ala DreamBusiness.</p>
+          <div class="actions">
+            <button class="primary" id="mainRoundBtn">Mainkan Round</button>
+            <button id="mainAutoBtn">Auto x3</button>
+            <button id="toBattleBtn">Battle Fullframe</button>
+            <button id="toMapBtn">Map Fullframe</button>
+            <button id="toPartyBtn">Party Fullframe</button>
+            <button id="mainResetBtn">Reset</button>
+          </div>
+        </article>
+        <section class="stats" id="mainStats"></section>
+        <section class="grid">
+          <article class="card">
+            <h2 class="section-title">Ringkasan Party</h2>
+            <div id="partySummary"></div>
+          </article>
+          <article class="card">
+            <h2 class="section-title">Ringkasan Enemy</h2>
+            <div id="enemySummary"></div>
+          </article>
+        </section>
+      </section>
 
-      <div class="box row">
-        <button id="stepBtn">round</button>
-        <button id="autoBtn">auto x3</button>
-        <button id="mapBtn">Map</button>
-        <button id="resetBtn">reset</button>
-        <select id="heroSelect"></select>
-        <select id="actionSelect"></select>
-        <button id="manualBtn">run action</button>
-        <input id="cmdInput" placeholder="ketik command: help/status/map/battle/travel loc-kaze" size="48" />
-        <button id="cmdBtn">enter</button>
-      </div>
+      <section id="frameBattle" class="frame">
+        <button class="frame-back" id="backBattle">↩</button>
+        <article class="card">
+          <h2 class="section-title">Battle Fullframe</h2>
+          <div class="hero-tabs" id="heroTabs"></div>
+          <div class="action-grid" id="actionGrid"></div>
+          <div class="actions" style="margin-top:8px;">
+            <button id="battleRoundBtn">Round</button>
+            <button id="battleAutoBtn">Auto x3</button>
+            <button id="battleResetBtn">Reset</button>
+          </div>
+          <div class="battle-log" id="battleLog"></div>
+        </article>
+      </section>
 
-      <div class="box map-wrap" id="mapWrap">
-        <div class="map" id="map"></div>
-      </div>
+      <section id="frameMap" class="frame">
+        <button class="frame-back" id="backMap">↩</button>
+        <article class="card">
+          <h2 class="section-title">Map Fullframe</h2>
+          <p class="tiny">Geser peta dengan drag. Tap node tetangga untuk travel.</p>
+          <div class="travel-grid" id="travelButtons"></div>
+          <div class="map-wrap" id="mapWrap"><div class="map-plane" id="mapPlane"></div></div>
+        </article>
+      </section>
 
-      <div class="grid">
-        <div class="box pane" id="partyPane"></div>
-        <div class="box pane" id="enemyPane"></div>
-      </div>
+      <section id="frameParty" class="frame">
+        <button class="frame-back" id="backParty">↩</button>
+        <article class="card">
+          <h2 class="section-title">Party Fullframe</h2>
+          <div class="party-grid" id="partyGrid"></div>
+        </article>
+      </section>
 
-      <div class="box status" id="status"></div>
-      <div class="box terminal" id="terminal"></div>
-    </div>
+      <section id="frameSub" class="frame">
+        <button class="frame-back" id="backSub">↩</button>
+        <article class="card detail" id="unitDetail"></article>
+      </section>
+    </main>
 
     <script src="./fadhilwebrpglib.js"></script>
     <script>
       var lib = window.fadhilwebrpglib;
       var rand = lib.seededRandom(2026);
+      var selectedHeroId = 'hero-akari';
+      var selectedAction = 'basic';
+      var logs = ['UI Fullframe siap.'];
+      var drag = { active:false, x:0, y:0, moved:false };
+      var currentUnitId = '';
 
       var partyTemplate = [
         { id:'hero-akari', name:'Akari Ronin', role:'striker', level:12, maxHp:290, hp:290, maxMp:88, mp:88, tp:20, attack:52, defense:30, agility:35, spirit:24, element:'wind', alive:true,
@@ -118,7 +183,6 @@
 
       function createInitialState() {
         return lib.createState(partyTemplate, enemyTemplate, {
-          weather: 'clear',
           inventory: [
             { id:'ether-mini', name:'Ether Mini', qty:3, healMp:26, target:'ally' },
             { id:'hi-potion', name:'Hi Potion', qty:4, healHp:110, target:'ally', cleanse:true },
@@ -128,210 +192,214 @@
       }
 
       var state = createInitialState();
-      var logBuffer = ['Sistem text RPG aktif. ketik help untuk command.'];
-      var mapVisible = false;
-      var drag = { active:false, moved:false, x:0, y:0 };
 
-      var nodes = {
-        partyPane: document.getElementById('partyPane'),
-        enemyPane: document.getElementById('enemyPane'),
-        status: document.getElementById('status'),
-        terminal: document.getElementById('terminal'),
-        heroSelect: document.getElementById('heroSelect'),
-        actionSelect: document.getElementById('actionSelect'),
-        cmdInput: document.getElementById('cmdInput'),
-        mapWrap: document.getElementById('mapWrap'),
-        map: document.getElementById('map')
-      };
+      function $(id){ return document.getElementById(id); }
+      function allFrames(){ return ['frameMain','frameBattle','frameMap','frameParty','frameSub']; }
+      function openFrame(id){ allFrames().forEach(function(fid){ $(fid).classList.toggle('frame-active', fid === id); }); if (id === 'frameMap') renderMap(); }
+      function appendLogs(lines){ if (!lines) return; logs = logs.concat(lines).slice(-220); }
+      function ratio(v, max){ return Math.max(0, Math.min(100, Math.round((v / Math.max(max,1)) * 100))); }
 
-      function appendLog(lines) {
-        if (!lines || !lines.length) return;
-        logBuffer = logBuffer.concat(lines).slice(-220);
-      }
-
-      function unitToText(u) {
+      function unitSummaryLine(u){
         var status = (u.status || []).map(function(s){ return s.type + ':' + s.turns; }).join(', ') || '-';
-        var life = u.alive ? 'alive' : 'dead';
-        return u.name + ' [' + life + ']\n'
-          + 'HP ' + u.hp + '/' + u.maxHp + ' | MP ' + u.mp + '/' + u.maxMp + ' | TP ' + u.tp + ' | Limit ' + u.limit + '%\n'
-          + 'Break ' + u.breakGauge + '/' + u.maxBreakGauge + ' | Status: ' + status + '\n';
+        return '<div class="line"><strong>' + u.name + '</strong><br/>HP ' + u.hp + '/' + u.maxHp + ' · MP ' + u.mp + '/' + u.maxMp + ' · TP ' + u.tp + ' · Break ' + u.breakGauge + '<br/><span class="tiny">Status: ' + status + '</span></div>';
       }
 
-      function renderPanels() {
-        nodes.partyPane.textContent = '== PARTY ==\n' + state.party.map(unitToText).join('\n');
-        nodes.enemyPane.textContent = '== ENEMY ==\n' + state.enemies.map(unitToText).join('\n');
-      }
-
-      function renderStatus() {
+      function renderMain(){
         var summary = lib.getBattleSummary(state);
-        nodes.status.textContent = [
-          'Mode=' + summary.mode,
-          'Location=' + summary.location,
-          'Round=' + summary.cycle,
-          'Weather=' + summary.weather,
-          'Anomaly=' + summary.anomaly,
-          'PartyAlive=' + summary.partyAlive,
-          'EnemyAlive=' + summary.enemyAlive,
-          'Travel=' + summary.travelCount,
-          'Damage=' + summary.metrics.totalDamage,
-          'Heal=' + summary.metrics.totalHealing,
-          'Action=' + summary.metrics.actions
-        ].join(' | ');
+        $('mainStats').innerHTML = [
+          ['Mode', summary.mode], ['Lokasi', summary.location], ['Round', summary.cycle],
+          ['Weather', summary.weather], ['Anomaly', summary.anomaly], ['Party Alive', summary.partyAlive],
+          ['Enemy Alive', summary.enemyAlive], ['Travel', summary.travelCount], ['Damage', summary.metrics.totalDamage]
+        ].map(function(p){ return '<article class="stat"><label>' + p[0] + '</label><strong>' + p[1] + '</strong></article>'; }).join('');
+
+        $('partySummary').innerHTML = state.party.map(unitSummaryLine).join('');
+        $('enemySummary').innerHTML = state.enemies.map(unitSummaryLine).join('');
       }
 
-      function renderManualControls() {
+      function renderBattle(){
         var aliveParty = state.party.filter(function(u){ return u.alive; });
-        var selectedHero = nodes.heroSelect.value;
+        if (!aliveParty.some(function(u){ return u.id === selectedHeroId; })) selectedHeroId = (aliveParty[0] || {}).id || '';
 
-        nodes.heroSelect.innerHTML = aliveParty.map(function(u){
-          var isSelected = selectedHero === u.id ? ' selected' : '';
-          return '<option value="' + u.id + '"' + isSelected + '>' + u.name + '</option>';
+        $('heroTabs').innerHTML = aliveParty.map(function(u){
+          return '<button data-hero="' + u.id + '" class="' + (u.id === selectedHeroId ? 'active' : '') + '">' + u.name + '</button>';
         }).join('');
 
-        var actorId = nodes.heroSelect.value || (aliveParty[0] && aliveParty[0].id);
-        var catalog = actorId ? lib.listActionCatalog(state, actorId) : [];
-        nodes.actionSelect.innerHTML = catalog.map(function(action){
-          var dis = action.enabled === false ? ' [LOCK]' : '';
-          return '<option value="' + action.id + '">' + action.label + dis + '</option>';
+        var catalog = selectedHeroId ? lib.listActionCatalog(state, selectedHeroId) : [];
+        $('actionGrid').innerHTML = catalog.map(function(action){
+          var active = action.id === selectedAction ? 'active' : '';
+          var dis = action.enabled === false ? 'disabled' : '';
+          return '<button data-action="' + action.id + '" class="' + active + '" ' + dis + '>' + action.label + '</button>';
+        }).join('');
+
+        $('battleLog').textContent = logs.join('\n');
+        $('battleLog').scrollTop = $('battleLog').scrollHeight;
+      }
+
+      function renderParty(){
+        $('partyGrid').innerHTML = state.party.map(function(u){
+          return '<button class="unit-card" data-unit="' + u.id + '"><strong>' + u.name + '</strong><small>Lv ' + u.level + ' · ' + u.role + '</small><small>HP ' + u.hp + '/' + u.maxHp + '</small></button>';
         }).join('');
       }
 
-      function renderTerminal() {
-        nodes.terminal.textContent = logBuffer.join('\n');
-        nodes.terminal.scrollTop = nodes.terminal.scrollHeight;
+      function renderUnitSub(){
+        var unit = state.party.concat(state.enemies).find(function(u){ return u.id === currentUnitId; });
+        if (!unit) return;
+        var status = (unit.status || []).map(function(s){ return s.type + ':' + s.turns; }).join(', ') || '-';
+        $('unitDetail').innerHTML = '<h2 class="section-title">' + unit.name + '</h2>'
+          + '<div class="tiny">Role: ' + unit.role + ' · Element: ' + unit.element + ' · Level: ' + unit.level + '</div>'
+          + '<div><div class="tiny">HP</div><div class="meter"><span class="hp" style="width:' + ratio(unit.hp, unit.maxHp) + '%"></span></div></div>'
+          + '<div><div class="tiny">MP</div><div class="meter"><span class="mp" style="width:' + ratio(unit.mp, unit.maxMp) + '%"></span></div></div>'
+          + '<div><div class="tiny">TP</div><div class="meter"><span class="tp" style="width:' + ratio(unit.tp, 100) + '%"></span></div></div>'
+          + '<div><div class="tiny">Break</div><div class="meter"><span class="break" style="width:' + ratio(unit.breakGauge, unit.maxBreakGauge) + '%"></span></div></div>'
+          + '<div class="line">Status: ' + status + '<br/>ATK ' + unit.attack + ' · DEF ' + unit.defense + ' · AGI ' + unit.agility + ' · SPR ' + unit.spirit + '</div>'
+          + '<div class="line">Skills:<br/>' + unit.skills.map(function(s){ return '- ' + s.name + ' (MP ' + s.costMp + ', TP ' + s.costTp + ')'; }).join('<br/>') + '</div>';
       }
 
-      function renderMap() {
-        if (!mapVisible) return;
+      function renderMap(){
         var view = lib.getMapView(state);
-        var cam = view.camera;
+        var plane = $('mapPlane');
+        var locById = {};
+        view.locations.forEach(function(l){ locById[l.id] = l; });
 
-        nodes.map.innerHTML = '';
-        nodes.map.style.transform = 'translate(' + cam.x + 'px,' + cam.y + 'px)';
-
+        var links = [];
         view.locations.forEach(function(loc){
-          var btn = document.createElement('button');
-          btn.className = 'node ' + loc.type + (loc.isCurrent ? ' current' : '') + (loc.reachable ? '' : ' locked');
-          btn.style.left = loc.x + 'px';
-          btn.style.top = loc.y + 'px';
-          btn.textContent = loc.name;
-          btn.dataset.locId = loc.id;
-          btn.title = loc.id + ' / danger ' + loc.danger;
-          nodes.map.appendChild(btn);
+          var full = state.world.map.locations.find(function(e){ return e.id === loc.id; });
+          (full.neighbors || []).forEach(function(nb){
+            if (loc.id > nb) return;
+            if (!locById[nb]) return;
+            var to = locById[nb];
+            var dx = to.x - loc.x;
+            var dy = to.y - loc.y;
+            var len = Math.sqrt(dx*dx + dy*dy);
+            var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+            links.push('<div class="map-link" style="left:' + loc.x + 'px;top:' + loc.y + 'px;width:' + len + 'px;transform:rotate(' + ang + 'deg);"></div>');
+          });
         });
+
+        var nodes = view.locations.map(function(loc){
+          return '<button class="node ' + loc.type + (loc.isCurrent ? ' current' : '') + (loc.reachable ? '' : ' locked') + '" data-loc="' + loc.id + '" style="left:' + loc.x + 'px;top:' + loc.y + 'px;" ' + (loc.reachable || loc.isCurrent ? '' : 'disabled') + '>' + loc.name + '</button>';
+        });
+
+        plane.innerHTML = links.join('') + nodes.join('');
+        plane.style.transform = 'translate3d(' + state.world.map.camera.x + 'px,' + state.world.map.camera.y + 'px,0)';
+
+        $('travelButtons').innerHTML = view.locations.filter(function(l){ return l.reachable && !l.isCurrent; }).map(function(l){
+          return '<button data-travel="' + l.id + '">' + l.name + '</button>';
+        }).join('') || '<span class="tiny">Tidak ada node tetangga yang bisa dituju.</span>';
       }
 
-      function render() {
-        nodes.mapWrap.style.display = mapVisible ? 'block' : 'none';
-        renderPanels();
-        renderStatus();
-        renderManualControls();
-        renderMap();
-        renderTerminal();
-      }
-
-      function runRound() {
+      function stepRound(){
         state = lib.runRound(state, rand);
-        appendLog(state.logs);
-        render();
+        appendLogs(state.logs);
+        renderAll();
       }
 
-      function runManual() {
-        var actorId = nodes.heroSelect.value;
-        var actionId = nodes.actionSelect.value;
-        if (!actorId || !actionId) return;
+      function auto3(){
+        state = lib.simulate(state, rand, 3);
+        appendLogs(state.logs);
+        renderAll();
+      }
 
-        var action = lib.buildManualAction(state, actorId, actionId);
-        if (!action) {
-          appendLog(['Aksi tidak valid.']);
-          render();
-          return;
-        }
+      function runSelectedAction(){
+        if (!selectedHeroId || !selectedAction) return;
+        var action = lib.buildManualAction(state, selectedHeroId, selectedAction);
+        if (!action) { appendLogs(['Aksi tidak valid untuk hero ini.']); renderAll(); return; }
 
         state = lib.execute(state, action, rand);
-        appendLog(['[manual] ' + actorId + ' => ' + actionId].concat(state.logs));
+        appendLogs(['[Manual] ' + selectedHeroId + ' => ' + selectedAction].concat(state.logs));
 
-        var enemyActor = lib.createTimeline(state, rand).find(function(id){
-          return state.enemies.some(function(e){ return e.id === id && e.alive; });
-        });
+        var enemyActor = lib.createTimeline(state, rand).find(function(id){ return state.enemies.some(function(e){ return e.id === id && e.alive; }); });
         if (enemyActor && !lib.battleFinished(state)) {
-          var enemyAction = lib.autoAction(state, enemyActor);
-          state = lib.execute(state, enemyAction, rand);
-          appendLog(state.logs);
+          state = lib.execute(state, lib.autoAction(state, enemyActor), rand);
+          appendLogs(state.logs);
         }
-
-        render();
+        renderAll();
       }
 
-      function runCommand() {
-        var cmd = nodes.cmdInput.value;
-        nodes.cmdInput.value = '';
-        state = lib.processTextCommand(state, cmd, rand);
-        appendLog(['> ' + cmd].concat(state.logs));
-        mapVisible = state.mode === 'map';
-        render();
-      }
-
-      document.getElementById('stepBtn').addEventListener('click', runRound);
-      document.getElementById('autoBtn').addEventListener('click', function(){
-        state = lib.simulate(state, rand, 3);
-        appendLog(['[auto x3]'].concat(state.logs));
-        render();
-      });
-
-      document.getElementById('mapBtn').addEventListener('click', function(){
-        mapVisible = !mapVisible;
-        state.mode = mapVisible ? 'map' : 'battle';
-        appendLog([mapVisible ? 'Map dibuka.' : 'Map ditutup.']);
-        render();
-      });
-
-      document.getElementById('resetBtn').addEventListener('click', function(){
+      function resetGame(){
         state = createInitialState();
-        mapVisible = false;
-        logBuffer = ['Battle + world direset.'];
-        render();
+        logs = ['Game direset.'];
+        selectedHeroId = 'hero-akari';
+        selectedAction = 'basic';
+        renderAll();
+      }
+
+      function travelToLocation(id){
+        state = lib.travelTo(state, id);
+        appendLogs(state.logs);
+        renderAll();
+      }
+
+      function renderAll(){ renderMain(); renderBattle(); renderParty(); if ($('frameSub').classList.contains('frame-active')) renderUnitSub(); if ($('frameMap').classList.contains('frame-active')) renderMap(); }
+
+      $('mainRoundBtn').addEventListener('click', stepRound);
+      $('mainAutoBtn').addEventListener('click', auto3);
+      $('mainResetBtn').addEventListener('click', resetGame);
+      $('toBattleBtn').addEventListener('click', function(){ openFrame('frameBattle'); renderBattle(); });
+      $('toMapBtn').addEventListener('click', function(){ openFrame('frameMap'); renderMap(); });
+      $('toPartyBtn').addEventListener('click', function(){ openFrame('frameParty'); renderParty(); });
+
+      $('backBattle').addEventListener('click', function(){ openFrame('frameMain'); });
+      $('backMap').addEventListener('click', function(){ openFrame('frameMain'); });
+      $('backParty').addEventListener('click', function(){ openFrame('frameMain'); });
+      $('backSub').addEventListener('click', function(){ openFrame('frameParty'); });
+
+      $('battleRoundBtn').addEventListener('click', stepRound);
+      $('battleAutoBtn').addEventListener('click', auto3);
+      $('battleResetBtn').addEventListener('click', resetGame);
+
+      $('heroTabs').addEventListener('click', function(ev){
+        var id = ev.target && ev.target.dataset ? ev.target.dataset.hero : '';
+        if (!id) return;
+        selectedHeroId = id;
+        selectedAction = 'basic';
+        renderBattle();
       });
 
-      document.getElementById('manualBtn').addEventListener('click', runManual);
-      document.getElementById('heroSelect').addEventListener('change', renderManualControls);
-      document.getElementById('cmdBtn').addEventListener('click', runCommand);
-      nodes.cmdInput.addEventListener('keydown', function(ev){ if (ev.key === 'Enter') runCommand(); });
+      $('actionGrid').addEventListener('click', function(ev){
+        var actionId = ev.target && ev.target.dataset ? ev.target.dataset.action : '';
+        if (!actionId) return;
+        selectedAction = actionId;
+        runSelectedAction();
+      });
 
-      nodes.map.addEventListener('click', function(ev){
+      $('partyGrid').addEventListener('click', function(ev){
+        var unitId = ev.target && ev.target.closest ? (ev.target.closest('[data-unit]') || {}).dataset.unit : '';
+        if (!unitId) return;
+        currentUnitId = unitId;
+        openFrame('frameSub');
+        renderUnitSub();
+      });
+
+      $('travelButtons').addEventListener('click', function(ev){
+        var id = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
+        if (!id) return;
+        travelToLocation(id);
+      });
+
+      $('mapPlane').addEventListener('click', function(ev){
         if (drag.moved) return;
-        var target = ev.target;
-        if (!target || !target.dataset || !target.dataset.locId) return;
-        state = lib.travelTo(state, target.dataset.locId);
-        appendLog(['[travel click] ' + target.dataset.locId].concat(state.logs));
-        render();
+        var id = ev.target && ev.target.dataset ? ev.target.dataset.loc : '';
+        if (!id) return;
+        travelToLocation(id);
       });
 
-      nodes.map.addEventListener('mousedown', function(ev){
-        drag.active = true;
-        drag.moved = false;
-        drag.x = ev.clientX;
-        drag.y = ev.clientY;
-        nodes.map.style.cursor = 'grabbing';
-      });
-
-      window.addEventListener('mouseup', function(){
-        drag.active = false;
-        nodes.map.style.cursor = 'grab';
-      });
-
-      window.addEventListener('mousemove', function(ev){
-        if (!drag.active || !mapVisible) return;
+      var mapWrap = $('mapWrap');
+      mapWrap.addEventListener('pointerdown', function(ev){ drag.active = true; drag.moved = false; drag.x = ev.clientX; drag.y = ev.clientY; mapWrap.setPointerCapture(ev.pointerId); });
+      mapWrap.addEventListener('pointermove', function(ev){
+        if (!drag.active) return;
         var dx = ev.clientX - drag.x;
         var dy = ev.clientY - drag.y;
         if (Math.abs(dx) + Math.abs(dy) > 2) drag.moved = true;
         drag.x = ev.clientX;
         drag.y = ev.clientY;
         state = lib.updateMapCamera(state, dx, dy);
-        renderMap();
+        if ($('frameMap').classList.contains('frame-active')) renderMap();
       });
+      mapWrap.addEventListener('pointerup', function(ev){ drag.active = false; mapWrap.releasePointerCapture(ev.pointerId); setTimeout(function(){ drag.moved = false; }, 0); });
+      mapWrap.addEventListener('pointercancel', function(ev){ drag.active = false; mapWrap.releasePointerCapture(ev.pointerId); drag.moved = false; });
 
-      render();
+      renderAll();
     </script>
   </body>
 </html>
