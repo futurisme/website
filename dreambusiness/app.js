@@ -13,8 +13,12 @@ import {
   investInCommunityPlan,
   investInCompanyPlan,
   requestAppStoreLicense,
+  runTicksBatched,
   simulateTick,
   transactShares,
+  withGameAction,
+  getCompanySelectOptions,
+  getTopCompaniesSnapshot,
 } from '/dreambusiness/dream-engine.bundle.js';
 
 const statsEl = document.getElementById('stats');
@@ -44,23 +48,14 @@ function setStatus(message, isError = false) {
 }
 
 function summarizeTopCompanies(state) {
-  return Object.values(state.companies)
-    .map((company) => ({
-      key: company.key,
-      name: company.name,
-      valuation: getCompanyValuation(company),
-      sharePrice: getSharePrice(company),
-      marketShare: company.marketShare,
-    }))
-    .sort((a, b) => b.valuation - a.valuation)
-    .slice(0, 6);
+  return getTopCompaniesSnapshot(state, getCompanyValuation, getSharePrice, 6);
 }
 
 function render() {
   if (!companySelect.options.length) {
-    companySelect.innerHTML = COMPANY_KEYS
-      .filter((key) => game.companies[key])
-      .map((key) => `<option value="${key}">${game.companies[key].name} (${key})</option>`)
+    companySelect.innerHTML = getCompanySelectOptions(game)
+      .filter((item) => COMPANY_KEYS.includes(item.key))
+      .map((item) => `<option value="${item.key}">${item.label}</option>`)
       .join('');
   }
 
@@ -83,7 +78,7 @@ function render() {
 }
 
 function runTick(n = 1) {
-  for (let i = 0; i < n; i += 1) game = simulateTick(game);
+  game = runTicksBatched(game, n, simulateTick);
   render();
 }
 
@@ -101,17 +96,31 @@ function handleTrade(mode) {
     setStatus(`Trade gagal: ${preview.reason ?? 'unknown'}`, true);
     return;
   }
-  game = transactShares(game, game.player.id, key, mode, amount, 'auto');
-  setStatus(`${mode === 'buy' ? 'Buy' : 'Sell'} ${key} berhasil. Gross ${formatMoneyCompact(preview.grossValue)}.`);
-  render();
+  withGameAction(
+    game,
+    (state) => transactShares(state, state.player.id, key, mode, amount, 'auto'),
+    (next) => {
+      game = next;
+      setStatus(`${mode === 'buy' ? 'Buy' : 'Sell'} ${key} berhasil. Gross ${formatMoneyCompact(preview.grossValue)}.`);
+      render();
+    },
+    () => setStatus('Trade tidak mengubah state game.', true)
+  );
 }
 
 function handleInvestCompanyPlan() {
   const key = selectedCompanyKey();
   const amount = Math.max(1, selectedTradeAmount());
-  game = investInCompanyPlan(game, game.player.id, key, amount);
-  setStatus(`Invest company plan ${key} sebesar ${formatMoneyCompact(amount)}.`);
-  render();
+  withGameAction(
+    game,
+    (state) => investInCompanyPlan(state, state.player.id, key, amount),
+    (next) => {
+      game = next;
+      setStatus(`Invest company plan ${key} sebesar ${formatMoneyCompact(amount)}.`);
+      render();
+    },
+    () => setStatus('Invest plan gagal (dana/validasi tidak memenuhi).', true)
+  );
 }
 
 function handleLicenseRequest() {
@@ -122,15 +131,22 @@ function handleLicenseRequest() {
     setStatus('Belum ada pasangan company game + app-store yang valid.', true);
     return;
   }
-  game = requestAppStoreLicense(
+  withGameAction(
     game,
-    game.player.id,
-    gameCompany.key,
-    appStoreCompany.key,
-    'license request from standalone dreambusiness'
+    (state) => requestAppStoreLicense(
+      state,
+      state.player.id,
+      gameCompany.key,
+      appStoreCompany.key,
+      'license request from standalone dreambusiness'
+    ),
+    (next) => {
+      game = next;
+      setStatus(`Request AppStore license: ${gameCompany.name} -> ${appStoreCompany.name}.`);
+      render();
+    },
+    () => setStatus('License request ditolak oleh rule engine.', true)
   );
-  setStatus(`Request AppStore license: ${gameCompany.name} -> ${appStoreCompany.name}.`);
-  render();
 }
 
 function handleCommunityPlanSeed() {

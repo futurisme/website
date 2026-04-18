@@ -3716,6 +3716,36 @@ function runNpcTurn(current) {
   });
   return resolveGovernance(next);
 }
+
+// library/fadhilweblib/fadhilwebgamelib/runtime-kit.ts
+function runTicksBatched(game, ticks, simulateTick2) {
+  let next = game;
+  const safeTicks = Number.isFinite(ticks) ? Math.max(0, Math.floor(ticks)) : 0;
+  for (let i = 0; i < safeTicks; i += 1) {
+    next = simulateTick2(next);
+  }
+  return next;
+}
+function getTopCompaniesSnapshot(game, getCompanyValuation2, getSharePrice2, limit = 6) {
+  return Object.values(game.companies).map((company) => ({
+    key: company.key,
+    name: company.name,
+    valuation: getCompanyValuation2(company),
+    sharePrice: getSharePrice2(company),
+    marketShare: company.marketShare
+  })).sort((a, b) => b.valuation - a.valuation).slice(0, Math.max(1, limit));
+}
+function getCompanySelectOptions(game) {
+  return Object.values(game.companies).map((company) => ({
+    key: company.key,
+    label: `${company.name} (${company.key})`
+  }));
+}
+function withGameAction(game, action, onSuccess, onNoop) {
+  const next = action(game);
+  if (next === game) return onNoop();
+  return onSuccess(next);
+}
 export {
   COMPANY_KEYS,
   DEFAULT_PROFILE_DRAFT,
@@ -3723,14 +3753,18 @@ export {
   createInitialGameState,
   formatDateFromDays,
   formatMoneyCompact,
+  getCompanySelectOptions,
   getCompanyValuation,
   getInvestorHoldingsValue,
   getInvestorWeeklyIncomeEstimate,
   getSharePrice,
+  getTopCompaniesSnapshot,
   getTradePreview,
   investInCommunityPlan,
   investInCompanyPlan,
   requestAppStoreLicense,
+  runTicksBatched,
   simulateTick,
-  transactShares
+  transactShares,
+  withGameAction
 };

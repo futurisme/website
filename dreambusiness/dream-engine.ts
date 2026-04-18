@@ -16,3 +16,10 @@ export {
   simulateTick,
   transactShares,
 } from '../mindmapmaker/src/features/gameplay/simulation-engine';
+
+export {
+  getCompanySelectOptions,
+  getTopCompaniesSnapshot,
+  runTicksBatched,
+  withGameAction,
+} from '../library/fadhilweblib/fadhilwebgamelib/runtime-kit';
