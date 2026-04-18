@@ -25,6 +25,12 @@
       }
     ],
     "paths": {
+      "@/games/dreambusiness": [
+        "./dreambusiness/games/dreambusiness"
+      ],
+      "@/games/dreambusiness/*": [
+        "./dreambusiness/games/dreambusiness/*"
+      ],
       "@/*": [
         "./src/*"
       ]
