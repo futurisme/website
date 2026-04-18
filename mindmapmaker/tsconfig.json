@@ -18,6 +18,9 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "jsx": "preserve",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "incremental": true,
     "plugins": [
       {
@@ -25,11 +28,17 @@
       }
     ],
     "paths": {
+      "react": [
+        "./node_modules/react"
+      ],
+      "react/*": [
+        "./node_modules/react/*"
+      ],
       "@/games/dreambusiness": [
-        "./dreambusiness/games/dreambusiness"
+        "../dreambusiness/games/dreambusiness"
       ],
       "@/games/dreambusiness/*": [
-        "./dreambusiness/games/dreambusiness/*"
+        "../dreambusiness/games/dreambusiness/*"
       ],
       "@/*": [
         "./src/*"

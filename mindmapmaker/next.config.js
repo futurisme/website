@@ -24,6 +24,7 @@ const nextConfig = {
   // Keep gzip enabled in-app as fallback; serve Brotli at CDN/reverse-proxy when available.
   compress: true,
   experimental: {
+    externalDir: true,
     optimizePackageImports: ['reactflow'],
   },
   env: {
