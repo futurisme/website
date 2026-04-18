@@ -6,25 +6,21 @@
     <title>DreamBusiness</title>
     <link rel="stylesheet" href="/dreambusiness/styles.css" />
   </head>
-  <body data-fwlb-theme="game">
+  <body data-fwlb-theme="utility">
     <main class="shell">
-      <header class="header">
-        <h1>DreamBusiness</h1>
-        <p>Standalone game page dengan mekanisme business simulator dari dream-engine.</p>
-        <nav class="frame-nav">
-          <button id="navMain">Mainframe</button>
-          <button id="navCompanies">Companies</button>
-          <button id="navBack">Back</button>
-        </nav>
-        <div class="actions">
-          <button id="tick1">Simulate 1 Tick</button>
-          <button id="tick25">Simulate 25 Tick</button>
-          <button id="auto">Start Auto</button>
-          <button id="reset">Reset</button>
-        </div>
-      </header>
-
       <section id="frameMain" class="frame frame-active">
+        <header class="header">
+          <h1>DreamBusiness</h1>
+          <p>Mainframe • business simulator dari dream-engine.</p>
+          <div class="actions">
+            <button id="tick1">Simulate 1 Tick</button>
+            <button id="tick25">Simulate 25 Tick</button>
+            <button id="auto">Start Auto</button>
+            <button id="reset">Reset</button>
+            <button id="toFullframe">Companies</button>
+          </div>
+        </header>
+
         <section class="stats" id="stats"></section>
         <section class="card controls">
           <h2>Interactive Command Deck</h2>
@@ -64,6 +60,7 @@
       </section>
 
       <section id="frameFull" class="frame">
+        <button id="backFromFull" class="frame-back" aria-label="Back to mainframe">↩</button>
         <article class="card fullframe">
           <h2>Companies Fullframe</h2>
           <p>Klik salah satu card company untuk masuk ke Subfullframe detail.</p>
@@ -72,6 +69,7 @@
       </section>
 
       <section id="frameSub" class="frame">
+        <button id="backFromSub" class="frame-back" aria-label="Back to fullframe">↩</button>
         <article class="card fullframe">
           <h2 id="companyDetailTitle">Company Subfullframe</h2>
           <div id="companyDetailBody" class="company-detail-body"></div>

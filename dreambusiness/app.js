@@ -34,9 +34,9 @@ const frameSub = document.getElementById('frameSub');
 const companyFrameList = document.getElementById('companyFrameList');
 const companyDetailTitle = document.getElementById('companyDetailTitle');
 const companyDetailBody = document.getElementById('companyDetailBody');
-const navMain = document.getElementById('navMain');
-const navCompanies = document.getElementById('navCompanies');
-const navBack = document.getElementById('navBack');
+const toFullframeBtn = document.getElementById('toFullframe');
+const backFromFullBtn = document.getElementById('backFromFull');
+const backFromSubBtn = document.getElementById('backFromSub');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
 let auto = false;
@@ -95,7 +95,6 @@ function renderFrameVisibility() {
   frameMain.classList.toggle('frame-active', frame === 'main');
   frameFull.classList.toggle('frame-active', frame === 'full');
   frameSub.classList.toggle('frame-active', frame === 'sub');
-  navBack.textContent = frame === 'sub' ? 'Back to Fullframe' : 'Back to Mainframe';
 }
 
 function renderCompanyFrames() {
@@ -237,12 +236,9 @@ document.getElementById('sellBtn').addEventListener('click', () => handleTrade('
 document.getElementById('investPlanBtn').addEventListener('click', handleInvestCompanyPlan);
 document.getElementById('licenseBtn').addEventListener('click', handleLicenseRequest);
 document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
-navMain.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
-navCompanies.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
-navBack.addEventListener('click', () => {
-  frame = frame === 'sub' ? 'full' : 'main';
-  renderFrameVisibility();
-});
+toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
+backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
+backFromSubBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 document.getElementById('reset').addEventListener('click', () => {
   game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
   auto = false;
