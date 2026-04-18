@@ -70,6 +70,13 @@ let rankingMode = 'companies';
 let previousSharePrices = {};
 let sliderMode = 'invest';
 const sliderPercentByMode = { invest: 25, sell: 25 };
+const RICHEST_ROWS_LIMIT = 76; // 75 NPC + 1 player
+const rankingCache = {
+  tick: -1,
+  companies: null,
+  richest: null,
+  products: null,
+};
 
 function isPlanOpenFunding(plan) {
   if (!plan || plan.isEstablished) return false;
@@ -441,7 +448,7 @@ function render() {
 
   updateSliderPreview();
   renderCompanyFrames();
-  renderRankingFrame();
+  if (frame === 'ranking') renderRankingFrame();
   renderNewsFrame();
   updateInvestmentActionState();
   renderFrameVisibility();
@@ -473,6 +480,16 @@ function renderCompanyFrames() {
 }
 
 function renderRankingFrame() {
+  if (rankingCache.tick !== game.tickCount) {
+    rankingCache.tick = game.tickCount;
+    rankingCache.companies = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 24)
+      .filter((row) => isCompanyVisibleInUi(row.key))
+      .slice(0, 12)
+      .map((row, index) => ({ ...row, rank: index + 1 }));
+    rankingCache.richest = buildRichestPeopleRows(game, getInvestorHoldingsValue, RICHEST_ROWS_LIMIT);
+    rankingCache.products = buildProductRankingRows(game, getCompanyValuation, 10);
+  }
+
   const renderRankingCards = (rows, formatter) => {
     rankingList.innerHTML = rows
       .map((row) => `
@@ -490,29 +507,23 @@ function renderRankingFrame() {
   };
 
   if (rankingMode === 'companies') {
-    const rows = buildTopCompanyRankingRows(game, getCompanyValuation, getSharePrice, 24)
-      .filter((row) => isCompanyVisibleInUi(row.key))
-      .slice(0, 12)
-      .map((row, index) => ({ ...row, rank: index + 1 }));
     renderRankingCards(
-      rows,
+      rankingCache.companies,
       (row) => `Valuation ${formatMoneyCompact(row.valuation)} • Share $${row.sharePrice.toFixed(2)} • MS ${row.marketShare.toFixed(1)}%`
     );
     return;
   }
 
   if (rankingMode === 'richest') {
-    const investors = buildRichestPeopleRows(game, getInvestorHoldingsValue, 10);
     renderRankingCards(
-      investors,
+      rankingCache.richest,
       (row) => `Net Worth ${formatMoneyCompact(row.total)} • Cash ${formatMoneyCompact(row.cash)} • Holdings ${formatMoneyCompact(row.holdings)}`
     );
     return;
   }
 
-  const productRows = buildProductRankingRows(game, getCompanyValuation, 10);
   renderRankingCards(
-    productRows,
+    rankingCache.products,
     (row) => `Product Score ${row.score.toFixed(1)} • Company ${escapeHtml(row.companyName ?? '-')} • Release ${row.releaseCount} • Reputation ${row.reputation.toFixed(1)}`
   );
 }
@@ -712,7 +723,7 @@ investSlider.addEventListener('input', () => {
 companySelect.addEventListener('change', updateSliderPreview);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
-toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderFrameVisibility(); });
+toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderRankingFrame(); renderFrameVisibility(); });
 toNewsBtn.addEventListener('click', () => { frame = 'news'; renderFrameVisibility(); });
 backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromRankingBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
