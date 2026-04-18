@@ -80,6 +80,7 @@
         <article class="card header">
           <h1>FadhilWebRPGLib JRPG Fullframe</h1>
           <p>Tanpa command input. Semua interaksi via tombol, fullframe, dan subfullframe ala DreamBusiness.</p>
+          <div id="runtimeStatus" class="tiny" style="margin-top:6px;">Status: inisialisasi...</div>
           <div class="actions">
             <button class="primary" id="mainRoundBtn">Mainkan Round</button>
             <button id="mainAutoBtn">Auto x3</button>
@@ -144,7 +145,7 @@
     <script src="./fadhilwebrpglib.js"></script>
     <script>
       var lib = window.fadhilwebrpglib;
-      var rand = lib.seededRandom(2026);
+      var rand = null;
       var selectedHeroId = 'hero-akari';
       var selectedAction = 'basic';
       var logs = ['UI Fullframe siap.'];
@@ -191,9 +192,11 @@
         });
       }
 
-      var state = createInitialState();
+      var state = null;
 
       function $(id){ return document.getElementById(id); }
+      function setRuntimeStatus(text, isError){ var el = $('runtimeStatus'); if (!el) return; el.textContent = 'Status: ' + text; el.style.color = isError ? '#fca5a5' : ''; }
+      function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); console.error(err); } }; }
       function allFrames(){ return ['frameMain','frameBattle','frameMap','frameParty','frameSub']; }
       function openFrame(id){ allFrames().forEach(function(fid){ $(fid).classList.toggle('frame-active', fid === id); }); if (id === 'frameMap') renderMap(); }
       function appendLogs(lines){ if (!lines) return; logs = logs.concat(lines).slice(-220); }
@@ -205,6 +208,7 @@
       }
 
       function renderMain(){
+        if (!state) return;
         var summary = lib.getBattleSummary(state);
         $('mainStats').innerHTML = [
           ['Mode', summary.mode], ['Lokasi', summary.location], ['Round', summary.cycle],
@@ -217,6 +221,7 @@
       }
 
       function renderBattle(){
+        if (!state) return;
         var aliveParty = state.party.filter(function(u){ return u.alive; });
         if (!aliveParty.some(function(u){ return u.id === selectedHeroId; })) selectedHeroId = (aliveParty[0] || {}).id || '';
 
@@ -236,12 +241,14 @@
       }
 
       function renderParty(){
+        if (!state) return;
         $('partyGrid').innerHTML = state.party.map(function(u){
           return '<button class="unit-card" data-unit="' + u.id + '"><strong>' + u.name + '</strong><small>Lv ' + u.level + ' · ' + u.role + '</small><small>HP ' + u.hp + '/' + u.maxHp + '</small></button>';
         }).join('');
       }
 
       function renderUnitSub(){
+        if (!state) return;
         var unit = state.party.concat(state.enemies).find(function(u){ return u.id === currentUnitId; });
         if (!unit) return;
         var status = (unit.status || []).map(function(s){ return s.type + ':' + s.turns; }).join(', ') || '-';
@@ -256,6 +263,7 @@
       }
 
       function renderMap(){
+        if (!state) return;
         var view = lib.getMapView(state);
         var plane = $('mapPlane');
         var locById = {};
@@ -289,18 +297,21 @@
       }
 
       function stepRound(){
+        if (!state) return;
         state = lib.runRound(state, rand);
         appendLogs(state.logs);
         renderAll();
       }
 
       function auto3(){
+        if (!state) return;
         state = lib.simulate(state, rand, 3);
         appendLogs(state.logs);
         renderAll();
       }
 
       function runSelectedAction(){
+        if (!state) return;
         if (!selectedHeroId || !selectedAction) return;
         var action = lib.buildManualAction(state, selectedHeroId, selectedAction);
         if (!action) { appendLogs(['Aksi tidak valid untuk hero ini.']); renderAll(); return; }
@@ -325,6 +336,7 @@
       }
 
       function travelToLocation(id){
+        if (!state) return;
         state = lib.travelTo(state, id);
         appendLogs(state.logs);
         renderAll();
@@ -332,61 +344,67 @@
 
       function renderAll(){ renderMain(); renderBattle(); renderParty(); if ($('frameSub').classList.contains('frame-active')) renderUnitSub(); if ($('frameMap').classList.contains('frame-active')) renderMap(); }
 
-      $('mainRoundBtn').addEventListener('click', stepRound);
-      $('mainAutoBtn').addEventListener('click', auto3);
-      $('mainResetBtn').addEventListener('click', resetGame);
-      $('toBattleBtn').addEventListener('click', function(){ openFrame('frameBattle'); renderBattle(); });
-      $('toMapBtn').addEventListener('click', function(){ openFrame('frameMap'); renderMap(); });
-      $('toPartyBtn').addEventListener('click', function(){ openFrame('frameParty'); renderParty(); });
+      function bindTap(id, handler) {
+        var el = $(id);
+        el.addEventListener('click', safe(handler), { passive: true });
+        el.addEventListener('touchend', safe(function(ev){ ev.preventDefault(); handler(ev); }), { passive: false });
+      }
 
-      $('backBattle').addEventListener('click', function(){ openFrame('frameMain'); });
-      $('backMap').addEventListener('click', function(){ openFrame('frameMain'); });
-      $('backParty').addEventListener('click', function(){ openFrame('frameMain'); });
-      $('backSub').addEventListener('click', function(){ openFrame('frameParty'); });
+      bindTap('mainRoundBtn', stepRound);
+      bindTap('mainAutoBtn', auto3);
+      bindTap('mainResetBtn', resetGame);
+      bindTap('toBattleBtn', function(){ openFrame('frameBattle'); renderBattle(); });
+      bindTap('toMapBtn', function(){ openFrame('frameMap'); renderMap(); });
+      bindTap('toPartyBtn', function(){ openFrame('frameParty'); renderParty(); });
 
-      $('battleRoundBtn').addEventListener('click', stepRound);
-      $('battleAutoBtn').addEventListener('click', auto3);
-      $('battleResetBtn').addEventListener('click', resetGame);
+      bindTap('backBattle', function(){ openFrame('frameMain'); });
+      bindTap('backMap', function(){ openFrame('frameMain'); });
+      bindTap('backParty', function(){ openFrame('frameMain'); });
+      bindTap('backSub', function(){ openFrame('frameParty'); });
 
-      $('heroTabs').addEventListener('click', function(ev){
+      bindTap('battleRoundBtn', stepRound);
+      bindTap('battleAutoBtn', auto3);
+      bindTap('battleResetBtn', resetGame);
+
+      $('heroTabs').addEventListener('click', safe(function(ev){
         var id = ev.target && ev.target.dataset ? ev.target.dataset.hero : '';
         if (!id) return;
         selectedHeroId = id;
         selectedAction = 'basic';
         renderBattle();
-      });
+      }));
 
-      $('actionGrid').addEventListener('click', function(ev){
+      $('actionGrid').addEventListener('click', safe(function(ev){
         var actionId = ev.target && ev.target.dataset ? ev.target.dataset.action : '';
         if (!actionId) return;
         selectedAction = actionId;
         runSelectedAction();
-      });
+      }));
 
-      $('partyGrid').addEventListener('click', function(ev){
+      $('partyGrid').addEventListener('click', safe(function(ev){
         var unitId = ev.target && ev.target.closest ? (ev.target.closest('[data-unit]') || {}).dataset.unit : '';
         if (!unitId) return;
         currentUnitId = unitId;
         openFrame('frameSub');
         renderUnitSub();
-      });
+      }));
 
-      $('travelButtons').addEventListener('click', function(ev){
+      $('travelButtons').addEventListener('click', safe(function(ev){
         var id = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
         if (!id) return;
         travelToLocation(id);
-      });
+      }));
 
-      $('mapPlane').addEventListener('click', function(ev){
+      $('mapPlane').addEventListener('click', safe(function(ev){
         if (drag.moved) return;
         var id = ev.target && ev.target.dataset ? ev.target.dataset.loc : '';
         if (!id) return;
         travelToLocation(id);
-      });
+      }));
 
       var mapWrap = $('mapWrap');
-      mapWrap.addEventListener('pointerdown', function(ev){ drag.active = true; drag.moved = false; drag.x = ev.clientX; drag.y = ev.clientY; mapWrap.setPointerCapture(ev.pointerId); });
-      mapWrap.addEventListener('pointermove', function(ev){
+      mapWrap.addEventListener('pointerdown', safe(function(ev){ drag.active = true; drag.moved = false; drag.x = ev.clientX; drag.y = ev.clientY; if (mapWrap.setPointerCapture) mapWrap.setPointerCapture(ev.pointerId); }));
+      mapWrap.addEventListener('pointermove', safe(function(ev){
         if (!drag.active) return;
         var dx = ev.clientX - drag.x;
         var dy = ev.clientY - drag.y;
@@ -395,11 +413,18 @@
         drag.y = ev.clientY;
         state = lib.updateMapCamera(state, dx, dy);
         if ($('frameMap').classList.contains('frame-active')) renderMap();
-      });
-      mapWrap.addEventListener('pointerup', function(ev){ drag.active = false; mapWrap.releasePointerCapture(ev.pointerId); setTimeout(function(){ drag.moved = false; }, 0); });
-      mapWrap.addEventListener('pointercancel', function(ev){ drag.active = false; mapWrap.releasePointerCapture(ev.pointerId); drag.moved = false; });
+      }));
+      mapWrap.addEventListener('pointerup', safe(function(ev){ drag.active = false; if (mapWrap.releasePointerCapture) { try { mapWrap.releasePointerCapture(ev.pointerId); } catch (_e) {} } setTimeout(function(){ drag.moved = false; }, 0); }));
+      mapWrap.addEventListener('pointercancel', safe(function(ev){ drag.active = false; if (mapWrap.releasePointerCapture) { try { mapWrap.releasePointerCapture(ev.pointerId); } catch (_e) {} } drag.moved = false; }));
 
-      renderAll();
+      if (!lib) {
+        setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
+      } else {
+        rand = lib.seededRandom(2026);
+        state = createInitialState();
+        setRuntimeStatus('aktif', false);
+        renderAll();
+      }
     </script>
   </body>
 </html>
