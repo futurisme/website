@@ -135,6 +135,7 @@ const OP_PRIORITY: Record<OpToken, number> = {
 };
 
 const expressionCache = new Map<string, RpnToken[]>();
+const programCache = new Map<string, Array<{ key: string; expression: string }>>();
 
 function tokenizeExpression(input: string) {
   const tokens: Token[] = [];
@@ -312,7 +313,30 @@ export function evaluateGameMathExpression(expression: string, scope: MathScope)
   return evalRpn(rpn, scope);
 }
 
+export function evaluateGameMathProgram(program: string, scope: MathScope) {
+  const cached = programCache.get(program);
+  const instructions = cached ?? program
+    .split(';')
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .map((segment) => {
+      const index = segment.indexOf('=');
+      if (index <= 0) throw new Error(`Invalid math program segment "${segment}"`);
+      return {
+        key: segment.slice(0, index).trim(),
+        expression: segment.slice(index + 1).trim(),
+      };
+    });
+  if (!cached) programCache.set(program, instructions);
+  const nextScope: MathScope = { ...scope };
+  instructions.forEach((instruction) => {
+    nextScope[instruction.key] = evaluateGameMathExpression(instruction.expression, nextScope);
+  });
+  return nextScope;
+}
+
 export const GAME_MATH_EXPRESSIONS = Object.freeze({
   releasedProductScore: 'max(1, cpuScore*scoreInnovationWeight + researchPerDay*scoreResearchWeight + releaseRating*scoreReleaseRatingWeight + fabricationCount*scoreFabricationWeight + marketingCount*scoreMarketingWeight + priceDiscipline)',
   releaseActionScore: 'urgentCashPressure*7.6 + cpuDelta*0.042 + staleness*1.65 + releaseCadencePressure*2.1 + normalCadenceBoost*1.6 + upgradeMomentumPressure*1.7 + marketNeed*1.4 + reputationNeed*0.8 + researchOverflow*0.32 + npcIntelligence*0.44 + launchRevenueSignal*0.9 + releaseRating*0.035 + crisisBoost - qualityGatePenalty - staleSpecPenalty - repeatedSpecPenalty',
+  releaseSignalProgram: 'marketNeed=clamp((18-marketShare)/18,0,1.2);reputationNeed=clamp((50-reputation)/50,0,1);staleness=clamp(daysSinceRelease/90,0,2.2);launchRevenueSignal=log10(1+max(0,launchRevenue));qualitySignal=releaseRating+cpuDelta*0.18+researchPerDay*1.4',
 });

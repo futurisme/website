@@ -1,5 +1,5 @@
 import { generateCatalogCompanyName } from '@/features/cpu-foundry/company-name-catalog';
-import { GAME_MATH_EXPRESSIONS, GAME_RELEASE_SYNTAX_PROFILE, evaluateGameMathExpression } from './custom-syntax';
+import { GAME_MATH_EXPRESSIONS, GAME_RELEASE_SYNTAX_PROFILE, evaluateGameMathExpression, evaluateGameMathProgram } from './custom-syntax';
 
 export type UpgradeKey = 'architecture' | 'lithography' | 'clockSpeed' | 'coreDesign' | 'cacheStack' | 'powerEfficiency';
 export type TeamKey = 'researchers' | 'marketing' | 'fabrication';
@@ -3963,10 +3963,7 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
     releaseDistance,
     gameExecutiveManaged,
   } = pressure;
-  const marketNeed = clamp((18 - company.marketShare) / 18, 0, 1.2);
-  const reputationNeed = clamp((50 - company.reputation) / 50, 0, 1);
   const priceIndex = chooseNpcReleasePriceIndex(npc, company, cpuDelta, cashEmergency);
-  const staleness = clamp(daysSinceRelease / 90, 0, 2.2);
   const inNormalCadenceMode = !cashMeltdown;
   if (company.field === 'game' && !gameExecutiveManaged) return null;
   if (company.field === 'game' && inNormalCadenceMode && daysSinceRelease < 90) return null;
@@ -3989,10 +3986,22 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
   const pricePreset = PRICE_PRESETS[priceIndex];
   const releaseRating = evaluateCpuReleaseRating(game, company, priceIndex, currentCpuScore);
   const launchRevenue = calculateLaunchRevenue(currentCpuScore, company.teams, company.marketShare, company.reputation, pricePreset.factor) * releaseRating.salesMultiplier;
-  const launchRevenueSignal = Math.log10(1 + Math.max(0, launchRevenue));
+  const releaseSignals = evaluateGameMathProgram(GAME_MATH_EXPRESSIONS.releaseSignalProgram, {
+    marketShare: company.marketShare,
+    reputation: company.reputation,
+    daysSinceRelease,
+    launchRevenue,
+    releaseRating: releaseRating.rating,
+    cpuDelta,
+    researchPerDay: company.researchPerDay,
+  });
+  const marketNeed = releaseSignals.marketNeed ?? 0;
+  const reputationNeed = releaseSignals.reputationNeed ?? 0;
+  const staleness = releaseSignals.staleness ?? 0;
+  const launchRevenueSignal = releaseSignals.launchRevenueSignal ?? 0;
   const releaseCadencePressure = clamp((daysSinceRelease - releaseWindow) / Math.max(8, releaseWindow), 0, 2.4);
   const upgradeMomentumPressure = clamp((releaseCadenceTarget - daysSinceRelease) / Math.max(6, releaseCadenceTarget), 0, 1.2) * (cpuDelta > 6 ? 1 : 0);
-  const qualitySignal = releaseRating.rating + cpuDelta * 0.18 + company.researchPerDay * 1.4;
+  const qualitySignal = releaseSignals.qualitySignal ?? 0;
   const qualityGatePenalty = !canForceRelease && qualitySignal < GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase
     ? (GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase - qualitySignal) * GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyFactor
     : 0;
