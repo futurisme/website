@@ -112,6 +112,13 @@ body {
   gap: 6px;
 }
 
+.idea-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .folder-title,
 .idea-title {
   margin: 0;
@@ -125,6 +132,22 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.idea-progress {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #ffffffb8;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  background: transparent;
+  box-shadow: 0 0 0 1px #00000048 inset;
 }
 
 .folder-tools,
@@ -344,6 +367,28 @@ body {
   background: #041020;
   color: #eaf8ff;
   font-size: 16px;
+}
+
+.modal .slider-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.modal input[type='range'] {
+  width: 100%;
+  padding: 0;
+  accent-color: #1fdfff;
+  background: transparent;
+}
+
+.modal .slider-value {
+  justify-self: start;
+  border: 1px solid #ffffffb8;
+  border-radius: 999px;
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 13px;
+  line-height: 1.2;
 }
 
 .modal .actions { display: flex; gap: 10px; flex-wrap: wrap; }

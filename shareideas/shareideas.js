@@ -58,6 +58,12 @@ function sanitizeAppTitle(input) {
   return trimmed || 'ShareIdeas';
 }
 
+function sanitizeProgress(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+}
+
 function reorderArray(values, fromIndex, toIndex) {
   if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= values.length || toIndex >= values.length) {
     return values;
@@ -91,6 +97,7 @@ function sanitizeDb(input) {
             id: typeof card.id === 'string' && card.id.trim() ? card.id.trim().slice(0, 96) : `card-${folderId}-${cardIndex + 1}`,
             title,
             description: typeof card.description === 'string' ? card.description.trim().slice(0, 6000) : '',
+            progress: sanitizeProgress(card.progress),
           };
         })
         .filter(Boolean);
@@ -592,6 +599,7 @@ function renderBoard() {
       const cardFrag = itemTemplate.content.cloneNode(true);
       const cardRoot = cardFrag.querySelector('.idea-item');
       const cardTitle = cardFrag.querySelector('.idea-title');
+      const cardProgress = cardFrag.querySelector('.idea-progress');
       const cardDesc = cardFrag.querySelector('.idea-description');
       const cardEdit = cardFrag.querySelector('.item-edit');
       const cardToggle = cardFrag.querySelector('.detail-toggle');
@@ -611,6 +619,7 @@ function renderBoard() {
       });
 
       cardTitle.textContent = card.title;
+      cardProgress.textContent = `${sanitizeProgress(card.progress)}%`;
       cardDesc.textContent = card.description || 'Belum ada deskripsi.';
       cardToggle.textContent = itemCollapsed ? '▼ Expand' : '▲ Collapse';
 
@@ -692,6 +701,12 @@ function openAddCardModal() {
     <h3>Add Card</h3>
     ${folders.length ? `<label>Folder tujuan<select id="new-card-folder">${options}</select></label>` : '<p>Buat folder dulu sebelum menambah card.</p>'}
     <label>Judul card<input id="new-card-title" type="text" placeholder="Contoh: Sistem Diplomasi" /></label>
+    <label>Status persentase
+      <div class="slider-wrap">
+        <input id="new-card-progress" type="range" min="0" max="100" step="1" value="0" />
+        <span class="slider-value" id="new-card-progress-value">0%</span>
+      </div>
+    </label>
     <div class="actions">
       <button type="button" id="save-new-card" ${folders.length ? '' : 'disabled'}>Simpan</button>
       <button type="button" id="back-to-chooser">Kembali</button>
@@ -700,18 +715,26 @@ function openAddCardModal() {
   `);
 
   const saveBtn = document.getElementById('save-new-card');
+  const progressInput = document.getElementById('new-card-progress');
+  const progressValue = document.getElementById('new-card-progress-value');
+  progressInput?.addEventListener('input', () => {
+    const value = sanitizeProgress(progressInput.value);
+    progressValue.textContent = `${value}%`;
+  });
+
   if (saveBtn) {
     saveBtn.addEventListener('click', () => {
       const activeFolders = getActiveFolders();
       const folderId = document.getElementById('new-card-folder')?.value || activeFolders[0]?.id;
       const title = document.getElementById('new-card-title').value.trim().slice(0, 120);
+      const progress = sanitizeProgress(document.getElementById('new-card-progress')?.value ?? 0);
       if (!folderId || !title) return;
 
       const folder = activeFolders.find((entry) => entry.id === folderId);
       if (!folder) return;
 
       const cardId = randomId('card');
-      folder.cards.push({ id: cardId, title, description: '' });
+      folder.cards.push({ id: cardId, title, description: '', progress });
       state.collapsedItems[cardId] = true;
       closeModal();
       render();
@@ -774,6 +797,12 @@ function openEditCard(folderId, cardId) {
     <h3>Edit Card</h3>
     <label>Judul card<input id="edit-card-title" type="text" value="${card.title.replaceAll('"', '&quot;')}" /></label>
     <label>Deskripsi card<textarea id="edit-card-description" rows="8">${card.description}</textarea></label>
+    <label>Status persentase
+      <div class="slider-wrap">
+        <input id="edit-card-progress" type="range" min="0" max="100" step="1" value="${sanitizeProgress(card.progress)}" />
+        <span class="slider-value" id="edit-card-progress-value">${sanitizeProgress(card.progress)}%</span>
+      </div>
+    </label>
     <div class="actions">
       <button type="button" id="save-card-edit">Simpan</button>
       <button type="button" id="delete-card">Delete</button>
@@ -781,12 +810,20 @@ function openEditCard(folderId, cardId) {
     </div>
   `);
 
+  const editProgressInput = document.getElementById('edit-card-progress');
+  const editProgressValue = document.getElementById('edit-card-progress-value');
+  editProgressInput?.addEventListener('input', () => {
+    const value = sanitizeProgress(editProgressInput.value);
+    editProgressValue.textContent = `${value}%`;
+  });
+
   document.getElementById('save-card-edit').addEventListener('click', () => {
     const nextTitle = document.getElementById('edit-card-title').value.trim().slice(0, 120);
     if (!nextTitle) return;
 
     card.title = nextTitle;
     card.description = document.getElementById('edit-card-description').value.trim().slice(0, 6000);
+    card.progress = sanitizeProgress(document.getElementById('edit-card-progress')?.value ?? 0);
 
     closeModal();
     render();
