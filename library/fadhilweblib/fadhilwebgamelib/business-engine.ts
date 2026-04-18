@@ -1,4 +1,5 @@
 import { generateCatalogCompanyName } from '@/features/cpu-foundry/company-name-catalog';
+import { GAME_RELEASE_SYNTAX_PROFILE } from './custom-syntax';
 
 export type UpgradeKey = 'architecture' | 'lithography' | 'clockSpeed' | 'coreDesign' | 'cacheStack' | 'powerEfficiency';
 export type TeamKey = 'researchers' | 'marketing' | 'fabrication';
@@ -571,11 +572,11 @@ function createProductName(company: CompanyState, releaseNumber: number, quality
     .split('')
     .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   const variantChance = variantSeed % 100;
-  const shouldAddVariant = qualitySignal >= 72
-    ? variantChance < 32
-    : qualitySignal >= 56
-      ? variantChance < 20
-      : variantChance < 10;
+  const shouldAddVariant = qualitySignal >= GAME_RELEASE_SYNTAX_PROFILE.qualityVariantHighGate
+    ? variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceHigh
+    : qualitySignal >= GAME_RELEASE_SYNTAX_PROFILE.qualityVariantMidGate
+      ? variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceMid
+      : variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceLow;
   if (!shouldAddVariant) return baseName;
   return `${baseName} ${variantTokens[variantSeed % variantTokens.length]}`;
 }
@@ -586,8 +587,10 @@ function computeReleasedProductScore(
   releaseRating: { rating: number },
   priceIndex: number
 ) {
-  const innovationSignal = cpuScore * 0.52 + (company.researchPerDay * 18);
-  const executionSignal = releaseRating.rating * 28 + company.teams.fabrication.count * 12 + company.teams.marketing.count * 9;
+  const innovationSignal = cpuScore * GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight + (company.researchPerDay * GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight);
+  const executionSignal = releaseRating.rating * GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight
+    + company.teams.fabrication.count * GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight
+    + company.teams.marketing.count * GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight;
   const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
   return Math.max(1, innovationSignal + executionSignal + priceDiscipline);
 }
@@ -3982,8 +3985,14 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
   const releaseCadencePressure = clamp((daysSinceRelease - releaseWindow) / Math.max(8, releaseWindow), 0, 2.4);
   const upgradeMomentumPressure = clamp((releaseCadenceTarget - daysSinceRelease) / Math.max(6, releaseCadenceTarget), 0, 1.2) * (cpuDelta > 6 ? 1 : 0);
   const qualitySignal = releaseRating.rating + cpuDelta * 0.18 + company.researchPerDay * 1.4;
-  const qualityGatePenalty = !canForceRelease && qualitySignal < 58 ? (58 - qualitySignal) * 0.52 : 0;
-  const staleSpecPenalty = !canForceRelease && daysSinceRelease < 24 && cpuDelta < 6 ? 3.2 : 0;
+  const qualityGatePenalty = !canForceRelease && qualitySignal < GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase
+    ? (GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase - qualitySignal) * GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyFactor
+    : 0;
+  const staleSpecPenalty = !canForceRelease
+    && daysSinceRelease < GAME_RELEASE_SYNTAX_PROFILE.staleDaysThreshold
+    && cpuDelta < GAME_RELEASE_SYNTAX_PROFILE.staleDeltaThreshold
+    ? GAME_RELEASE_SYNTAX_PROFILE.stalePenalty
+    : 0;
   const urgentCashPressure = Math.max(cashEmergency, cashReserveGap * 0.9);
   const crisisBoost = canForceRelease ? 9 + Math.max(0, 1.6 - company.cash) * 0.7 : 0;
   const normalCadenceBoost = inNormalCadenceMode ? clamp((daysSinceRelease - 28) / 32, 0, 1.8) : 0;

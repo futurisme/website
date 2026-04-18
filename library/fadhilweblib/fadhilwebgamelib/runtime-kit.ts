@@ -1,4 +1,5 @@
 import type { CompanyKey, GameState } from './business-engine';
+import { GAME_RELEASE_SYNTAX_PROFILE } from './custom-syntax';
 
 export type CompanySnapshot = {
   key: CompanyKey;
@@ -117,8 +118,8 @@ export function buildProductRankingRows(
           getCompanyValuation(company) * 0.25
           + company.marketShare * 20
           + company.reputation * 8
-          + company.releaseCount * 40
-          + company.researchPerDay * 30
+          + company.releaseCount * (GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight + 12)
+          + company.researchPerDay * GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight
         );
       return {
         rank: 0,
