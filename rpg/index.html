@@ -3,76 +3,332 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fadhil Web JRPG Lite</title>
+    <title>Fadhil Web JRPG 2026</title>
     <style>
-      body { font-family: system-ui, sans-serif; background:#111827; color:#f9fafb; margin:0; padding:24px; }
-      .card { max-width:900px; margin:auto; background:#1f2937; border-radius:16px; padding:20px; }
-      .row { display:flex; gap:16px; flex-wrap:wrap; }
-      .panel { flex:1 1 260px; background:#111827; border-radius:12px; padding:12px; }
-      button { background:#22c55e; border:0; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; }
-      .log { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-line; font-size: 13px; opacity:.9; }
+      :root {
+        color-scheme: dark;
+        --bg: #04070f;
+        --surface: #121827;
+        --surface-soft: #1d2436;
+        --accent: #7c3aed;
+        --good: #22c55e;
+        --warn: #f59e0b;
+        --danger: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+        background: radial-gradient(circle at top, #1b2445 0%, var(--bg) 50%);
+        color: #edf1ff;
+      }
+      .shell { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; gap: 14px; }
+      .card { background: linear-gradient(160deg, #11172a, var(--surface)); border: 1px solid #2a3552; border-radius: 16px; padding: 14px; box-shadow: 0 14px 42px rgba(0,0,0,0.35); }
+      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .title { margin: 0; font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
+      .desc { margin: 0; opacity: 0.82; font-size: 0.95rem; }
+      .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+      .panel { grid-column: span 6; background: var(--surface-soft); border-radius: 12px; padding: 12px; }
+      .panel h2 { margin: 0 0 10px; font-size: 1rem; }
+      .unit { padding: 10px; background: #11182a; border: 1px solid #303e66; border-radius: 10px; margin-bottom: 8px; }
+      .unit.dead { opacity: 0.45; filter: grayscale(0.6); }
+      .unit strong { display: block; margin-bottom: 4px; }
+      .meter { height: 8px; border-radius: 20px; background: #0a0f1c; overflow: hidden; margin: 5px 0; }
+      .meter > span { height: 100%; display: block; }
+      .hp { background: linear-gradient(90deg, #16a34a, #86efac); }
+      .mp { background: linear-gradient(90deg, #2563eb, #93c5fd); }
+      .meta { font-size: 0.83rem; opacity: 0.9; display: flex; justify-content: space-between; }
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      button, select {
+        border: 1px solid #3d4a73;
+        background: #1a2440;
+        color: #f5f7ff;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 650;
+      }
+      button:hover { background: #243057; cursor: pointer; }
+      button.primary { background: linear-gradient(90deg, #6d28d9, #2563eb); border-color: transparent; }
+      button.auto { background: linear-gradient(90deg, #059669, #2563eb); border-color: transparent; }
+      .timeline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+      .chip { background: #0f1527; border: 1px solid #2f3a5a; border-radius: 999px; font-size: 0.78rem; padding: 4px 10px; }
+      .hud { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 8px; }
+      .stat { background: #0f1527; border: 1px solid #2d3655; border-radius: 10px; padding: 8px; }
+      .stat label { font-size: 0.74rem; opacity: 0.8; display: block; }
+      .stat strong { font-size: 1rem; }
+      .log {
+        background: #090f1f;
+        border: 1px solid #2a3552;
+        border-radius: 12px;
+        min-height: 210px;
+        max-height: 290px;
+        overflow: auto;
+        padding: 10px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+      .foot { font-size: 0.75rem; opacity: 0.75; }
+      @media (max-width: 900px) { .panel { grid-column: span 12; } .hud { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
     </style>
   </head>
   <body>
-    <div class="card">
-      <h1>Japanese RPG Super Ringan</h1>
-      <p>Semua sistem battle ditangani oleh <strong>fadhilwebrpglib</strong> tanpa library eksternal.</p>
-      <button id="turn">Jalankan 1 Turn</button>
-      <div class="row" style="margin-top:14px;">
-        <section class="panel"><h3>Party</h3><div id="party"></div></section>
-        <section class="panel"><h3>Enemy</h3><div id="enemy"></div></section>
+    <div class="shell">
+      <div class="card header">
+        <div>
+          <h1 class="title">Fadhil Web JRPG Core (2026 Lite Complex)</h1>
+          <p class="desc">Battle loop, timeline, limit, status, AI, item, dan auto-sim ditenagai penuh oleh <b>fadhilwebrpglib</b>.</p>
+        </div>
+        <div class="actions">
+          <button class="primary" id="stepBtn">Mainkan 1 Round</button>
+          <button id="autoBtn" class="auto">Auto x8</button>
+          <button id="resetBtn">Reset Battle</button>
+          <select id="heroSelect"></select>
+          <select id="actionSelect"></select>
+          <button id="manualBtn">Jalankan Aksi Hero</button>
+        </div>
       </div>
-      <h3>Log</h3>
-      <div id="log" class="log"></div>
+
+      <div class="card hud" id="hud"></div>
+
+      <div class="grid">
+        <section class="panel" aria-label="party panel">
+          <h2>Party</h2>
+          <div id="party"></div>
+        </section>
+        <section class="panel" aria-label="enemy panel">
+          <h2>Enemy Squad</h2>
+          <div id="enemies"></div>
+        </section>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0;">Timeline Inisiatif</h2>
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 8px;">Combat Log</h2>
+        <div class="log" id="log"></div>
+      </div>
+      <div class="foot">Optimized: stateless render + mekanik deterministic seeded RNG untuk benchmark ringan.</div>
     </div>
+
     <script src="./fadhilwebrpglib.js"></script>
     <script>
-      const party = [
-        { id:'hero-akari',name:'Akari Ronin',level:8,maxHp:188,hp:188,maxMp:58,mp:58,attack:36,defense:24,agility:29,spirit:21,element:'wind',alive:true,skills:[{id:'sakura-edge',name:'Sakura Edge',costMp:7,power:24,element:'wind',variance:0.14}] },
-        { id:'hero-ren',name:'Ren Onmyoji',level:8,maxHp:156,hp:156,maxMp:82,mp:82,attack:28,defense:20,agility:23,spirit:34,element:'water',alive:true,skills:[{id:'aqua-noctis',name:'Aqua Noctis',costMp:9,power:30,element:'water',variance:0.12}] }
-      ];
-      const enemies = [
-        { id:'enemy-oni',name:'Oni Vanguard',level:8,maxHp:212,hp:212,maxMp:40,mp:40,attack:34,defense:30,agility:16,spirit:18,element:'earth',alive:true,skills:[{id:'basalt-crash',name:'Basalt Crash',costMp:6,power:22,element:'earth',variance:0.1}] },
-        { id:'enemy-yoru',name:'Yoru Specter',level:8,maxHp:148,hp:148,maxMp:78,mp:78,attack:30,defense:18,agility:32,spirit:33,element:'shadow',alive:true,skills:[{id:'abyss-lance',name:'Abyss Lance',costMp:10,power:35,element:'shadow',variance:0.16}] }
+      var lib = window.fadhilwebrpglib;
+      var rand = lib.seededRandom(2026);
+      var autoTimer = null;
+
+      var partyTemplate = [
+        { id:'hero-akari', name:'Akari Ronin', level:12, maxHp:290, hp:290, maxMp:88, mp:88, attack:52, defense:30, agility:35, spirit:24, element:'wind', alive:true,
+          skills:[
+            { id:'sakura-edge', name:'Sakura Edge', costMp:9, power:30, element:'wind', variance:0.14, addStatus:'slow' },
+            { id:'zen-limit', name:'Zen Limit Blade', costMp:14, power:66, element:'light', variance:0.1, limitCost:60 }
+          ] },
+        { id:'hero-ren', name:'Ren Onmyoji', level:12, maxHp:238, hp:238, maxMp:132, mp:132, attack:40, defense:26, agility:29, spirit:44, element:'water', alive:true,
+          skills:[
+            { id:'aqua-noctis', name:'Aqua Noctis', costMp:12, power:40, element:'water', variance:0.12, addStatus:'poison' },
+            { id:'tidal-prayer', name:'Tidal Prayer', costMp:16, power:0, element:'water', variance:0, target:'ally', healScale:3.1 }
+          ] },
+        { id:'hero-mei', name:'Mei Gearsmith', level:12, maxHp:260, hp:260, maxMp:74, mp:74, attack:47, defense:33, agility:31, spirit:30, element:'fire', alive:true,
+          skills:[
+            { id:'gear-burst', name:'Gear Burst', costMp:8, power:28, element:'fire', variance:0.18, addStatus:'stun' },
+            { id:'omega-cascade', name:'Omega Cascade', costMp:16, power:52, element:'fire', variance:0.16, limitCost:70 }
+          ] }
       ];
 
-      const rand = window.fadhilwebrpglib.seededRandom(42);
-      let state = window.fadhilwebrpglib.createState(party, enemies);
-      const partyNode = document.getElementById('party');
-      const enemyNode = document.getElementById('enemy');
-      const logNode = document.getElementById('log');
+      var enemyTemplate = [
+        { id:'enemy-oni', name:'Oni Vanguard', level:12, maxHp:336, hp:336, maxMp:82, mp:82, attack:48, defense:38, agility:20, spirit:24, element:'earth', alive:true,
+          skills:[{ id:'basalt-crash', name:'Basalt Crash', costMp:8, power:34, element:'earth', variance:0.1 }] },
+        { id:'enemy-yoru', name:'Yoru Specter', level:12, maxHp:224, hp:224, maxMp:126, mp:126, attack:42, defense:24, agility:41, spirit:41, element:'shadow', alive:true,
+          skills:[{ id:'abyss-lance', name:'Abyss Lance', costMp:12, power:45, element:'shadow', variance:0.15, addStatus:'poison' }] },
+        { id:'enemy-cleric', name:'Void Cleric', level:12, maxHp:270, hp:270, maxMp:140, mp:140, attack:36, defense:30, agility:27, spirit:45, element:'light', alive:true,
+          skills:[
+            { id:'dusk-ray', name:'Dusk Ray', costMp:11, power:33, element:'light', variance:0.12 },
+            { id:'night-rite', name:'Night Rite', costMp:15, power:0, element:'light', variance:0, target:'ally', healScale:2.6 }
+          ] }
+      ];
 
-      function renderList(root, units){
-        root.innerHTML = units.map(u => `${u.name} HP ${u.hp}/${u.maxHp} | MP ${u.mp}/${u.maxMp} ${u.alive ? '' : ' (KO)'}`).join('<br/>');
+      function createInitialState(){
+        return lib.createState(partyTemplate, enemyTemplate, {
+          inventory: [
+            { id:'ether-mini', name:'Ether Mini', qty:3, healMp:26, target:'ally' },
+            { id:'hi-potion', name:'Hi Potion', qty:4, healHp:110, target:'ally', cleanse:true }
+          ]
+        });
+      }
+
+      var state = createInitialState();
+      var gameLog = [];
+
+      var nodes = {
+        party: document.getElementById('party'),
+        enemies: document.getElementById('enemies'),
+        timeline: document.getElementById('timeline'),
+        hud: document.getElementById('hud'),
+        log: document.getElementById('log'),
+        heroSelect: document.getElementById('heroSelect'),
+        actionSelect: document.getElementById('actionSelect')
+      };
+
+      function ratio(part, total){ return Math.max(0, Math.min(100, Math.round((part / Math.max(1, total)) * 100))); }
+
+      function renderUnits(root, units){
+        root.innerHTML = units.map(function(u){
+          var status = u.status.map(function(s){ return s.type + '(' + s.turns + ')'; }).join(', ') || '-';
+          return '<article class="unit ' + (u.alive ? '' : 'dead') + '">'
+            + '<strong>' + u.name + ' Lv' + u.level + '</strong>'
+            + '<div class="meter"><span class="hp" style="width:' + ratio(u.hp, u.maxHp) + '%"></span></div>'
+            + '<div class="meter"><span class="mp" style="width:' + ratio(u.mp, u.maxMp) + '%"></span></div>'
+            + '<div class="meta"><span>HP ' + u.hp + '/' + u.maxHp + ' · MP ' + u.mp + '/' + u.maxMp + '</span><span>Limit ' + u.limit + '%</span></div>'
+            + '<div class="meta"><span>Status: ' + status + '</span><span>' + (u.guarding ? 'Guard' : 'Ready') + '</span></div>'
+            + '</article>';
+        }).join('');
+      }
+
+      function renderHud(summary){
+        var inv = state.inventory.map(function(item){ return item.name + ':' + item.qty; }).join(' | ');
+        nodes.hud.innerHTML = [
+          ['Round', summary.cycle],
+          ['Combo', state.combo + '/9'],
+          ['Party Alive', summary.partyAlive],
+          ['Enemy Alive', summary.enemyAlive],
+          ['Winner', summary.winner || '-'],
+          ['Turn Counter', state.turn],
+          ['Inventory', inv || '-'],
+          ['Engine', 'fadhilwebrpglib']
+        ].map(function(pair){
+          return '<div class="stat"><label>' + pair[0] + '</label><strong>' + pair[1] + '</strong></div>';
+        }).join('');
+      }
+
+      function renderTimeline(){
+        var timeline = lib.createTimeline(state, rand);
+        state.timeline = timeline;
+        nodes.timeline.innerHTML = timeline.map(function(id){
+          var u = state.party.concat(state.enemies).find(function(e){ return e.id === id; });
+          return '<span class="chip">' + (u ? u.name : id) + '</span>';
+        }).join('');
+      }
+
+      function renderManualControls(){
+        nodes.heroSelect.innerHTML = state.party.filter(function(u){ return u.alive; }).map(function(u){
+          return '<option value="' + u.id + '">' + u.name + '</option>';
+        }).join('');
+        var heroId = nodes.heroSelect.value || (state.party.find(function(u){ return u.alive; }) || {}).id;
+        var hero = state.party.find(function(u){ return u.id === heroId; });
+        if (!hero) {
+          nodes.actionSelect.innerHTML = '<option>Tidak ada hero hidup</option>';
+          return;
+        }
+        var options = ['basic'].concat(hero.skills.map(function(skill){ return 'skill:' + skill.id; })).concat(state.inventory.filter(function(i){ return i.qty > 0; }).map(function(i){ return 'item:' + i.id; })).concat(['guard']);
+        nodes.actionSelect.innerHTML = options.map(function(value){ return '<option value="' + value + '">' + value + '</option>'; }).join('');
+      }
+
+      function renderLog(){
+        nodes.log.textContent = gameLog.slice(-80).join('\n');
+        nodes.log.scrollTop = nodes.log.scrollHeight;
       }
 
       function render(){
-        renderList(partyNode, state.party);
-        renderList(enemyNode, state.enemies);
+        renderUnits(nodes.party, state.party);
+        renderUnits(nodes.enemies, state.enemies);
+        renderTimeline();
+        renderManualControls();
+        renderHud(lib.getBattleSummary(state));
+        renderLog();
       }
 
-      document.getElementById('turn').onclick = function(){
-        if (window.fadhilwebrpglib.battleFinished(state)) return;
-        const order = state.party.concat(state.enemies)
-          .filter(u => u.alive)
-          .sort((a,b)=>b.agility-a.agility)
-          .map(u=>u.id);
+      function appendLogs(lines){
+        gameLog = gameLog.concat(lines);
+      }
 
-        let logs = [];
-        for (const actorId of order){
-          if (window.fadhilwebrpglib.battleFinished(state)) break;
-          const action = window.fadhilwebrpglib.autoAction(state, actorId);
-          state = window.fadhilwebrpglib.execute(state, action, rand);
-          logs = logs.concat(state.logs);
+      function stepRound(){
+        if (lib.battleFinished(state)) {
+          appendLogs(['=== Battle selesai ===']);
+          render();
+          return;
         }
-
-        if (window.fadhilwebrpglib.battleFinished(state)) {
-          logs.push(state.party.some(u=>u.alive) ? 'Menang!': 'Kalah, coba lagi.');
-        }
-        logNode.textContent = logs.join('\n');
+        state = lib.runRound(state, rand);
+        appendLogs(state.logs);
+        var summary = lib.getBattleSummary(state);
+        if (summary.finished) appendLogs(['Pemenang: ' + summary.winner]);
         render();
-      };
+      }
 
+      function runHeroAction(){
+        var actorId = nodes.heroSelect.value;
+        if (!actorId || lib.battleFinished(state)) return;
+        var enemy = state.enemies.find(function(u){ return u.alive; });
+        var allyLow = state.party.filter(function(u){ return u.alive; }).sort(function(a,b){ return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
+        var selected = nodes.actionSelect.value;
+        var action;
+
+        if (selected === 'basic') {
+          action = { type: 'basic', actorId: actorId, targetId: enemy && enemy.id };
+        } else if (selected === 'guard') {
+          action = { type: 'guard', actorId: actorId };
+        } else if (selected.indexOf('skill:') === 0) {
+          var skillId = selected.slice(6);
+          var actor = state.party.find(function(u){ return u.id === actorId; });
+          var skill = actor && actor.skills.find(function(s){ return s.id === skillId; });
+          var targetId = skill && skill.target === 'ally' ? (allyLow && allyLow.id) : (enemy && enemy.id);
+          action = { type: 'skill', actorId: actorId, targetId: targetId, skillId: skillId };
+        } else if (selected.indexOf('item:') === 0) {
+          action = { type: 'item', actorId: actorId, targetId: allyLow && allyLow.id, itemId: selected.slice(5) };
+        }
+
+        if (!action || (!action.targetId && action.type !== 'guard')) return;
+        state = lib.execute(state, action, rand);
+        appendLogs(['[Manual] ' + actorId + ' => ' + selected].concat(state.logs));
+
+        // musuh langsung balas satu aksi agar interaktif
+        var enemyActor = lib.createTimeline(state, rand).find(function(id){ return state.enemies.some(function(e){ return e.id === id && e.alive; }); });
+        if (enemyActor && !lib.battleFinished(state)) {
+          var enemyAction = lib.autoAction(state, enemyActor);
+          state = lib.execute(state, enemyAction, rand);
+          appendLogs(state.logs);
+        }
+        render();
+      }
+
+      document.getElementById('stepBtn').addEventListener('click', stepRound);
+      document.getElementById('manualBtn').addEventListener('click', runHeroAction);
+      document.getElementById('heroSelect').addEventListener('change', renderManualControls);
+      document.getElementById('resetBtn').addEventListener('click', function(){
+        state = createInitialState();
+        gameLog = ['Battle direset.'];
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          document.getElementById('autoBtn').textContent = 'Auto x8';
+        }
+        render();
+      });
+
+      document.getElementById('autoBtn').addEventListener('click', function(){
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+          this.textContent = 'Auto x8';
+          return;
+        }
+        var loops = 0;
+        this.textContent = 'Stop Auto';
+        autoTimer = setInterval(function(){
+          if (loops >= 8 || lib.battleFinished(state)) {
+            clearInterval(autoTimer);
+            autoTimer = null;
+            document.getElementById('autoBtn').textContent = 'Auto x8';
+            return;
+          }
+          loops += 1;
+          stepRound();
+        }, 220);
+      });
+
+      gameLog.push('Mesin JRPG aktif. Gunakan manual action atau auto battle.');
       render();
     </script>
   </body>
