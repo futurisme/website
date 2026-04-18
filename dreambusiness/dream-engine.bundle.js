@@ -3005,6 +3005,14 @@ function getNpcReleasePressure(game, npc, company) {
     gameExecutiveManaged
   };
 }
+function createProductName(company, releaseNumber) {
+  const companyToken = company.name.trim().split(/\s+/).filter(Boolean).slice(0, 1).join("");
+  const seriesSeeds = company.field === "game" ? ["Arena", "Quest", "Pulse", "Nova"] : company.field === "software" ? ["Suite", "Flow", "Sync", "Core"] : ["Core", "Fusion", "Vector", "Prime"];
+  const seedNumber = `${company.key}-${releaseNumber}`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
+  const categoryToken = company.field === "game" ? "Game" : company.field === "software" ? "App" : "Chip";
+  return `${companyToken} ${seriesToken} ${categoryToken} ${releaseNumber}`;
+}
 function scoreNpcReleaseAction(game, npc, company) {
   const pressure = getNpcReleasePressure(game, npc, company);
   const {
@@ -3047,19 +3055,18 @@ function scoreNpcReleaseAction(game, npc, company) {
   const score = urgentCashPressure * 7.6 + cpuDelta * 0.042 + staleness * 1.65 + releaseCadencePressure * 2.1 + normalCadenceBoost * 1.6 + upgradeMomentumPressure * 1.7 + marketNeed * 1.4 + reputationNeed * 0.8 + management.researchOverflow * 0.32 + npc.intelligence * 0.44 + launchRevenueSignal * 0.9 + releaseRating.rating * 0.035 + crisisBoost - repeatedSpecPenalty;
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === "game" ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;
-  const releaseSeries = company.field === "game" ? `${company.name} Live Ops` : company.field === "software" ? `${company.name} Suite` : `${company.name} G-Series`;
-  const releaseCpuName = company.field === "game" ? `Game Patch ${releaseNumber}` : company.field === "software" ? `Software Build ${releaseNumber}` : `CPU G${releaseNumber}`;
+  const productName = createProductName(company, releaseNumber);
   return {
     type: "release",
     key: "release",
     resource: "cash",
     cost: 0,
     score,
-    label: company.field === "game" ? `Release Game ${releaseCpuName}` : company.field === "software" ? `Release Software ${releaseCpuName}` : `Release CPU ${releaseCpuName}`,
+    label: `Release ${productName}`,
     rationale: canForceRelease ? "kas < $10M: rilis darurat mingguan aktif untuk menyelamatkan runway" : cashEmergency > 0.6 ? "mengisi kas darurat lewat produk terbaik yang siap dijual" : cpuDelta > 18 ? "mengunci lonjakan spesifikasi menjadi pendapatan baru" : "menjaga ritme pasar tanpa terlalu menunggu roadmap sempurna",
     priceIndex,
-    releaseSeries,
-    releaseCpuName,
+    releaseSeries: productName,
+    releaseCpuName: productName,
     releasePriorityBoost: releaseCadencePressure + upgradeMomentumPressure * 0.9 + urgentCashPressure * 1.6 + (canForceRelease ? 9 : 0),
     forceImmediate: canForceRelease || nearZeroCash
   };
@@ -3088,8 +3095,7 @@ function applyNpcCompanyAction(game, companyKey, action) {
     const lastEmergencyReleaseDay = isEmergencyRelease ? game.elapsedDays : nextCash > 10 ? null : company.lastEmergencyReleaseDay;
     const reputationGain = Math.max(0.8, (cpuScore / 240 + company.teams.marketing.count * 0.7 + pricePreset.reputationBonus) * releaseRating.reputationMultiplier);
     const marketShareGain = Math.min(5.5, (cpuScore / 500 + company.teams.fabrication.count * 0.16 + pricePreset.marketBonus) * releaseRating.marketShareMultiplier);
-    const series = action.releaseSeries ?? (company.field === "game" ? `${company.name} Live Ops` : company.field === "software" ? `${company.name} Suite` : `${company.name} G-Series`);
-    const cpuName = action.releaseCpuName ?? (company.field === "game" ? `Game Patch ${company.releaseCount + 1}` : company.field === "software" ? `Software Build ${company.releaseCount + 1}` : `CPU G${company.releaseCount + 1}`);
+    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1);
     const productLabel = company.field === "game" ? "game" : company.field === "software" ? "software" : "CPU";
     const nextLicenseRequests = selectedStoreLicense ? game.appStoreLicenseRequests.map((request) => {
       if (request.id !== selectedStoreLicense.id) return request;
@@ -3118,10 +3124,11 @@ function applyNpcCompanyAction(game, companyKey, action) {
           lastReleaseDay: game.elapsedDays,
           lastReleaseCpuScore: cpuScore,
           lastReleasePriceIndex: priceIndex,
+          lastProductName: series,
           emergencyReleaseAnchorDay: emergencyAnchorDay,
           emergencyReleaseCount,
           lastEmergencyReleaseDay,
-          lastRelease: `${series} ${cpuName} rilis ${formatDateFromDays(game.elapsedDays)} (${pricePreset.label.toLowerCase()})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ""} \xB7 ${releaseRating.summary}`
+          lastRelease: `${series} rilis ${formatDateFromDays(game.elapsedDays)} (${pricePreset.label.toLowerCase()})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ""} \xB7 ${releaseRating.summary}`
         },
         ...selectedStoreLicense ? {
           [selectedStoreLicense.softwareCompanyKey]: {
@@ -3133,7 +3140,7 @@ function applyNpcCompanyAction(game, companyKey, action) {
       appStoreLicenseRequests: nextLicenseRequests,
       activityFeed: addFeedEntry(
         game.activityFeed,
-        `${formatDateFromDays(game.elapsedDays)}: ${wasCashCritical ? "\u{1F6A8} RILIS DARURAT" : "Update produk"} \u2014 ${company.name} merilis ${productLabel} ${series} ${cpuName} (rating ${formatNumber(releaseRating.rating, 1)})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ""} dan membukukan $${formatMoneyCompact(launchRevenue)}.`
+        `${formatDateFromDays(game.elapsedDays)}: ${wasCashCritical ? "\u{1F6A8} RILIS DARURAT" : "Update produk"} \u2014 ${company.name} merilis ${productLabel} ${series} (rating ${formatNumber(releaseRating.rating, 1)})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ""} dan membukukan $${formatMoneyCompact(launchRevenue)}.`
       )
     };
   }
@@ -3776,12 +3783,13 @@ function buildRichestPeopleRows(game, getInvestorHoldingsValue2, maxRows = 10) {
   }).sort((a, b) => b.total - a.total).slice(0, Math.max(1, maxRows)).map((row, index) => ({ ...row, rank: index + 1 }));
 }
 function buildProductRankingRows(game, getCompanyValuation2, maxRows = 10) {
-  return getDisplayCompanies(game, maxRows).map((slot) => {
-    const company = slot.company;
+  return Object.values(game.companies).filter((company) => company.isEstablished).map((company) => {
+    const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
     const score = getCompanyValuation2(company) * 0.25 + company.marketShare * 20 + company.reputation * 8 + company.releaseCount * 40 + company.researchPerDay * 30;
     return {
       rank: 0,
-      name: company.name,
+      name: productName,
+      companyName: company.name,
       score,
       releaseCount: company.releaseCount,
       reputation: company.reputation,

@@ -248,7 +248,7 @@ function renderRankingFrame() {
   const productRows = buildProductRankingRows(game, getCompanyValuation, 10);
   renderRankingCards(
     productRows,
-    (row) => `Product Score ${row.score.toFixed(1)} • Release ${row.releaseCount} • Reputation ${row.reputation.toFixed(1)}`
+    (row) => `Skor Produk ${row.score.toFixed(1)} • Perusahaan ${escapeHtml(row.companyName ?? '-')} • Release ${row.releaseCount} • Reputation ${row.reputation.toFixed(1)}`
   );
 }
 

@@ -107,9 +107,10 @@ export function buildProductRankingRows(
   getCompanyValuation: (company: GameState['companies'][CompanyKey]) => number,
   maxRows = 10
 ) {
-  return getDisplayCompanies(game, maxRows)
-    .map((slot) => {
-      const company = slot.company;
+  return Object.values(game.companies)
+    .filter((company) => company.isEstablished)
+    .map((company) => {
+      const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
       const score = (
         getCompanyValuation(company) * 0.25
         + company.marketShare * 20
@@ -119,7 +120,8 @@ export function buildProductRankingRows(
       );
       return {
         rank: 0,
-        name: company.name,
+        name: productName,
+        companyName: company.name,
         score,
         releaseCount: company.releaseCount,
         reputation: company.reputation,

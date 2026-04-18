@@ -127,6 +127,7 @@ export type CompanyState = {
   bestCpuScore: number;
   revenuePerDay: number;
   researchPerDay: number;
+  lastProductName: string;
   lastRelease: string;
   focus: string;
   lastReleaseDay: number;
@@ -545,6 +546,26 @@ function normalizeCompanyNameWords(value: string) {
     .split(' ')
     .map((part) => part.trim())
     .filter(Boolean);
+}
+
+function createProductName(company: CompanyState, releaseNumber: number) {
+  const companyToken = company.name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 1)
+    .join('');
+  const seriesSeeds = company.field === 'game'
+    ? ['Arena', 'Quest', 'Pulse', 'Nova']
+    : company.field === 'software'
+      ? ['Suite', 'Flow', 'Sync', 'Core']
+      : ['Core', 'Fusion', 'Vector', 'Prime'];
+  const seedNumber = `${company.key}-${releaseNumber}`
+    .split('')
+    .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
+  const categoryToken = company.field === 'game' ? 'Game' : company.field === 'software' ? 'App' : 'Chip';
+  return `${companyToken} ${seriesToken} ${categoryToken} ${releaseNumber}`;
 }
 
 function hasCompanyWordCollision(game: GameState, candidateName: string) {
@@ -1827,10 +1848,14 @@ export function createCompany(config: {
   const marketPoolShares = Math.max(0, shareSheetTotal - founderShares);
   const revenuePerDay = calculateRevenuePerDay(config.teams, config.upgrades, config.marketShare, config.reputation, boardMood);
   const researchPerDay = calculateResearchPerDay(config.teams, config.upgrades);
+  const field = config.field ?? 'semiconductor';
+  const firstToken = config.name.trim().split(/\s+/).filter(Boolean)[0] ?? config.name.trim();
+  const initialCategory = field === 'game' ? 'Game' : field === 'software' ? 'App' : 'Chip';
+  const initialProductName = `${firstToken} Prime ${initialCategory} 1`;
   return {
     company: {
       key: config.key,
-      field: config.field ?? 'semiconductor',
+      field,
       softwareSpecialization: config.field === 'software' ? (config.softwareSpecialization ?? 'utility-apps') : null,
       name: config.name,
       founder: config.founder,
@@ -1846,6 +1871,7 @@ export function createCompany(config: {
       bestCpuScore: calculateCpuScore(config.upgrades),
       revenuePerDay,
       researchPerDay,
+      lastProductName: initialProductName,
       lastRelease: config.lastRelease,
       focus: config.focus,
       lastReleaseDay: 0,
@@ -2601,6 +2627,7 @@ export function progressCompanyPlans(game: GameState) {
       marketShare: Math.max(2.5, plan.pledgedCapital / 22),
       reputation: Math.max(8, 6 + plan.pledgedCapital / 12),
       releaseCount: 1,
+      lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === 'game' ? 'Game' : plan.field === 'software' ? 'App' : 'Chip'} 1`,
       revenuePerDay: Math.max(2.2, plan.pledgedCapital / 18),
       researchPerDay: Math.max(1.4, plan.pledgedCapital / 28),
       payoutRatio: 0.1,
@@ -2909,6 +2936,7 @@ export function progressCommunityPlans(game: GameState) {
         marketShare: clamp(plan.pledgedCapital / 30, 2.4, 11),
         reputation: clamp(8 + plan.pledgedCapital / 18, 8, 34),
         releaseCount: 1,
+        lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === 'game' ? 'Game' : plan.field === 'software' ? 'App' : 'Chip'} 1`,
         bestCpuScore: calculateCpuScore(seededUpgrades),
         revenuePerDay: Math.max(1.8, plan.pledgedCapital / 24),
         researchPerDay: Math.max(1.1, plan.pledgedCapital / 34),
@@ -3948,16 +3976,7 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
 
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === 'game' ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;
-  const releaseSeries = company.field === 'game'
-    ? `${company.name} Live Ops`
-    : company.field === 'software'
-      ? `${company.name} Suite`
-      : `${company.name} G-Series`;
-  const releaseCpuName = company.field === 'game'
-    ? `Game Patch ${releaseNumber}`
-    : company.field === 'software'
-      ? `Software Build ${releaseNumber}`
-      : `CPU G${releaseNumber}`;
+  const productName = createProductName(company, releaseNumber);
 
   return {
     type: 'release',
@@ -3965,11 +3984,7 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
     resource: 'cash',
     cost: 0,
     score,
-    label: company.field === 'game'
-      ? `Release Game ${releaseCpuName}`
-      : company.field === 'software'
-        ? `Release Software ${releaseCpuName}`
-        : `Release CPU ${releaseCpuName}`,
+    label: `Release ${productName}`,
     rationale: canForceRelease
       ? 'kas < $10M: rilis darurat mingguan aktif untuk menyelamatkan runway'
       : cashEmergency > 0.6
@@ -3978,8 +3993,8 @@ export function scoreNpcReleaseAction(game: GameState, npc: NpcInvestor, company
         ? 'mengunci lonjakan spesifikasi menjadi pendapatan baru'
         : 'menjaga ritme pasar tanpa terlalu menunggu roadmap sempurna',
     priceIndex,
-    releaseSeries,
-    releaseCpuName,
+    releaseSeries: productName,
+    releaseCpuName: productName,
     releasePriorityBoost: releaseCadencePressure + upgradeMomentumPressure * 0.9 + urgentCashPressure * 1.6 + (canForceRelease ? 9 : 0),
     forceImmediate: canForceRelease || nearZeroCash,
   };
@@ -4019,20 +4034,7 @@ export function applyNpcCompanyAction(game: GameState, companyKey: CompanyKey, a
       : (nextCash > 10 ? null : company.lastEmergencyReleaseDay);
     const reputationGain = Math.max(0.8, (cpuScore / 240 + company.teams.marketing.count * 0.7 + pricePreset.reputationBonus) * releaseRating.reputationMultiplier);
     const marketShareGain = Math.min(5.5, (cpuScore / 500 + company.teams.fabrication.count * 0.16 + pricePreset.marketBonus) * releaseRating.marketShareMultiplier);
-    const series = action.releaseSeries ?? (
-      company.field === 'game'
-        ? `${company.name} Live Ops`
-        : company.field === 'software'
-          ? `${company.name} Suite`
-          : `${company.name} G-Series`
-    );
-    const cpuName = action.releaseCpuName ?? (
-      company.field === 'game'
-        ? `Game Patch ${company.releaseCount + 1}`
-        : company.field === 'software'
-          ? `Software Build ${company.releaseCount + 1}`
-          : `CPU G${company.releaseCount + 1}`
-    );
+    const series = action.releaseSeries ?? action.releaseCpuName ?? createProductName(company, company.releaseCount + 1);
     const productLabel = company.field === 'game' ? 'game' : company.field === 'software' ? 'software' : 'CPU';
     const nextLicenseRequests = selectedStoreLicense
       ? game.appStoreLicenseRequests.map((request) => {
@@ -4063,10 +4065,11 @@ export function applyNpcCompanyAction(game: GameState, companyKey: CompanyKey, a
           lastReleaseDay: game.elapsedDays,
           lastReleaseCpuScore: cpuScore,
           lastReleasePriceIndex: priceIndex,
+          lastProductName: series,
           emergencyReleaseAnchorDay: emergencyAnchorDay,
           emergencyReleaseCount: emergencyReleaseCount,
           lastEmergencyReleaseDay: lastEmergencyReleaseDay,
-          lastRelease: `${series} ${cpuName} rilis ${formatDateFromDays(game.elapsedDays)} (${pricePreset.label.toLowerCase()})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ''} · ${releaseRating.summary}`,
+          lastRelease: `${series} rilis ${formatDateFromDays(game.elapsedDays)} (${pricePreset.label.toLowerCase()})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ''} · ${releaseRating.summary}`,
         },
         ...(selectedStoreLicense
           ? {
@@ -4080,7 +4083,7 @@ export function applyNpcCompanyAction(game: GameState, companyKey: CompanyKey, a
       appStoreLicenseRequests: nextLicenseRequests,
       activityFeed: addFeedEntry(
         game.activityFeed,
-        `${formatDateFromDays(game.elapsedDays)}: ${wasCashCritical ? '🚨 RILIS DARURAT' : 'Update produk'} — ${company.name} merilis ${productLabel} ${series} ${cpuName} (rating ${formatNumber(releaseRating.rating, 1)})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ''} dan membukukan $${formatMoneyCompact(launchRevenue)}.`
+        `${formatDateFromDays(game.elapsedDays)}: ${wasCashCritical ? '🚨 RILIS DARURAT' : 'Update produk'} — ${company.name} merilis ${productLabel} ${series} (rating ${formatNumber(releaseRating.rating, 1)})${selectedStoreLicense ? ` via ${game.companies[selectedStoreLicense.softwareCompanyKey].name}` : ''} dan membukukan $${formatMoneyCompact(launchRevenue)}.`
       ),
     };
   }
