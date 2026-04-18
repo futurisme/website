@@ -1,4 +1,180 @@
 (function (global) {
+  var DEBUG_SESSION_KEY = '__fwrpg_debug_once__';
+  var DEBUG_DOM_ID = 'fwrpg-debug-once';
+
+  function safeStringify(value) {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (_err) {
+      return String(value);
+    }
+  }
+
+  function buildLikelyCauses(payload) {
+    var causes = [];
+    if (payload.kind === 'lib-load-failure') {
+      causes.push('Path script tidak valid atau file tidak ikut ter-deploy.');
+      causes.push('Akses file diblokir (404/403/CSP/MIME mismatch).');
+      causes.push('Service worker / cache lama masih menunjuk versi file yang hilang.');
+    }
+    if (payload.kind === 'resource-error') {
+      causes.push('Resource gagal dimuat akibat URL salah, cache stale, atau kebijakan keamanan browser.');
+    }
+    if (payload.kind === 'runtime-error' || payload.kind === 'interaction-error') {
+      causes.push('Exception saat eksekusi runtime/interaksi tombol.');
+      causes.push('State tidak valid (null/undefined) ketika handler dipicu.');
+    }
+    if (payload.kind === 'unhandled-rejection') {
+      causes.push('Promise rejection tidak ditangani, biasanya dari async flow yang gagal.');
+    }
+    if (causes.length === 0) causes.push('Anomali terdeteksi tanpa signature spesifik.');
+    return causes;
+  }
+
+  function buildPredictions(payload) {
+    var predictions = [];
+    if (payload.kind === 'lib-load-failure') {
+      predictions.push('Fitur RPG tidak akan terinisialisasi dan status UI tetap di mode gagal load.');
+      predictions.push('Semua interaksi tombol yang bergantung pada library akan non-fungsional.');
+    } else if (payload.kind === 'interaction-error') {
+      predictions.push('Aksi berikutnya berpotensi gagal pada hero/action yang sama sampai state direfresh.');
+    } else if (payload.kind === 'runtime-error') {
+      predictions.push('Render parsial mungkin masih jalan, namun beberapa frame dapat gagal update.');
+    } else {
+      predictions.push('Kegagalan berulang mungkin muncul ketika pemicu yang sama terjadi lagi.');
+    }
+    return predictions;
+  }
+
+  function hasTriggeredDebug() {
+    if (!global || !global.sessionStorage) return !!global.__fwrpgDebugTriggered;
+    try {
+      return global.sessionStorage.getItem(DEBUG_SESSION_KEY) === '1' || !!global.__fwrpgDebugTriggered;
+    } catch (_err) {
+      return !!global.__fwrpgDebugTriggered;
+    }
+  }
+
+  function markDebugTriggered() {
+    global.__fwrpgDebugTriggered = true;
+    if (!global || !global.sessionStorage) return;
+    try {
+      global.sessionStorage.setItem(DEBUG_SESSION_KEY, '1');
+    } catch (_err) {}
+  }
+
+  function openDebugContainer(payload) {
+    var doc = global && global.document;
+    if (!doc || hasTriggeredDebug()) return false;
+    var body = doc.body;
+    if (!body) return false;
+
+    if (doc.getElementById(DEBUG_DOM_ID)) return false;
+    markDebugTriggered();
+
+    var panel = doc.createElement('section');
+    panel.id = DEBUG_DOM_ID;
+    panel.setAttribute('role', 'alert');
+    panel.style.cssText = 'position:fixed;inset:auto 12px 12px 12px;z-index:2147483647;padding:10px;border-radius:12px;border:1px solid #ef4444;background:#140b0b;color:#fecaca;font:12px/1.4 ui-monospace,Menlo,monospace;box-shadow:0 8px 24px rgba(0,0,0,.45)';
+
+    var heading = doc.createElement('strong');
+    heading.textContent = 'RPG One-shot Debug Report';
+    heading.style.display = 'block';
+    heading.style.marginBottom = '6px';
+    panel.appendChild(heading);
+
+    var detail = doc.createElement('pre');
+    detail.style.cssText = 'margin:0;max-height:38vh;overflow:auto;white-space:pre-wrap;word-break:break-word;';
+    detail.textContent = safeStringify(payload);
+    panel.appendChild(detail);
+
+    var actions = doc.createElement('div');
+    actions.style.cssText = 'display:flex;gap:6px;margin-top:8px;';
+    var copyBtn = doc.createElement('button');
+    copyBtn.textContent = 'Copy Debug';
+    copyBtn.style.cssText = 'border:1px solid #f87171;background:#7f1d1d;color:#fee2e2;border-radius:8px;padding:4px 8px;cursor:pointer;';
+    copyBtn.addEventListener('click', function () {
+      var text = detail.textContent || '';
+      var nav = global.navigator;
+      if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {
+        nav.clipboard.writeText(text);
+      }
+    }, { passive: true });
+
+    var closeBtn = doc.createElement('button');
+    closeBtn.textContent = 'Tutup';
+    closeBtn.style.cssText = 'border:1px solid #374151;background:#0f172a;color:#cbd5e1;border-radius:8px;padding:4px 8px;cursor:pointer;';
+    closeBtn.addEventListener('click', function () { panel.remove(); }, { passive: true });
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(closeBtn);
+    panel.appendChild(actions);
+    body.appendChild(panel);
+    return true;
+  }
+
+  function buildDebugPayload(kind, detail) {
+    var info = detail || {};
+    var payload = {
+      system: 'fadhilwebrpglib',
+      version: '2026.04.18-debug-once',
+      kind: kind,
+      timestamp: new Date().toISOString(),
+      href: global.location && global.location.href ? global.location.href : '',
+      causes: [],
+      predictions: [],
+      detail: info
+    };
+    payload.causes = buildLikelyCauses(payload);
+    payload.predictions = buildPredictions(payload);
+    return payload;
+  }
+
+  function reportDebugIssue(kind, detail) {
+    var payload = buildDebugPayload(kind, detail);
+    openDebugContainer(payload);
+    return payload;
+  }
+
+  function installOneShotDebug(options) {
+    var doc = global && global.document;
+    if (!doc || global.__fwrpgDebugInstalled) return { report: reportDebugIssue };
+    global.__fwrpgDebugInstalled = true;
+
+    var config = options || {};
+    var param = config.triggerParam || 'rpgdebug';
+    var search = (global.location && global.location.search) || '';
+    if (search.indexOf(param + '=1') >= 0) {
+      reportDebugIssue('manual-trigger', { source: 'query-param' });
+    }
+
+    global.addEventListener('error', function (event) {
+      var target = event && event.target;
+      if (target && target.tagName) {
+        reportDebugIssue('resource-error', {
+          tagName: target.tagName,
+          source: target.src || target.href || '',
+          message: event.message || 'resource load error'
+        });
+        return;
+      }
+      reportDebugIssue('runtime-error', {
+        message: event.message || '',
+        filename: event.filename || '',
+        lineno: event.lineno || 0,
+        colno: event.colno || 0
+      });
+    }, true);
+
+    global.addEventListener('unhandledrejection', function (event) {
+      reportDebugIssue('unhandled-rejection', {
+        reason: event && event.reason ? String(event.reason && event.reason.message ? event.reason.message : event.reason) : 'unknown'
+      });
+    });
+
+    return { report: reportDebugIssue };
+  }
+
   function seededRandom(seed) {
     var localSeed = seed >>> 0;
     return function () {
@@ -706,6 +882,8 @@
     updateMapCamera: updateMapCamera,
     travelTo: travelTo,
     processTextCommand: processTextCommand,
-    getBattleSummary: getBattleSummary
+    getBattleSummary: getBattleSummary,
+    installOneShotDebug: installOneShotDebug,
+    reportDebugIssue: reportDebugIssue
   };
 })(window);

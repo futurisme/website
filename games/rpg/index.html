@@ -7,8 +7,12 @@
   </head>
   <body>
     <p>Membuka modul RPG ringan dari folder root <code>/rpg</code>...</p>
+    <noscript>
+      <p>JavaScript dibutuhkan. Buka langsung <a href="../../rpg/index.html">/rpg/index.html</a>.</p>
+    </noscript>
     <script>
-      window.location.href = '../../rpg/index.html';
+      var target = new URL('../../rpg/index.html', window.location.href).toString();
+      window.location.replace(target);
     </script>
   </body>
 </html>

@@ -142,9 +142,47 @@
       </section>
     </main>
 
-    <script src="./fadhilwebrpglib.js"></script>
+    <script>
+      window.__FWRPG_BOOT__ = {
+        libUrl: new URL('./fadhilwebrpglib.js', window.location.href).toString()
+      };
+      window.__FWRPG_BOOT__.onLibLoadError = function () {
+        var payload = {
+          system: 'fadhilwebrpglib',
+          kind: 'lib-load-failure',
+          timestamp: new Date().toISOString(),
+          href: window.location.href,
+          attemptedScript: window.__FWRPG_BOOT__.libUrl,
+          causes: [
+            'Path script tidak valid / file tidak tersedia di deployment.',
+            'Resource diblokir (404/403/CSP/MIME).',
+            'Cache lama atau service worker mengarah ke aset tidak sinkron.'
+          ],
+          predictions: [
+            'window.fadhilwebrpglib tetap undefined.',
+            'Seluruh interaksi battle/map/party tidak akan berjalan.'
+          ]
+        };
+        var wrap = document.createElement('section');
+        wrap.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483647;background:#140b0b;border:1px solid #ef4444;border-radius:12px;padding:10px;color:#fecaca;font:12px/1.4 ui-monospace,monospace;';
+        var text = document.createElement('pre');
+        text.textContent = JSON.stringify(payload, null, 2);
+        text.style.cssText = 'margin:0;max-height:42vh;overflow:auto;white-space:pre-wrap;word-break:break-word;';
+        var copy = document.createElement('button');
+        copy.textContent = 'Copy Debug';
+        copy.style.cssText = 'margin-top:8px;border:1px solid #f87171;background:#7f1d1d;color:#fee2e2;border-radius:8px;padding:4px 8px;';
+        copy.addEventListener('click', function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text.textContent);
+        }, { passive: true });
+        wrap.appendChild(text);
+        wrap.appendChild(copy);
+        document.body.appendChild(wrap);
+      };
+    </script>
+    <script src="./fadhilwebrpglib.js" onerror="window.__FWRPG_BOOT__ && window.__FWRPG_BOOT__.onLibLoadError && window.__FWRPG_BOOT__.onLibLoadError()"></script>
     <script>
       var lib = window.fadhilwebrpglib;
+      var debugAgent = null;
       var rand = null;
       var selectedHeroId = 'hero-akari';
       var selectedAction = 'basic';
@@ -196,7 +234,7 @@
 
       function $(id){ return document.getElementById(id); }
       function setRuntimeStatus(text, isError){ var el = $('runtimeStatus'); if (!el) return; el.textContent = 'Status: ' + text; el.style.color = isError ? '#fca5a5' : ''; }
-      function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); console.error(err); } }; }
+      function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       function allFrames(){ return ['frameMain','frameBattle','frameMap','frameParty','frameSub']; }
       function openFrame(id){ allFrames().forEach(function(fid){ $(fid).classList.toggle('frame-active', fid === id); }); if (id === 'frameMap') renderMap(); }
       function appendLogs(lines){ if (!lines) return; logs = logs.concat(lines).slice(-220); }
@@ -420,6 +458,7 @@
       if (!lib) {
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
       } else {
+        debugAgent = lib.installOneShotDebug({ triggerParam: 'rpgdebug' });
         rand = lib.seededRandom(2026);
         state = createInitialState();
         setRuntimeStatus('aktif', false);
