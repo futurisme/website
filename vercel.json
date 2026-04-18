@@ -40,6 +40,14 @@
     {
       "src": "dreambusiness/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "games/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "rpg/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -72,6 +80,18 @@
       "dest": "/dreambusiness/$1"
     },
     {
+      "src": "/games/rpg",
+      "dest": "/rpg/index.html"
+    },
+    {
+      "src": "/games/rpg/",
+      "dest": "/rpg/index.html"
+    },
+    {
+      "src": "/games/rpg/(.*)",
+      "dest": "/rpg/$1"
+    },
+    {
       "src": "/dreambusiness",
       "dest": "/dreambusiness/index.html"
     },
@@ -82,6 +102,18 @@
     {
       "src": "/dreambusiness/(.*)",
       "dest": "/dreambusiness/$1"
+    },
+    {
+      "src": "/rpg",
+      "dest": "/rpg/index.html"
+    },
+    {
+      "src": "/rpg/",
+      "dest": "/rpg/index.html"
+    },
+    {
+      "src": "/rpg/(.*)",
+      "dest": "/rpg/$1"
     },
     {
       "src": "/home",
