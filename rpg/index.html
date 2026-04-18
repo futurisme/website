@@ -19,33 +19,34 @@
       .shell { width: 100vw; min-height: 100dvh; }
       .frame { display: none; width: 100%; padding: 10px; }
       .frame-active { display: block; animation: fadeIn .18s ease-out; }
-      .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
-      .header h1 { margin: 0; font-size: clamp(1.2rem, 4vw, 1.8rem); }
-      .header p { margin: 6px 0 0; color: var(--muted); }
-      .actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+      .card { background: color-mix(in oklab, var(--panel) 90%, #0f172a); border: 1px solid var(--border); border-radius: 10px; padding: 8px; outline: 1px solid rgba(148,163,184,.16); outline-offset: -1px; }
+      .header h1 { margin: 0; font-size: clamp(1rem, 2.8vw, 1.2rem); letter-spacing: .01em; }
+      .header p { margin: 4px 0 0; color: var(--muted); font-size: .79rem; }
+      .actions { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
       button {
         border: 1px solid #3f4c66;
-        border-radius: 10px;
+        border-radius: 8px;
         background: #162136;
         color: #e8f1ff;
-        min-height: 38px;
-        padding: 7px 12px;
-        font-weight: 650;
+        min-height: 32px;
+        padding: 5px 10px;
+        font-weight: 620;
+        font-size: .78rem;
       }
       button:hover { cursor: pointer; background: #1e2b46; }
       button.primary { background: linear-gradient(90deg,#4f46e5,#2563eb); border-color: transparent; }
-      .stats { margin-top: 10px; display: grid; gap: 8px; grid-template-columns: repeat(3, minmax(0,1fr)); }
-      .stat { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 10px; padding: 8px; }
+      .stats { margin-top: 8px; display: grid; gap: 6px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .stat { background: var(--panel-soft); border: 1px solid var(--border); border-radius: 8px; padding: 6px; }
       .stat label { font-size: .75rem; color: var(--muted); display:block; }
-      .stat strong { font-size: .95rem; }
-      .grid { margin-top: 10px; display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .line { border: 1px solid var(--border); border-radius: 8px; padding: 8px; background: #0a1326; font-size: .83rem; margin-bottom: 6px; }
+      .stat strong { font-size: .84rem; }
+      .grid { margin-top: 8px; display: grid; gap: 6px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .line { border: 1px solid var(--border); border-radius: 8px; padding: 6px; background: #0a1326; font-size: .78rem; margin-bottom: 5px; }
       .frame-back { position: sticky; top: 8px; float: right; border-radius: 999px; width: 34px; height: 34px; padding: 0; }
       .section-title { margin: 0 0 8px; font-size: 1rem; }
       .hero-tabs, .action-grid, .travel-grid { display: flex; gap: 6px; flex-wrap: wrap; }
       .hero-tabs button.active, .action-grid button.active { border-color: #60a5fa; background: #1d3356; }
       .action-grid button[disabled], .travel-grid button[disabled] { opacity: .45; cursor: not-allowed; }
-      .battle-log { margin-top: 8px; background: #070c18; border: 1px solid var(--border); border-radius: 10px; min-height: 180px; max-height: 280px; overflow: auto; padding: 8px; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .8rem; }
+      .battle-log { margin-top: 6px; background: #070c18; border: 1px solid var(--border); border-radius: 9px; min-height: 148px; max-height: 220px; overflow: auto; padding: 7px; white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: .75rem; }
       .map-wrap { margin-top: 8px; border: 1px solid var(--border); border-radius: 12px; background: #081425; overflow: hidden; height: min(62dvh, 520px); position: relative; touch-action: none; }
       .map-plane { position: absolute; width: 1280px; height: 900px; background: radial-gradient(circle at 35% 35%, #115e59, #0f172a 62%); transform-origin: 0 0; }
       .map-link { position: absolute; height: 2px; background: rgba(148,163,184,.4); transform-origin: 0 0; pointer-events: none; }
@@ -78,8 +79,7 @@
     <main class="shell">
       <section id="frameMain" class="frame frame-active">
         <article class="card header">
-          <h1>FadhilWebRPGLib JRPG Fullframe</h1>
-          <p>Tanpa command input. Semua interaksi via tombol, fullframe, dan subfullframe ala DreamBusiness.</p>
+          <h1>FadhiumRPG</h1>
           <div id="runtimeStatus" class="tiny" style="margin-top:6px;">Status: inisialisasi...</div>
           <div class="actions">
             <button class="primary" id="mainRoundBtn">Mainkan Round</button>
@@ -233,7 +233,19 @@
       var state = null;
 
       function $(id){ return document.getElementById(id); }
-      function setRuntimeStatus(text, isError){ var el = $('runtimeStatus'); if (!el) return; el.textContent = 'Status: ' + text; el.style.color = isError ? '#fca5a5' : ''; }
+      function setRuntimeStatus(text, isError){
+        var el = $('runtimeStatus');
+        if (!el) return;
+        if (!text) {
+          el.textContent = '';
+          el.style.display = 'none';
+          el.style.color = '';
+          return;
+        }
+        el.style.display = '';
+        el.textContent = 'Status: ' + text;
+        el.style.color = isError ? '#fca5a5' : '';
+      }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       function allFrames(){ return ['frameMain','frameBattle','frameMap','frameParty','frameSub']; }
       function openFrame(id){ allFrames().forEach(function(fid){ $(fid).classList.toggle('frame-active', fid === id); }); if (id === 'frameMap') renderMap(); }
@@ -461,7 +473,7 @@
         debugAgent = lib.installOneShotDebug({ triggerParam: 'rpgdebug' });
         rand = lib.seededRandom(2026);
         state = createInitialState();
-        setRuntimeStatus('aktif', false);
+        setRuntimeStatus('', false);
         renderAll();
       }
     </script>
