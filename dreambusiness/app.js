@@ -528,6 +528,25 @@ function renderRankingFrame() {
   );
 }
 
+function formatPersonNameByInvestorId(investorId) {
+  if (!investorId) return '—';
+  if (investorId === game.player.id) return game.player.name;
+  const npc = game.npcs.find((entry) => entry.id === investorId);
+  if (npc) return npc.name;
+  const company = Object.values(game.companies).find((entry) => entry.key === investorId);
+  if (company) return `${company.name} (Corporate)`;
+  return investorId;
+}
+
+function toTitleCase(value) {
+  return String(value)
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/[-_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
@@ -536,12 +555,49 @@ function renderCompanyDetail() {
     companyDetailBody.innerHTML = '<p>Company not found.</p>';
     return;
   }
+
+  const boardMembers = Object.entries(company.investors ?? {})
+    .filter(([, shares]) => Number.isFinite(shares) && shares > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([investorId, shares], index) => ({
+      rank: index + 1,
+      investorId,
+      name: formatPersonNameByInvestorId(investorId),
+      shares,
+      ownership: ((shares / Math.max(1, company.totalShares || 1)) * 100),
+    }));
+
+  const executiveRows = [
+    { role: 'CEO', name: formatPersonNameByInvestorId(company.ceoId) },
+    { role: 'COO', name: formatPersonNameByInvestorId(company.executives?.coo?.occupantId ?? null) },
+    { role: 'CMO', name: formatPersonNameByInvestorId(company.executives?.cmo?.occupantId ?? null) },
+    { role: 'CTO', name: formatPersonNameByInvestorId(company.executives?.cto?.occupantId ?? null) },
+    { role: 'CFO', name: formatPersonNameByInvestorId(company.executives?.cfo?.occupantId ?? null) },
+  ];
+
+  const technologyRows = Object.entries(company.upgrades ?? {})
+    .map(([upgradeKey, upgrade]) => ({ name: toTitleCase(upgradeKey), value: Number(upgrade?.value ?? 0) }))
+    .sort((a, b) => b.value - a.value);
+
+  const buildingRows = Object.entries(company.teams ?? {})
+    .map(([teamKey, team]) => ({ name: toTitleCase(teamKey), count: Number(team?.count ?? 0) }))
+    .sort((a, b) => b.count - a.count);
+
   companyDetailTitle.textContent = `${company.name} • Subfullframe`;
   companyDetailBody.innerHTML = `
-    <article class="detail-tile"><h3>Identity</h3><p>Founder: ${company.founder}</p><p>Field: ${company.field}</p></article>
+    <article class="detail-tile"><h3>Identity</h3><p>Founder: ${company.founder}</p><p>CEO: ${formatPersonNameByInvestorId(company.ceoId)}</p><p>Field: ${company.field}</p></article>
     <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p></article>
     <article class="detail-tile"><h3>Operation</h3><p>Research/day: ${company.researchPerDay.toFixed(2)}</p><p>Revenue/day: ${formatMoneyCompact(company.revenuePerDay)}</p><p>Market Share: ${company.marketShare.toFixed(1)}%</p></article>
     <article class="detail-tile"><h3>Game State</h3><p>Release Count: ${company.releaseCount}</p><p>Reputation: ${company.reputation.toFixed(1)}</p><p>Established: ${company.isEstablished ? 'Yes' : 'No'}</p></article>
+    <details class="detail-tile"><summary>Board of Directors</summary><div class="detail-expand-content">${boardMembers.length === 0
+      ? '<p>Belum ada anggota dewan.</p>'
+      : boardMembers.map((member) => `<p>#${member.rank} ${member.name} • ${member.shares.toFixed(2)} saham (${member.ownership.toFixed(2)}%)</p>`).join('')}</div></details>
+    <details class="detail-tile"><summary>Executives</summary><div class="detail-expand-content">${executiveRows.map((entry) => `<p>${entry.role}: ${entry.name}</p>`).join('')}</div></details>
+    <details class="detail-tile"><summary>Assets</summary><div class="detail-expand-content">
+      <details><summary>Technology</summary><div>${technologyRows.map((entry) => `<p>${entry.name}: Lv ${entry.value.toFixed(2)}</p>`).join('')}</div></details>
+      <details><summary>Buildings</summary><div>${buildingRows.map((entry) => `<p>${entry.name}: ${entry.count}</p>`).join('')}</div></details>
+    </div></details>
   `;
 }
 

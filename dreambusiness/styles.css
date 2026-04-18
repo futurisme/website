@@ -65,6 +65,10 @@ small { color: var(--fwlb-text-muted); font-size: .7rem; }
 .company-status-proposal { color: #a86b12; font-weight: 700; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.03em; }
 .company-detail-body { display: grid; gap: 4px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .detail-tile { padding: 6px; border: 1px solid var(--fwlb-border-soft); border-radius: var(--fwlb-radius-md); background: var(--fwlb-surface-muted); }
+.detail-tile summary { cursor: pointer; font-weight: 700; margin-bottom: 4px; }
+.detail-expand-content { margin-top: 4px; display: grid; gap: 3px; }
+.detail-expand-content details { border: 1px dashed var(--fwlb-border-soft); border-radius: 7px; padding: 4px 6px; background: var(--fwlb-surface-elevated); }
+.detail-expand-content p { margin: 0; font-size: 0.74rem; line-height: 1.25; }
 .ranking-list { margin: 5px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .ranking-item { margin: 0; }
 .ranking-card {
