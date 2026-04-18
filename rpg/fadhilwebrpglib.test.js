@@ -68,3 +68,29 @@ test('battleFinished true bila enemy tumbang semua', () => {
   state.enemies[0].alive = false;
   assert.equal(lib.battleFinished(state), true);
 });
+
+test('travelTo berhasil untuk node tetangga', () => {
+  const lib = loadLib();
+  const state = sampleState(lib);
+  const view = lib.getMapView(state);
+  const current = view.locations.find((l) => l.isCurrent);
+  const neighbor = view.locations.find((l) => l.reachable && !l.isCurrent);
+  assert.ok(current);
+  assert.ok(neighbor);
+
+  const next = lib.travelTo(state, neighbor.id);
+  const nextView = lib.getMapView(next);
+  const moved = nextView.locations.find((l) => l.id === neighbor.id);
+  assert.equal(moved.isCurrent, true);
+});
+
+test('processTextCommand map/battle mengganti mode', () => {
+  const lib = loadLib();
+  const state = sampleState(lib);
+
+  const mapMode = lib.processTextCommand(state, 'map', lib.seededRandom(1));
+  assert.equal(mapMode.mode, 'map');
+
+  const battleMode = lib.processTextCommand(mapMode, 'battle', lib.seededRandom(1));
+  assert.equal(battleMode.mode, 'battle');
+});

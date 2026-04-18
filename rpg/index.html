@@ -3,332 +3,334 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fadhil Web JRPG 2026</title>
+    <title>Fadhil Web Text RPG 2026</title>
     <style>
-      :root {
-        color-scheme: dark;
-        --bg: #04070f;
-        --surface: #121827;
-        --surface-soft: #1d2436;
-        --accent: #7c3aed;
-        --good: #22c55e;
-        --warn: #f59e0b;
-        --danger: #ef4444;
-      }
+      :root { color-scheme: dark; }
       * { box-sizing: border-box; }
       body {
         margin: 0;
-        font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
-        background: radial-gradient(circle at top, #1b2445 0%, var(--bg) 50%);
-        color: #edf1ff;
-      }
-      .shell { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; gap: 14px; }
-      .card { background: linear-gradient(160deg, #11172a, var(--surface)); border: 1px solid #2a3552; border-radius: 16px; padding: 14px; box-shadow: 0 14px 42px rgba(0,0,0,0.35); }
-      .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-      .title { margin: 0; font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
-      .desc { margin: 0; opacity: 0.82; font-size: 0.95rem; }
-      .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
-      .panel { grid-column: span 6; background: var(--surface-soft); border-radius: 12px; padding: 12px; }
-      .panel h2 { margin: 0 0 10px; font-size: 1rem; }
-      .unit { padding: 10px; background: #11182a; border: 1px solid #303e66; border-radius: 10px; margin-bottom: 8px; }
-      .unit.dead { opacity: 0.45; filter: grayscale(0.6); }
-      .unit strong { display: block; margin-bottom: 4px; }
-      .meter { height: 8px; border-radius: 20px; background: #0a0f1c; overflow: hidden; margin: 5px 0; }
-      .meter > span { height: 100%; display: block; }
-      .hp { background: linear-gradient(90deg, #16a34a, #86efac); }
-      .mp { background: linear-gradient(90deg, #2563eb, #93c5fd); }
-      .meta { font-size: 0.83rem; opacity: 0.9; display: flex; justify-content: space-between; }
-      .actions { display: flex; flex-wrap: wrap; gap: 8px; }
-      button, select {
-        border: 1px solid #3d4a73;
-        background: #1a2440;
-        color: #f5f7ff;
-        border-radius: 10px;
-        padding: 9px 12px;
-        font-weight: 650;
-      }
-      button:hover { background: #243057; cursor: pointer; }
-      button.primary { background: linear-gradient(90deg, #6d28d9, #2563eb); border-color: transparent; }
-      button.auto { background: linear-gradient(90deg, #059669, #2563eb); border-color: transparent; }
-      .timeline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-      .chip { background: #0f1527; border: 1px solid #2f3a5a; border-radius: 999px; font-size: 0.78rem; padding: 4px 10px; }
-      .hud { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 8px; }
-      .stat { background: #0f1527; border: 1px solid #2d3655; border-radius: 10px; padding: 8px; }
-      .stat label { font-size: 0.74rem; opacity: 0.8; display: block; }
-      .stat strong { font-size: 1rem; }
-      .log {
-        background: #090f1f;
-        border: 1px solid #2a3552;
-        border-radius: 12px;
-        min-height: 210px;
-        max-height: 290px;
-        overflow: auto;
-        padding: 10px;
+        background: #020617;
+        color: #dbeafe;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.82rem;
-        line-height: 1.45;
       }
-      .foot { font-size: 0.75rem; opacity: 0.75; }
-      @media (max-width: 900px) { .panel { grid-column: span 12; } .hud { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
+      .app { max-width: 1200px; margin: 0 auto; padding: 12px; display: grid; gap: 10px; }
+      .box { border: 1px solid #334155; border-radius: 8px; background: #0b1220; padding: 10px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+      .title { margin: 0; font-size: 1.1rem; }
+      button, select, input {
+        background: #111827;
+        color: #e2e8f0;
+        border: 1px solid #475569;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-family: inherit;
+      }
+      button:hover { cursor: pointer; background: #1e293b; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .pane { min-height: 180px; white-space: pre-wrap; font-size: 12px; line-height: 1.45; }
+      .terminal { min-height: 250px; max-height: 320px; overflow: auto; }
+      .status { font-size: 12px; line-height: 1.4; }
+      .map-wrap { display: none; overflow: hidden; height: 300px; position: relative; }
+      .map { position: absolute; inset: 0; background: linear-gradient(180deg, #082f49, #14532d); cursor: grab; }
+      .node {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        border: 1px solid #0f172a;
+        border-radius: 999px;
+        padding: 4px 7px;
+        font-size: 11px;
+      }
+      .node.city { background: #1d4ed8; }
+      .node.village { background: #059669; }
+      .node.dungeon { background: #7e22ce; }
+      .node.current { outline: 2px solid #fbbf24; }
+      .node.locked { opacity: 0.45; }
+      .help { opacity: 0.8; font-size: 11px; }
+      @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     </style>
   </head>
   <body>
-    <div class="shell">
-      <div class="card header">
-        <div>
-          <h1 class="title">Fadhil Web JRPG Core (2026 Lite Complex)</h1>
-          <p class="desc">Battle loop, timeline, limit, status, AI, item, dan auto-sim ditenagai penuh oleh <b>fadhilwebrpglib</b>.</p>
-        </div>
-        <div class="actions">
-          <button class="primary" id="stepBtn">Mainkan 1 Round</button>
-          <button id="autoBtn" class="auto">Auto x8</button>
-          <button id="resetBtn">Reset Battle</button>
-          <select id="heroSelect"></select>
-          <select id="actionSelect"></select>
-          <button id="manualBtn">Jalankan Aksi Hero</button>
-        </div>
+    <div class="app">
+      <div class="box">
+        <h1 class="title">FadhilWebRPGLib :: Text-Based JRPG 2026</h1>
+        <div class="help">Ringan & antilag: UI ini hanya terminal/render layer. Mekanik penuh dari fadhilwebrpglib.</div>
       </div>
 
-      <div class="card hud" id="hud"></div>
+      <div class="box row">
+        <button id="stepBtn">round</button>
+        <button id="autoBtn">auto x3</button>
+        <button id="mapBtn">Map</button>
+        <button id="resetBtn">reset</button>
+        <select id="heroSelect"></select>
+        <select id="actionSelect"></select>
+        <button id="manualBtn">run action</button>
+        <input id="cmdInput" placeholder="ketik command: help/status/map/battle/travel loc-kaze" size="48" />
+        <button id="cmdBtn">enter</button>
+      </div>
+
+      <div class="box map-wrap" id="mapWrap">
+        <div class="map" id="map"></div>
+      </div>
 
       <div class="grid">
-        <section class="panel" aria-label="party panel">
-          <h2>Party</h2>
-          <div id="party"></div>
-        </section>
-        <section class="panel" aria-label="enemy panel">
-          <h2>Enemy Squad</h2>
-          <div id="enemies"></div>
-        </section>
+        <div class="box pane" id="partyPane"></div>
+        <div class="box pane" id="enemyPane"></div>
       </div>
 
-      <div class="card">
-        <h2 style="margin:0;">Timeline Inisiatif</h2>
-        <div id="timeline" class="timeline"></div>
-      </div>
-
-      <div class="card">
-        <h2 style="margin:0 0 8px;">Combat Log</h2>
-        <div class="log" id="log"></div>
-      </div>
-      <div class="foot">Optimized: stateless render + mekanik deterministic seeded RNG untuk benchmark ringan.</div>
+      <div class="box status" id="status"></div>
+      <div class="box terminal" id="terminal"></div>
     </div>
 
     <script src="./fadhilwebrpglib.js"></script>
     <script>
       var lib = window.fadhilwebrpglib;
       var rand = lib.seededRandom(2026);
-      var autoTimer = null;
 
       var partyTemplate = [
-        { id:'hero-akari', name:'Akari Ronin', level:12, maxHp:290, hp:290, maxMp:88, mp:88, attack:52, defense:30, agility:35, spirit:24, element:'wind', alive:true,
+        { id:'hero-akari', name:'Akari Ronin', role:'striker', level:12, maxHp:290, hp:290, maxMp:88, mp:88, tp:20, attack:52, defense:30, agility:35, spirit:24, element:'wind', alive:true,
           skills:[
-            { id:'sakura-edge', name:'Sakura Edge', costMp:9, power:30, element:'wind', variance:0.14, addStatus:'slow' },
-            { id:'zen-limit', name:'Zen Limit Blade', costMp:14, power:66, element:'light', variance:0.1, limitCost:60 }
+            { id:'sakura-edge', name:'Sakura Edge', costMp:9, costTp:10, power:30, element:'wind', variance:0.14, addStatus:'slow', breakDamage:26, tags:['breaker'] },
+            { id:'zen-limit', name:'Zen Limit Blade', costMp:14, costTp:28, power:66, element:'light', variance:0.1, limitCost:60, breakDamage:30 }
           ] },
-        { id:'hero-ren', name:'Ren Onmyoji', level:12, maxHp:238, hp:238, maxMp:132, mp:132, attack:40, defense:26, agility:29, spirit:44, element:'water', alive:true,
+        { id:'hero-ren', name:'Ren Onmyoji', role:'oracle', level:12, maxHp:238, hp:238, maxMp:132, mp:132, tp:16, attack:40, defense:26, agility:29, spirit:44, element:'water', alive:true,
           skills:[
-            { id:'aqua-noctis', name:'Aqua Noctis', costMp:12, power:40, element:'water', variance:0.12, addStatus:'poison' },
-            { id:'tidal-prayer', name:'Tidal Prayer', costMp:16, power:0, element:'water', variance:0, target:'ally', healScale:3.1 }
+            { id:'aqua-noctis', name:'Aqua Noctis', costMp:12, costTp:6, power:40, element:'water', variance:0.12, addStatus:'poison', breakDamage:20 },
+            { id:'tidal-prayer', name:'Tidal Prayer', costMp:16, costTp:0, power:0, element:'water', variance:0, target:'ally', healScale:3.1, addStatus:'regen' }
           ] },
-        { id:'hero-mei', name:'Mei Gearsmith', level:12, maxHp:260, hp:260, maxMp:74, mp:74, attack:47, defense:33, agility:31, spirit:30, element:'fire', alive:true,
+        { id:'hero-mei', name:'Mei Gearsmith', role:'vanguard', level:12, maxHp:260, hp:260, maxMp:74, mp:74, tp:22, attack:47, defense:33, agility:31, spirit:30, element:'fire', alive:true,
           skills:[
-            { id:'gear-burst', name:'Gear Burst', costMp:8, power:28, element:'fire', variance:0.18, addStatus:'stun' },
-            { id:'omega-cascade', name:'Omega Cascade', costMp:16, power:52, element:'fire', variance:0.16, limitCost:70 }
+            { id:'gear-burst', name:'Gear Burst', costMp:8, costTp:10, power:28, element:'fire', variance:0.18, addStatus:'stun', breakDamage:24, tags:['breaker'] },
+            { id:'omega-cascade', name:'Omega Cascade', costMp:16, costTp:24, power:52, element:'fire', variance:0.16, limitCost:70, breakDamage:28 }
           ] }
       ];
 
       var enemyTemplate = [
-        { id:'enemy-oni', name:'Oni Vanguard', level:12, maxHp:336, hp:336, maxMp:82, mp:82, attack:48, defense:38, agility:20, spirit:24, element:'earth', alive:true,
-          skills:[{ id:'basalt-crash', name:'Basalt Crash', costMp:8, power:34, element:'earth', variance:0.1 }] },
-        { id:'enemy-yoru', name:'Yoru Specter', level:12, maxHp:224, hp:224, maxMp:126, mp:126, attack:42, defense:24, agility:41, spirit:41, element:'shadow', alive:true,
-          skills:[{ id:'abyss-lance', name:'Abyss Lance', costMp:12, power:45, element:'shadow', variance:0.15, addStatus:'poison' }] },
-        { id:'enemy-cleric', name:'Void Cleric', level:12, maxHp:270, hp:270, maxMp:140, mp:140, attack:36, defense:30, agility:27, spirit:45, element:'light', alive:true,
+        { id:'enemy-oni', name:'Oni Vanguard', role:'vanguard', level:12, maxHp:336, hp:336, maxMp:82, mp:82, tp:18, attack:48, defense:38, agility:20, spirit:24, element:'earth', alive:true,
+          skills:[{ id:'basalt-crash', name:'Basalt Crash', costMp:8, costTp:8, power:34, element:'earth', variance:0.1, breakDamage:22 }] },
+        { id:'enemy-yoru', name:'Yoru Specter', role:'striker', level:12, maxHp:224, hp:224, maxMp:126, mp:126, tp:20, attack:42, defense:24, agility:41, spirit:41, element:'shadow', alive:true,
+          skills:[{ id:'abyss-lance', name:'Abyss Lance', costMp:12, costTp:10, power:45, element:'shadow', variance:0.15, addStatus:'poison', breakDamage:20 }] },
+        { id:'enemy-cleric', name:'Void Cleric', role:'oracle', level:12, maxHp:270, hp:270, maxMp:140, mp:140, tp:14, attack:36, defense:30, agility:27, spirit:45, element:'light', alive:true,
           skills:[
-            { id:'dusk-ray', name:'Dusk Ray', costMp:11, power:33, element:'light', variance:0.12 },
-            { id:'night-rite', name:'Night Rite', costMp:15, power:0, element:'light', variance:0, target:'ally', healScale:2.6 }
+            { id:'dusk-ray', name:'Dusk Ray', costMp:11, costTp:6, power:33, element:'light', variance:0.12, breakDamage:18 },
+            { id:'night-rite', name:'Night Rite', costMp:15, costTp:0, power:0, element:'light', variance:0, target:'ally', healScale:2.6, addStatus:'regen' }
           ] }
       ];
 
-      function createInitialState(){
+      function createInitialState() {
         return lib.createState(partyTemplate, enemyTemplate, {
+          weather: 'clear',
           inventory: [
             { id:'ether-mini', name:'Ether Mini', qty:3, healMp:26, target:'ally' },
-            { id:'hi-potion', name:'Hi Potion', qty:4, healHp:110, target:'ally', cleanse:true }
+            { id:'hi-potion', name:'Hi Potion', qty:4, healHp:110, target:'ally', cleanse:true },
+            { id:'phoenix-nano', name:'Phoenix Nano', qty:2, revive:90, target:'ally' }
           ]
         });
       }
 
       var state = createInitialState();
-      var gameLog = [];
+      var logBuffer = ['Sistem text RPG aktif. ketik help untuk command.'];
+      var mapVisible = false;
+      var drag = { active:false, moved:false, x:0, y:0 };
 
       var nodes = {
-        party: document.getElementById('party'),
-        enemies: document.getElementById('enemies'),
-        timeline: document.getElementById('timeline'),
-        hud: document.getElementById('hud'),
-        log: document.getElementById('log'),
+        partyPane: document.getElementById('partyPane'),
+        enemyPane: document.getElementById('enemyPane'),
+        status: document.getElementById('status'),
+        terminal: document.getElementById('terminal'),
         heroSelect: document.getElementById('heroSelect'),
-        actionSelect: document.getElementById('actionSelect')
+        actionSelect: document.getElementById('actionSelect'),
+        cmdInput: document.getElementById('cmdInput'),
+        mapWrap: document.getElementById('mapWrap'),
+        map: document.getElementById('map')
       };
 
-      function ratio(part, total){ return Math.max(0, Math.min(100, Math.round((part / Math.max(1, total)) * 100))); }
+      function appendLog(lines) {
+        if (!lines || !lines.length) return;
+        logBuffer = logBuffer.concat(lines).slice(-220);
+      }
 
-      function renderUnits(root, units){
-        root.innerHTML = units.map(function(u){
-          var status = u.status.map(function(s){ return s.type + '(' + s.turns + ')'; }).join(', ') || '-';
-          return '<article class="unit ' + (u.alive ? '' : 'dead') + '">'
-            + '<strong>' + u.name + ' Lv' + u.level + '</strong>'
-            + '<div class="meter"><span class="hp" style="width:' + ratio(u.hp, u.maxHp) + '%"></span></div>'
-            + '<div class="meter"><span class="mp" style="width:' + ratio(u.mp, u.maxMp) + '%"></span></div>'
-            + '<div class="meta"><span>HP ' + u.hp + '/' + u.maxHp + ' · MP ' + u.mp + '/' + u.maxMp + '</span><span>Limit ' + u.limit + '%</span></div>'
-            + '<div class="meta"><span>Status: ' + status + '</span><span>' + (u.guarding ? 'Guard' : 'Ready') + '</span></div>'
-            + '</article>';
+      function unitToText(u) {
+        var status = (u.status || []).map(function(s){ return s.type + ':' + s.turns; }).join(', ') || '-';
+        var life = u.alive ? 'alive' : 'dead';
+        return u.name + ' [' + life + ']\n'
+          + 'HP ' + u.hp + '/' + u.maxHp + ' | MP ' + u.mp + '/' + u.maxMp + ' | TP ' + u.tp + ' | Limit ' + u.limit + '%\n'
+          + 'Break ' + u.breakGauge + '/' + u.maxBreakGauge + ' | Status: ' + status + '\n';
+      }
+
+      function renderPanels() {
+        nodes.partyPane.textContent = '== PARTY ==\n' + state.party.map(unitToText).join('\n');
+        nodes.enemyPane.textContent = '== ENEMY ==\n' + state.enemies.map(unitToText).join('\n');
+      }
+
+      function renderStatus() {
+        var summary = lib.getBattleSummary(state);
+        nodes.status.textContent = [
+          'Mode=' + summary.mode,
+          'Location=' + summary.location,
+          'Round=' + summary.cycle,
+          'Weather=' + summary.weather,
+          'Anomaly=' + summary.anomaly,
+          'PartyAlive=' + summary.partyAlive,
+          'EnemyAlive=' + summary.enemyAlive,
+          'Travel=' + summary.travelCount,
+          'Damage=' + summary.metrics.totalDamage,
+          'Heal=' + summary.metrics.totalHealing,
+          'Action=' + summary.metrics.actions
+        ].join(' | ');
+      }
+
+      function renderManualControls() {
+        var aliveParty = state.party.filter(function(u){ return u.alive; });
+        var selectedHero = nodes.heroSelect.value;
+
+        nodes.heroSelect.innerHTML = aliveParty.map(function(u){
+          var isSelected = selectedHero === u.id ? ' selected' : '';
+          return '<option value="' + u.id + '"' + isSelected + '>' + u.name + '</option>';
+        }).join('');
+
+        var actorId = nodes.heroSelect.value || (aliveParty[0] && aliveParty[0].id);
+        var catalog = actorId ? lib.listActionCatalog(state, actorId) : [];
+        nodes.actionSelect.innerHTML = catalog.map(function(action){
+          var dis = action.enabled === false ? ' [LOCK]' : '';
+          return '<option value="' + action.id + '">' + action.label + dis + '</option>';
         }).join('');
       }
 
-      function renderHud(summary){
-        var inv = state.inventory.map(function(item){ return item.name + ':' + item.qty; }).join(' | ');
-        nodes.hud.innerHTML = [
-          ['Round', summary.cycle],
-          ['Combo', state.combo + '/9'],
-          ['Party Alive', summary.partyAlive],
-          ['Enemy Alive', summary.enemyAlive],
-          ['Winner', summary.winner || '-'],
-          ['Turn Counter', state.turn],
-          ['Inventory', inv || '-'],
-          ['Engine', 'fadhilwebrpglib']
-        ].map(function(pair){
-          return '<div class="stat"><label>' + pair[0] + '</label><strong>' + pair[1] + '</strong></div>';
-        }).join('');
+      function renderTerminal() {
+        nodes.terminal.textContent = logBuffer.join('\n');
+        nodes.terminal.scrollTop = nodes.terminal.scrollHeight;
       }
 
-      function renderTimeline(){
-        var timeline = lib.createTimeline(state, rand);
-        state.timeline = timeline;
-        nodes.timeline.innerHTML = timeline.map(function(id){
-          var u = state.party.concat(state.enemies).find(function(e){ return e.id === id; });
-          return '<span class="chip">' + (u ? u.name : id) + '</span>';
-        }).join('');
+      function renderMap() {
+        if (!mapVisible) return;
+        var view = lib.getMapView(state);
+        var cam = view.camera;
+
+        nodes.map.innerHTML = '';
+        nodes.map.style.transform = 'translate(' + cam.x + 'px,' + cam.y + 'px)';
+
+        view.locations.forEach(function(loc){
+          var btn = document.createElement('button');
+          btn.className = 'node ' + loc.type + (loc.isCurrent ? ' current' : '') + (loc.reachable ? '' : ' locked');
+          btn.style.left = loc.x + 'px';
+          btn.style.top = loc.y + 'px';
+          btn.textContent = loc.name;
+          btn.dataset.locId = loc.id;
+          btn.title = loc.id + ' / danger ' + loc.danger;
+          nodes.map.appendChild(btn);
+        });
       }
 
-      function renderManualControls(){
-        nodes.heroSelect.innerHTML = state.party.filter(function(u){ return u.alive; }).map(function(u){
-          return '<option value="' + u.id + '">' + u.name + '</option>';
-        }).join('');
-        var heroId = nodes.heroSelect.value || (state.party.find(function(u){ return u.alive; }) || {}).id;
-        var hero = state.party.find(function(u){ return u.id === heroId; });
-        if (!hero) {
-          nodes.actionSelect.innerHTML = '<option>Tidak ada hero hidup</option>';
-          return;
-        }
-        var options = ['basic'].concat(hero.skills.map(function(skill){ return 'skill:' + skill.id; })).concat(state.inventory.filter(function(i){ return i.qty > 0; }).map(function(i){ return 'item:' + i.id; })).concat(['guard']);
-        nodes.actionSelect.innerHTML = options.map(function(value){ return '<option value="' + value + '">' + value + '</option>'; }).join('');
-      }
-
-      function renderLog(){
-        nodes.log.textContent = gameLog.slice(-80).join('\n');
-        nodes.log.scrollTop = nodes.log.scrollHeight;
-      }
-
-      function render(){
-        renderUnits(nodes.party, state.party);
-        renderUnits(nodes.enemies, state.enemies);
-        renderTimeline();
+      function render() {
+        nodes.mapWrap.style.display = mapVisible ? 'block' : 'none';
+        renderPanels();
+        renderStatus();
         renderManualControls();
-        renderHud(lib.getBattleSummary(state));
-        renderLog();
+        renderMap();
+        renderTerminal();
       }
 
-      function appendLogs(lines){
-        gameLog = gameLog.concat(lines);
+      function runRound() {
+        state = lib.runRound(state, rand);
+        appendLog(state.logs);
+        render();
       }
 
-      function stepRound(){
-        if (lib.battleFinished(state)) {
-          appendLogs(['=== Battle selesai ===']);
+      function runManual() {
+        var actorId = nodes.heroSelect.value;
+        var actionId = nodes.actionSelect.value;
+        if (!actorId || !actionId) return;
+
+        var action = lib.buildManualAction(state, actorId, actionId);
+        if (!action) {
+          appendLog(['Aksi tidak valid.']);
           render();
           return;
         }
-        state = lib.runRound(state, rand);
-        appendLogs(state.logs);
-        var summary = lib.getBattleSummary(state);
-        if (summary.finished) appendLogs(['Pemenang: ' + summary.winner]);
-        render();
-      }
 
-      function runHeroAction(){
-        var actorId = nodes.heroSelect.value;
-        if (!actorId || lib.battleFinished(state)) return;
-        var enemy = state.enemies.find(function(u){ return u.alive; });
-        var allyLow = state.party.filter(function(u){ return u.alive; }).sort(function(a,b){ return (a.hp / a.maxHp) - (b.hp / b.maxHp); })[0];
-        var selected = nodes.actionSelect.value;
-        var action;
-
-        if (selected === 'basic') {
-          action = { type: 'basic', actorId: actorId, targetId: enemy && enemy.id };
-        } else if (selected === 'guard') {
-          action = { type: 'guard', actorId: actorId };
-        } else if (selected.indexOf('skill:') === 0) {
-          var skillId = selected.slice(6);
-          var actor = state.party.find(function(u){ return u.id === actorId; });
-          var skill = actor && actor.skills.find(function(s){ return s.id === skillId; });
-          var targetId = skill && skill.target === 'ally' ? (allyLow && allyLow.id) : (enemy && enemy.id);
-          action = { type: 'skill', actorId: actorId, targetId: targetId, skillId: skillId };
-        } else if (selected.indexOf('item:') === 0) {
-          action = { type: 'item', actorId: actorId, targetId: allyLow && allyLow.id, itemId: selected.slice(5) };
-        }
-
-        if (!action || (!action.targetId && action.type !== 'guard')) return;
         state = lib.execute(state, action, rand);
-        appendLogs(['[Manual] ' + actorId + ' => ' + selected].concat(state.logs));
+        appendLog(['[manual] ' + actorId + ' => ' + actionId].concat(state.logs));
 
-        // musuh langsung balas satu aksi agar interaktif
-        var enemyActor = lib.createTimeline(state, rand).find(function(id){ return state.enemies.some(function(e){ return e.id === id && e.alive; }); });
+        var enemyActor = lib.createTimeline(state, rand).find(function(id){
+          return state.enemies.some(function(e){ return e.id === id && e.alive; });
+        });
         if (enemyActor && !lib.battleFinished(state)) {
           var enemyAction = lib.autoAction(state, enemyActor);
           state = lib.execute(state, enemyAction, rand);
-          appendLogs(state.logs);
+          appendLog(state.logs);
         }
+
         render();
       }
 
-      document.getElementById('stepBtn').addEventListener('click', stepRound);
-      document.getElementById('manualBtn').addEventListener('click', runHeroAction);
-      document.getElementById('heroSelect').addEventListener('change', renderManualControls);
-      document.getElementById('resetBtn').addEventListener('click', function(){
-        state = createInitialState();
-        gameLog = ['Battle direset.'];
-        if (autoTimer) {
-          clearInterval(autoTimer);
-          autoTimer = null;
-          document.getElementById('autoBtn').textContent = 'Auto x8';
-        }
+      function runCommand() {
+        var cmd = nodes.cmdInput.value;
+        nodes.cmdInput.value = '';
+        state = lib.processTextCommand(state, cmd, rand);
+        appendLog(['> ' + cmd].concat(state.logs));
+        mapVisible = state.mode === 'map';
+        render();
+      }
+
+      document.getElementById('stepBtn').addEventListener('click', runRound);
+      document.getElementById('autoBtn').addEventListener('click', function(){
+        state = lib.simulate(state, rand, 3);
+        appendLog(['[auto x3]'].concat(state.logs));
         render();
       });
 
-      document.getElementById('autoBtn').addEventListener('click', function(){
-        if (autoTimer) {
-          clearInterval(autoTimer);
-          autoTimer = null;
-          this.textContent = 'Auto x8';
-          return;
-        }
-        var loops = 0;
-        this.textContent = 'Stop Auto';
-        autoTimer = setInterval(function(){
-          if (loops >= 8 || lib.battleFinished(state)) {
-            clearInterval(autoTimer);
-            autoTimer = null;
-            document.getElementById('autoBtn').textContent = 'Auto x8';
-            return;
-          }
-          loops += 1;
-          stepRound();
-        }, 220);
+      document.getElementById('mapBtn').addEventListener('click', function(){
+        mapVisible = !mapVisible;
+        state.mode = mapVisible ? 'map' : 'battle';
+        appendLog([mapVisible ? 'Map dibuka.' : 'Map ditutup.']);
+        render();
       });
 
-      gameLog.push('Mesin JRPG aktif. Gunakan manual action atau auto battle.');
+      document.getElementById('resetBtn').addEventListener('click', function(){
+        state = createInitialState();
+        mapVisible = false;
+        logBuffer = ['Battle + world direset.'];
+        render();
+      });
+
+      document.getElementById('manualBtn').addEventListener('click', runManual);
+      document.getElementById('heroSelect').addEventListener('change', renderManualControls);
+      document.getElementById('cmdBtn').addEventListener('click', runCommand);
+      nodes.cmdInput.addEventListener('keydown', function(ev){ if (ev.key === 'Enter') runCommand(); });
+
+      nodes.map.addEventListener('click', function(ev){
+        if (drag.moved) return;
+        var target = ev.target;
+        if (!target || !target.dataset || !target.dataset.locId) return;
+        state = lib.travelTo(state, target.dataset.locId);
+        appendLog(['[travel click] ' + target.dataset.locId].concat(state.logs));
+        render();
+      });
+
+      nodes.map.addEventListener('mousedown', function(ev){
+        drag.active = true;
+        drag.moved = false;
+        drag.x = ev.clientX;
+        drag.y = ev.clientY;
+        nodes.map.style.cursor = 'grabbing';
+      });
+
+      window.addEventListener('mouseup', function(){
+        drag.active = false;
+        nodes.map.style.cursor = 'grab';
+      });
+
+      window.addEventListener('mousemove', function(ev){
+        if (!drag.active || !mapVisible) return;
+        var dx = ev.clientX - drag.x;
+        var dy = ev.clientY - drag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 2) drag.moved = true;
+        drag.x = ev.clientX;
+        drag.y = ev.clientY;
+        state = lib.updateMapCamera(state, dx, dy);
+        renderMap();
+      });
+
       render();
     </script>
   </body>
