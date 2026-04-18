@@ -19,7 +19,6 @@ import {
   runTicksBatched,
   simulateTick,
   transactShares,
-  withGameAction,
   getDisplayCompanies,
   getTopCompaniesSnapshot,
 } from '/dreambusiness/dream-engine.bundle.js';
@@ -58,6 +57,52 @@ let timer = null;
 let frame = 'main';
 let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
+
+function isValidGameState(candidate) {
+  return Boolean(
+    candidate
+    && typeof candidate === 'object'
+    && Number.isFinite(candidate.elapsedDays)
+    && Number.isFinite(candidate.tickCount)
+    && candidate.player
+    && Number.isFinite(candidate.player.cash)
+    && candidate.companies
+  );
+}
+
+function applyActionSafely(action, options = {}) {
+  const {
+    successMessage = null,
+    noopMessage = 'Aksi tidak mengubah state game.',
+    errorMessage = 'Terjadi error saat memproses aksi.',
+  } = options;
+  try {
+    const next = action(game);
+    if (next === game) {
+      setStatus(noopMessage, true);
+      return false;
+    }
+    if (!isValidGameState(next)) {
+      setStatus(`${errorMessage} (state tidak valid)`, true);
+      return false;
+    }
+    game = next;
+    if (successMessage) setStatus(successMessage);
+    return true;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    setStatus(`${errorMessage} (${reason})`, true);
+    return false;
+  }
+}
+
+function stopAutoIfRunning() {
+  if (!auto) return;
+  auto = false;
+  autoBtn.textContent = 'Start Auto';
+  if (timer) clearInterval(timer);
+  timer = null;
+}
 
 function selectedCompanyKey() {
   return companySelect.value || COMPANY_KEYS[0];
@@ -197,8 +242,20 @@ function renderCompanyDetail() {
 }
 
 function runTick(n = 1) {
-  game = runTicksBatched(game, n, simulateTick);
-  render();
+  try {
+    const next = runTicksBatched(game, n, simulateTick);
+    if (!isValidGameState(next)) {
+      stopAutoIfRunning();
+      setStatus('Tick gagal: state game tidak valid setelah simulasi.', true);
+      return;
+    }
+    game = next;
+    render();
+  } catch (error) {
+    stopAutoIfRunning();
+    const reason = error instanceof Error ? error.message : String(error);
+    setStatus(`Tick gagal karena error engine: ${reason}`, true);
+  }
 }
 
 function handleTrade(mode) {
@@ -225,34 +282,48 @@ function handleTrade(mode) {
     setStatus('Trade gagal: likuiditas atau dana tidak cukup.', true);
     return;
   }
-  withGameAction(
-    game,
+  const changed = applyActionSafely(
     (state) => transactShares(state, state.player.id, key, mode, amount, 'auto'),
-    (next) => {
-      game = next;
-      setStatus(`${mode === 'buy' ? 'Buy' : 'Sell'} ${key} berhasil. Gross ${formatMoneyCompact(preview.grossValue)}.`);
-      render();
-    },
-    () => setStatus('Trade tidak mengubah state game.', true)
+    {
+      successMessage: `${mode === 'buy' ? 'Buy' : 'Sell'} ${key} berhasil. Gross ${formatMoneyCompact(preview.grossTradeValue)}.`,
+      noopMessage: 'Trade tidak diproses: dana/likuiditas/aturan belum memenuhi.',
+      errorMessage: 'Trade gagal diproses',
+    }
   );
+  if (changed) render();
 }
 
 function handleInvestCompanyPlan() {
   const key = selectedCompanyKey();
   const company = game.companies[key];
-  if (!company) return;
+  if (!company) {
+    setStatus('Company tidak ditemukan.', true);
+    return;
+  }
+  const plan = game.plans[key];
+  if (!plan) {
+    setStatus(`Plan pendirian ${key} tidak tersedia.`, true);
+    return;
+  }
+  if (plan.isEstablished) {
+    setStatus(`Plan ${key} sudah selesai (company sudah established).`, true);
+    return;
+  }
   const context = getPlayerContext(company);
   const amount = Math.max(1, getRequestedTradeValue('buy', context));
-  withGameAction(
-    game,
+  if (amount > context.investorCash) {
+    setStatus('Invest plan gagal: kas player tidak cukup.', true);
+    return;
+  }
+  const changed = applyActionSafely(
     (state) => investInCompanyPlan(state, state.player.id, key, amount),
-    (next) => {
-      game = next;
-      setStatus(`Invest company plan ${key} sebesar ${formatMoneyCompact(amount)}.`);
-      render();
-    },
-    () => setStatus('Invest plan gagal (dana/validasi tidak memenuhi).', true)
+    {
+      successMessage: `Invest company plan ${key} sukses sebesar ${formatMoneyCompact(amount)}.`,
+      noopMessage: 'Invest plan gagal: dana minimum/validasi plan tidak terpenuhi.',
+      errorMessage: 'Invest plan error',
+    }
   );
+  if (changed) render();
 }
 
 function handleLicenseRequest() {
@@ -263,8 +334,7 @@ function handleLicenseRequest() {
     setStatus('Belum ada pasangan company game + app-store yang valid.', true);
     return;
   }
-  withGameAction(
-    game,
+  const changed = applyActionSafely(
     (state) => requestAppStoreLicense(
       state,
       state.player.id,
@@ -272,13 +342,13 @@ function handleLicenseRequest() {
       appStoreCompany.key,
       'license request from standalone dreambusiness'
     ),
-    (next) => {
-      game = next;
-      setStatus(`Request AppStore license: ${gameCompany.name} -> ${appStoreCompany.name}.`);
-      render();
-    },
-    () => setStatus('License request ditolak oleh rule engine.', true)
+    {
+      successMessage: `Request AppStore license: ${gameCompany.name} -> ${appStoreCompany.name}.`,
+      noopMessage: 'License request ditolak oleh rule engine.',
+      errorMessage: 'License request error',
+    }
   );
+  if (changed) render();
 }
 
 function handleCommunityPlanSeed() {
@@ -288,17 +358,41 @@ function handleCommunityPlanSeed() {
   const context = getPlayerContext(company);
   const amount = Math.max(6, getRequestedTradeValue('buy', context));
   const planName = `${company.name} Labs`;
-  const next = createCommunityCompanyPlan(game, game.player.id, planName, amount, company.field, company.softwareSpecialization ?? undefined);
-  if (next === game) {
-    setStatus('Gagal membuat community plan (cek dana/nama/slot aktif).', true);
+  const planCreated = applyActionSafely(
+    (state) => createCommunityCompanyPlan(
+      state,
+      state.player.id,
+      planName,
+      amount,
+      company.field,
+      company.softwareSpecialization ?? undefined
+    ),
+    {
+      successMessage: null,
+      noopMessage: 'Gagal membuat community plan (cek dana/nama/slot aktif).',
+      errorMessage: 'Community plan error',
+    }
+  );
+  if (!planCreated) {
     return;
   }
-  game = next;
   const plan = game.communityPlans.find((entry) => entry.companyName === planName && entry.status === 'funding');
-  if (plan) {
-    game = investInCommunityPlan(game, game.player.id, plan.id, Math.max(1, amount / 2));
+  if (!plan) {
+    setStatus('Community plan berhasil dibuat, tetapi plan tidak ditemukan untuk investasi lanjutan.', true);
+    render();
+    return;
   }
-  setStatus(`Community plan ${planName} dibuat dan didanai.`);
+  const seeded = applyActionSafely(
+    (state) => investInCommunityPlan(state, state.player.id, plan.id, Math.max(1, amount / 2)),
+    {
+      successMessage: `Community plan ${planName} dibuat dan didanai.`,
+      noopMessage: `Community plan ${planName} dibuat, namun top-up investasi tidak diproses.`,
+      errorMessage: `Top-up community plan ${planName} error`,
+    }
+  );
+  if (!seeded) {
+    setStatus(`Community plan ${planName} dibuat, namun top-up investasi gagal.`, true);
+  }
   render();
 }
 
