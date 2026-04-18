@@ -626,7 +626,36 @@ function renderCompanyDetail() {
         nextTierCost,
       };
     })
-    .sort((a, b) => b.tier - a.tier || b.nextTierCost - a.nextTierCost);
+    .sort((a, b) => a.tier - b.tier || a.nextTierCost - b.nextTierCost);
+
+  const topProductScore = Number.isFinite(company.lastProductScore)
+    ? Number(company.lastProductScore)
+    : (getCompanyValuation(company) * 0.25)
+      + (company.marketShare * 20)
+      + (company.reputation * 8)
+      + (company.releaseCount * 40)
+      + (company.researchPerDay * 30);
+
+  const technologyCapabilityScore = company.field === 'semiconductor'
+    ? (cpuScore * 0.62) + (company.researchPerDay * 20) + (company.releaseCount * 34) + (company.reputation * 6)
+    : company.field === 'game'
+      ? topProductScore + (company.releaseCount * 14) + (company.marketShare * 4)
+      : topProductScore + (company.researchPerDay * 10);
+
+  const averageTier = technologyRows.length
+    ? technologyRows.reduce((sum, row) => sum + row.tier, 0) / technologyRows.length
+    : 0;
+  const tierSpread = technologyRows.length
+    ? Math.sqrt(technologyRows.reduce((sum, row) => sum + Math.pow(row.tier - averageTier, 2), 0) / technologyRows.length)
+    : 0;
+  const rdBalanceIndex = Math.max(0, 100 - tierSpread * 18);
+  const hasNpcCeo = company.ceoId && company.ceoId !== game.player.id;
+  const hasCto = Boolean(company.executives?.cto?.occupantId);
+  const rdCoordinationNote = !hasCto
+    ? 'CTO belum terisi, riset cenderung tidak merata.'
+    : rdBalanceIndex < 70
+      ? 'Distribusi riset belum rata, upgrade tier terendah diprioritaskan.'
+      : 'Koordinasi CEO/CTO cukup stabil untuk riset merata.';
 
   const buildingRows = Object.entries(company.teams ?? {})
     .map(([teamKey, team]) => ({ name: toTitleCase(teamKey), count: Number(team?.count ?? 0) }))
@@ -645,6 +674,10 @@ function renderCompanyDetail() {
     <details class="detail-tile"><summary>Assets</summary><div class="detail-expand-content">
       <details><summary>Technology</summary><div>
         <p>CPU Performance Score: ${cpuScore.toFixed(2)}</p>
+        <p>Technology Capability Score: ${technologyCapabilityScore.toFixed(2)}</p>
+        <p>Top Product Score (Ranking): ${topProductScore.toFixed(2)}</p>
+        <p>R&D Balance Index: ${rdBalanceIndex.toFixed(1)}%</p>
+        <p>${hasNpcCeo ? 'CEO dipimpin AI. ' : 'CEO dipimpin player. '}${rdCoordinationNote}</p>
         ${technologyRows.map((entry) => `<p>${entry.name}: ${entry.spec} • Tier ${entry.tier} • Next Upgrade ${formatMoneyCompact(entry.nextTierCost)}</p>`).join('')}
       </div></details>
       <details><summary>Buildings</summary><div>${buildingRows.map((entry) => `<p>${entry.name}: ${entry.count}</p>`).join('')}</div></details>
