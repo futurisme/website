@@ -29,6 +29,7 @@ select, input { width: 100%; background: var(--fwlb-control-bg); color: var(--fw
 .company-card-btn { text-align: left; width: 100%; }
 .company-detail-body { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .detail-tile { padding: 8px; border: 1px solid var(--fwlb-border-soft); border-radius: var(--fwlb-radius-md); background: var(--fwlb-surface-muted); }
+.ranking-list { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
 .frame-back {
   position: absolute;
   top: 12px;

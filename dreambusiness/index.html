@@ -18,6 +18,7 @@
             <button id="auto">Start Auto</button>
             <button id="reset">Reset</button>
             <button id="toInvestment">Investment</button>
+            <button id="toRanking">Ranking</button>
             <button id="toFullframe">Companies</button>
           </div>
         </header>
@@ -26,8 +27,8 @@
 
         <section class="grid">
           <article class="card">
-            <h2>Top Company Snapshot</h2>
-            <ul id="companies"></ul>
+            <h2>Mainframe Notice</h2>
+            <p>Gunakan tombol Ranking untuk melihat leaderboard lengkap lintas perusahaan, investor, dan produk.</p>
           </article>
 
           <article class="card">
@@ -46,6 +47,19 @@
         </article>
       </section>
 
+      <section id="frameRanking" class="frame">
+        <button id="backFromRanking" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Ranking Fullframe</h2>
+          <div class="button-row">
+            <button id="rankingTopCompanies">Top Companies</button>
+            <button id="rankingRichest">Top Richest People</button>
+            <button id="rankingProducts">Product Ranking</button>
+          </div>
+          <ol id="rankingList" class="ranking-list"></ol>
+        </article>
+      </section>
+
       <section id="frameInvestment" class="frame">
         <button id="backFromInvestment" class="frame-back" aria-label="Back to mainframe">↩</button>
         <article class="card fullframe">
@@ -53,7 +67,7 @@
           <p>Fokus investasi, opsi pembelian, dan mekanisme penjualan full.</p>
           <div class="control-grid">
             <div>
-              <label>Company</label>
+              <label>Company ID (1-10)</label>
               <select id="companySelect"></select>
             </div>
             <div>

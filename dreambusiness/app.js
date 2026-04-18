@@ -22,7 +22,6 @@ import {
 } from '/dreambusiness/dream-engine.bundle.js';
 
 const statsEl = document.getElementById('stats');
-const companiesEl = document.getElementById('companies');
 const feedEl = document.getElementById('feed');
 const autoBtn = document.getElementById('auto');
 const companySelect = document.getElementById('companySelect');
@@ -30,6 +29,7 @@ const tradeAmountInput = document.getElementById('tradeAmount');
 const actionStatus = document.getElementById('actionStatus');
 const frameMain = document.getElementById('frameMain');
 const frameFull = document.getElementById('frameFull');
+const frameRanking = document.getElementById('frameRanking');
 const frameInvestment = document.getElementById('frameInvestment');
 const frameSub = document.getElementById('frameSub');
 const companyFrameList = document.getElementById('companyFrameList');
@@ -37,15 +37,33 @@ const companyDetailTitle = document.getElementById('companyDetailTitle');
 const companyDetailBody = document.getElementById('companyDetailBody');
 const toFullframeBtn = document.getElementById('toFullframe');
 const toInvestmentBtn = document.getElementById('toInvestment');
+const toRankingBtn = document.getElementById('toRanking');
 const backFromFullBtn = document.getElementById('backFromFull');
+const backFromRankingBtn = document.getElementById('backFromRanking');
 const backFromInvestmentBtn = document.getElementById('backFromInvestment');
 const backFromSubBtn = document.getElementById('backFromSub');
+const rankingList = document.getElementById('rankingList');
+const rankingTopCompaniesBtn = document.getElementById('rankingTopCompanies');
+const rankingRichestBtn = document.getElementById('rankingRichest');
+const rankingProductsBtn = document.getElementById('rankingProducts');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
 let auto = false;
 let timer = null;
 let frame = 'main';
 let selectedCompanyForDetail = null;
+let rankingMode = 'companies';
+
+function getDisplayCompanies(state) {
+  return getCompanySelectOptions(state)
+    .slice(0, 10)
+    .map((item, index) => ({
+      key: item.key,
+      slotId: String(index + 1),
+      name: state.companies[item.key].name,
+      company: state.companies[item.key],
+    }));
+}
 
 function selectedCompanyKey() {
   return companySelect.value || COMPANY_KEYS[0];
@@ -61,15 +79,11 @@ function setStatus(message, isError = false) {
   actionStatus.style.color = isError ? '#f1a0a0' : '#9ad7a8';
 }
 
-function summarizeTopCompanies(state) {
-  return getTopCompaniesSnapshot(state, getCompanyValuation, getSharePrice, 6);
-}
-
 function render() {
-  if (!companySelect.options.length) {
-    companySelect.innerHTML = getCompanySelectOptions(game)
-      .filter((item) => COMPANY_KEYS.includes(item.key))
-      .map((item) => `<option value="${item.key}">${item.label}</option>`)
+  const displayCompanies = getDisplayCompanies(game);
+  if (!companySelect.options.length || companySelect.options.length !== displayCompanies.length) {
+    companySelect.innerHTML = displayCompanies
+      .map((item) => `<option value="${item.key}">ID ${item.slotId} • ${item.name}</option>`)
       .join('');
   }
 
@@ -82,32 +96,31 @@ function render() {
     <article><h2>Weekly Income</h2><strong>${formatMoneyCompact(investorWeekly)}</strong><small>estimasi mingguan</small></article>
   `;
 
-  const top = summarizeTopCompanies(game);
-  companiesEl.innerHTML = top
-    .map((c) => `<li><strong>${c.name}</strong> (${c.key}) · Valuation ${formatMoneyCompact(c.valuation)} · Share $${c.sharePrice.toFixed(2)} · MS ${c.marketShare.toFixed(1)}%</li>`)
-    .join('');
-
   const feed = game.activityFeed.slice(-8).reverse();
   feedEl.innerHTML = (feed.length ? feed : ['Belum ada activity.']).map((item) => `<li>${item}</li>`).join('');
 
   renderCompanyFrames();
+  renderRankingFrame();
   renderFrameVisibility();
 }
 
 function renderFrameVisibility() {
   frameMain.classList.toggle('frame-active', frame === 'main');
   frameFull.classList.toggle('frame-active', frame === 'full');
+  frameRanking.classList.toggle('frame-active', frame === 'ranking');
   frameInvestment.classList.toggle('frame-active', frame === 'investment');
   frameSub.classList.toggle('frame-active', frame === 'sub');
 }
 
 function renderCompanyFrames() {
-  const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 20);
+  const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 10);
+  const slots = getDisplayCompanies(game);
+  const slotMap = new Map(slots.map((item) => [item.key, item.slotId]));
   companyFrameList.innerHTML = snapshots
     .map((company) => `
       <button class="company-card-btn" data-company-card="${company.key}">
+        <small>ID ${slotMap.get(company.key) ?? '-'}</small><br />
         <strong>${company.name}</strong><br />
-        <small>${company.key}</small><br />
         <span>Valuation ${formatMoneyCompact(company.valuation)}</span><br />
         <span>Share $${company.sharePrice.toFixed(2)} | MS ${company.marketShare.toFixed(1)}%</span>
       </button>
@@ -116,15 +129,76 @@ function renderCompanyFrames() {
 
 }
 
+function renderRankingFrame() {
+  const slots = getDisplayCompanies(game);
+  const slotMap = new Map(slots.map((item) => [item.key, item.slotId]));
+
+  if (rankingMode === 'companies') {
+    const rows = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 10);
+    rankingList.innerHTML = rows
+      .map((row, index) => `<li>#${index + 1} • ID ${slotMap.get(row.key) ?? '-'} • ${row.name} — Valuation ${formatMoneyCompact(row.valuation)} | Share $${row.sharePrice.toFixed(2)} | MS ${row.marketShare.toFixed(1)}%</li>`)
+      .join('');
+    return;
+  }
+
+  if (rankingMode === 'richest') {
+    const investors = [
+      { id: game.player.id, name: game.player.name },
+      ...game.npcs.map((npc) => ({ id: npc.id, name: npc.name })),
+    ]
+      .map((investor) => {
+        const holdings = getInvestorHoldingsValue(game, investor.id);
+        const cash = investor.id === game.player.id ? game.player.cash : (game.npcs.find((npc) => npc.id === investor.id)?.cash ?? 0);
+        return {
+          ...investor,
+          holdings,
+          cash,
+          total: holdings + cash,
+        };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+    rankingList.innerHTML = investors
+      .map((row, index) => `<li>#${index + 1} • ${row.name} — Net Worth ${formatMoneyCompact(row.total)} (Cash ${formatMoneyCompact(row.cash)}, Holdings ${formatMoneyCompact(row.holdings)})</li>`)
+      .join('');
+    return;
+  }
+
+  const productRows = slots
+    .map((slot) => {
+      const company = slot.company;
+      const score = (
+        getCompanyValuation(company) * 0.25
+        + company.marketShare * 20
+        + company.reputation * 8
+        + company.releaseCount * 40
+        + company.researchPerDay * 30
+      );
+      return {
+        slotId: slot.slotId,
+        name: company.name,
+        score,
+        releaseCount: company.releaseCount,
+        reputation: company.reputation,
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+  rankingList.innerHTML = productRows
+    .map((row, index) => `<li>#${index + 1} • ID ${row.slotId} • ${row.name} — Product Score ${row.score.toFixed(1)} (release ${row.releaseCount}, reputation ${row.reputation.toFixed(1)})</li>`)
+    .join('');
+}
+
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
+  const slot = getDisplayCompanies(game).find((item) => item.key === key);
   if (!company) {
     companyDetailTitle.textContent = 'Company Subfullframe';
     companyDetailBody.innerHTML = '<p>Company tidak ditemukan.</p>';
     return;
   }
-  companyDetailTitle.textContent = `${company.name} • Subfullframe`;
+  companyDetailTitle.textContent = `ID ${slot?.slotId ?? '-'} • ${company.name} • Subfullframe`;
   companyDetailBody.innerHTML = `
     <article class="detail-tile"><h3>Identity</h3><p>Key: ${company.key}</p><p>Founder: ${company.founder}</p><p>Field: ${company.field}</p></article>
     <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p></article>
@@ -234,9 +308,14 @@ document.getElementById('licenseBtn').addEventListener('click', handleLicenseReq
 document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
+toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderFrameVisibility(); });
 backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
+backFromRankingBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromInvestmentBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromSubBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
+rankingTopCompaniesBtn.addEventListener('click', () => { rankingMode = 'companies'; renderRankingFrame(); });
+rankingRichestBtn.addEventListener('click', () => { rankingMode = 'richest'; renderRankingFrame(); });
+rankingProductsBtn.addEventListener('click', () => { rankingMode = 'products'; renderRankingFrame(); });
 companyFrameList.addEventListener('click', (event) => {
   const target = event.target.closest('[data-company-card]');
   if (!target) return;
