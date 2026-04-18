@@ -448,11 +448,15 @@ function render() {
     <article><h2>Weekly Income</h2><strong>${formatMoneyCompact(investorWeekly)}</strong><small>weekly estimate</small></article>
   `;
 
-  updateSliderPreview();
-  renderCompanyFrames();
+  if (frame === 'investment') {
+    updateSliderPreview();
+    updateInvestmentActionState();
+  }
+  if (frame === 'full' || frame === 'sub') {
+    renderCompanyFrames();
+  }
   if (frame === 'ranking') renderRankingFrame();
-  renderNewsFrame();
-  updateInvestmentActionState();
+  if (frame === 'news') renderNewsFrame();
   renderFrameVisibility();
 }
 
@@ -568,6 +572,18 @@ function getUpgradeSpecLabel(key, value) {
   return `${value.toFixed(2)}`;
 }
 
+function getUpgradeStepImpactLabel(key, step) {
+  const magnitude = Math.abs(Number(step ?? 0));
+  if (!Number.isFinite(magnitude) || magnitude <= 0) return 'No upgrade delta';
+  if (key === 'architecture') return `+${magnitude.toFixed(0)} gen / upgrade`;
+  if (key === 'clockSpeed') return `+${magnitude.toFixed(2)} GHz / upgrade`;
+  if (key === 'coreDesign') return `+${magnitude.toFixed(0)} core / upgrade`;
+  if (key === 'cacheStack') return `+${magnitude.toFixed(0)} KB cache / upgrade`;
+  if (key === 'lithography') return `-${magnitude.toFixed(0)} nm / upgrade`;
+  if (key === 'powerEfficiency') return `-${magnitude.toFixed(0)} W TDP / upgrade`;
+  return `${magnitude.toFixed(2)} / upgrade`;
+}
+
 function ensureCompanyUpgradeBaseline(company) {
   if (!company?.key || upgradeBaselineByCompany[company.key]) return;
   const baseline = {};
@@ -637,11 +653,11 @@ function renderCompanyDetail() {
       return {
         name: toTitleCase(upgradeKey),
         spec: getUpgradeSpecLabel(upgradeKey, value),
-        tier,
+        stepImpact: getUpgradeStepImpactLabel(upgradeKey, upgrade?.step),
         nextTierCost,
       };
     })
-    .sort((a, b) => a.tier - b.tier || a.nextTierCost - b.nextTierCost);
+    .sort((a, b) => a.nextTierCost - b.nextTierCost);
 
   const topProductScore = Number.isFinite(company.lastProductScore)
     ? Number(company.lastProductScore)
@@ -657,13 +673,13 @@ function renderCompanyDetail() {
       ? topProductScore + (company.releaseCount * 14) + (company.marketShare * 4)
       : topProductScore + (company.researchPerDay * 10);
 
-  const averageTier = technologyRows.length
-    ? technologyRows.reduce((sum, row) => sum + row.tier, 0) / technologyRows.length
+  const averageUpgradeCost = technologyRows.length
+    ? technologyRows.reduce((sum, row) => sum + row.nextTierCost, 0) / technologyRows.length
     : 0;
-  const tierSpread = technologyRows.length
-    ? Math.sqrt(technologyRows.reduce((sum, row) => sum + Math.pow(row.tier - averageTier, 2), 0) / technologyRows.length)
+  const upgradeCostSpread = technologyRows.length
+    ? Math.sqrt(technologyRows.reduce((sum, row) => sum + Math.pow(row.nextTierCost - averageUpgradeCost, 2), 0) / technologyRows.length)
     : 0;
-  const rdBalanceIndex = Math.max(0, 100 - tierSpread * 18);
+  const rdBalanceIndex = Math.max(0, 100 - (upgradeCostSpread / Math.max(1, averageUpgradeCost)) * 120);
   const hasNpcCeo = company.ceoId && company.ceoId !== game.player.id;
   const hasCto = Boolean(company.executives?.cto?.occupantId);
   const rdCoordinationNote = !hasCto
@@ -693,7 +709,7 @@ function renderCompanyDetail() {
         <p>Top Product Score (Ranking): ${topProductScore.toFixed(2)}</p>
         <p>R&D Balance Index: ${rdBalanceIndex.toFixed(1)}%</p>
         <p>${hasNpcCeo ? 'CEO dipimpin AI. ' : 'CEO dipimpin player. '}${rdCoordinationNote}</p>
-        ${technologyRows.map((entry) => `<p>${entry.name}: ${entry.spec} • Tier ${entry.tier} • Next Upgrade ${formatMoneyCompact(entry.nextTierCost)}</p>`).join('')}
+        ${technologyRows.map((entry) => `<p>${entry.name}: ${entry.spec} • ${entry.stepImpact} • Next Upgrade ${formatMoneyCompact(entry.nextTierCost)}</p>`).join('')}
       </div></details>
       <details><summary>Buildings</summary><div>${buildingRows.map((entry) => `<p>${entry.name}: ${entry.count}</p>`).join('')}</div></details>
     </div></details>
@@ -876,10 +892,10 @@ investSlider.addEventListener('input', () => {
   updateSliderPreview();
 });
 companySelect.addEventListener('change', updateSliderPreview);
-toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
-toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
+toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderCompanyFrames(); renderFrameVisibility(); });
+toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; updateSliderPreview(); updateInvestmentActionState(); renderFrameVisibility(); });
 toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderRankingFrame(); renderFrameVisibility(); });
-toNewsBtn.addEventListener('click', () => { frame = 'news'; renderFrameVisibility(); });
+toNewsBtn.addEventListener('click', () => { frame = 'news'; renderNewsFrame(); renderFrameVisibility(); });
 backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromRankingBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromInvestmentBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
