@@ -28,10 +28,21 @@ const autoBtn = document.getElementById('auto');
 const companySelect = document.getElementById('companySelect');
 const tradeAmountInput = document.getElementById('tradeAmount');
 const actionStatus = document.getElementById('actionStatus');
+const frameMain = document.getElementById('frameMain');
+const frameFull = document.getElementById('frameFull');
+const frameSub = document.getElementById('frameSub');
+const companyFrameList = document.getElementById('companyFrameList');
+const companyDetailTitle = document.getElementById('companyDetailTitle');
+const companyDetailBody = document.getElementById('companyDetailBody');
+const navMain = document.getElementById('navMain');
+const navCompanies = document.getElementById('navCompanies');
+const navBack = document.getElementById('navBack');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
 let auto = false;
 let timer = null;
+let frame = 'main';
+let selectedCompanyForDetail = null;
 
 function selectedCompanyKey() {
   return companySelect.value || COMPANY_KEYS[0];
@@ -75,6 +86,56 @@ function render() {
 
   const feed = game.activityFeed.slice(-8).reverse();
   feedEl.innerHTML = (feed.length ? feed : ['Belum ada activity.']).map((item) => `<li>${item}</li>`).join('');
+
+  renderCompanyFrames();
+  renderFrameVisibility();
+}
+
+function renderFrameVisibility() {
+  frameMain.classList.toggle('frame-active', frame === 'main');
+  frameFull.classList.toggle('frame-active', frame === 'full');
+  frameSub.classList.toggle('frame-active', frame === 'sub');
+  navBack.textContent = frame === 'sub' ? 'Back to Fullframe' : 'Back to Mainframe';
+}
+
+function renderCompanyFrames() {
+  const snapshots = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 20);
+  companyFrameList.innerHTML = snapshots
+    .map((company) => `
+      <button class="company-card-btn" data-company-card="${company.key}">
+        <strong>${company.name}</strong><br />
+        <small>${company.key}</small><br />
+        <span>Valuation ${formatMoneyCompact(company.valuation)}</span><br />
+        <span>Share $${company.sharePrice.toFixed(2)} | MS ${company.marketShare.toFixed(1)}%</span>
+      </button>
+    `)
+    .join('');
+
+  companyFrameList.querySelectorAll('[data-company-card]').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedCompanyForDetail = button.getAttribute('data-company-card');
+      frame = 'sub';
+      renderCompanyDetail();
+      renderFrameVisibility();
+    });
+  });
+}
+
+function renderCompanyDetail() {
+  const key = selectedCompanyForDetail;
+  const company = key ? game.companies[key] : null;
+  if (!company) {
+    companyDetailTitle.textContent = 'Company Subfullframe';
+    companyDetailBody.innerHTML = '<p>Company tidak ditemukan.</p>';
+    return;
+  }
+  companyDetailTitle.textContent = `${company.name} • Subfullframe`;
+  companyDetailBody.innerHTML = `
+    <article class="detail-tile"><h3>Identity</h3><p>Key: ${company.key}</p><p>Founder: ${company.founder}</p><p>Field: ${company.field}</p></article>
+    <article class="detail-tile"><h3>Financial</h3><p>Cash: ${formatMoneyCompact(company.cash)}</p><p>Valuation: ${formatMoneyCompact(getCompanyValuation(company))}</p><p>Share: $${getSharePrice(company).toFixed(2)}</p></article>
+    <article class="detail-tile"><h3>Operation</h3><p>Research/day: ${company.researchPerDay.toFixed(2)}</p><p>Revenue/day: ${formatMoneyCompact(company.revenuePerDay)}</p><p>Market Share: ${company.marketShare.toFixed(1)}%</p></article>
+    <article class="detail-tile"><h3>Game State</h3><p>Release Count: ${company.releaseCount}</p><p>Reputation: ${company.reputation.toFixed(1)}</p><p>Established: ${company.isEstablished ? 'Yes' : 'No'}</p></article>
+  `;
 }
 
 function runTick(n = 1) {
@@ -176,6 +237,12 @@ document.getElementById('sellBtn').addEventListener('click', () => handleTrade('
 document.getElementById('investPlanBtn').addEventListener('click', handleInvestCompanyPlan);
 document.getElementById('licenseBtn').addEventListener('click', handleLicenseRequest);
 document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
+navMain.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
+navCompanies.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
+navBack.addEventListener('click', () => {
+  frame = frame === 'sub' ? 'full' : 'main';
+  renderFrameVisibility();
+});
 document.getElementById('reset').addEventListener('click', () => {
   game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
   auto = false;
@@ -184,6 +251,8 @@ document.getElementById('reset').addEventListener('click', () => {
   timer = null;
   companySelect.innerHTML = '';
   setStatus('Game di-reset.');
+  frame = 'main';
+  selectedCompanyForDetail = null;
   render();
 });
 

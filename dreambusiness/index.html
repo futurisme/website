@@ -6,11 +6,16 @@
     <title>DreamBusiness</title>
     <link rel="stylesheet" href="/dreambusiness/styles.css" />
   </head>
-  <body>
+  <body data-fwlb-theme="game">
     <main class="shell">
       <header class="header">
         <h1>DreamBusiness</h1>
         <p>Standalone game page dengan mekanisme business simulator dari dream-engine.</p>
+        <nav class="frame-nav">
+          <button id="navMain">Mainframe</button>
+          <button id="navCompanies">Companies</button>
+          <button id="navBack">Back</button>
+        </nav>
         <div class="actions">
           <button id="tick1">Simulate 1 Tick</button>
           <button id="tick25">Simulate 25 Tick</button>
@@ -19,40 +24,57 @@
         </div>
       </header>
 
-      <section class="stats" id="stats"></section>
-      <section class="card controls">
-        <h2>Interactive Command Deck</h2>
-        <div class="control-grid">
-          <div>
-            <label>Company</label>
-            <select id="companySelect"></select>
+      <section id="frameMain" class="frame frame-active">
+        <section class="stats" id="stats"></section>
+        <section class="card controls">
+          <h2>Interactive Command Deck</h2>
+          <div class="control-grid">
+            <div>
+              <label>Company</label>
+              <select id="companySelect"></select>
+            </div>
+            <div>
+              <label>Trade Value (M$)</label>
+              <input id="tradeAmount" type="number" min="0.1" step="0.1" value="2" />
+            </div>
+            <div class="button-row">
+              <button id="buyBtn">Buy (Auto Route)</button>
+              <button id="sellBtn">Sell (Auto Route)</button>
+            </div>
+            <div class="button-row">
+              <button id="investPlanBtn">Invest Company Plan</button>
+              <button id="licenseBtn">Request AppStore License</button>
+              <button id="communityBtn">Seed Community Plan</button>
+            </div>
           </div>
-          <div>
-            <label>Trade Value (M$)</label>
-            <input id="tradeAmount" type="number" min="0.1" step="0.1" value="2" />
-          </div>
-          <div class="button-row">
-            <button id="buyBtn">Buy (Auto Route)</button>
-            <button id="sellBtn">Sell (Auto Route)</button>
-          </div>
-          <div class="button-row">
-            <button id="investPlanBtn">Invest Company Plan</button>
-            <button id="licenseBtn">Request AppStore License</button>
-            <button id="communityBtn">Seed Community Plan</button>
-          </div>
-        </div>
-        <p id="actionStatus" class="status"></p>
+          <p id="actionStatus" class="status"></p>
+        </section>
+
+        <section class="grid">
+          <article class="card">
+            <h2>Top Company Snapshot</h2>
+            <ul id="companies"></ul>
+          </article>
+
+          <article class="card">
+            <h2>Activity Feed (Latest)</h2>
+            <ul id="feed"></ul>
+          </article>
+        </section>
       </section>
 
-      <section class="grid">
-        <article class="card">
-          <h2>Top Company Snapshot</h2>
-          <ul id="companies"></ul>
+      <section id="frameFull" class="frame">
+        <article class="card fullframe">
+          <h2>Companies Fullframe</h2>
+          <p>Klik salah satu card company untuk masuk ke Subfullframe detail.</p>
+          <div id="companyFrameList" class="company-frame-list"></div>
         </article>
+      </section>
 
-        <article class="card">
-          <h2>Activity Feed (Latest)</h2>
-          <ul id="feed"></ul>
+      <section id="frameSub" class="frame">
+        <article class="card fullframe">
+          <h2 id="companyDetailTitle">Company Subfullframe</h2>
+          <div id="companyDetailBody" class="company-detail-body"></div>
         </article>
       </section>
     </main>
