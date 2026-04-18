@@ -72,6 +72,12 @@ function sanitizeTitle(input) {
   return cleaned || 'ShareIdeas';
 }
 
+function sanitizeProgress(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+}
+
 function sanitizeData(input) {
   const root = input && typeof input === 'object' ? input : {};
   const appTitle = sanitizeTitle(root.appTitle);
@@ -103,6 +109,7 @@ function sanitizeData(input) {
                 id: sanitizeId(card.id, `card-${folderId}-${cardIndex + 1}`),
                 title,
                 description,
+                progress: sanitizeProgress(card.progress),
               };
             })
             .filter(Boolean)

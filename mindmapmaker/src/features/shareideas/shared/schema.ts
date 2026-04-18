@@ -2,6 +2,7 @@ export interface ShareIdeasCard {
   id: string;
   title: string;
   description: string;
+  progress: number;
 }
 
 export interface ShareIdeasFolder {
@@ -34,6 +35,12 @@ function sanitizeId(value: unknown, fallback: string) {
   return normalized ? normalized.slice(0, 96) : fallback;
 }
 
+function sanitizeProgress(value: unknown) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+}
+
 function sanitizeCard(value: unknown, fallbackId: string): ShareIdeasCard | null {
   if (!isRecord(value)) return null;
 
@@ -46,6 +53,7 @@ function sanitizeCard(value: unknown, fallbackId: string): ShareIdeasCard | null
     id: sanitizeId(value.id, fallbackId),
     title,
     description,
+    progress: sanitizeProgress(value.progress),
   };
 }
 
