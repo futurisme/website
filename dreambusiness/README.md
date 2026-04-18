@@ -1,15 +1,16 @@
 # DreamBusiness
 
-Folder ini adalah root top-level repository untuk semua source game **DreamBusiness**
-setara dengan folder `mindmapmaker`, `shareideas`, dan folder utama lain.
+Folder ini adalah proyek game standalone di level root repository.
 
-Struktur utama:
+## Struktur
 
-- `games/dreambusiness`: implementasi UI game dan antarmuka business simulator.
+- `index.html`, `styles.css`, `app.js`: halaman standalone untuk `https://fadhil.dev/games/dreambusiness`.
+- `dream-engine.ts`: entry rebranding engine yang **mengimpor mekanisme asli** dari:
+  - `mindmapmaker/src/features/gameplay/simulation-engine.ts`
+- `dream-engine.bundle.js`: hasil bundle browser dari `dream-engine.ts`.
+- `games/dreambusiness/*`: source UI React DreamBusiness existing.
 
-Aplikasi `mindmapmaker` tetap mengakses modul ini dengan alias:
+## Catatan
 
-- `@/games/dreambusiness`
-
-Alias tersebut diarahkan ke folder ini lewat konfigurasi
-`mindmapmaker/tsconfig.json`.
+Mekanisme simulasi tetap memakai engine existing (tanpa membuat mekanisme baru),
+hanya dipisahkan sebagai proyek game tersendiri di folder root `dreambusiness`.

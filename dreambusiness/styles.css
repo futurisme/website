@@ -1,0 +1,16 @@
+:root { color-scheme: dark; }
+body { margin: 0; font-family: Inter, system-ui, sans-serif; background: #070b18; color: #e8eeff; }
+.shell { max-width: 1100px; margin: 0 auto; padding: 28px; }
+.header h1 { margin: 0; font-size: 2rem; }
+.header p { margin: 8px 0 18px; color: #a5b4d8; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+button { background: #182341; border: 1px solid #2c3f72; color: #e8eeff; padding: 10px 12px; border-radius: 8px; cursor: pointer; }
+.stats { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0,1fr)); margin: 20px 0; }
+.stats article, .card { background: #101933; border: 1px solid #27345f; border-radius: 12px; padding: 14px; }
+.stats h2 { font-size: .8rem; margin: 0 0 8px; color: #9ab0df; text-transform: uppercase; letter-spacing: .05em; }
+.stats strong { font-size: 1.1rem; display:block; }
+.stats small { color: #a5b4d8; }
+.grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+ul { margin: 0; padding-left: 18px; }
+li { margin: 6px 0; }
+@media (max-width: 800px) { .stats, .grid { grid-template-columns: 1fr; } }

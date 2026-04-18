@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DreamBusiness</title>
+    <link rel="stylesheet" href="/dreambusiness/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <h1>DreamBusiness</h1>
+        <p>Standalone game page dengan mekanisme business simulator dari dream-engine.</p>
+        <div class="actions">
+          <button id="tick1">Simulate 1 Tick</button>
+          <button id="tick25">Simulate 25 Tick</button>
+          <button id="auto">Start Auto</button>
+          <button id="reset">Reset</button>
+        </div>
+      </header>
+
+      <section class="stats" id="stats"></section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Top Company Snapshot</h2>
+          <ul id="companies"></ul>
+        </article>
+
+        <article class="card">
+          <h2>Activity Feed (Latest)</h2>
+          <ul id="feed"></ul>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="/dreambusiness/app.js"></script>
+  </body>
+</html>

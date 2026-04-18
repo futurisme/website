@@ -36,6 +36,10 @@
     {
       "src": "Assets/Public/Images/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "dreambusiness/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -57,19 +61,27 @@
     },
     {
       "src": "/games/dreambusiness",
-      "dest": "/website/website/mindmapmaker/index.html"
+      "dest": "/dreambusiness/index.html"
     },
     {
       "src": "/games/dreambusiness/",
-      "dest": "/website/website/mindmapmaker/index.html"
+      "dest": "/dreambusiness/index.html"
+    },
+    {
+      "src": "/games/dreambusiness/(.*)",
+      "dest": "/dreambusiness/$1"
     },
     {
       "src": "/dreambusiness",
-      "dest": "/website/website/mindmapmaker/index.html"
+      "dest": "/dreambusiness/index.html"
     },
     {
       "src": "/dreambusiness/",
-      "dest": "/website/website/mindmapmaker/index.html"
+      "dest": "/dreambusiness/index.html"
+    },
+    {
+      "src": "/dreambusiness/(.*)",
+      "dest": "/dreambusiness/$1"
     },
     {
       "src": "/home",
