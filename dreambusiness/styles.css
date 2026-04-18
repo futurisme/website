@@ -18,6 +18,16 @@ button {
   font-size: .8rem;
   line-height: 1.15;
 }
+button.action-can-run {
+  border-color: #2f9d54;
+  background: #e7f7ed;
+  color: #165f2f;
+}
+button.action-will-fail {
+  border-color: #c65252;
+  background: #fdeeee;
+  color: #8e1e1e;
+}
 .stats { display: grid; gap: 4px; grid-template-columns: repeat(4, minmax(0,1fr)); margin: 6px 0; }
 .stats article, .card { background: var(--fwlb-surface-elevated); border: 1px solid var(--fwlb-border-soft); border-radius: var(--fwlb-radius-panel); padding: 7px; box-shadow: var(--fwlb-shadow-soft); }
 .stats h2 { font-size: .68rem; margin: 0 0 4px; color: var(--fwlb-text-muted); text-transform: uppercase; letter-spacing: .04em; line-height: 1.15; }

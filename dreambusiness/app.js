@@ -53,6 +53,11 @@ const rankingList = document.getElementById('rankingList');
 const rankingTopCompaniesBtn = document.getElementById('rankingTopCompanies');
 const rankingRichestBtn = document.getElementById('rankingRichest');
 const rankingProductsBtn = document.getElementById('rankingProducts');
+const buyBtn = document.getElementById('buyBtn');
+const sellBtn = document.getElementById('sellBtn');
+const investPlanBtn = document.getElementById('investPlanBtn');
+const licenseBtn = document.getElementById('licenseBtn');
+const communityBtn = document.getElementById('communityBtn');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
 let auto = false;
@@ -284,6 +289,99 @@ function updateSliderPreview() {
   );
   sliderValueLabel.textContent = `Invest ${sliderPercent.toFixed(0)}% cash = ${formatMoneyCompact(requestedValue, 2)}`;
   sharePercentPreview.textContent = `Estimated ownership after buy: ${preview.futureOwnership.toFixed(2)}% (fee ${formatMoneyCompact(preview.feeValue, 2)})`;
+  updateInvestmentActionState();
+}
+
+function setActionButtonState(button, canRun, canMessage, failMessage) {
+  button.classList.toggle('action-can-run', canRun);
+  button.classList.toggle('action-will-fail', !canRun);
+  button.setAttribute('aria-label', canRun ? canMessage : failMessage);
+  button.title = canRun ? canMessage : failMessage;
+}
+
+function canExecuteSafely(simulateAction) {
+  try {
+    const next = simulateAction(game);
+    return next !== game && isValidGameState(next);
+  } catch {
+    return false;
+  }
+}
+
+function updateInvestmentActionState() {
+  const key = selectedCompanyKey();
+  const company = game.companies[key];
+  if (!company) {
+    setActionButtonState(buyBtn, false, 'Buy is available', 'Buy akan gagal: company tidak ditemukan.');
+    setActionButtonState(sellBtn, false, 'Sell is available', 'Sell akan gagal: company tidak ditemukan.');
+    setActionButtonState(investPlanBtn, false, 'Invest plan is available', 'Invest Plan akan gagal: plan tidak ditemukan.');
+    setActionButtonState(licenseBtn, false, 'License flow is available', 'License Flow akan gagal.');
+    setActionButtonState(communityBtn, false, 'Community plan is available', 'Community Plan akan gagal.');
+    return;
+  }
+
+  const context = getPlayerContext(company);
+  const buyAmount = getRequestedTradeValue('buy', context);
+  const sellAmount = getRequestedTradeValue('sell', context);
+  const buyPreview = getTradePreview(game, company, game.player.id, context.investorCash, context.currentShares, 'buy', buyAmount, 'auto');
+  const sellPreview = getTradePreview(game, company, game.player.id, context.investorCash, context.currentShares, 'sell', sellAmount, 'auto');
+  setActionButtonState(
+    buyBtn,
+    buyPreview.grossTradeValue > 0,
+    'Buy (Auto) siap dieksekusi.',
+    'Buy (Auto) dipastikan gagal (dana/likuiditas tidak cukup).'
+  );
+  setActionButtonState(
+    sellBtn,
+    sellPreview.grossTradeValue > 0,
+    'Sell (Auto) siap dieksekusi.',
+    'Sell (Auto) dipastikan gagal (kepemilikan/likuiditas tidak cukup).'
+  );
+
+  const planAmount = Math.max(1, buyAmount);
+  const canInvestPlan = canExecuteSafely((state) => investInCompanyPlan(state, state.player.id, key, planAmount));
+  setActionButtonState(
+    investPlanBtn,
+    canInvestPlan,
+    'Invest Plan siap dieksekusi.',
+    'Invest Plan dipastikan gagal pada kondisi saat ini.'
+  );
+
+  const canLicense = canExecuteSafely((state) => {
+    const companies = Object.values(state.companies);
+    const gameCompany = companies.find((item) => item.isEstablished && item.field === 'game');
+    const appStoreCompany = companies.find((item) => item.isEstablished && item.field === 'software' && item.softwareSpecialization === 'app-store');
+    if (!gameCompany || !appStoreCompany) return state;
+    return requestAppStoreLicense(
+      state,
+      state.player.id,
+      gameCompany.key,
+      appStoreCompany.key,
+      'license request from standalone dreambusiness'
+    );
+  });
+  setActionButtonState(
+    licenseBtn,
+    canLicense,
+    'License Flow siap dieksekusi.',
+    'License Flow dipastikan gagal (pair game/app-store belum valid atau ditolak aturan).'
+  );
+
+  const communityAmount = Math.max(6, buyAmount);
+  const canCommunity = canExecuteSafely((state) => createCommunityCompanyPlan(
+    state,
+    state.player.id,
+    `${company.name} Labs`,
+    communityAmount,
+    company.field,
+    company.softwareSpecialization ?? undefined
+  ));
+  setActionButtonState(
+    communityBtn,
+    canCommunity,
+    'Community Plan siap dieksekusi.',
+    'Community Plan dipastikan gagal (fund/slot/nama tidak memenuhi aturan).'
+  );
 }
 
 function render() {
@@ -307,6 +405,7 @@ function render() {
   renderCompanyFrames();
   renderRankingFrame();
   renderNewsFrame();
+  updateInvestmentActionState();
   renderFrameVisibility();
 }
 
@@ -549,11 +648,11 @@ function handleCommunityPlanSeed() {
 
 document.getElementById('tick1').addEventListener('click', () => runTick(1));
 document.getElementById('tick25').addEventListener('click', () => runTick(25));
-document.getElementById('buyBtn').addEventListener('click', () => handleTrade('buy'));
-document.getElementById('sellBtn').addEventListener('click', () => handleTrade('sell'));
-document.getElementById('investPlanBtn').addEventListener('click', handleInvestCompanyPlan);
-document.getElementById('licenseBtn').addEventListener('click', handleLicenseRequest);
-document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
+buyBtn.addEventListener('click', () => handleTrade('buy'));
+sellBtn.addEventListener('click', () => handleTrade('sell'));
+investPlanBtn.addEventListener('click', handleInvestCompanyPlan);
+licenseBtn.addEventListener('click', handleLicenseRequest);
+communityBtn.addEventListener('click', handleCommunityPlanSeed);
 investSlider.addEventListener('input', updateSliderPreview);
 companySelect.addEventListener('change', updateSliderPreview);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
