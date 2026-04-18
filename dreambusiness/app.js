@@ -30,12 +30,15 @@ const tradeAmountInput = document.getElementById('tradeAmount');
 const actionStatus = document.getElementById('actionStatus');
 const frameMain = document.getElementById('frameMain');
 const frameFull = document.getElementById('frameFull');
+const frameInvestment = document.getElementById('frameInvestment');
 const frameSub = document.getElementById('frameSub');
 const companyFrameList = document.getElementById('companyFrameList');
 const companyDetailTitle = document.getElementById('companyDetailTitle');
 const companyDetailBody = document.getElementById('companyDetailBody');
 const toFullframeBtn = document.getElementById('toFullframe');
+const toInvestmentBtn = document.getElementById('toInvestment');
 const backFromFullBtn = document.getElementById('backFromFull');
+const backFromInvestmentBtn = document.getElementById('backFromInvestment');
 const backFromSubBtn = document.getElementById('backFromSub');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
@@ -94,6 +97,7 @@ function render() {
 function renderFrameVisibility() {
   frameMain.classList.toggle('frame-active', frame === 'main');
   frameFull.classList.toggle('frame-active', frame === 'full');
+  frameInvestment.classList.toggle('frame-active', frame === 'investment');
   frameSub.classList.toggle('frame-active', frame === 'sub');
 }
 
@@ -110,14 +114,6 @@ function renderCompanyFrames() {
     `)
     .join('');
 
-  companyFrameList.querySelectorAll('[data-company-card]').forEach((button) => {
-    button.addEventListener('click', () => {
-      selectedCompanyForDetail = button.getAttribute('data-company-card');
-      frame = 'sub';
-      renderCompanyDetail();
-      renderFrameVisibility();
-    });
-  });
 }
 
 function renderCompanyDetail() {
@@ -237,8 +233,18 @@ document.getElementById('investPlanBtn').addEventListener('click', handleInvestC
 document.getElementById('licenseBtn').addEventListener('click', handleLicenseRequest);
 document.getElementById('communityBtn').addEventListener('click', handleCommunityPlanSeed);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
+toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
 backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
+backFromInvestmentBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromSubBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
+companyFrameList.addEventListener('click', (event) => {
+  const target = event.target.closest('[data-company-card]');
+  if (!target) return;
+  selectedCompanyForDetail = target.getAttribute('data-company-card');
+  frame = 'sub';
+  renderCompanyDetail();
+  renderFrameVisibility();
+});
 document.getElementById('reset').addEventListener('click', () => {
   game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
   auto = false;

@@ -17,34 +17,12 @@
             <button id="tick25">Simulate 25 Tick</button>
             <button id="auto">Start Auto</button>
             <button id="reset">Reset</button>
+            <button id="toInvestment">Investment</button>
             <button id="toFullframe">Companies</button>
           </div>
         </header>
 
         <section class="stats" id="stats"></section>
-        <section class="card controls">
-          <h2>Interactive Command Deck</h2>
-          <div class="control-grid">
-            <div>
-              <label>Company</label>
-              <select id="companySelect"></select>
-            </div>
-            <div>
-              <label>Trade Value (M$)</label>
-              <input id="tradeAmount" type="number" min="0.1" step="0.1" value="2" />
-            </div>
-            <div class="button-row">
-              <button id="buyBtn">Buy (Auto Route)</button>
-              <button id="sellBtn">Sell (Auto Route)</button>
-            </div>
-            <div class="button-row">
-              <button id="investPlanBtn">Invest Company Plan</button>
-              <button id="licenseBtn">Request AppStore License</button>
-              <button id="communityBtn">Seed Community Plan</button>
-            </div>
-          </div>
-          <p id="actionStatus" class="status"></p>
-        </section>
 
         <section class="grid">
           <article class="card">
@@ -65,6 +43,34 @@
           <h2>Companies Fullframe</h2>
           <p>Klik salah satu card company untuk masuk ke Subfullframe detail.</p>
           <div id="companyFrameList" class="company-frame-list"></div>
+        </article>
+      </section>
+
+      <section id="frameInvestment" class="frame">
+        <button id="backFromInvestment" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Investment Fullframe</h2>
+          <p>Fokus investasi, opsi pembelian, dan mekanisme penjualan full.</p>
+          <div class="control-grid">
+            <div>
+              <label>Company</label>
+              <select id="companySelect"></select>
+            </div>
+            <div>
+              <label>Trade Value (M$)</label>
+              <input id="tradeAmount" type="number" min="0.1" step="0.1" value="2" />
+            </div>
+            <div class="button-row">
+              <button id="buyBtn">Buy (Auto)</button>
+              <button id="sellBtn">Sell (Auto)</button>
+              <button id="investPlanBtn">Invest Plan</button>
+            </div>
+            <div class="button-row">
+              <button id="licenseBtn">License Flow</button>
+              <button id="communityBtn">Community Plan</button>
+            </div>
+            <p id="actionStatus" class="status"></p>
+          </div>
         </article>
       </section>
 
