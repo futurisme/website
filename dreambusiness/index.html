@@ -20,6 +20,7 @@
             <button id="toInvestment">Investment</button>
             <button id="toRanking">Ranking</button>
             <button id="toFullframe">Companies</button>
+            <button id="toNews">News</button>
           </div>
         </header>
 
@@ -28,14 +29,18 @@
         <section class="grid">
           <article class="card">
             <h2>Mainframe Notice</h2>
-            <p>Use Ranking to view the full leaderboard across companies, investors, and products.</p>
-          </article>
-
-          <article class="card">
-            <h2>Activity Feed (Latest)</h2>
-            <ul id="feed"></ul>
+            <p>Use News to read 5 major events only, while other fullframes focus on deeper analysis.</p>
           </article>
         </section>
+      </section>
+
+      <section id="frameNews" class="frame">
+        <button id="backFromNews" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe news-panel">
+          <h2>News Fullframe (Latest Major 5)</h2>
+          <p>Smart filter hanya menampilkan peristiwa besar agar tidak spam.</p>
+          <div id="newsTimeline" class="news-timeline"></div>
+        </article>
       </section>
 
       <section id="frameFull" class="frame">

@@ -24,7 +24,6 @@ import {
 } from '/dreambusiness/dream-engine.bundle.js';
 
 const statsEl = document.getElementById('stats');
-const feedEl = document.getElementById('feed');
 const autoBtn = document.getElementById('auto');
 const companySelect = document.getElementById('companySelect');
 const investSlider = document.getElementById('investSlider');
@@ -35,16 +34,20 @@ const frameMain = document.getElementById('frameMain');
 const frameFull = document.getElementById('frameFull');
 const frameRanking = document.getElementById('frameRanking');
 const frameInvestment = document.getElementById('frameInvestment');
+const frameNews = document.getElementById('frameNews');
 const frameSub = document.getElementById('frameSub');
+const newsTimeline = document.getElementById('newsTimeline');
 const companyFrameList = document.getElementById('companyFrameList');
 const companyDetailTitle = document.getElementById('companyDetailTitle');
 const companyDetailBody = document.getElementById('companyDetailBody');
 const toFullframeBtn = document.getElementById('toFullframe');
 const toInvestmentBtn = document.getElementById('toInvestment');
 const toRankingBtn = document.getElementById('toRanking');
+const toNewsBtn = document.getElementById('toNews');
 const backFromFullBtn = document.getElementById('backFromFull');
 const backFromRankingBtn = document.getElementById('backFromRanking');
 const backFromInvestmentBtn = document.getElementById('backFromInvestment');
+const backFromNewsBtn = document.getElementById('backFromNews');
 const backFromSubBtn = document.getElementById('backFromSub');
 const rankingList = document.getElementById('rankingList');
 const rankingTopCompaniesBtn = document.getElementById('rankingTopCompanies');
@@ -57,6 +60,127 @@ let timer = null;
 let frame = 'main';
 let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
+let previousSharePrices = {};
+
+function parseFeedEntry(entry) {
+  const [head, ...tail] = String(entry ?? '').split(':');
+  if (tail.length === 0) {
+    return { dateLabel: formatDateFromDays(game.elapsedDays), detail: head.trim() };
+  }
+  return { dateLabel: head.trim(), detail: tail.join(':').trim() };
+}
+
+function parseCompactMoney(text) {
+  const match = String(text).match(/(-?\$?\s?\d[\d,.]*)(?:\s?([KMBT]))?/i);
+  if (!match) return null;
+  const numeric = Number(match[1].replace(/\$/g, '').replace(/,/g, '').trim());
+  if (!Number.isFinite(numeric)) return null;
+  const unit = (match[2] ?? '').toUpperCase();
+  const scale = unit === 'T' ? 1e12 : unit === 'B' ? 1e9 : unit === 'M' ? 1e6 : unit === 'K' ? 1e3 : 1;
+  return numeric * scale;
+}
+
+function buildNewsItems() {
+  const keywordRules = [
+    { category: 'Pergantian CEO', regex: /\bCEO\b|chief executive|direktur utama|pergantian pimpinan|mengganti pimpinan/i, base: 9 },
+    { category: 'Investasi Besar', regex: /investasi|berkomitmen|modal|pendanaan|funding|suntikan dana/i, base: 5 },
+    { category: 'Penjualan Besar', regex: /menjual|penjualan|melepas|divestasi|buyback|akuisisi/i, base: 5 },
+    { category: 'Saham Ekstrem', regex: /saham|listing|harga|valuasi|anjlok|melonjak|drastis/i, base: 4 },
+  ];
+  const intensityRegex = /rekor|terbesar|di atas rata-rata|sangat mahal|anjlok|melonjak|drastis|panic|euforia/i;
+  const moneyValues = game.activityFeed
+    .map((entry) => parseCompactMoney(parseFeedEntry(entry).detail))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const amountAverage = moneyValues.length
+    ? moneyValues.reduce((sum, value) => sum + value, 0) / moneyValues.length
+    : 0;
+
+  const events = [];
+  const seen = new Set();
+  for (let index = game.activityFeed.length - 1; index >= 0; index -= 1) {
+    const parsed = parseFeedEntry(game.activityFeed[index]);
+    const matchRule = keywordRules.find((rule) => rule.regex.test(parsed.detail));
+    if (!matchRule) continue;
+
+    const amount = parseCompactMoney(parsed.detail);
+    const amountBoost = amountAverage > 0 && amount > amountAverage * 1.75 ? 3 : 0;
+    const intensityBoost = intensityRegex.test(parsed.detail) ? 2 : 0;
+    const score = matchRule.base + amountBoost + intensityBoost;
+    const severity = score >= 10 ? 'critical' : score >= 7 ? 'high' : 'normal';
+    const signature = `${parsed.dateLabel}:${matchRule.category}:${parsed.detail.slice(0, 44)}`;
+    if (seen.has(signature)) continue;
+    seen.add(signature);
+    events.push({
+      day: index,
+      dateLabel: parsed.dateLabel,
+      category: matchRule.category,
+      severity,
+      headline: parsed.detail,
+      detail: amountBoost > 0
+        ? 'Nilai transaksi berada jauh di atas rata-rata periode ini.'
+        : 'Peristiwa besar terdeteksi dari activity log.',
+      score,
+    });
+  }
+
+  for (const company of Object.values(game.companies)) {
+    const currentPrice = getSharePrice(company);
+    const previousPrice = previousSharePrices[company.key];
+    previousSharePrices[company.key] = currentPrice;
+    if (!Number.isFinite(previousPrice) || previousPrice <= 0) continue;
+    const deltaPct = ((currentPrice - previousPrice) / previousPrice) * 100;
+    if (Math.abs(deltaPct) < 15) continue;
+    const severity = Math.abs(deltaPct) >= 25 ? 'critical' : 'high';
+    const signature = `${game.elapsedDays}:${company.key}:price`;
+    if (seen.has(signature)) continue;
+    seen.add(signature);
+    events.push({
+      day: game.elapsedDays + 1_000_000,
+      dateLabel: formatDateFromDays(game.elapsedDays),
+      category: 'Saham Ekstrem',
+      severity,
+      headline: `${company.name} ${deltaPct > 0 ? 'naik drastis' : 'anjlok drastis'} ${Math.abs(deltaPct).toFixed(1)}%.`,
+      detail: `Harga saham berubah dari $${previousPrice.toFixed(2)} ke $${currentPrice.toFixed(2)}.`,
+      score: severity === 'critical' ? 11 : 8,
+    });
+  }
+
+  return events
+    .sort((a, b) => b.day - a.day || b.score - a.score)
+    .slice(0, 5);
+}
+
+function renderNewsFrame() {
+  const items = buildNewsItems();
+  if (items.length === 0) {
+    newsTimeline.innerHTML = '<p class="news-empty">Belum ada peristiwa besar. Jalankan simulasi dulu.</p>';
+    return;
+  }
+  const grouped = items.reduce((acc, item) => {
+    if (!acc[item.dateLabel]) acc[item.dateLabel] = [];
+    acc[item.dateLabel].push(item);
+    return acc;
+  }, {});
+  newsTimeline.innerHTML = Object.entries(grouped)
+    .map(([date, rows]) => `
+      <section class="news-date-group">
+        <h3>${escapeHtml(date)}</h3>
+        <ul>
+          ${rows.map((row) => `
+            <li class="news-item" data-severity="${row.severity}">
+              <div class="news-item-head">
+                <strong>${escapeHtml(row.category)}</strong>
+                <small>${row.severity === 'critical' ? 'Critical' : row.severity === 'high' ? 'High Impact' : 'Normal'}</small>
+              </div>
+              <p>${escapeHtml(row.headline)}</p>
+              <span>${escapeHtml(row.detail)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </section>
+    `)
+    .join('');
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -179,12 +303,10 @@ function render() {
     <article><h2>Weekly Income</h2><strong>${formatMoneyCompact(investorWeekly)}</strong><small>weekly estimate</small></article>
   `;
 
-  const feed = game.activityFeed.slice(-8).reverse();
-  feedEl.innerHTML = (feed.length ? feed : ['No activity yet.']).map((item) => `<li>${item}</li>`).join('');
-
   updateSliderPreview();
   renderCompanyFrames();
   renderRankingFrame();
+  renderNewsFrame();
   renderFrameVisibility();
 }
 
@@ -193,6 +315,7 @@ function renderFrameVisibility() {
   frameFull.classList.toggle('frame-active', frame === 'full');
   frameRanking.classList.toggle('frame-active', frame === 'ranking');
   frameInvestment.classList.toggle('frame-active', frame === 'investment');
+  frameNews.classList.toggle('frame-active', frame === 'news');
   frameSub.classList.toggle('frame-active', frame === 'sub');
 }
 
@@ -436,9 +559,11 @@ companySelect.addEventListener('change', updateSliderPreview);
 toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; renderFrameVisibility(); });
 toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderFrameVisibility(); });
+toNewsBtn.addEventListener('click', () => { frame = 'news'; renderFrameVisibility(); });
 backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromRankingBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromInvestmentBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
+backFromNewsBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
 backFromSubBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
 rankingTopCompaniesBtn.addEventListener('click', () => { rankingMode = 'companies'; renderRankingFrame(); });
 rankingRichestBtn.addEventListener('click', () => { rankingMode = 'richest'; renderRankingFrame(); });
@@ -458,6 +583,7 @@ document.getElementById('reset').addEventListener('click', () => {
   if (timer) clearInterval(timer);
   timer = null;
   companySelect.innerHTML = '';
+  previousSharePrices = {};
   setStatus('Game has been reset.');
   frame = 'main';
   selectedCompanyForDetail = null;
