@@ -57,17 +57,19 @@
     },
     {
       "src": "/games/dreambusiness",
-      "status": 308,
-      "headers": {
-        "Location": "/mindmapmaker"
-      }
+      "dest": "/mindmapmaker/dreambusiness"
     },
     {
       "src": "/games/dreambusiness/",
-      "status": 308,
-      "headers": {
-        "Location": "/mindmapmaker"
-      }
+      "dest": "/mindmapmaker/dreambusiness"
+    },
+    {
+      "src": "/dreambusiness",
+      "dest": "/mindmapmaker/dreambusiness"
+    },
+    {
+      "src": "/dreambusiness/",
+      "dest": "/mindmapmaker/dreambusiness"
     },
     {
       "src": "/home",
