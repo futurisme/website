@@ -867,6 +867,159 @@
     };
   }
 
+  var raceCatalog = {
+    humans: { label: 'Humans', stats: { vitality: 1, intellect: 1, charisma: 2, craft: 1, fortune: 1 } },
+    elves: { label: 'Elves', stats: { vitality: 0, intellect: 3, charisma: 1, craft: 2, fortune: 1 } },
+    dwarves: { label: 'Dwarves', stats: { vitality: 3, intellect: 1, charisma: 0, craft: 3, fortune: 0 } }
+  };
+
+  var bornAsCatalog = [
+    { id: 'peasants', label: 'Peasants', bonus: { vitality: 1, craft: 1 } },
+    { id: 'commoners', label: 'Commoners', bonus: { charisma: 1, fortune: 1 } },
+    { id: 'honorable', label: 'Honorable', bonus: { intellect: 1, charisma: 2 } },
+    { id: 'nobles', label: 'Nobles', bonus: { intellect: 2, fortune: 2 } }
+  ];
+
+  var birthPlaces = [
+    'Dusun Emberfall',
+    'Lereng Aurora',
+    'Pesisir Veloria',
+    'Benteng Kharon',
+    'Kampung Lumen',
+    'Hutan Nythra'
+  ];
+
+  var specialSkills = [
+    'Echo Reading',
+    'Iron Will',
+    'Moonlit Aim',
+    'Thread of Fortune',
+    'Aegis Pulse',
+    'Whispercraft'
+  ];
+
+  function capitalize(value) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  function randomPick(list, rng) {
+    return list[Math.floor(rng() * list.length)];
+  }
+
+  function normalizeRace(inputRace) {
+    var race = String(inputRace || '').toLowerCase();
+    if (!raceCatalog[race]) return 'humans';
+    return race;
+  }
+
+  function createAdventureProfile(input, rng) {
+    var rand = rng || Math.random;
+    var name = String((input && input.name) || '').trim();
+    if (!name) name = 'Wanderer';
+    var race = normalizeRace(input && input.race);
+    var bornAs = randomPick(bornAsCatalog, rand);
+    var birthPlace = randomPick(birthPlaces, rand);
+    var specialSkill = randomPick(specialSkills, rand);
+    return {
+      name: name.slice(0, 32),
+      race: race,
+      raceLabel: raceCatalog[race].label,
+      birthPlace: birthPlace,
+      specialSkill: specialSkill,
+      bornAs: bornAs.id,
+      bornAsLabel: bornAs.label,
+      introLines: [
+        'Malam sunyi pecah oleh tangisan pertama di ' + birthPlace + '.',
+        name + ' lahir sebagai ' + raceCatalog[race].label + ', membawa aura tak biasa.',
+        'Takdir menandai hidupmu dengan bakat: ' + specialSkill + '.',
+        'Darahmu tercatat sebagai ' + bornAs.label + ', dan dunia mulai bergerak.'
+      ]
+    };
+  }
+
+  function createPersonalState(profile, startAge, rng) {
+    var rand = rng || Math.random;
+    var age = Math.max(5, Math.min(8, Number(startAge) || 5));
+    var raceStats = raceCatalog[profile.race] ? raceCatalog[profile.race].stats : raceCatalog.humans.stats;
+    var bornAs = bornAsCatalog.find(function (entry) { return entry.id === profile.bornAs; }) || bornAsCatalog[0];
+    function stat(base) { return Math.max(1, base + Math.floor(rand() * 4)); }
+    return {
+      profile: {
+        name: profile.name,
+        race: profile.race,
+        raceLabel: profile.raceLabel,
+        birthPlace: profile.birthPlace,
+        specialSkill: profile.specialSkill,
+        bornAs: profile.bornAs,
+        bornAsLabel: profile.bornAsLabel
+      },
+      ageYears: age,
+      ageDays: 0,
+      totalDays: 0,
+      location: profile.birthPlace,
+      energy: 100,
+      mood: 72,
+      stats: {
+        vitality: stat(6 + raceStats.vitality + (bornAs.bonus.vitality || 0)),
+        intellect: stat(6 + raceStats.intellect + (bornAs.bonus.intellect || 0)),
+        charisma: stat(6 + raceStats.charisma + (bornAs.bonus.charisma || 0)),
+        craft: stat(6 + raceStats.craft + (bornAs.bonus.craft || 0)),
+        fortune: stat(6 + raceStats.fortune + (bornAs.bonus.fortune || 0))
+      },
+      logs: ['Kehidupan dimulai di umur ' + age + '.']
+    };
+  }
+
+  function tickIdleDays(personalState, days) {
+    var next = {
+      profile: personalState.profile,
+      ageYears: personalState.ageYears,
+      ageDays: personalState.ageDays,
+      totalDays: personalState.totalDays,
+      location: personalState.location,
+      energy: personalState.energy,
+      mood: personalState.mood,
+      stats: {
+        vitality: personalState.stats.vitality,
+        intellect: personalState.stats.intellect,
+        charisma: personalState.stats.charisma,
+        craft: personalState.stats.craft,
+        fortune: personalState.stats.fortune
+      },
+      logs: personalState.logs.slice(-14)
+    };
+    var step = Math.max(1, days || 1);
+    next.totalDays += step;
+    next.ageDays += step;
+    while (next.ageDays >= 365) {
+      next.ageYears += 1;
+      next.ageDays -= 365;
+      next.logs.push('Usia bertambah menjadi ' + next.ageYears + ' tahun.');
+    }
+    next.energy = Math.max(50, Math.min(100, next.energy - Math.floor(step / 3) + 2));
+    next.mood = Math.max(20, Math.min(100, next.mood + (next.stats.fortune > 9 ? 1 : 0)));
+    return next;
+  }
+
+  function getPersonalSummary(personalState) {
+    var month = Math.floor(personalState.ageDays / 30) + 1;
+    var day = (personalState.ageDays % 30) + 1;
+    return {
+      name: personalState.profile.name,
+      race: personalState.profile.raceLabel,
+      bornAs: personalState.profile.bornAsLabel,
+      specialSkill: personalState.profile.specialSkill,
+      location: personalState.location,
+      ageYears: personalState.ageYears,
+      ageDays: personalState.ageDays,
+      calendarText: 'Year ' + personalState.ageYears + ' · Month ' + month + ' · Day ' + day,
+      totalDays: personalState.totalDays,
+      energy: personalState.energy,
+      mood: personalState.mood,
+      stats: personalState.stats
+    };
+  }
+
   global.fadhilwebrpglib = {
     seededRandom: seededRandom,
     createState: createState,
@@ -883,6 +1036,10 @@
     travelTo: travelTo,
     processTextCommand: processTextCommand,
     getBattleSummary: getBattleSummary,
+    createAdventureProfile: createAdventureProfile,
+    createPersonalState: createPersonalState,
+    tickIdleDays: tickIdleDays,
+    getPersonalSummary: getPersonalSummary,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue
   };

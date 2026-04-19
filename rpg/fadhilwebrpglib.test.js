@@ -94,3 +94,26 @@ test('processTextCommand map/battle mengganti mode', () => {
   const battleMode = lib.processTextCommand(mapMode, 'battle', lib.seededRandom(1));
   assert.equal(battleMode.mode, 'battle');
 });
+
+test('createAdventureProfile menghasilkan data personal lengkap', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Fadhil', race: 'elves' }, lib.seededRandom(7));
+  assert.equal(profile.name, 'Fadhil');
+  assert.equal(profile.race, 'elves');
+  assert.ok(profile.birthPlace.length > 0);
+  assert.ok(profile.specialSkill.length > 0);
+  assert.ok(Array.isArray(profile.introLines));
+  assert.ok(profile.introLines.length >= 4);
+});
+
+test('tickIdleDays menambah hari dan menjaga state personal', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Nova', race: 'humans' }, lib.seededRandom(11));
+  const state = lib.createPersonalState(profile, 5, lib.seededRandom(12));
+  const next = lib.tickIdleDays(state, 3);
+  assert.equal(next.totalDays, 3);
+  assert.equal(next.ageDays, 3);
+  const summary = lib.getPersonalSummary(next);
+  assert.equal(summary.name, 'Nova');
+  assert.equal(summary.ageYears, 5);
+});
