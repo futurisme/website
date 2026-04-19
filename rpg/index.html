@@ -36,6 +36,10 @@
         margin-top:10px; min-height:150px; max-height:230px; overflow:auto; border:1px solid var(--line);
         border-radius:10px; background:#060b18; padding:8px; white-space:pre-wrap; font:12px/1.5 ui-monospace, monospace;
       }
+      .intro-stage { margin-top:10px; display:grid; gap:8px; }
+      .scene-card { border:1px solid var(--line); border-radius:10px; padding:10px; background:linear-gradient(120deg,#0c1630,#1e1b4b); min-height:86px; display:grid; align-content:center; }
+      .scene-card strong { font-size:.92rem; }
+      .scene-card span { color:#c7d2fe; font-size:.8rem; margin-top:4px; }
       .age-pick { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
       .stats { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
       .stat { border:1px solid var(--line); border-radius:9px; padding:6px; background:#0b162a; }
@@ -43,6 +47,18 @@
       .stat strong { font-size:.85rem; }
       .timeline { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; max-height:180px; overflow:auto; font:12px/1.45 ui-monospace, monospace; }
       .top-actions { margin-top:8px; display:flex; gap:6px; }
+      .map-wrap { margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#081425; overflow:hidden; height:min(56dvh, 430px); position:relative; touch-action:none; }
+      .map-plane { position:absolute; width:1120px; height:760px; background:radial-gradient(circle at 35% 35%, #0f766e, #0f172a 62%); transform-origin:0 0; }
+      .map-link { position:absolute; height:2px; background:rgba(148,163,184,.45); transform-origin:0 0; pointer-events:none; }
+      .travel-node { position:absolute; transform:translate(-50%, -50%); border:1px solid #1e293b; border-radius:10px; background:#111827; min-width:120px; padding:6px; text-align:center; }
+      .travel-node.current { outline:2px solid #fbbf24; }
+      .travel-node.locked { opacity:.45; }
+      .travel-node .place { display:block; font-size:.75rem; color:#dbeafe; margin-bottom:4px; }
+      .travel-node button { min-height:26px; font-size:.73rem; padding:4px 6px; display:flex; align-items:center; justify-content:center; gap:5px; }
+      .travel-node button:disabled { opacity:.5; cursor:not-allowed; }
+      .travel-banner { display:grid; place-items:center; min-height:62dvh; text-align:center; background:linear-gradient(180deg,#020617,#111827,#1d4ed8); border:1px solid var(--line); border-radius:12px; padding:18px; }
+      .travel-banner h2 { font-size:clamp(1.2rem,3.8vw,2rem); margin-bottom:10px; }
+      .travel-banner p { color:#bfdbfe; margin-bottom:8px; }
       @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
       @media (max-width:760px){ .split, .stats { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } }
     </style>
@@ -72,6 +88,7 @@
         <article class="card">
           <h2 class="title">Cinematic Intro</h2>
           <p class="muted">Narasi emosional pembukaan hidupmu.</p>
+          <div class="intro-stage" id="introStage"></div>
           <div class="intro-log" id="introLog"></div>
           <div class="age-pick" id="agePick" style="display:none;">
             <button data-age="5">Start Age 5</button>
@@ -94,8 +111,29 @@
           <div class="top-actions">
             <button id="restBtn">Rest +1 day</button>
             <button id="focusBtn">Focus training</button>
+            <button id="openMapBtn">World Map</button>
           </div>
           <div class="timeline" id="lifeLog"></div>
+        </article>
+      </section>
+
+      <section id="frameMap" class="frame">
+        <article class="card">
+          <h2 class="title">World Map</h2>
+          <p class="muted">Geser peta 2D. Tap panah Travel here untuk berpindah lokasi tetangga.</p>
+          <div class="top-actions"><button id="backMainBtn">Back</button></div>
+          <div class="map-wrap" id="mapWrap"><div class="map-plane" id="mapPlane"></div></div>
+        </article>
+      </section>
+
+      <section id="frameTravelIntro" class="frame">
+        <article class="travel-banner">
+          <div>
+            <p class="muted">Travel Sequence</p>
+            <h2 id="travelArrivalTitle">You have arrived at ...</h2>
+            <p id="travelArrivalDate">On Year 0 · Month 0 · Day 0</p>
+            <button class="primary" id="continueTravelBtn" style="max-width:240px;margin:0 auto;">Continue Journey</button>
+          </div>
         </article>
       </section>
     </main>
@@ -156,7 +194,8 @@
         el.style.color = isError ? '#fca5a5' : '';
       }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
-      function openFrame(id){ ['frameRegister','frameIntro','frameMain'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      var mapDrag = { active:false, x:0, y:0, moved:false };
+      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
 
       function renderMain(){
         if (!personalState) return;
@@ -175,6 +214,35 @@
         $('lifeLog').textContent = personalState.logs.slice(-18).join('\n');
       }
 
+      function renderMap(){
+        if (!personalState) return;
+        var view = lib.getPersonalMapView(personalState);
+        var byId = {};
+        view.locations.forEach(function(loc){ byId[loc.id] = loc; });
+        var links = [];
+        view.locations.forEach(function(loc){
+          var full = personalState.world.map.locations.find(function(x){ return x.id === loc.id; }) || { neighbors: [] };
+          (full.neighbors || []).forEach(function(targetId){
+            if (loc.id > targetId || !byId[targetId]) return;
+            var target = byId[targetId];
+            var dx = target.x - loc.x;
+            var dy = target.y - loc.y;
+            var len = Math.sqrt(dx * dx + dy * dy);
+            var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+            links.push('<div class=\"map-link\" style=\"left:' + loc.x + 'px;top:' + loc.y + 'px;width:' + len + 'px;transform:rotate(' + ang + 'deg);\"></div>');
+          });
+        });
+        var nodes = view.locations.map(function(loc){
+          return '<div class=\"travel-node ' + (loc.isCurrent ? 'current' : '') + (loc.reachable ? '' : ' locked') + '\" style=\"left:' + loc.x + 'px;top:' + loc.y + 'px;\">'
+            + '<span class=\"place\">' + loc.name + '</span>'
+            + '<button data-travel=\"' + loc.id + '\" ' + (loc.reachable && !loc.isCurrent ? '' : 'disabled') + '>Travel here ➜</button>'
+            + '</div>';
+        });
+        var plane = $('mapPlane');
+        plane.innerHTML = links.join('') + nodes.join('');
+        plane.style.transform = 'translate3d(' + view.camera.x + 'px,' + view.camera.y + 'px,0)';
+      }
+
       function startIdleClock(){
         if (idleTimer) clearInterval(idleTimer);
         idleTimer = setInterval(function(){
@@ -188,6 +256,7 @@
       function playIntro(){
         openFrame('frameIntro');
         $('introLog').textContent = '';
+        $('introStage').innerHTML = '';
         $('agePick').style.display = 'none';
         var lines = profile.introLines.concat([
           'Nama: ' + profile.name,
@@ -203,6 +272,9 @@
             clearInterval(timer);
             $('agePick').style.display = 'grid';
             return;
+          }
+          if (idx < 4) {
+            $('introStage').innerHTML = '<article class=\"scene-card\"><strong>' + lines[idx] + '</strong><span>Frame ' + (idx + 1) + ' · Takdir terus bergerak...</span></article>';
           }
           $('introLog').textContent += (idx ? '\n\n' : '') + lines[idx];
           $('introLog').scrollTop = $('introLog').scrollHeight;
@@ -244,6 +316,48 @@
         personalState.logs.push('Latihan fokus meningkatkan Intellect +1.');
         renderMain();
       }));
+
+      $('openMapBtn').addEventListener('click', safe(function(){
+        openFrame('frameMap');
+        renderMap();
+      }));
+
+      $('backMainBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('continueTravelBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('mapPlane').addEventListener('click', safe(function(ev){
+        if (mapDrag.moved) { mapDrag.moved = false; return; }
+        var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
+        if (!targetId || !personalState) return;
+        var before = personalState.location;
+        personalState = lib.travelPersonal(personalState, targetId);
+        if (before === personalState.location) return;
+        var summary = lib.getPersonalSummary(personalState);
+        $('travelArrivalTitle').textContent = 'You have arrived at ' + personalState.location;
+        $('travelArrivalDate').textContent = 'On ' + summary.calendarText;
+        openFrame('frameTravelIntro');
+      }));
+
+      $('mapWrap').addEventListener('pointerdown', safe(function(ev){ mapDrag.active = true; mapDrag.x = ev.clientX; mapDrag.y = ev.clientY; mapDrag.moved = false; if ($('mapWrap').setPointerCapture) $('mapWrap').setPointerCapture(ev.pointerId); }));
+      $('mapWrap').addEventListener('pointermove', safe(function(ev){
+        if (!mapDrag.active || !personalState) return;
+        var dx = ev.clientX - mapDrag.x;
+        var dy = ev.clientY - mapDrag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 2) mapDrag.moved = true;
+        mapDrag.x = ev.clientX;
+        mapDrag.y = ev.clientY;
+        personalState = lib.movePersonalMapCamera(personalState, dx, dy);
+        renderMap();
+      }));
+      $('mapWrap').addEventListener('pointerup', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } setTimeout(function(){ mapDrag.moved = false; }, 0); }));
+      $('mapWrap').addEventListener('pointercancel', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } }));
 
       if (!lib) {
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);

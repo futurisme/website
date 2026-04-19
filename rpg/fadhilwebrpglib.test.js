@@ -117,3 +117,17 @@ test('tickIdleDays menambah hari dan menjaga state personal', () => {
   assert.equal(summary.name, 'Nova');
   assert.equal(summary.ageYears, 5);
 });
+
+test('travelPersonal berpindah ke lokasi tetangga dan menambah waktu', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Kira', race: 'dwarves' }, lib.seededRandom(14));
+  const state = lib.createPersonalState(profile, 5, lib.seededRandom(15));
+  const view = lib.getPersonalMapView(state);
+  const current = view.locations.find((l) => l.isCurrent);
+  const target = view.locations.find((l) => l.reachable && !l.isCurrent);
+  assert.ok(current);
+  assert.ok(target);
+  const moved = lib.travelPersonal(state, target.id);
+  assert.equal(moved.location, target.name);
+  assert.equal(moved.totalDays, 2);
+});

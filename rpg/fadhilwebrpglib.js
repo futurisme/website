@@ -953,6 +953,20 @@
       ageDays: 0,
       totalDays: 0,
       location: profile.birthPlace,
+      world: {
+        map: {
+          width: 1120,
+          height: 760,
+          camera: { x: 0, y: 0 },
+          currentLocationId: 'loc-home',
+          locations: [
+            { id: 'loc-home', name: profile.birthPlace, type: 'hometown', x: 220, y: 260, neighbors: ['loc-river', 'loc-fort'] },
+            { id: 'loc-river', name: 'Rivergate', type: 'town', x: 430, y: 430, neighbors: ['loc-home', 'loc-fort', 'loc-vale'] },
+            { id: 'loc-fort', name: 'Fort Aster', type: 'city', x: 640, y: 240, neighbors: ['loc-home', 'loc-river', 'loc-vale'] },
+            { id: 'loc-vale', name: 'Vale of Lumen', type: 'city', x: 860, y: 480, neighbors: ['loc-river', 'loc-fort'] }
+          ]
+        }
+      },
       energy: 100,
       mood: 72,
       stats: {
@@ -973,6 +987,24 @@
       ageDays: personalState.ageDays,
       totalDays: personalState.totalDays,
       location: personalState.location,
+      world: {
+        map: {
+          width: personalState.world.map.width,
+          height: personalState.world.map.height,
+          camera: { x: personalState.world.map.camera.x, y: personalState.world.map.camera.y },
+          currentLocationId: personalState.world.map.currentLocationId,
+          locations: personalState.world.map.locations.map(function (loc) {
+            return {
+              id: loc.id,
+              name: loc.name,
+              type: loc.type,
+              x: loc.x,
+              y: loc.y,
+              neighbors: (loc.neighbors || []).slice(0)
+            };
+          })
+        }
+      },
       energy: personalState.energy,
       mood: personalState.mood,
       stats: {
@@ -984,7 +1016,8 @@
       },
       logs: personalState.logs.slice(-14)
     };
-    var step = Math.max(1, days || 1);
+    var rawStep = Number(days);
+    var step = Number.isFinite(rawStep) ? Math.max(0, Math.floor(rawStep)) : 1;
     next.totalDays += step;
     next.ageDays += step;
     while (next.ageDays >= 365) {
@@ -1016,6 +1049,51 @@
     };
   }
 
+  function getPersonalMapView(personalState) {
+    var map = personalState.world.map;
+    var currentId = map.currentLocationId;
+    var current = map.locations.find(function (loc) { return loc.id === currentId; }) || map.locations[0];
+    return {
+      width: map.width,
+      height: map.height,
+      camera: { x: map.camera.x, y: map.camera.y },
+      currentLocationId: currentId,
+      locations: map.locations.map(function (loc) {
+        return {
+          id: loc.id,
+          name: loc.name,
+          type: loc.type,
+          x: loc.x,
+          y: loc.y,
+          isCurrent: loc.id === currentId,
+          reachable: loc.id === currentId || (current.neighbors || []).indexOf(loc.id) >= 0
+        };
+      })
+    };
+  }
+
+  function movePersonalMapCamera(personalState, dx, dy) {
+    var next = tickIdleDays(personalState, 0);
+    var cam = next.world.map.camera;
+    cam.x = Math.max(-next.world.map.width * 0.5, Math.min(next.world.map.width * 0.5, cam.x + dx));
+    cam.y = Math.max(-next.world.map.height * 0.5, Math.min(next.world.map.height * 0.5, cam.y + dy));
+    return next;
+  }
+
+  function travelPersonal(personalState, targetLocationId) {
+    var next = tickIdleDays(personalState, 2);
+    var map = next.world.map;
+    var current = map.locations.find(function (loc) { return loc.id === map.currentLocationId; });
+    if (!current) return next;
+    if ((current.neighbors || []).indexOf(targetLocationId) < 0) return next;
+    var destination = map.locations.find(function (loc) { return loc.id === targetLocationId; });
+    if (!destination) return next;
+    map.currentLocationId = destination.id;
+    next.location = destination.name;
+    next.logs.push('Perjalanan berakhir di ' + destination.name + '.');
+    return next;
+  }
+
   global.fadhilwebrpglib = {
     seededRandom: seededRandom,
     createState: createState,
@@ -1036,6 +1114,9 @@
     createPersonalState: createPersonalState,
     tickIdleDays: tickIdleDays,
     getPersonalSummary: getPersonalSummary,
+    getPersonalMapView: getPersonalMapView,
+    movePersonalMapCamera: movePersonalMapCamera,
+    travelPersonal: travelPersonal,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue
   };
