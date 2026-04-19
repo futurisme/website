@@ -35,10 +35,10 @@
         "./node_modules/react/*"
       ],
       "@/games/dreambusiness": [
-        "../games/dreambusiness/games/dreambusiness"
+        "../games/dreambusiness"
       ],
       "@/games/dreambusiness/*": [
-        "../games/dreambusiness/games/dreambusiness/*"
+        "../games/dreambusiness/*"
       ],
       "@/*": [
         "./src/*"

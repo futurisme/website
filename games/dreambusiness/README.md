@@ -13,7 +13,7 @@ Folder ini adalah proyek game standalone di level root repository.
 ## Catatan
 
 Mekanisme simulasi tetap memakai engine existing (tanpa membuat mekanisme baru),
-hanya dipisahkan sebagai proyek game tersendiri di folder root `dreambusiness`.
+sekarang berada rapi di `games/dreambusiness` sebagai proyek game tersendiri.
 
 ## Quality Check
 
