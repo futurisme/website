@@ -92,18 +92,6 @@
       "dest": "/games/rpg/$1"
     },
     {
-      "src": "/dreambusiness",
-      "dest": "/games/dreambusiness/index.html"
-    },
-    {
-      "src": "/dreambusiness/",
-      "dest": "/games/dreambusiness/index.html"
-    },
-    {
-      "src": "/dreambusiness/(.*)",
-      "dest": "/games/dreambusiness/$1"
-    },
-    {
       "src": "/rpg",
       "dest": "/games/rpg/index.html"
     },

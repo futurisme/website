@@ -1,10 +1,11 @@
 {
   "summary": {
     "base_url": "https://fadhil.dev",
-    "generated_at": "2026-04-19T05:19:44Z",
-    "active_ok_count": 14,
+    "generated_at": "2026-04-19T05:27:23Z",
+    "paths_checked": 13,
+    "active_ok_count": 13,
     "error_count": 0,
-    "paths_checked": 14
+    "duplicate_groups": 71
   },
   "results": [
     {
@@ -12,7 +13,7 @@
       "url": "https://fadhil.dev/",
       "status": 200,
       "final_url": "https://fadhil.dev/",
-      "time_ms": 307.4,
+      "time_ms": 318.4,
       "content_type": "text/html; charset=utf-8",
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
       "seo_basics": {
@@ -30,12 +31,12 @@
       "url": "https://fadhil.dev/Books",
       "status": 200,
       "final_url": "https://fadhil.dev/Books",
-      "time_ms": 239.2,
+      "time_ms": 223.3,
       "content_type": "text/html; charset=utf-8",
       "title": "Books",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 1,
@@ -48,30 +49,12 @@
       "url": "https://fadhil.dev/Books/Editor",
       "status": 200,
       "final_url": "https://fadhil.dev/Books/Editor",
-      "time_ms": 215.8,
+      "time_ms": 151.5,
       "content_type": "text/html; charset=utf-8",
       "title": "Books Editor",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
-      },
-      "processing_hints": {
-        "script_tags": 1,
-        "stylesheet_links": 1
-      },
-      "deprecated_flags": []
-    },
-    {
-      "path": "/dreambusiness",
-      "url": "https://fadhil.dev/dreambusiness",
-      "status": 200,
-      "final_url": "https://fadhil.dev/dreambusiness",
-      "time_ms": 256.8,
-      "content_type": "text/html; charset=utf-8",
-      "title": "DreamBusiness",
-      "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 1,
@@ -84,7 +67,7 @@
       "url": "https://fadhil.dev/editor",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
-      "time_ms": 352.8,
+      "time_ms": 361.1,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Workspace",
       "seo_basics": {
@@ -102,12 +85,12 @@
       "url": "https://fadhil.dev/games/dreambusiness",
       "status": 200,
       "final_url": "https://fadhil.dev/games/dreambusiness",
-      "time_ms": 122.6,
+      "time_ms": 170.5,
       "content_type": "text/html; charset=utf-8",
       "title": "DreamBusiness",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 1,
@@ -120,12 +103,12 @@
       "url": "https://fadhil.dev/games/rpg",
       "status": 200,
       "final_url": "https://fadhil.dev/games/rpg",
-      "time_ms": 216.3,
+      "time_ms": 207.5,
       "content_type": "text/html; charset=utf-8",
       "title": "FadhiumRPG",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 3,
@@ -138,12 +121,12 @@
       "url": "https://fadhil.dev/home",
       "status": 200,
       "final_url": "https://fadhil.dev/home",
-      "time_ms": 174.4,
+      "time_ms": 144.6,
       "content_type": "text/html; charset=utf-8",
       "title": "Home | Website Hub",
       "seo_basics": {
         "meta_description": true,
-        "canonical": false
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 0,
@@ -156,7 +139,7 @@
       "url": "https://fadhil.dev/mindmapmaker",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker",
-      "time_ms": 179.2,
+      "time_ms": 192.5,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Menu",
       "seo_basics": {
@@ -174,7 +157,7 @@
       "url": "https://fadhil.dev/mindmapmaker/editor/1",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
-      "time_ms": 83.2,
+      "time_ms": 120.6,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Workspace",
       "seo_basics": {
@@ -192,7 +175,7 @@
       "url": "https://fadhil.dev/portfolio",
       "status": 200,
       "final_url": "https://fadhil.dev/portfolio",
-      "time_ms": 115.1,
+      "time_ms": 116.2,
       "content_type": "text/html; charset=utf-8",
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
       "seo_basics": {
@@ -210,12 +193,12 @@
       "url": "https://fadhil.dev/rpg",
       "status": 200,
       "final_url": "https://fadhil.dev/rpg",
-      "time_ms": 103.3,
+      "time_ms": 63.1,
       "content_type": "text/html; charset=utf-8",
       "title": "FadhiumRPG",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 3,
@@ -228,12 +211,12 @@
       "url": "https://fadhil.dev/shareideas",
       "status": 200,
       "final_url": "https://fadhil.dev/shareideas",
-      "time_ms": 148.2,
+      "time_ms": 155.3,
       "content_type": "text/html; charset=utf-8",
       "title": "ShareIdeas — Home",
       "seo_basics": {
-        "meta_description": false,
-        "canonical": false
+        "meta_description": true,
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 1,
@@ -246,12 +229,12 @@
       "url": "https://fadhil.dev/shareideas/page/1",
       "status": 200,
       "final_url": "https://fadhil.dev/shareideas/page/1",
-      "time_ms": 147.8,
+      "time_ms": 134.0,
       "content_type": "text/html; charset=utf-8",
       "title": "ShareIdeas",
       "seo_basics": {
         "meta_description": true,
-        "canonical": false
+        "canonical": true
       },
       "processing_hints": {
         "script_tags": 1,
@@ -259,5 +242,110 @@
       },
       "deprecated_flags": []
     }
+  ],
+  "duplicate_groups": [
+    [
+      "Assets/Public/Images/Mindmapmaker.webp",
+      "website/portfolio/testing/images/Mindmapmaker.webp",
+      "website/portfolio/testing/images/Portfolio.webp",
+      "website/portfolio/testing/images/ShareIdeas.webp"
+    ],
+    [
+      "library/fadhilweblib/styles/theme.css",
+      "website/home/theme.css",
+      "website/website/mindmapmaker/theme.css"
+    ],
+    [
+      "Assets/Public/Images/Shareideas.webp",
+      "Assets/Public/Images/shareideas.webp"
+    ],
+    [
+      "library/fadhilweblib/components/ActionGroup.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/ActionGroup.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/Button.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/Button.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/CollapsiblePanel.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/CollapsiblePanel.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/HeaderShell.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/HeaderShell.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/IconButton.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/IconButton.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/Inline.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/Inline.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/Panel.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/Panel.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/Stack.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/Stack.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/StatusChip.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/StatusChip.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/action-group.module.css",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/action-group.module.css"
+    ],
+    [
+      "library/fadhilweblib/components/feedback/EmptyState.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/EmptyState.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/feedback/KeyValueList.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/KeyValueList.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/feedback/Notice.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/Notice.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/feedback/ProgressBar.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/ProgressBar.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/feedback/Skeleton.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/Skeleton.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Checkbox.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Checkbox.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Field.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Field.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Input.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Input.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Range.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Range.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Select.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Select.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Switch.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Switch.tsx"
+    ],
+    [
+      "library/fadhilweblib/components/forms/Textarea.tsx",
+      "website/mindmapmaker/src/lib/fadhilweblib/components/forms/Textarea.tsx"
+    ]
   ]
 }
