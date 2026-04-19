@@ -11,6 +11,7 @@ export function createIndustryUiController({ root, handlers }) {
   const frames = {
     register: root.querySelector('#frameRegister'),
     main: root.querySelector('#frameMain'),
+    fullProfile: root.querySelector('#frameFullProfile'),
     fullProjects: root.querySelector('#frameFullProjects'),
     fullAdmin: root.querySelector('#frameFullAdmin'),
     fullFeed: root.querySelector('#frameFullFeed'),
@@ -18,6 +19,7 @@ export function createIndustryUiController({ root, handlers }) {
   };
 
   const statsEl = root.querySelector('#industryStats');
+  const profileEl = root.querySelector('#industryProfile');
   const projectsEl = root.querySelector('#industryProjects');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
@@ -28,8 +30,15 @@ export function createIndustryUiController({ root, handlers }) {
   const studioNameInput = root.querySelector('#studioNameInput');
 
   let selectedProjectId = null;
+  let currentSnapshot = null;
+
+  function canOpenFrame(frameKey) {
+    if (!currentSnapshot?.visualAccess) return true;
+    return currentSnapshot.visualAccess[frameKey] !== false;
+  }
 
   function openFrame(key) {
+    if (!canOpenFrame(key)) return;
     Object.values(frames).forEach((frame) => frame?.classList.remove('frame-active'));
     frames[key]?.classList.add('frame-active');
   }
@@ -45,6 +54,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="brainstorm"]').addEventListener('click', handlers.onBrainstorm);
   root.querySelector('[data-action="toggle-auto"]').addEventListener('click', handlers.onAutoToggle);
 
+  root.querySelector('[data-action="to-full-profile"]').addEventListener('click', () => openFrame('fullProfile'));
   root.querySelector('[data-action="to-full-projects"]').addEventListener('click', () => openFrame('fullProjects'));
   root.querySelector('[data-action="to-full-admin"]').addEventListener('click', () => openFrame('fullAdmin'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
@@ -79,6 +89,8 @@ export function createIndustryUiController({ root, handlers }) {
 
   return {
     render(snapshot) {
+      currentSnapshot = snapshot;
+
       if (!snapshot.registered) {
         openFrame('register');
         return;
@@ -86,12 +98,17 @@ export function createIndustryUiController({ root, handlers }) {
 
       topDateEl.textContent = snapshot.dayLabel;
       statsEl.innerHTML = `
-        <article class="industry-metric"><small>Nama</small><strong>${esc(snapshot.player.name)}</strong></article>
-        <article class="industry-metric"><small>Profesi awal</small><strong>${esc(snapshot.player.initialProfession)}</strong></article>
-        <article class="industry-metric"><small>Career sekarang</small><strong>${esc(snapshot.player.career)}</strong></article>
         <article class="industry-metric"><small>Cash</small><strong>${esc(snapshot.cashLabel)}</strong></article>
         <article class="industry-metric"><small>Funding Pool</small><strong>${snapshot.player.fundingPool.toLocaleString()}</strong></article>
         <article class="industry-metric"><small>Admin Score</small><strong>${snapshot.player.adminScore}</strong></article>
+        <article class="industry-metric"><small>Market Trend</small><strong>${snapshot.trend.toFixed(2)}</strong></article>
+      `;
+
+      profileEl.innerHTML = `
+        <article class="industry-metric"><small>Nama</small><strong>${esc(snapshot.player.name)}</strong></article>
+        <article class="industry-metric"><small>Profesi saat ini</small><strong>${esc(snapshot.player.currentProfession)}</strong></article>
+        <article class="industry-metric"><small>Reputasi</small><strong>${snapshot.reputation}</strong></article>
+        <article class="industry-metric"><small>Studio Aktif</small><strong>${esc(snapshot.player.studioName)}</strong></article>
       `;
 
       projectsEl.innerHTML = snapshot.projects.length
@@ -138,6 +155,12 @@ export function createIndustryUiController({ root, handlers }) {
           `;
         }
       }
+
+      root.querySelectorAll('[data-frame-target]').forEach((button) => {
+        const target = button.getAttribute('data-frame-target');
+        if (!target) return;
+        button.disabled = !canOpenFrame(target);
+      });
 
       if (!Object.values(frames).some((frame) => frame?.classList.contains('frame-active'))) {
         openFrame('main');

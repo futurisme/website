@@ -190,6 +190,19 @@ export function createAnimeIndustryRuntime() {
       }
 
       state.projects.forEach((project) => {
+        if (project.stage === 'committee_setup') {
+          const committeeStrength = project.committeeIds.reduce((sum, id) => {
+            const investor = state.investors.find((entry) => entry.id === id);
+            return sum + (investor ? investor.influence : 0);
+          }, 0);
+          const fundingTick = 120_000 + committeeStrength * 1100 + state.player.adminScore * 520;
+          project.securedBudget = Math.min(project.budgetNeed, project.securedBudget + fundingTick);
+          if (project.securedBudget >= project.budgetNeed * 0.78) {
+            project.stage = 'preproduction';
+            log(state, `${project.title} lolos komite dan masuk pre-production.`);
+          }
+        }
+
         if (project.stage === 'production' || project.stage === 'postproduction') {
           const studio = state.studios.find((entry) => entry.id === project.studioId);
           const speed = (studio?.speed ?? 50) / 100;
@@ -250,6 +263,7 @@ export function createAnimeIndustryRuntime() {
       const project = byId(state, projectId);
       if (!project || !project.studioId || !['pitching', 'committee_setup'].includes(project.stage)) return false;
       project.stage = 'committee_setup';
+      project.delayRisk = Math.max(0.05, project.delayRisk - 0.02);
       while (project.committeeIds.length < 3) {
         const candidate = state.investors[(state.day + project.committeeIds.length) % state.investors.length];
         if (!project.committeeIds.includes(candidate.id)) project.committeeIds.push(candidate.id);
@@ -259,6 +273,10 @@ export function createAnimeIndustryRuntime() {
         return sum + (inv ? 2_500_000 + inv.influence * 8_000 : 0);
       }, 0);
       project.securedBudget = Math.min(project.budgetNeed, raised);
+      if (project.securedBudget >= project.budgetNeed * 0.78) {
+        project.stage = 'preproduction';
+        log(state, `${project.title} langsung disetujui komite untuk pre-production.`);
+      }
       return true;
     });
   }
@@ -267,7 +285,9 @@ export function createAnimeIndustryRuntime() {
     return withAction('start-production', () => {
       const project = byId(state, projectId);
       if (!project || project.securedBudget < project.budgetNeed * 0.78) return false;
-      if (project.stage === 'committee_setup') project.stage = 'preproduction';
+      if (project.stage === 'committee_setup') {
+        project.stage = 'preproduction';
+      }
       if (project.stage === 'preproduction') {
         project.stage = 'production';
         state.cash -= 1_850_000;
@@ -313,13 +333,21 @@ export function createAnimeIndustryRuntime() {
       player: {
         name: state.player.name,
         initialProfession: state.player.initialProfession,
-        career: state.player.career,
+        currentProfession: state.player.career === 'studio-founder' ? 'CEO Studio' : state.player.career === 'animator' ? 'Animator' : state.player.initialProfession,
         writingMedium: state.player.writingMedium,
         studioName: state.studios.find((entry) => entry.id === state.player.studioId)?.name ?? '-',
         adminScore: state.player.adminScore,
         fundingPool: state.player.fundingPool,
       },
       ceoRequirements,
+      visualAccess: {
+        main: true,
+        fullProfile: true,
+        fullProjects: true,
+        fullFeed: true,
+        fullAdmin: state.player.career === 'studio-founder' || state.player.adminScore >= 8 || state.player.fundingPool >= 1_500_000,
+        subProject: true,
+      },
       projects: state.projects.filter((project) => !project.archived).map((project) => ({
         ...project,
         studioName: state.studios.find((entry) => entry.id === project.studioId)?.name ?? '-',

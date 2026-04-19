@@ -30,7 +30,7 @@
       <section id="frameMain" class="frame">
         <article class="industry-panel">
           <div class="topline">
-            <h2>Mainframe</h2>
+            <h1>Mainframe</h1>
             <small id="topDate"></small>
           </div>
           <div id="industryStats" class="industry-stats"></div>
@@ -39,10 +39,19 @@
             <button data-action="tick-7">+7 Day</button>
             <button data-action="brainstorm">Brainstorm IP</button>
             <button data-action="toggle-auto">Auto</button>
-            <button data-action="to-full-projects">Projects</button>
-            <button data-action="to-full-admin">CEO/Admin</button>
-            <button data-action="to-full-feed">Feed</button>
+            <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
+            <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
+            <button data-action="to-full-admin" data-frame-target="fullAdmin">CEO/Admin</button>
+            <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
           </div>
+        </article>
+      </section>
+
+
+      <section id="frameFullProfile" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Profile Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="industryProfile" class="industry-stats"></div>
         </article>
       </section>
 
