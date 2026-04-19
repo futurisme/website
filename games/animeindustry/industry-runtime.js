@@ -728,6 +728,76 @@ export function createAnimeIndustryRuntime() {
     });
   }
 
+  function exportCompactSave() {
+    return withAction('export-compact-save', () => {
+      const compact = {
+        v: 1,
+        d: state.day,
+        c: Math.round(state.cash),
+        r: Math.round(state.reputation),
+        p: {
+          n: state.player.name,
+          i: state.player.initialProfession,
+          cr: state.player.career,
+          wm: state.player.writingMedium,
+          sid: state.player.studioId,
+          a: Math.round(state.player.adminScore),
+          f: Math.round(state.player.fundingPool),
+          sp: !!state.player.studioPlanningOpen,
+        },
+        s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0 })),
+        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived })),
+        rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, rv: entry.revenue, st: entry.studio, d: entry.day })),
+        em: state.emails.slice(-40).map((entry) => ({ id: entry.id, s: entry.subject, b: entry.body, r: entry.read, t: entry.type, d: entry.day })),
+      };
+      return `AI26:${JSON.stringify(compact)}`;
+    });
+  }
+
+  function importCompactSave(rawText) {
+    return withAction('import-compact-save', () => {
+      const raw = String(rawText || '').trim();
+      if (!raw.startsWith('AI26:')) return false;
+      const data = JSON.parse(raw.slice(5));
+      if (!data || typeof data !== 'object') return false;
+
+      const fresh = createInitialState();
+      fresh.registered = true;
+      fresh.day = Number(data.d) || 0;
+      fresh.cash = Number(data.c) || 0;
+      fresh.reputation = Number(data.r) || 0;
+      fresh.player = {
+        ...fresh.player,
+        name: data.p?.n ?? fresh.player.name,
+        initialProfession: data.p?.i ?? fresh.player.initialProfession,
+        career: data.p?.cr ?? fresh.player.career,
+        writingMedium: data.p?.wm ?? fresh.player.writingMedium,
+        studioId: data.p?.sid ?? fresh.player.studioId,
+        adminScore: Number(data.p?.a) || 0,
+        fundingPool: Number(data.p?.f) || 0,
+        studioPlanningOpen: !!data.p?.sp,
+      };
+      fresh.studios = Array.isArray(data.s) ? data.s.map((entry) => ({
+        id: entry.id, name: entry.n, craft: Number(entry.c) || 50, speed: Number(entry.sp) || 50, network: Number(entry.nw) || 50,
+        ownership: entry.o ?? 'external', scoutPower: Number(entry.sc) || 50, ceoNpcId: entry.ceo ?? null,
+        equity: { player: Number(entry.eqp) || 0, investor: Number(entry.eqi) || 0 },
+      })) : fresh.studios;
+      fresh.projects = Array.isArray(data.pj) ? data.pj.map((entry) => ({
+        id: entry.id, title: entry.t, medium: entry.m, stage: entry.st, popularity: Number(entry.p) || 0, scriptQuality: Number(entry.q) || 0,
+        chapters: Number(entry.ch) || 0, studioId: entry.sid ?? null, interestedStudioIds: Array.isArray(entry.ints) ? entry.ints : [],
+        committeeIds: Array.isArray(entry.cm) ? entry.cm : [], committeeNegotiationLog: [], contractDraft: entry.cd ?? { creatorShare: 38, studioShare: 42, investorShare: 20 },
+        committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0,
+        delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar,
+      })) : [];
+      fresh.releases = Array.isArray(data.rl) ? data.rl.map((entry) => ({ id: entry.id, title: entry.t, score: Number(entry.s) || 0, revenue: Number(entry.rv) || 0, studio: entry.st ?? 'Unknown', day: Number(entry.d) || 0, medium: 'manga' })) : [];
+      fresh.emails = Array.isArray(data.em) ? data.em.map((entry) => ({ id: entry.id, subject: entry.s, body: entry.b, read: !!entry.r, type: entry.t ?? 'system', day: Number(entry.d) || 0 })) : [];
+      fresh.feed = [`Day ${fresh.day}: Save berhasil di-load.`];
+      fresh.usedNames = new Set([...fresh.studios.map((s) => s.name), ...fresh.projects.map((p) => p.title), ...fresh.npcs.map((n) => n.name)]);
+      state = fresh;
+      return true;
+    });
+  }
+
   function proposeMergerStudio() {
     return withAction('propose-merger-studio', () => {
       if (state.player.career !== 'studio-founder' || !state.player.studioId) return false;
@@ -902,6 +972,8 @@ export function createAnimeIndustryRuntime() {
     chooseAdaptationStudio,
     discussCommitteeContract,
     markEmailRead,
+    exportCompactSave,
+    importCompactSave,
     tick,
     snapshot,
     reset() {

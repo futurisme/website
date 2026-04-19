@@ -10,6 +10,7 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 .topline h1, .topline h2 { margin: 0; }
 .industry-toolbar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; margin-top: 6px; }
 button, input, select { width: 100%; border-radius: 7px; border: 1px solid #a5b7f366; background: #102453; color: #fff; min-height: 28px; padding: 4px 7px; line-height: 1.15; }
+textarea { width: 100%; border-radius: 7px; border: 1px solid #a5b7f366; background: #102453; color: #fff; min-height: 140px; padding: 6px 8px; resize: vertical; }
 button { transition: border-color .15s ease, background .15s ease; }
 button:hover:not(:disabled) { border-color: #d4e0ff; background: #16316f; }
 button:disabled { opacity: .45; cursor: not-allowed; }
@@ -42,6 +43,16 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 .industry-popup[data-tone="success"] { background: #0e3b20; border-color: #8dffc188; }
 .industry-popup.popup-show { opacity: 1; transform: translateY(0); }
+.settings-dock-btn {
+  position: fixed;
+  right: 10px;
+  bottom: 6px;
+  z-index: 9998;
+  width: auto;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
 @media (max-width: 760px) {
   .industry-toolbar { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }

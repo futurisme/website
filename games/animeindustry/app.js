@@ -44,6 +44,8 @@ if (!appRoot) {
       onReadEmail: (emailId) => { const ok = runtime.markEmailRead(emailId); ui.render(runtime.snapshot()); return ok; },
       onManagementMerger: () => { const ok = runtime.proposeMergerStudio(); ui.render(runtime.snapshot()); return ok; },
       onManagementCoFund: () => { const ok = runtime.proposeCoFundedStudio(); ui.render(runtime.snapshot()); return ok; },
+      onExportSave: () => runtime.exportCompactSave(),
+      onImportSave: (payload) => { const ok = runtime.importCompactSave(payload); ui.render(runtime.snapshot()); return ok; },
       onProduction: (projectId) => { runtime.startProduction(projectId); ui.render(runtime.snapshot()); },
       onLaunch: (projectId) => { runtime.launchAnime(projectId); ui.render(runtime.snapshot()); },
       onReset: () => { runtime.reset(); ui.setAutoState(false); ui.render(runtime.snapshot()); },

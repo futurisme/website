@@ -19,6 +19,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullFoundStudio: root.querySelector('#frameFullFoundStudio'),
     fullRanking: root.querySelector('#frameFullRanking'),
     fullManagement: root.querySelector('#frameFullManagement'),
+    fullSettings: root.querySelector('#frameFullSettings'),
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
   };
@@ -38,6 +39,7 @@ export function createIndustryUiController({ root, handlers }) {
   const subTitleEl = root.querySelector('#subProjectTitle');
   const subBodyEl = root.querySelector('#subProjectBody');
   const studioNameInput = root.querySelector('#studioNameInput');
+  const savePayloadInput = root.querySelector('#savePayloadInput');
 
   let selectedProjectId = null;
   let currentSnapshot = null;
@@ -88,6 +90,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="to-full-ranking"]').addEventListener('click', () => openFrame('fullRanking'));
   root.querySelector('[data-action="to-full-management"]').addEventListener('click', () => openFrame('fullManagement'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
+  root.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
 
@@ -131,6 +134,36 @@ export function createIndustryUiController({ root, handlers }) {
       openFrame('main');
     } else {
       showPopup('Gagal: co-funding belum memenuhi syarat.', 'error');
+    }
+  });
+  root.querySelector('[data-action="export-save"]')?.addEventListener('click', () => {
+    const payload = handlers.onExportSave?.() ?? '';
+    if (savePayloadInput) savePayloadInput.value = payload;
+    showPopup('Save berhasil digenerate.', 'success');
+  });
+  root.querySelector('[data-action="download-save"]')?.addEventListener('click', () => {
+    const payload = savePayloadInput?.value?.trim();
+    if (!payload) {
+      showPopup('Generate save dulu sebelum download.', 'error');
+      return;
+    }
+    const blob = new Blob([payload], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `animeindustry-save-day-${currentSnapshot?.day ?? 0}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showPopup('Save berhasil diunduh.', 'success');
+  });
+  root.querySelector('[data-action="load-save"]')?.addEventListener('click', () => {
+    const payload = savePayloadInput?.value ?? '';
+    const ok = handlers.onImportSave?.(payload);
+    if (ok) {
+      showPopup('Save berhasil di-load.', 'success');
+      openFrame('main');
+    } else {
+      showPopup('Gagal load save. Periksa format AI26.', 'error');
     }
   });
 

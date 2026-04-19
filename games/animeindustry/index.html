@@ -139,7 +139,21 @@
           <div id="subProjectBody"></div>
         </article>
       </section>
+
+      <section id="frameFullSettings" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Settings Save/Load</h2><button data-action="back-main">↩</button></div>
+          <p>Format save: teks ringkas yang bisa dibaca dan diedit manual.</p>
+          <textarea id="savePayloadInput" rows="8" placeholder="AI26:{...}"></textarea>
+          <div class="industry-toolbar">
+            <button data-action="export-save">Generate Save</button>
+            <button data-action="download-save">Download Save</button>
+            <button data-action="load-save">Load Save</button>
+          </div>
+        </article>
+      </section>
     </main>
+    <button id="settingsDockButton" data-action="to-full-settings" class="settings-dock-btn">Settings</button>
 
     <script type="module" src="/games/animeindustry/app.js"></script>
   </body>
