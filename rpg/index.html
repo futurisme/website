@@ -87,6 +87,11 @@
       .travel-banner h2 { font-size:clamp(1.2rem,3.8vw,2rem); margin-bottom:10px; }
       .travel-banner p { color:#bfdbfe; margin-bottom:8px; }
       .guild-log { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#060b18; min-height:180px; max-height:260px; overflow:auto; padding:8px; white-space:pre-wrap; font:12px/1.45 ui-monospace, monospace; }
+      .transition-frame { display:grid; place-items:center; min-height:80dvh; text-align:center; background:radial-gradient(circle at center,#111827,#020617); border:1px solid var(--line); border-radius:12px; opacity:0; animation:fadePulse .42s ease-out forwards; }
+      .subframe-head { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+      .building-detail { margin-top:8px; border:1px solid var(--line); border-radius:10px; background:#0a1226; padding:8px; }
+      .ranking-list { margin-top:8px; max-height:220px; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; font:12px/1.45 ui-monospace, monospace; }
+      @keyframes fadePulse { from { opacity:0; transform:scale(1.02); } to { opacity:1; transform:scale(1); } }
       @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
       @media (max-width:760px){ .split { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } .stat-row { grid-template-columns:84px 1fr; } }
     </style>
@@ -195,6 +200,27 @@
           <div class="top-actions"><button class="primary" id="guildDoneBtn">Finish</button></div>
         </article>
       </section>
+
+      <section id="frameTransition" class="frame">
+        <article class="transition-frame">
+          <div>
+            <p class="muted">Entering</p>
+            <h2 class="title" id="transitionTitle">Building...</h2>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameBuilding" class="frame">
+        <article class="card">
+          <div class="subframe-head">
+            <h2 class="title" id="buildingTitle">Building</h2>
+            <button id="backBuildingBtn" class="mini-btn">↩ Back</button>
+          </div>
+          <div class="building-detail" id="buildingDetail"></div>
+          <div class="top-actions" id="buildingActions"></div>
+          <div class="ranking-list" id="buildingExtra" style="display:none;"></div>
+        </article>
+      </section>
     </main>
 
     <script>
@@ -244,6 +270,7 @@
       var idleTimer = null;
       var introTimer = null;
       var panelOpenState = { Physical: true, Mental: false, Social: false };
+      var activeBuilding = null;
 
       function $(id){ return document.getElementById(id); }
       function setRuntimeStatus(text, isError){
@@ -256,7 +283,7 @@
       }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       var mapDrag = { active:false, x:0, y:0, moved:false };
-      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro','frameExplore'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro','frameExplore','frameTransition','frameBuilding'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
       function createEntropyRng(){
         var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);
         if (window.crypto && window.crypto.getRandomValues) {
@@ -414,6 +441,41 @@
         }, 900);
       }
 
+      function enterBuildingWithTransition(building){
+        activeBuilding = building;
+        $('transitionTitle').textContent = building.name;
+        openFrame('frameTransition');
+        setTimeout(function(){
+          renderBuildingSubframe();
+          openFrame('frameBuilding');
+        }, 420);
+      }
+
+      function renderBuildingSubframe(){
+        if (!personalState || !activeBuilding) return;
+        var summary = lib.getPersonalSummary(personalState);
+        $('buildingTitle').textContent = activeBuilding.name;
+        $('buildingExtra').style.display = 'none';
+        $('buildingExtra').textContent = '';
+        if (activeBuilding.id === 'guild') {
+          $('buildingDetail').innerHTML = '<strong>Adventurer\\'s Guild Branch</strong><br/>Grade kamu: <b>' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '') + '</b><br/>Status: ' + (summary.adventurerRegistered ? 'Registered' : 'Belum terdaftar');
+          $('buildingActions').innerHTML = '<button id=\"guildRegisterBtn\">Register to be an adventurer</button><button id=\"guildRankingBtn\">Ranking</button><button id=\"guildRecheckBtn\">Recheck Grade</button>';
+          return;
+        }
+        if (activeBuilding.id === 'training') {
+          $('buildingDetail').innerHTML = '<strong>Training Yard</strong><br/>Kondisi: ramai, pelatih siap membantu.';
+          $('buildingActions').innerHTML = '<button id=\"buildingTrainBtn\">Quick Drill</button>';
+          return;
+        }
+        if (activeBuilding.id === 'market') {
+          $('buildingDetail').innerHTML = '<strong>Grand Market</strong><br/>Kondisi: stok stabil, harga normal.';
+          $('buildingActions').innerHTML = '<button id=\"buildingTradeBtn\">Browse Market</button>';
+          return;
+        }
+        $('buildingDetail').innerHTML = '<strong>' + activeBuilding.name + '</strong><br/>' + activeBuilding.description;
+        $('buildingActions').innerHTML = '<button id=\"buildingRestBtn\">Take a Rest</button>';
+      }
+
       $('giveBirthBtn').addEventListener('click', safe(function(){
         if (!lib) return;
         rng = createEntropyRng();
@@ -475,6 +537,11 @@
         renderMain();
       }));
 
+      $('backBuildingBtn').addEventListener('click', safe(function(){
+        renderExplore();
+        openFrame('frameExplore');
+      }));
+
       $('mapPlane').addEventListener('click', safe(function(ev){
         if (mapDrag.moved) { mapDrag.moved = false; return; }
         var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
@@ -515,22 +582,57 @@
       $('exploreGrid').addEventListener('click', safe(function(ev){
         var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';
         if (!id || !personalState) return;
-        if (id === 'guild') {
-          if (!personalState.adventurer.registered) {
-            var reg = lib.registerAtGuild(personalState, rng);
-            personalState = reg.state;
-            playGuildIntro(reg.lines);
-          } else {
-            personalState.logs.push('Guild: status petualangmu sudah aktif.');
-            openFrame('frameMain');
-            renderMain();
+        var view = lib.getExploreView(personalState);
+        var building = view.buildings.find(function(item){ return item.id === id; });
+        if (!building) return;
+        enterBuildingWithTransition(building);
+      }));
+
+      $('buildingActions').addEventListener('click', safe(function(ev){
+        var id = ev.target && ev.target.id ? ev.target.id : '';
+        if (!id || !personalState || !activeBuilding) return;
+        if (id === 'guildRegisterBtn') {
+          if (personalState.adventurer.registered) {
+            personalState.logs.push('Kamu sudah terdaftar sebagai petualang.');
+            renderBuildingSubframe();
+            return;
           }
+          var reg = lib.registerAtGuild(personalState, rng);
+          personalState = reg.state;
+          playGuildIntro(reg.lines);
           return;
         }
-        personalState = lib.tickIdleDays(personalState, 1);
-        personalState.logs.push('Kamu mengunjungi ' + id + '.');
-        openFrame('frameMain');
-        renderMain();
+        if (id === 'guildRankingBtn') {
+          var ranking = lib.getGuildRanking(personalState, rng, 80);
+          $('buildingExtra').style.display = 'block';
+          $('buildingExtra').textContent = ranking.map(function(r){ return (r.rank + '. ' + r.name + ' · ' + r.grade + (r.isPlayer ? ' ← You' : '')); }).join('\\n');
+          return;
+        }
+        if (id === 'guildRecheckBtn') {
+          var re = lib.recheckGrade(personalState, rng);
+          personalState = re.state;
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingTrainBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.stats.strength += 1;
+          personalState.logs.push('Quick Drill: Strength +1.');
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingTradeBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.logs.push('Kamu meninjau pasar dan menemukan rumor baru.');
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingRestBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.energy = Math.min(100, personalState.energy + 10);
+          personalState.logs.push('Istirahat singkat memulihkan energi.');
+          renderBuildingSubframe();
+        }
       }));
 
       if (!lib) {

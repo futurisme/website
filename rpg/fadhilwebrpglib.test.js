@@ -173,3 +173,18 @@ test('getExploreView selalu menyediakan Adventurer guild di setiap lokasi', () =
   const second = lib.getExploreView(state);
   assert.ok(second.buildings.some((b) => b.id === 'guild'));
 });
+
+test('recheckGrade dan getGuildRanking bekerja setelah registrasi', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Mila', race: 'elves' }, lib.seededRandom(40));
+  let state = lib.createPersonalState(profile, 5, lib.seededRandom(41));
+  const reg = lib.registerAtGuild(state, lib.seededRandom(42));
+  assert.equal(reg.ok, true);
+  state = reg.state;
+  const recheck = lib.recheckGrade(state, lib.seededRandom(43));
+  assert.equal(recheck.ok, true);
+  state = recheck.state;
+  const ranking = lib.getGuildRanking(state, lib.seededRandom(44), 80);
+  assert.ok(ranking.length <= 80);
+  assert.ok(ranking.some((entry) => entry.isPlayer));
+});

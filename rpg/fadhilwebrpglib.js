@@ -1168,19 +1168,15 @@
     if (next.adventurer.registered) {
       return { ok: false, reason: 'Registrasi sudah selesai sebelumnya.', state: next, lines: [] };
     }
-    var s = next.stats;
-    var total = s.strength + s.agility + s.durability + s.stamina + s.intelligence + s.wisdom + s.willpower + s.perception + s.charisma + s.appearance + s.socialWisdom;
-    var scoreNorm = Math.max(0, Math.min(11.999, (total / 165) * 12 + sampleRandom(rand) * 1.2));
-    var gradeIndex = Math.max(0, Math.min(gradeCatalog.length - 1, Math.floor(scoreNorm)));
-    var fraction = scoreNorm - gradeIndex;
-    var delta = fraction >= 0.67 ? '+' : (fraction <= 0.25 ? '-' : '');
+    var scoreNorm = computeAdventurerScore(next, rand);
+    var gradeMeta = scoreToGrade(scoreNorm);
     next.adventurer = {
       registered: true,
-      grade: gradeCatalog[gradeIndex],
-      gradeDelta: delta,
+      grade: gradeMeta.grade,
+      gradeDelta: gradeMeta.delta,
       score: scoreNorm
     };
-    next.logs.push('Registrasi guild selesai. Grade: ' + next.adventurer.grade + (delta ? ' ' + delta : '') + '.');
+    next.logs.push('Registrasi guild selesai. Grade: ' + next.adventurer.grade + (next.adventurer.gradeDelta ? ' ' + next.adventurer.gradeDelta : '') + '.');
     return {
       ok: true,
       state: next,
@@ -1188,9 +1184,60 @@
         'Gerbang Adventurer\'s Guild terbuka, panel evaluasi menyala.',
         'Uji fisik, mental, dan sosial dipindai dalam hitungan detik.',
         'Akumulasi performa dan potensi sedang dipertimbangkan...',
-        'Berdasarkan kemampuan, Grade kamu adalah ' + next.adventurer.grade + (delta ? ' ' + delta : '') + '.'
+        'Berdasarkan kemampuan, Grade kamu adalah ' + next.adventurer.grade + (next.adventurer.gradeDelta ? ' ' + next.adventurer.gradeDelta : '') + '.'
       ]
     };
+  }
+
+  function computeAdventurerScore(personalState, rng) {
+    var s = personalState.stats;
+    var total = s.strength + s.agility + s.durability + s.stamina + s.intelligence + s.wisdom + s.willpower + s.perception + s.charisma + s.appearance + s.socialWisdom;
+    return Math.max(0, Math.min(11.999, (total / 165) * 12 + sampleRandom(rng) * 1.2));
+  }
+
+  function scoreToGrade(scoreNorm) {
+    var gradeIndex = Math.max(0, Math.min(gradeCatalog.length - 1, Math.floor(scoreNorm)));
+    var fraction = scoreNorm - gradeIndex;
+    var delta = fraction >= 0.67 ? '+' : (fraction <= 0.25 ? '-' : '');
+    return { grade: gradeCatalog[gradeIndex], delta: delta };
+  }
+
+  function recheckGrade(personalState, rng) {
+    var rand = rng || Math.random;
+    var next = tickIdleDays(personalState, 1);
+    if (!next.adventurer.registered) {
+      return { ok: false, reason: 'Belum terdaftar sebagai petualang.', state: next };
+    }
+    var adjusted = Math.max(0, Math.min(11.999, next.adventurer.score + (sampleRandom(rand) - 0.48) * 0.5));
+    var gradeMeta = scoreToGrade(adjusted);
+    next.adventurer.grade = gradeMeta.grade;
+    next.adventurer.gradeDelta = gradeMeta.delta;
+    next.adventurer.score = adjusted;
+    next.logs.push('Grade diperiksa ulang: ' + gradeMeta.grade + (gradeMeta.delta ? ' ' + gradeMeta.delta : '') + '.');
+    return { ok: true, state: next, grade: gradeMeta.grade, gradeDelta: gradeMeta.delta };
+  }
+
+  function getGuildRanking(personalState, rng, maxEntries) {
+    var rand = rng || Math.random;
+    var limit = Math.max(1, Math.min(80, maxEntries || 80));
+    var list = [];
+    for (var i = 0; i < limit - 1; i += 1) {
+      var score = Math.max(0, Math.min(11.999, sampleRandom(rand) * 12));
+      var meta = scoreToGrade(score);
+      list.push({ name: 'NPC-' + String(i + 1).padStart(2, '0'), grade: meta.grade, gradeDelta: meta.delta, score: score, isPlayer: false });
+    }
+    if (personalState.adventurer && personalState.adventurer.registered) {
+      list.push({ name: personalState.profile.name, grade: personalState.adventurer.grade, gradeDelta: personalState.adventurer.gradeDelta, score: personalState.adventurer.score, isPlayer: true });
+    }
+    list.sort(function (a, b) { return b.score - a.score; });
+    return list.slice(0, limit).map(function (entry, idx) {
+      return {
+        rank: idx + 1,
+        name: entry.name,
+        grade: entry.grade + (entry.gradeDelta ? ' ' + entry.gradeDelta : ''),
+        isPlayer: entry.isPlayer
+      };
+    });
   }
 
   global.fadhilwebrpglib = {
@@ -1218,6 +1265,8 @@
     travelPersonal: travelPersonal,
     getExploreView: getExploreView,
     registerAtGuild: registerAtGuild,
+    recheckGrade: recheckGrade,
+    getGuildRanking: getGuildRanking,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue
   };
