@@ -25,7 +25,12 @@ def collect_paths(vercel_path: Path):
         # skip regex-heavy patterns and add only deterministic paths
         if any(token in src for token in ['(.*)', '([0-9]+)', '$']):
             continue
-        paths.add(src.rstrip('/') or '/')
+        candidate = src.rstrip('/') or '/'
+        if candidate.startswith('/api'):
+            continue
+        if re.search(r'\.[a-zA-Z0-9]{2,5}$', candidate):
+            continue
+        paths.add(candidate)
     # sampled dynamic routes that are known active
     paths.update([
         '/mindmapmaker/editor/1',

@@ -1,10 +1,10 @@
 {
   "summary": {
     "base_url": "https://fadhil.dev",
-    "generated_at": "2026-04-19T05:09:34Z",
-    "active_ok_count": 16,
-    "error_count": 1,
-    "paths_checked": 17
+    "generated_at": "2026-04-19T05:19:44Z",
+    "active_ok_count": 14,
+    "error_count": 0,
+    "paths_checked": 14
   },
   "results": [
     {
@@ -12,7 +12,7 @@
       "url": "https://fadhil.dev/",
       "status": 200,
       "final_url": "https://fadhil.dev/",
-      "time_ms": 227.8,
+      "time_ms": 307.4,
       "content_type": "text/html; charset=utf-8",
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
       "seo_basics": {
@@ -30,7 +30,7 @@
       "url": "https://fadhil.dev/Books",
       "status": 200,
       "final_url": "https://fadhil.dev/Books",
-      "time_ms": 212.7,
+      "time_ms": 239.2,
       "content_type": "text/html; charset=utf-8",
       "title": "Books",
       "seo_basics": {
@@ -48,7 +48,7 @@
       "url": "https://fadhil.dev/Books/Editor",
       "status": 200,
       "final_url": "https://fadhil.dev/Books/Editor",
-      "time_ms": 222.0,
+      "time_ms": 215.8,
       "content_type": "text/html; charset=utf-8",
       "title": "Books Editor",
       "seo_basics": {
@@ -62,36 +62,11 @@
       "deprecated_flags": []
     },
     {
-      "path": "/api/mindmapmaker",
-      "url": "https://fadhil.dev/api/mindmapmaker",
-      "status": "ERR",
-      "error": "HTTP Error 400: Bad Request",
-      "time_ms": 211.7
-    },
-    {
-      "path": "/api/shareideas",
-      "url": "https://fadhil.dev/api/shareideas",
-      "status": 200,
-      "final_url": "https://fadhil.dev/api/shareideas",
-      "time_ms": 364.9,
-      "content_type": "application/json; charset=utf-8",
-      "title": "",
-      "seo_basics": {
-        "meta_description": false,
-        "canonical": false
-      },
-      "processing_hints": {
-        "script_tags": 0,
-        "stylesheet_links": 0
-      },
-      "deprecated_flags": []
-    },
-    {
       "path": "/dreambusiness",
       "url": "https://fadhil.dev/dreambusiness",
       "status": 200,
       "final_url": "https://fadhil.dev/dreambusiness",
-      "time_ms": 122.0,
+      "time_ms": 256.8,
       "content_type": "text/html; charset=utf-8",
       "title": "DreamBusiness",
       "seo_basics": {
@@ -109,7 +84,7 @@
       "url": "https://fadhil.dev/editor",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
-      "time_ms": 289.4,
+      "time_ms": 352.8,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Workspace",
       "seo_basics": {
@@ -127,7 +102,7 @@
       "url": "https://fadhil.dev/games/dreambusiness",
       "status": 200,
       "final_url": "https://fadhil.dev/games/dreambusiness",
-      "time_ms": 99.1,
+      "time_ms": 122.6,
       "content_type": "text/html; charset=utf-8",
       "title": "DreamBusiness",
       "seo_basics": {
@@ -145,7 +120,7 @@
       "url": "https://fadhil.dev/games/rpg",
       "status": 200,
       "final_url": "https://fadhil.dev/games/rpg",
-      "time_ms": 100.4,
+      "time_ms": 216.3,
       "content_type": "text/html; charset=utf-8",
       "title": "FadhiumRPG",
       "seo_basics": {
@@ -163,7 +138,7 @@
       "url": "https://fadhil.dev/home",
       "status": 200,
       "final_url": "https://fadhil.dev/home",
-      "time_ms": 255.3,
+      "time_ms": 174.4,
       "content_type": "text/html; charset=utf-8",
       "title": "Home | Website Hub",
       "seo_basics": {
@@ -181,7 +156,7 @@
       "url": "https://fadhil.dev/mindmapmaker",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker",
-      "time_ms": 134.2,
+      "time_ms": 179.2,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Menu",
       "seo_basics": {
@@ -199,7 +174,7 @@
       "url": "https://fadhil.dev/mindmapmaker/editor/1",
       "status": 200,
       "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
-      "time_ms": 48.0,
+      "time_ms": 83.2,
       "content_type": "text/html; charset=utf-8",
       "title": "Mindmapmaker Workspace",
       "seo_basics": {
@@ -217,7 +192,7 @@
       "url": "https://fadhil.dev/portfolio",
       "status": 200,
       "final_url": "https://fadhil.dev/portfolio",
-      "time_ms": 93.0,
+      "time_ms": 115.1,
       "content_type": "text/html; charset=utf-8",
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
       "seo_basics": {
@@ -231,29 +206,11 @@
       "deprecated_flags": []
     },
     {
-      "path": "/portfolio.webp",
-      "url": "https://fadhil.dev/portfolio.webp",
-      "status": 200,
-      "final_url": "https://fadhil.dev/portfolio.webp",
-      "time_ms": 177.9,
-      "content_type": "image/webp",
-      "title": "",
-      "seo_basics": {
-        "meta_description": false,
-        "canonical": false
-      },
-      "processing_hints": {
-        "script_tags": 0,
-        "stylesheet_links": 0
-      },
-      "deprecated_flags": []
-    },
-    {
       "path": "/rpg",
       "url": "https://fadhil.dev/rpg",
       "status": 200,
       "final_url": "https://fadhil.dev/rpg",
-      "time_ms": 39.0,
+      "time_ms": 103.3,
       "content_type": "text/html; charset=utf-8",
       "title": "FadhiumRPG",
       "seo_basics": {
@@ -271,7 +228,7 @@
       "url": "https://fadhil.dev/shareideas",
       "status": 200,
       "final_url": "https://fadhil.dev/shareideas",
-      "time_ms": 164.4,
+      "time_ms": 148.2,
       "content_type": "text/html; charset=utf-8",
       "title": "ShareIdeas — Home",
       "seo_basics": {
@@ -289,7 +246,7 @@
       "url": "https://fadhil.dev/shareideas/page/1",
       "status": 200,
       "final_url": "https://fadhil.dev/shareideas/page/1",
-      "time_ms": 132.5,
+      "time_ms": 147.8,
       "content_type": "text/html; charset=utf-8",
       "title": "ShareIdeas",
       "seo_basics": {
