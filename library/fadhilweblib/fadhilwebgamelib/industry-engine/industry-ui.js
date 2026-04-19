@@ -13,6 +13,8 @@ export function createIndustryUiController({ root, handlers }) {
     main: root.querySelector('#frameMain'),
     fullProfile: root.querySelector('#frameFullProfile'),
     fullProjects: root.querySelector('#frameFullProjects'),
+    fullStudios: root.querySelector('#frameFullStudios'),
+    fullCommittee: root.querySelector('#frameFullCommittee'),
     fullAdmin: root.querySelector('#frameFullAdmin'),
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
@@ -21,6 +23,8 @@ export function createIndustryUiController({ root, handlers }) {
   const statsEl = root.querySelector('#industryStats');
   const profileEl = root.querySelector('#industryProfile');
   const projectsEl = root.querySelector('#industryProjects');
+  const studiosEl = root.querySelector('#industryStudios');
+  const committeeBodyEl = root.querySelector('#committeeBody');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
   const ceoStatusEl = root.querySelector('#ceoStatus');
@@ -56,14 +60,21 @@ export function createIndustryUiController({ root, handlers }) {
 
   root.querySelector('[data-action="to-full-profile"]').addEventListener('click', () => openFrame('fullProfile'));
   root.querySelector('[data-action="to-full-projects"]').addEventListener('click', () => openFrame('fullProjects'));
+  root.querySelector('[data-action="to-full-studios"]').addEventListener('click', () => openFrame('fullStudios'));
   root.querySelector('[data-action="to-full-admin"]').addEventListener('click', () => openFrame('fullAdmin'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
-  root.querySelector('[data-action="back-projects"]').addEventListener('click', () => openFrame('fullProjects'));
+  root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
 
   root.querySelector('[data-action="seek-funding"]').addEventListener('click', handlers.onSeekFunding);
   root.querySelector('[data-action="improve-admin"]').addEventListener('click', handlers.onImproveAdmin);
   root.querySelector('[data-action="found-studio"]').addEventListener('click', () => handlers.onFoundStudio(studioNameInput.value));
+  root.querySelector('[data-action="committee-discuss"]').addEventListener('click', () => {
+    if (selectedProjectId) handlers.onCommitteeDiscuss(selectedProjectId);
+  });
+  root.querySelector('[data-action="committee-confirm"]').addEventListener('click', () => {
+    if (selectedProjectId) handlers.onCommittee(selectedProjectId);
+  });
 
   projectsEl.addEventListener('click', (event) => {
     const target = event.target;
@@ -82,9 +93,22 @@ export function createIndustryUiController({ root, handlers }) {
     }
     if (action === 'serialize') handlers.onSerialize(projectId);
     if (action === 'pitch') handlers.onPitch(projectId);
-    if (action === 'committee') handlers.onCommittee(projectId);
+    if (action === 'committee') {
+      openFrame('fullCommittee');
+      return;
+    }
     if (action === 'production') handlers.onProduction(projectId);
     if (action === 'launch') handlers.onLaunch(projectId);
+  });
+
+  committeeBodyEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const action = target.getAttribute('data-action');
+    if (action !== 'select-studio') return;
+    const studioId = target.getAttribute('data-studio-id');
+    if (!selectedProjectId || !studioId) return;
+    handlers.onSelectStudio(selectedProjectId, studioId);
   });
 
   return {
@@ -128,6 +152,31 @@ export function createIndustryUiController({ root, handlers }) {
         `).join('')
         : '<p class="empty">Tidak ada project aktif.</p>';
 
+      studiosEl.innerHTML = snapshot.studios.map((studio) => `
+        <article class="industry-project">
+          <h3>${esc(studio.name)}</h3>
+          <p>CEO: ${esc(studio.ceoName)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)}</p>
+        </article>
+      `).join('');
+
+      const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
+      if (committeeProject) {
+        committeeBodyEl.innerHTML = `
+          <article class="industry-project">
+            <h3>${esc(committeeProject.title)}</h3>
+            <p>Studio dipilih: ${esc(committeeProject.studioName)}</p>
+            <p>Draft Bagi Hasil (Creator/Studio/Investor): ${committeeProject.contractDraft.creatorShare}% / ${committeeProject.contractDraft.studioShare}% / ${committeeProject.contractDraft.investorShare}%</p>
+            <p>Komite approval: ${committeeProject.committeeApproved ? '✅ Ready' : '⏳ Diskusi berjalan'}</p>
+            <div class="actions">
+              ${(committeeProject.interestedStudios || []).map((studio) => `<button data-action="select-studio" data-studio-id="${esc(studio.id)}">Pilih ${esc(studio.name)}</button>`).join('')}
+            </div>
+            <ul class="industry-feed">${(committeeProject.committeeNegotiationLog || []).map((line) => `<li>${esc(line)}</li>`).join('')}</ul>
+          </article>
+        `;
+      } else {
+        committeeBodyEl.innerHTML = '<p>Pilih project dari frame Projects lalu masuk ke Production Committee.</p>';
+      }
+
       ceoStatusEl.innerHTML = `
         <p>Syarat CEO Studio:</p>
         <ul>
@@ -162,9 +211,7 @@ export function createIndustryUiController({ root, handlers }) {
         button.disabled = !canOpenFrame(target);
       });
 
-      if (!Object.values(frames).some((frame) => frame?.classList.contains('frame-active'))) {
-        openFrame('main');
-      }
+      if (!Object.values(frames).some((frame) => frame?.classList.contains('frame-active'))) openFrame('main');
     },
     setAutoState(active) {
       root.querySelector('[data-action="toggle-auto"]').textContent = active ? 'Stop Auto' : 'Auto';
