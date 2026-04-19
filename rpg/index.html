@@ -43,6 +43,9 @@
       .intro-text { position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:20px; opacity:0; transform:translateY(8px); transition:opacity .7s ease, transform .7s ease; }
       .intro-text.active { opacity:1; transform:translateY(0); }
       .intro-text strong { font-size:clamp(1rem,2.8vw,1.35rem); text-shadow:0 6px 24px rgba(0,0,0,.5); }
+      .intro-vignette { position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at center, rgba(2,6,23,0) 28%, rgba(2,6,23,.58) 68%, rgba(0,0,0,.86) 100%); opacity:.85; transition:opacity .6s ease; }
+      .intro-blackout { position:absolute; inset:0; pointer-events:none; background:#000; opacity:0; transition:opacity .35s ease; }
+      .intro-blackout.flash { opacity:.24; }
       .intro-meta { margin-top:10px; display:grid; gap:6px; }
       .identity-card { border:1px solid var(--line); border-radius:10px; padding:10px; background:#0a1226; }
       .identity-card ul { margin:0; padding-left:16px; }
@@ -102,6 +105,8 @@
             <div class="intro-bg frame-4"></div>
             <div class="intro-bg frame-5"></div>
             <div class="intro-text" id="introText"><strong></strong></div>
+            <div class="intro-vignette"></div>
+            <div class="intro-blackout" id="introBlackout"></div>
           </div>
           <div class="intro-meta" id="introMeta"></div>
           <div class="age-pick" id="agePick" style="display:none;">
@@ -197,6 +202,7 @@
       var profile = null;
       var personalState = null;
       var idleTimer = null;
+      var introTimer = null;
 
       function $(id){ return document.getElementById(id); }
       function setRuntimeStatus(text, isError){
@@ -210,6 +216,15 @@
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       var mapDrag = { active:false, x:0, y:0, moved:false };
       function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      function createEntropyRng(){
+        var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);
+        if (window.crypto && window.crypto.getRandomValues) {
+          var arr = new Uint32Array(1);
+          window.crypto.getRandomValues(arr);
+          seed ^= arr[0];
+        }
+        return lib.seededRandom(seed >>> 0);
+      }
 
       function renderMain(){
         if (!personalState) return;
@@ -269,11 +284,13 @@
 
       function playIntro(){
         openFrame('frameIntro');
+        if (introTimer) { clearInterval(introTimer); introTimer = null; }
         $('introMeta').innerHTML = '';
         $('agePick').style.display = 'none';
         var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));
         var textStrong = $('introText').querySelector('strong');
         var textWrap = $('introText');
+        var blackout = $('introBlackout');
         var frames = [
           { text: profile.introLines[0] || ('Malam kelahiran mekar di ' + profile.birthPlace + '.'), bg: 0 },
           { text: profile.name + ' lahir sebagai ' + profile.raceLabel + '.', bg: 1 },
@@ -282,20 +299,25 @@
           { text: profile.name + ' · ' + profile.birthPlace + ' · ' + profile.raceLabel + ' · ' + profile.specialSkill + ' · ' + profile.bornAsLabel, bg: 4 }
         ];
         var idx = 0;
-        var minDuration = 2200;
+        var minDuration = 1000;
         function renderFrame(frameIndex){
           frameNodes.forEach(function(node, i){ node.classList.toggle('active', i === frames[frameIndex].bg); });
+          blackout.classList.remove('flash');
           textWrap.classList.remove('active');
           setTimeout(function(){
+            blackout.classList.add('flash');
             textStrong.textContent = frames[frameIndex].text;
             textWrap.classList.add('active');
+            setTimeout(function(){ blackout.classList.remove('flash'); }, 240);
           }, 100);
         }
         renderFrame(idx);
-        var timer = setInterval(function(){
+        introTimer = setInterval(function(){
           idx += 1;
-          if (idx >= frames.length) {
-            clearInterval(timer);
+          if (idx >= 4) {
+            clearInterval(introTimer);
+            introTimer = null;
+            renderFrame(4);
             $('introMeta').innerHTML = '<article class=\"identity-card\"><ul>'
               + '<li>Nama: ' + profile.name + '</li>'
               + '<li>Tempat Lahir: ' + profile.birthPlace + '</li>'
@@ -312,6 +334,7 @@
 
       $('giveBirthBtn').addEventListener('click', safe(function(){
         if (!lib) return;
+        rng = createEntropyRng();
         var name = $('nameInput').value;
         var race = $('raceInput').value;
         profile = lib.createAdventureProfile({ name:name, race:race }, rng);
@@ -391,7 +414,6 @@
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
       } else {
         debugAgent = lib.installOneShotDebug({ triggerParam: 'rpgdebug' });
-        rng = lib.seededRandom(2026);
         setRuntimeStatus('', false);
       }
     </script>

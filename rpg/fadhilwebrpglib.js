@@ -874,10 +874,10 @@
   };
 
   var bornAsCatalog = [
-    { id: 'peasants', label: 'Peasants', bonus: { vitality: 1, craft: 1 } },
-    { id: 'commoners', label: 'Commoners', bonus: { charisma: 1, fortune: 1 } },
-    { id: 'honorable', label: 'Honorable', bonus: { intellect: 1, charisma: 2 } },
-    { id: 'nobles', label: 'Nobles', bonus: { intellect: 2, fortune: 2 } }
+    { id: 'peasants', label: 'Peasant', bonus: { vitality: 1, craft: 1 }, weight: 0.4 },
+    { id: 'commoners', label: 'Commoner', bonus: { charisma: 1, fortune: 1 }, weight: 0.3 },
+    { id: 'honorable', label: 'Honorable', bonus: { intellect: 1, charisma: 2 }, weight: 0.2 },
+    { id: 'nobles', label: 'Noble', bonus: { intellect: 2, fortune: 2 }, weight: 0.1 }
   ];
 
   var birthPlaces = [
@@ -898,8 +898,17 @@
     'Whispercraft'
   ];
 
+  function sampleRandom(rng) {
+    var acc = 2166136261;
+    for (var i = 0; i < 8; i += 1) {
+      acc ^= Math.floor(rng() * 4294967295);
+      acc = Math.imul(acc, 16777619) >>> 0;
+    }
+    return acc / 4294967295;
+  }
+
   function randomPick(list, rng) {
-    return list[Math.floor(rng() * list.length)];
+    return list[Math.floor(sampleRandom(rng) * list.length)];
   }
 
   function normalizeRace(inputRace) {
@@ -908,12 +917,22 @@
     return race;
   }
 
+  function pickBornAs(rng) {
+    var roll = sampleRandom(rng);
+    var cursor = 0;
+    for (var i = 0; i < bornAsCatalog.length; i += 1) {
+      cursor += bornAsCatalog[i].weight;
+      if (roll <= cursor) return bornAsCatalog[i];
+    }
+    return bornAsCatalog[bornAsCatalog.length - 1];
+  }
+
   function createAdventureProfile(input, rng) {
     var rand = rng || Math.random;
     var name = String((input && input.name) || '').trim();
     if (!name) name = 'Wanderer';
     var race = normalizeRace(input && input.race);
-    var bornAs = randomPick(bornAsCatalog, rand);
+    var bornAs = pickBornAs(rand);
     var birthPlace = randomPick(birthPlaces, rand);
     var specialSkill = randomPick(specialSkills, rand);
     return {

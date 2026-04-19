@@ -131,3 +131,16 @@ test('travelPersonal berpindah ke lokasi tetangga dan menambah waktu', () => {
   assert.equal(moved.location, target.name);
   assert.equal(moved.totalDays, 2);
 });
+
+test('createAdventureProfile tetap variatif dan noble tetap mungkin', () => {
+  const lib = loadLib();
+  const outcomes = new Set();
+  for (let seed = 1; seed <= 120; seed += 1) {
+    const profile = lib.createAdventureProfile({ name: `P${seed}`, race: 'humans' }, lib.seededRandom(seed));
+    outcomes.add(profile.bornAs);
+  }
+  assert.ok(outcomes.has('peasants'));
+  assert.ok(outcomes.has('commoners'));
+  assert.ok(outcomes.has('honorable'));
+  assert.ok(outcomes.has('nobles'));
+});
