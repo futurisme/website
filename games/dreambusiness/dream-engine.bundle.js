@@ -1,4 +1,4 @@
-// mindmapmaker/src/features/cpu-foundry/company-name-catalog.ts
+// website/mindmapmaker/src/features/cpu-foundry/company-name-catalog.ts
 var SEMICONDUCTOR_PRIMARY = [
   "Nova",
   "Quantum",

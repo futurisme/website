@@ -12,7 +12,7 @@ npx --yes esbuild games/dreambusiness/dream-engine.ts \
   --bundle \
   --format=esm \
   --platform=browser \
-  --tsconfig=mindmapmaker/tsconfig.json \
+  --tsconfig=website/mindmapmaker/tsconfig.json \
   --outfile=games/dreambusiness/dream-engine.bundle.js > /tmp/dreambusiness-esbuild.log
 tail -n 2 /tmp/dreambusiness-esbuild.log || true
 
@@ -23,7 +23,7 @@ echo "[4/5] JS syntax check (DreamBusiness bundle)"
 node --check games/dreambusiness/dream-engine.bundle.js
 
 echo "[5/5] Lint mindmapmaker"
-cd "${ROOT_DIR}/mindmapmaker"
+cd "${ROOT_DIR}/website/mindmapmaker"
 npm run -s lint
 
 echo "Quality check finished successfully."
