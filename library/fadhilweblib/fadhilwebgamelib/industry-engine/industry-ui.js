@@ -40,6 +40,7 @@ export function createIndustryUiController({ root, handlers }) {
   const subBodyEl = root.querySelector('#subProjectBody');
   const studioNameInput = root.querySelector('#studioNameInput');
   const savePayloadInput = root.querySelector('#savePayloadInput');
+  const registerSaveInput = root.querySelector('#registerSaveInput');
 
   let selectedProjectId = null;
   let currentSnapshot = null;
@@ -90,7 +91,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="to-full-ranking"]').addEventListener('click', () => openFrame('fullRanking'));
   root.querySelector('[data-action="to-full-management"]').addEventListener('click', () => openFrame('fullManagement'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
-  root.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
+  document.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
 
@@ -164,6 +165,16 @@ export function createIndustryUiController({ root, handlers }) {
       openFrame('main');
     } else {
       showPopup('Gagal load save. Periksa format AI26.', 'error');
+    }
+  });
+  root.querySelector('[data-action="load-save-register"]')?.addEventListener('click', () => {
+    const payload = registerSaveInput?.value ?? '';
+    const ok = handlers.onImportSave?.(payload);
+    if (ok) {
+      showPopup('Save berhasil di-load dari register.', 'success');
+      openFrame('main');
+    } else {
+      showPopup('Gagal load save dari register.', 'error');
     }
   });
 
