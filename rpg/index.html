@@ -32,14 +32,21 @@
       button.primary { background:linear-gradient(90deg,#4f46e5,#2563eb); border-color:transparent; }
       .split { margin-top:10px; display:grid; gap:8px; grid-template-columns:1fr 1fr; }
       .block { border:1px solid var(--line); border-radius:10px; padding:8px; background:#0a1226; }
-      .intro-log {
-        margin-top:10px; min-height:150px; max-height:230px; overflow:auto; border:1px solid var(--line);
-        border-radius:10px; background:#060b18; padding:8px; white-space:pre-wrap; font:12px/1.5 ui-monospace, monospace;
-      }
-      .intro-stage { margin-top:10px; display:grid; gap:8px; }
-      .scene-card { border:1px solid var(--line); border-radius:10px; padding:10px; background:linear-gradient(120deg,#0c1630,#1e1b4b); min-height:86px; display:grid; align-content:center; }
-      .scene-card strong { font-size:.92rem; }
-      .scene-card span { color:#c7d2fe; font-size:.8rem; margin-top:4px; }
+      .intro-stage { margin-top:10px; position:relative; min-height:250px; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+      .intro-bg { position:absolute; inset:0; transition:opacity .8s ease; opacity:0; }
+      .intro-bg.active { opacity:1; }
+      .intro-bg.frame-1 { background:radial-gradient(circle at 28% 40%, #38bdf8, #0f172a 62%); }
+      .intro-bg.frame-2 { background:radial-gradient(circle at 70% 35%, #818cf8, #0f172a 66%); }
+      .intro-bg.frame-3 { background:radial-gradient(circle at 42% 65%, #22d3ee, #020617 72%); }
+      .intro-bg.frame-4 { background:radial-gradient(circle at 55% 30%, #f59e0b, #111827 72%); }
+      .intro-bg.frame-5 { background:linear-gradient(140deg,#0f172a,#1e293b,#172554); }
+      .intro-text { position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:20px; opacity:0; transform:translateY(8px); transition:opacity .7s ease, transform .7s ease; }
+      .intro-text.active { opacity:1; transform:translateY(0); }
+      .intro-text strong { font-size:clamp(1rem,2.8vw,1.35rem); text-shadow:0 6px 24px rgba(0,0,0,.5); }
+      .intro-meta { margin-top:10px; display:grid; gap:6px; }
+      .identity-card { border:1px solid var(--line); border-radius:10px; padding:10px; background:#0a1226; }
+      .identity-card ul { margin:0; padding-left:16px; }
+      .identity-card li { margin:2px 0; color:#cbd5e1; font-size:.82rem; }
       .age-pick { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
       .stats { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
       .stat { border:1px solid var(--line); border-radius:9px; padding:6px; background:#0b162a; }
@@ -88,8 +95,15 @@
         <article class="card">
           <h2 class="title">Cinematic Intro</h2>
           <p class="muted">Narasi emosional pembukaan hidupmu.</p>
-          <div class="intro-stage" id="introStage"></div>
-          <div class="intro-log" id="introLog"></div>
+          <div class="intro-stage" id="introStage">
+            <div class="intro-bg frame-1"></div>
+            <div class="intro-bg frame-2"></div>
+            <div class="intro-bg frame-3"></div>
+            <div class="intro-bg frame-4"></div>
+            <div class="intro-bg frame-5"></div>
+            <div class="intro-text" id="introText"><strong></strong></div>
+          </div>
+          <div class="intro-meta" id="introMeta"></div>
           <div class="age-pick" id="agePick" style="display:none;">
             <button data-age="5">Start Age 5</button>
             <button data-age="6">Start Age 6</button>
@@ -255,31 +269,45 @@
 
       function playIntro(){
         openFrame('frameIntro');
-        $('introLog').textContent = '';
-        $('introStage').innerHTML = '';
+        $('introMeta').innerHTML = '';
         $('agePick').style.display = 'none';
-        var lines = profile.introLines.concat([
-          'Nama: ' + profile.name,
-          'Race: ' + profile.raceLabel,
-          'Lahir di: ' + profile.birthPlace,
-          'Keahlian khusus: ' + profile.specialSkill,
-          'Born as: ' + profile.bornAsLabel,
-          'Pilih Starting at age untuk memulai kehidupan...'
-        ]);
+        var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));
+        var textStrong = $('introText').querySelector('strong');
+        var textWrap = $('introText');
+        var frames = [
+          { text: profile.introLines[0] || ('Malam kelahiran mekar di ' + profile.birthPlace + '.'), bg: 0 },
+          { text: profile.name + ' lahir sebagai ' + profile.raceLabel + '.', bg: 1 },
+          { text: 'Keahlian khusus: ' + profile.specialSkill + '.', bg: 2 },
+          { text: 'Lahir sebagai ' + profile.bornAsLabel + '.', bg: 3 },
+          { text: profile.name + ' · ' + profile.birthPlace + ' · ' + profile.raceLabel + ' · ' + profile.specialSkill + ' · ' + profile.bornAsLabel, bg: 4 }
+        ];
         var idx = 0;
+        var minDuration = 2200;
+        function renderFrame(frameIndex){
+          frameNodes.forEach(function(node, i){ node.classList.toggle('active', i === frames[frameIndex].bg); });
+          textWrap.classList.remove('active');
+          setTimeout(function(){
+            textStrong.textContent = frames[frameIndex].text;
+            textWrap.classList.add('active');
+          }, 100);
+        }
+        renderFrame(idx);
         var timer = setInterval(function(){
-          if (idx >= lines.length) {
+          idx += 1;
+          if (idx >= frames.length) {
             clearInterval(timer);
+            $('introMeta').innerHTML = '<article class=\"identity-card\"><ul>'
+              + '<li>Nama: ' + profile.name + '</li>'
+              + '<li>Tempat Lahir: ' + profile.birthPlace + '</li>'
+              + '<li>Ras: ' + profile.raceLabel + '</li>'
+              + '<li>Keahlian Khusus: ' + profile.specialSkill + '</li>'
+              + '<li>Golongan: ' + profile.bornAsLabel + '</li>'
+              + '</ul></article>';
             $('agePick').style.display = 'grid';
             return;
           }
-          if (idx < 4) {
-            $('introStage').innerHTML = '<article class=\"scene-card\"><strong>' + lines[idx] + '</strong><span>Frame ' + (idx + 1) + ' · Takdir terus bergerak...</span></article>';
-          }
-          $('introLog').textContent += (idx ? '\n\n' : '') + lines[idx];
-          $('introLog').scrollTop = $('introLog').scrollHeight;
-          idx += 1;
-        }, 680);
+          renderFrame(idx);
+        }, minDuration);
       }
 
       $('giveBirthBtn').addEventListener('click', safe(function(){
