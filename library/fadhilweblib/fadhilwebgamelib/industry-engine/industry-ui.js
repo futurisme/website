@@ -157,7 +157,18 @@ export function createIndustryUiController({ root, handlers }) {
           <h3>${esc(studio.name)}</h3>
           <p>CEO: ${esc(studio.ceoName)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)}</p>
         </article>
-      `).join('');
+      `).join('') + `
+        <article class="industry-project">
+          <h3>NPC Roster</h3>
+          <p>${snapshot.npcs.map((npc) => `${esc(npc.name)} (${esc(npc.role)})`).join(' · ')}</p>
+        </article>
+        <article class="industry-project">
+          <h3>NPC Adaptation Pipeline</h3>
+          <p>${snapshot.npcProjects?.length
+            ? snapshot.npcProjects.map((entry) => `${esc(entry.title)} [${esc(entry.stage)}]`).join(' · ')
+            : 'Belum ada project NPC aktif.'}</p>
+        </article>
+      `;
 
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {

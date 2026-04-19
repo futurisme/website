@@ -32,14 +32,37 @@ const INVESTOR_POOL = Object.freeze([
   { id: 'inv-merch', name: 'Merch Partner', influence: 62, risk: 59 },
 ]);
 
-const NPC_NAMES = ['Aki', 'Ren', 'Mio', 'Sena', 'Kaito', 'Rin', 'Hana', 'Sora', 'Yuki', 'Riku', 'Nao', 'Hiro'];
+const NPC_FIRST_NAMES = [
+  'Akira', 'Haruto', 'Souta', 'Yuma', 'Rin', 'Takumi', 'Naoki', 'Daichi', 'Kenta', 'Shin',
+  'Kaori', 'Yui', 'Sakura', 'Aoi', 'Misaki', 'Nanami', 'Hikari', 'Miyu', 'Reina', 'Kana',
+];
+const NPC_LAST_NAMES = [
+  'Sakamoto', 'Tachibana', 'Aoyama', 'Kurosawa', 'Morioka', 'Ishikawa', 'Kanzaki', 'Fujimoto', 'Hoshino', 'Shirakawa',
+  'Naruse', 'Kirishima', 'Amamiya', 'Tsukishiro', 'Matsuda', 'Kojima', 'Mizuno', 'Hayashida', 'Nishimura', 'Okamoto',
+];
 const NPC_ROLES = ['ceo-studio', 'mangaka', 'novelis', 'animator', 'investor'];
 
+function generateUniqueNpcNames(targetCount) {
+  const usedFirst = new Set();
+  const usedLast = new Set();
+  const names = [];
+  for (let i = 0; i < targetCount; i += 1) {
+    const first = NPC_FIRST_NAMES[i % NPC_FIRST_NAMES.length];
+    const last = NPC_LAST_NAMES[(i * 3) % NPC_LAST_NAMES.length];
+    if (usedFirst.has(first) || usedLast.has(last)) continue;
+    usedFirst.add(first);
+    usedLast.add(last);
+    names.push(`${first} ${last}`);
+  }
+  return names;
+}
+
 function createNpcAgents(studios) {
+  const generatedNames = generateUniqueNpcNames(20);
   const npcs = [];
   for (let i = 0; i < 20; i += 1) {
     const role = NPC_ROLES[i % NPC_ROLES.length];
-    const name = `${NPC_NAMES[i % NPC_NAMES.length]}-${i + 1}`;
+    const name = generatedNames[i];
     const npc = {
       id: `npc-${i + 1}`,
       name,
@@ -50,6 +73,7 @@ function createNpcAgents(studios) {
       studioId: null,
       mood: 0.5,
       active: true,
+      currentProject: null,
     };
     npcs.push(npc);
   }
@@ -88,6 +112,21 @@ function createProject(id, medium) {
   };
 }
 
+function createNpcProject(npc, day) {
+  return {
+    id: `npc-ip-${npc.id}-${day}`,
+    npcId: npc.id,
+    title: `NPC Manga ${npc.name.split(' ')[0]}`,
+    stage: 'serialization',
+    chapters: 6,
+    quality: 40 + Math.min(35, Math.round(npc.reputation * 0.4)),
+    popularity: 32 + Math.min(35, Math.round(npc.ambition * 0.35)),
+    studioId: null,
+    productionProgress: 0,
+    launched: false,
+  };
+}
+
 function createInitialState() {
   const studios = STUDIO_POOL.slice(0, MAX_ACTIVE_STUDIOS).map((studio) => ({ ...studio }));
   const npcs = createNpcAgents(studios);
@@ -110,6 +149,7 @@ function createInitialState() {
     studios,
     investors: INVESTOR_POOL,
     npcs,
+    npcProjects: [],
     releases: [],
     feed: ['Day 0: Menunggu registrasi pemain.'],
     debug: { lastAction: 'bootstrap' },
@@ -231,7 +271,58 @@ export function createAnimeIndustryRuntime() {
         npc.cash += 55_000;
       }
       if (npc.role === 'mangaka' && state.day % 13 === (index % 7)) {
-        log(state, `${npc.name} (NPC Mangaka) merilis chapter baru dan menarik perhatian editor.`);
+        if (!npc.currentProject) {
+          const npcProject = createNpcProject(npc, state.day);
+          state.npcProjects.push(npcProject);
+          npc.currentProject = npcProject.id;
+          log(state, `${npc.name} memulai serial baru: ${npcProject.title}.`);
+          return;
+        }
+        const project = state.npcProjects.find((entry) => entry.id === npc.currentProject && !entry.launched);
+        if (!project) return;
+        if (project.stage === 'serialization') {
+          project.chapters += 1;
+          project.quality = Math.min(100, project.quality + 2 + (npc.ambition / 100));
+          project.popularity = Math.min(100, project.popularity + 1.6 + (npc.reputation / 140));
+          if (project.chapters >= 10) {
+            project.stage = 'studio-interest';
+            const studio = [...state.studios].sort((a, b) => (b.network + b.scoutPower) - (a.network + a.scoutPower))[index % state.studios.length];
+            project.studioId = studio?.id ?? null;
+            log(state, `${project.title} karya ${npc.name} dilirik ${studio?.name ?? 'studio'} untuk adaptasi anime.`);
+          }
+          return;
+        }
+        if (project.stage === 'studio-interest') {
+          project.stage = 'production';
+          log(state, `${project.title} (NPC) lolos production committee dan masuk produksi.`);
+          return;
+        }
+        if (project.stage === 'production') {
+          const studio = state.studios.find((entry) => entry.id === project.studioId);
+          const speed = ((studio?.speed ?? 50) / 100) * 3.1;
+          project.productionProgress = Math.min(100, project.productionProgress + 2.2 + speed);
+          if (project.productionProgress >= 100) {
+            project.stage = 'launch-ready';
+            log(state, `${project.title} (NPC) siap tayang.`);
+          }
+          return;
+        }
+        if (project.stage === 'launch-ready') {
+          project.launched = true;
+          const studio = state.studios.find((entry) => entry.id === project.studioId);
+          const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2));
+          state.releases.push({
+            id: project.id,
+            title: project.title,
+            medium: 'manga-npc',
+            score: releaseScore,
+            revenue: Math.round(1_600_000 + releaseScore * 55_000),
+            studio: studio?.name ?? 'Unknown Studio',
+            day: state.day,
+          });
+          log(state, `${project.title} (NPC Mangaka ${npc.name}) resmi rilis anime.`);
+          npc.currentProject = null;
+        }
       }
       if (npc.role === 'ceo-studio' && npc.studioId && state.day % 15 === (index % 4)) {
         const studio = state.studios.find((entry) => entry.id === npc.studioId);
@@ -473,6 +564,7 @@ export function createAnimeIndustryRuntime() {
         ceoName: state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
       })),
       npcs: state.npcs.slice(0, 12),
+      npcProjects: state.npcProjects.filter((entry) => !entry.launched).slice(-8),
       projects: state.projects.filter((project) => !project.archived).map((project) => ({
         ...project,
         studioName: state.studios.find((entry) => entry.id === project.studioId)?.name ?? '-',
