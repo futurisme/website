@@ -147,3 +147,18 @@ test('createAdventureProfile tetap variatif dan noble tetap mungkin', () => {
   assert.ok(outcomes.has('honorable'));
   assert.ok(outcomes.has('nobles'));
 });
+
+test('registerAtGuild berhasil setelah tiba di guild dan memberi grade', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Ira', race: 'elves' }, lib.seededRandom(21));
+  let state = lib.createPersonalState(profile, 5, lib.seededRandom(22));
+  state = lib.travelPersonal(state, 'loc-river');
+  state = lib.travelPersonal(state, 'loc-vale');
+  state = lib.travelPersonal(state, 'loc-guild');
+  const result = lib.registerAtGuild(state, lib.seededRandom(23));
+  assert.equal(result.ok, true);
+  assert.equal(result.state.adventurer.registered, true);
+  assert.ok(result.state.adventurer.grade.length > 0);
+  assert.ok(Array.isArray(result.lines));
+  assert.ok(result.lines.length >= 4);
+});

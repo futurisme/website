@@ -79,6 +79,7 @@
       .travel-banner { display:grid; place-items:center; min-height:62dvh; text-align:center; background:linear-gradient(180deg,#020617,#111827,#1d4ed8); border:1px solid var(--line); border-radius:12px; padding:18px; }
       .travel-banner h2 { font-size:clamp(1.2rem,3.8vw,2rem); margin-bottom:10px; }
       .travel-banner p { color:#bfdbfe; margin-bottom:8px; }
+      .guild-log { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#060b18; min-height:180px; max-height:260px; overflow:auto; padding:8px; white-space:pre-wrap; font:12px/1.45 ui-monospace, monospace; }
       @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
       @media (max-width:760px){ .split { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } .stat-row { grid-template-columns:84px 1fr; } }
     </style>
@@ -167,6 +168,15 @@
           </div>
         </article>
       </section>
+
+      <section id="frameGuildIntro" class="frame">
+        <article class="card">
+          <h2 class="title">Adventurer's Guild Registration</h2>
+          <p class="muted">Proses uji dan akumulasi kelayakan petualang.</p>
+          <div class="guild-log" id="guildLog"></div>
+          <div class="top-actions"><button class="primary" id="guildDoneBtn">Finish</button></div>
+        </article>
+      </section>
     </main>
 
     <script>
@@ -228,7 +238,7 @@
       }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       var mapDrag = { active:false, x:0, y:0, moved:false };
-      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
       function createEntropyRng(){
         var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);
         if (window.crypto && window.crypto.getRandomValues) {
@@ -247,7 +257,7 @@
         var dayStr = String((summary.ageDays % 30) + 1).padStart(2, '0');
         var yearStr = String(summary.ageYears).padStart(4, '0');
         $('topDate').textContent = dayStr + ', ' + monthNames[monthIndex] + ', ' + yearStr;
-        $('identityText').textContent = summary.name + ' · ' + summary.race + ' · Born as ' + summary.bornAs;
+        $('identityText').textContent = summary.name + ' · ' + summary.race + ' · Born as ' + summary.bornAs + ' · Lv ' + summary.level + ' · Grade ' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '');
         $('originMeta').innerHTML = '<strong>Current location</strong><div class="chipline"><span class="chip">' + summary.location + '</span></div>';
 
         var panels = [
@@ -357,6 +367,19 @@
         }, minDuration);
       }
 
+      function playGuildIntro(lines){
+        openFrame('frameGuildIntro');
+        $('guildLog').textContent = '';
+        var idx = 0;
+        var seq = lines || [];
+        var timer = setInterval(function(){
+          if (idx >= seq.length) { clearInterval(timer); return; }
+          $('guildLog').textContent += (idx ? '\n\n' : '') + seq[idx];
+          $('guildLog').scrollTop = $('guildLog').scrollHeight;
+          idx += 1;
+        }, 900);
+      }
+
       $('giveBirthBtn').addEventListener('click', safe(function(){
         if (!lib) return;
         rng = createEntropyRng();
@@ -408,6 +431,11 @@
         renderMain();
       }));
 
+      $('guildDoneBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
       $('mapPlane').addEventListener('click', safe(function(ev){
         if (mapDrag.moved) { mapDrag.moved = false; return; }
         var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
@@ -418,7 +446,13 @@
         var summary = lib.getPersonalSummary(personalState);
         $('travelArrivalTitle').textContent = 'You have arrived at ' + personalState.location;
         $('travelArrivalDate').textContent = 'On ' + summary.calendarText;
-        openFrame('frameTravelIntro');
+        if (personalState.world.map.currentLocationId === 'loc-guild' && !personalState.adventurer.registered) {
+          var reg = lib.registerAtGuild(personalState, rng);
+          personalState = reg.state;
+          playGuildIntro(reg.lines);
+        } else {
+          openFrame('frameTravelIntro');
+        }
       }));
 
       $('mapWrap').addEventListener('pointerdown', safe(function(ev){ mapDrag.active = true; mapDrag.x = ev.clientX; mapDrag.y = ev.clientY; mapDrag.moved = false; if ($('mapWrap').setPointerCapture) $('mapWrap').setPointerCapture(ev.pointerId); }));

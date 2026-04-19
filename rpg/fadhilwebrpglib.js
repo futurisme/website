@@ -897,6 +897,7 @@
     'Aegis Pulse',
     'Whispercraft'
   ];
+  var gradeCatalog = ['F+', 'E', 'D', 'C', 'B', 'A', 'AA', 'S', 'SS', 'SSS', 'SSR', 'SSU+'];
 
   function sampleRandom(rng) {
     var acc = 2166136261;
@@ -982,10 +983,13 @@
             { id: 'loc-home', name: profile.birthPlace, type: 'hometown', x: 220, y: 260, neighbors: ['loc-river', 'loc-fort'] },
             { id: 'loc-river', name: 'Rivergate', type: 'town', x: 430, y: 430, neighbors: ['loc-home', 'loc-fort', 'loc-vale'] },
             { id: 'loc-fort', name: 'Fort Aster', type: 'city', x: 640, y: 240, neighbors: ['loc-home', 'loc-river', 'loc-vale'] },
-            { id: 'loc-vale', name: 'Vale of Lumen', type: 'city', x: 860, y: 480, neighbors: ['loc-river', 'loc-fort'] }
+            { id: 'loc-vale', name: 'Vale of Lumen', type: 'city', x: 860, y: 480, neighbors: ['loc-river', 'loc-fort', 'loc-guild'] },
+            { id: 'loc-guild', name: 'Adventurer\'s Guild', type: 'guild', x: 980, y: 270, neighbors: ['loc-vale', 'loc-fort'] }
           ]
         }
       },
+      level: 0,
+      adventurer: { registered: false, grade: 'Unranked', gradeDelta: '', score: 0 },
       energy: 100,
       mood: 72,
       stats: {
@@ -1029,6 +1033,13 @@
             };
           })
         }
+      },
+      level: personalState.level || 0,
+      adventurer: {
+        registered: !!(personalState.adventurer && personalState.adventurer.registered),
+        grade: (personalState.adventurer && personalState.adventurer.grade) || 'Unranked',
+        gradeDelta: (personalState.adventurer && personalState.adventurer.gradeDelta) || '',
+        score: (personalState.adventurer && personalState.adventurer.score) || 0
       },
       energy: personalState.energy,
       mood: personalState.mood,
@@ -1076,7 +1087,11 @@
       totalDays: personalState.totalDays,
       energy: personalState.energy,
       mood: personalState.mood,
-      stats: personalState.stats
+      stats: personalState.stats,
+      level: personalState.level || 0,
+      grade: (personalState.adventurer && personalState.adventurer.grade) || 'Unranked',
+      gradeDelta: (personalState.adventurer && personalState.adventurer.gradeDelta) || '',
+      adventurerRegistered: !!(personalState.adventurer && personalState.adventurer.registered)
     };
   }
 
@@ -1125,6 +1140,41 @@
     return next;
   }
 
+  function registerAtGuild(personalState, rng) {
+    var rand = rng || Math.random;
+    var next = tickIdleDays(personalState, 1);
+    var map = next.world.map;
+    if (map.currentLocationId !== 'loc-guild') {
+      return { ok: false, reason: 'Kamu harus tiba di Adventurer\'s Guild.', state: next, lines: [] };
+    }
+    if (next.adventurer.registered) {
+      return { ok: false, reason: 'Registrasi sudah selesai sebelumnya.', state: next, lines: [] };
+    }
+    var s = next.stats;
+    var total = s.strength + s.agility + s.durability + s.stamina + s.intelligence + s.wisdom + s.willpower + s.perception + s.charisma + s.appearance + s.socialWisdom;
+    var scoreNorm = Math.max(0, Math.min(11.999, (total / 165) * 12 + sampleRandom(rand) * 1.2));
+    var gradeIndex = Math.max(0, Math.min(gradeCatalog.length - 1, Math.floor(scoreNorm)));
+    var fraction = scoreNorm - gradeIndex;
+    var delta = fraction >= 0.67 ? '+' : (fraction <= 0.25 ? '-' : '');
+    next.adventurer = {
+      registered: true,
+      grade: gradeCatalog[gradeIndex],
+      gradeDelta: delta,
+      score: scoreNorm
+    };
+    next.logs.push('Registrasi guild selesai. Grade: ' + next.adventurer.grade + (delta ? ' ' + delta : '') + '.');
+    return {
+      ok: true,
+      state: next,
+      lines: [
+        'Gerbang Adventurer\'s Guild terbuka, panel evaluasi menyala.',
+        'Uji fisik, mental, dan sosial dipindai dalam hitungan detik.',
+        'Akumulasi performa dan potensi sedang dipertimbangkan...',
+        'Berdasarkan kemampuan, Grade kamu adalah ' + next.adventurer.grade + (delta ? ' ' + delta : '') + '.'
+      ]
+    };
+  }
+
   global.fadhilwebrpglib = {
     seededRandom: seededRandom,
     createState: createState,
@@ -1148,6 +1198,7 @@
     getPersonalMapView: getPersonalMapView,
     movePersonalMapCamera: movePersonalMapCamera,
     travelPersonal: travelPersonal,
+    registerAtGuild: registerAtGuild,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue
   };
