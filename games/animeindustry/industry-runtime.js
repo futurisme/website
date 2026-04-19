@@ -427,74 +427,96 @@ export function createAnimeIndustryRuntime() {
 
   function tickNpcEcosystem() {
     const rankedStudios = getRankedStudios(state);
-    state.npcs.forEach((npc, index) => {
-      if (!npc.active) return;
-      if (npc.role === 'investor' && state.day % 9 === (index % 5)) {
-        npc.cash += 55_000;
-      }
-      if (npc.role === 'mangaka' && state.day % 13 === (index % 7)) {
-        if (!npc.currentProject) {
-          const npcProject = createNpcProject(state, npc, state.day);
-          state.npcProjects.push(npcProject);
-          npc.currentProject = npcProject.id;
-          log(state, `${npc.name} memulai serial baru: ${npcProject.title}.`);
-          return;
-        }
-        const project = state.npcProjects.find((entry) => entry.id === npc.currentProject && !entry.launched);
-        if (!project) return;
-        if (project.stage === 'serialization') {
-          project.chapters += 1;
-          project.quality = Math.min(100, project.quality + 2 + (npc.ambition / 100));
-          project.popularity = Math.min(100, project.popularity + 1.6 + (npc.reputation / 140));
-          if (project.chapters >= 10) {
-            project.stage = 'studio-interest';
-            const ownStudio = npc.writesManga && npc.studioId ? state.studios.find((entry) => entry.id === npc.studioId) : null;
-            const studio = ownStudio ?? state.studios.find((entry) => entry.id === rankedStudios[index % rankedStudios.length]);
-            project.studioId = studio?.id ?? null;
-            log(state, `${project.title} karya ${npc.name} dilirik ${studio?.name ?? 'studio'} untuk adaptasi anime.`);
-          }
-          return;
-        }
-        if (project.stage === 'studio-interest') {
-          project.stage = 'production';
-          log(state, `${project.title} (NPC) lolos production committee dan masuk produksi.`);
-          return;
-        }
-        if (project.stage === 'production') {
-          const studio = state.studios.find((entry) => entry.id === project.studioId);
-          const speed = ((studio?.speed ?? 50) / 100) * 3.1;
-          project.productionProgress = Math.min(100, project.productionProgress + 2.2 + speed);
-          if (project.productionProgress >= 100) {
-            project.stage = 'launch-ready';
-            log(state, `${project.title} (NPC) siap tayang.`);
-          }
-          return;
-        }
-        if (project.stage === 'launch-ready') {
-          project.launched = true;
-          const studio = state.studios.find((entry) => entry.id === project.studioId);
-          const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2));
-          state.releases.push({
-            id: project.id,
-            title: project.title,
-            medium: 'manga-npc',
-            score: releaseScore,
-            revenue: Math.round(1_600_000 + releaseScore * 55_000),
-            studio: studio?.name ?? 'Unknown Studio',
-            day: state.day,
-          });
-          log(state, `${project.title} (NPC Mangaka ${npc.name}) resmi rilis anime.`);
-          npc.currentProject = null;
+    const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
+    const projectById = new Map(state.npcProjects.map((project) => [project.id, project]));
+
+    for (let index = 0; index < state.npcs.length; index += 1) {
+      const npc = state.npcs[index];
+      if (!npc.active) continue;
+      npc.mood = Math.max(0.05, Math.min(0.95, npc.mood + (state.market.trend - 1) * 0.08));
+
+      if (npc.role === 'investor') {
+        npc.cash += 42_000 + Math.floor(npc.ambition * 210);
+        if (state.player.studioPlanningOpen && npc.cash > 3_000_000 && index % 3 === state.day % 3) {
+          const amount = 240_000 + Math.floor(npc.ambition * 2100);
+          state.player.fundingPool += amount;
+          npc.cash -= amount;
         }
       }
-      if (npc.role === 'ceo-studio' && npc.studioId && state.day % 15 === (index % 4)) {
-        const studio = state.studios.find((entry) => entry.id === npc.studioId);
+
+      if (npc.role === 'animator' && npc.studioId) {
+        const studio = studioById.get(npc.studioId);
         if (studio) {
-          studio.network = Math.min(95, studio.network + 0.3);
-          studio.craft = Math.min(98, studio.craft + 0.2);
+          studio.speed = Math.min(99, studio.speed + 0.02 + npc.mood * 0.01);
+          studio.craft = Math.min(99, studio.craft + 0.018 + npc.reputation * 0.0006);
         }
       }
-    });
+
+      if (npc.role === 'ceo-studio' && npc.studioId) {
+        const studio = studioById.get(npc.studioId);
+        if (studio) {
+          studio.network = Math.min(99, studio.network + 0.025 + npc.mood * 0.02);
+        }
+      }
+
+      const isWriter = npc.role === 'mangaka' || npc.writesManga || npc.role === 'novelis';
+      if (!isWriter) continue;
+      if (!npc.currentProject) {
+        const npcProject = createNpcProject(state, npc, state.day);
+        state.npcProjects.push(npcProject);
+        projectById.set(npcProject.id, npcProject);
+        npc.currentProject = npcProject.id;
+        log(state, `${npc.name} memulai serial baru: ${npcProject.title}.`);
+        continue;
+      }
+
+      const project = projectById.get(npc.currentProject);
+      if (!project || project.launched) {
+        npc.currentProject = null;
+        continue;
+      }
+
+      if (project.stage === 'serialization') {
+        project.chapters += 1 + (npc.ambition > 62 ? 1 : 0);
+        project.quality = Math.min(100, project.quality + 1.35 + (npc.ambition / 120));
+        project.popularity = Math.min(100, project.popularity + 1.05 + (npc.reputation / 180));
+        if (project.chapters >= 10) {
+          project.stage = 'studio-interest';
+          const ownStudio = npc.writesManga && npc.studioId ? studioById.get(npc.studioId) : null;
+          const studio = ownStudio ?? studioById.get(rankedStudios[index % rankedStudios.length]);
+          project.studioId = studio?.id ?? null;
+          log(state, `${project.title} karya ${npc.name} dilirik ${studio?.name ?? 'studio'} untuk adaptasi anime.`);
+        }
+        continue;
+      }
+      if (project.stage === 'studio-interest') {
+        project.stage = 'production';
+        continue;
+      }
+      if (project.stage === 'production') {
+        const studio = studioById.get(project.studioId);
+        const speed = ((studio?.speed ?? 50) / 100) * 3.1;
+        project.productionProgress = Math.min(100, project.productionProgress + 2.1 + speed + npc.mood);
+        if (project.productionProgress >= 100) project.stage = 'launch-ready';
+        continue;
+      }
+      if (project.stage === 'launch-ready') {
+        project.launched = true;
+        const studio = studioById.get(project.studioId);
+        const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2));
+        state.releases.push({
+          id: project.id,
+          title: project.title,
+          medium: 'manga-npc',
+          score: releaseScore,
+          revenue: Math.round(1_600_000 + releaseScore * 55_000),
+          studio: studio?.name ?? 'Unknown Studio',
+          day: state.day,
+        });
+        log(state, `${project.title} (NPC ${npc.name}) resmi rilis anime.`);
+        npc.currentProject = null;
+      }
+    }
 
     if (state.registered && state.player.studioPlanningOpen && state.day % 9 === 0) {
       const investor = state.investors[state.day % state.investors.length];
