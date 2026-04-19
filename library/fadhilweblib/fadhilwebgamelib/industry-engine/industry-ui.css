@@ -23,6 +23,25 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; margin-top: 6px; }
 .industry-feed, .industry-releases { margin: 6px 0 0; padding-left: 16px; max-height: 60vh; overflow: auto; }
 #industryStudios { max-height: calc(100vh - 150px); overflow-y: auto; padding-bottom: 44px; }
+.industry-ranking-list { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+.industry-ranking-list li { line-height: 1.25; }
+.industry-popup {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  background: #3c1111;
+  border: 1px solid #ff9e9e88;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all .16s ease;
+  pointer-events: none;
+  z-index: 9999;
+}
+.industry-popup[data-tone="success"] { background: #0e3b20; border-color: #8dffc188; }
+.industry-popup.popup-show { opacity: 1; transform: translateY(0); }
 @media (max-width: 760px) {
   .industry-toolbar { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }

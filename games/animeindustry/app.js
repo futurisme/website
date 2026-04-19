@@ -27,12 +27,13 @@ if (!appRoot) {
         const active = runtime.toggleAuto((snapshot) => ui.render(snapshot));
         ui.setAutoState(active);
       },
-      onSeekFunding: () => { runtime.seekFunding(); ui.render(runtime.snapshot()); },
-      onImproveAdmin: () => { runtime.improveAdministration(); ui.render(runtime.snapshot()); },
-      onOpenStudioPlanning: () => { runtime.openStudioPlanning(); ui.render(runtime.snapshot()); },
+      onSeekFunding: () => { const ok = runtime.seekFunding(); ui.render(runtime.snapshot()); return ok; },
+      onImproveAdmin: () => { const ok = runtime.improveAdministration(); ui.render(runtime.snapshot()); return ok; },
+      onOpenStudioPlanning: () => { const ok = runtime.openStudioPlanning(); ui.render(runtime.snapshot()); return ok; },
       onFoundStudio: (studioName) => {
-        runtime.foundStudioAsCeo(studioName);
+        const ok = runtime.foundStudioAsCeo(studioName);
         ui.render(runtime.snapshot());
+        return ok;
       },
       onOpenProject: () => {},
       onSerialize: (projectId) => { runtime.serializeChapter(projectId); ui.render(runtime.snapshot()); },
@@ -40,9 +41,9 @@ if (!appRoot) {
       onCommittee: (projectId) => { runtime.formCommittee(projectId); ui.render(runtime.snapshot()); },
       onCommitteeDiscuss: (projectId) => { runtime.discussCommitteeContract(projectId); ui.render(runtime.snapshot()); },
       onSelectStudio: (projectId, studioId) => { runtime.chooseAdaptationStudio(projectId, studioId); ui.render(runtime.snapshot()); },
-      onReadEmail: (emailId) => { runtime.markEmailRead(emailId); ui.render(runtime.snapshot()); },
-      onManagementMerger: () => { runtime.proposeMergerStudio(); ui.render(runtime.snapshot()); },
-      onManagementCoFund: () => { runtime.proposeCoFundedStudio(); ui.render(runtime.snapshot()); },
+      onReadEmail: (emailId) => { const ok = runtime.markEmailRead(emailId); ui.render(runtime.snapshot()); return ok; },
+      onManagementMerger: () => { const ok = runtime.proposeMergerStudio(); ui.render(runtime.snapshot()); return ok; },
+      onManagementCoFund: () => { const ok = runtime.proposeCoFundedStudio(); ui.render(runtime.snapshot()); return ok; },
       onProduction: (projectId) => { runtime.startProduction(projectId); ui.render(runtime.snapshot()); },
       onLaunch: (projectId) => { runtime.launchAnime(projectId); ui.render(runtime.snapshot()); },
       onReset: () => { runtime.reset(); ui.setAutoState(false); ui.render(runtime.snapshot()); },

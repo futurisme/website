@@ -41,6 +41,22 @@ export function createIndustryUiController({ root, handlers }) {
 
   let selectedProjectId = null;
   let currentSnapshot = null;
+  let popupTimer = null;
+
+  function showPopup(message, tone = 'error') {
+    let popup = root.querySelector('#industryInlinePopup');
+    if (!popup) {
+      popup = document.createElement('div');
+      popup.id = 'industryInlinePopup';
+      popup.className = 'industry-popup';
+      root.appendChild(popup);
+    }
+    popup.textContent = message;
+    popup.setAttribute('data-tone', tone);
+    popup.classList.add('popup-show');
+    if (popupTimer) clearTimeout(popupTimer);
+    popupTimer = setTimeout(() => popup.classList.remove('popup-show'), 2200);
+  }
 
   function canOpenFrame(frameKey) {
     if (!currentSnapshot?.visualAccess) return true;
@@ -75,18 +91,48 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
 
-  root.querySelector('[data-action="seek-funding"]')?.addEventListener('click', handlers.onSeekFunding);
+  root.querySelector('[data-action="seek-funding"]')?.addEventListener('click', () => {
+    const ok = handlers.onSeekFunding();
+    if (!ok) showPopup('Gagal melakukan pendanaan.', 'error');
+  });
   root.querySelector('[data-action="improve-admin"]')?.addEventListener('click', handlers.onImproveAdmin);
-  root.querySelector('[data-action="open-studio-planning"]')?.addEventListener('click', handlers.onOpenStudioPlanning);
-  root.querySelector('[data-action="found-studio"]')?.addEventListener('click', () => handlers.onFoundStudio(studioNameInput.value));
+  root.querySelector('[data-action="open-studio-planning"]')?.addEventListener('click', () => {
+    const ok = handlers.onOpenStudioPlanning();
+    if (!ok) showPopup('Gagal membuka perencanaan studio.', 'error');
+  });
+  root.querySelector('[data-action="found-studio"]')?.addEventListener('click', () => {
+    const ok = handlers.onFoundStudio(studioNameInput.value);
+    if (ok) {
+      showPopup('Studio berhasil didirikan.', 'success');
+      openFrame('main');
+    } else {
+      showPopup('Gagal mendirikan studio.', 'error');
+    }
+  });
   root.querySelector('[data-action="committee-discuss"]').addEventListener('click', () => {
     if (selectedProjectId) handlers.onCommitteeDiscuss(selectedProjectId);
   });
   root.querySelector('[data-action="committee-confirm"]').addEventListener('click', () => {
     if (selectedProjectId) handlers.onCommittee(selectedProjectId);
   });
-  root.querySelector('[data-action="management-merger"]')?.addEventListener('click', handlers.onManagementMerger);
-  root.querySelector('[data-action="management-cofund"]')?.addEventListener('click', handlers.onManagementCoFund);
+  root.querySelector('[data-action="management-merger"]')?.addEventListener('click', () => {
+    const ok = handlers.onManagementMerger();
+    if (ok) {
+      showPopup('Merger berhasil disetujui.', 'success');
+      openFrame('main');
+    } else {
+      showPopup('Gagal: proposal merger ditolak.', 'error');
+    }
+  });
+  root.querySelector('[data-action="management-cofund"]')?.addEventListener('click', () => {
+    const ok = handlers.onManagementCoFund();
+    if (ok) {
+      showPopup('Co-funding studio baru berhasil.', 'success');
+      openFrame('main');
+    } else {
+      showPopup('Gagal: co-funding belum memenuhi syarat.', 'error');
+    }
+  });
 
   projectsEl.addEventListener('click', (event) => {
     const target = event.target;
@@ -205,15 +251,21 @@ export function createIndustryUiController({ root, handlers }) {
       rankingEl.innerHTML = `
         <article class="industry-project">
           <h3>Ranking Manga</h3>
-          <p>${snapshot.rankings.manga.map((entry, idx) => `#${idx + 1} ${esc(entry.title)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada data.'}</p>
+          <ol class="industry-ranking-list">${snapshot.rankings.manga.length
+            ? snapshot.rankings.manga.map((entry, idx) => `<li>#${idx + 1} ${esc(entry.title)} <strong>${entry.score.toFixed(1)}</strong></li>`).join('')
+            : '<li>Belum ada data.</li>'}</ol>
         </article>
         <article class="industry-project">
           <h3>Ranking Anime</h3>
-          <p>${snapshot.rankings.anime.map((entry, idx) => `#${idx + 1} ${esc(entry.title)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada rilis.'}</p>
+          <ol class="industry-ranking-list">${snapshot.rankings.anime.length
+            ? snapshot.rankings.anime.map((entry, idx) => `<li>#${idx + 1} ${esc(entry.title)} <strong>${entry.score.toFixed(1)}</strong></li>`).join('')
+            : '<li>Belum ada rilis.</li>'}</ol>
         </article>
         <article class="industry-project">
           <h3>Studio Terbesar / Terkaya</h3>
-          <p>${snapshot.rankings.studio.map((entry, idx) => `#${idx + 1} ${esc(entry.name)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada data studio.'}</p>
+          <ol class="industry-ranking-list">${snapshot.rankings.studio.length
+            ? snapshot.rankings.studio.map((entry, idx) => `<li>#${idx + 1} ${esc(entry.name)} <strong>${entry.score.toFixed(1)}</strong></li>`).join('')
+            : '<li>Belum ada data studio.</li>'}</ol>
         </article>
       `;
 
