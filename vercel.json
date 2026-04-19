@@ -80,6 +80,30 @@
       "dest": "/games/dreambusiness/$1"
     },
     {
+      "src": "/games/animeindustry",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/games/animeindustry/",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/games/animeindustry/(.*)",
+      "dest": "/games/animeindustry/$1"
+    },
+    {
+      "src": "/animeindustry",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/animeindustry/",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/animeindustry/(.*)",
+      "dest": "/games/animeindustry/$1"
+    },
+    {
       "src": "/games/rpg",
       "dest": "/games/rpg/index.html"
     },

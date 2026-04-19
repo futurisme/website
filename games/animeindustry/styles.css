@@ -1,0 +1,68 @@
+:root {
+  color-scheme: dark;
+  --bg: #090914;
+  --panel: #141428;
+  --line: #2f3154;
+  --accent: #92a6ff;
+  --text: #f3f5ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: radial-gradient(circle at top, #171735, var(--bg));
+  color: var(--text);
+}
+
+.shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+header h1 { margin: 0 0 8px; }
+header p { margin: 0 0 18px; opacity: .82; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--accent); }
+
+section {
+  background: rgb(16 18 36 / 84%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.card {
+  background: #111327;
+  border: 1px solid #2a2d4a;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.list, .feed { margin: 0; padding-left: 18px; }
+.list li, .feed li { margin: 6px 0; }

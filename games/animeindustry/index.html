@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AnimeIndustry</title>
+    <link rel="canonical" href="https://fadhil.dev/games/animeindustry" />
+    <meta
+      name="description"
+      content="AnimeIndustry adalah simulasi industri anime dengan mekanik pasar, riset, dan investasi berbasis engine khusus industry-engine."
+    />
+    <link rel="stylesheet" href="/games/animeindustry/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <h1>AnimeIndustry</h1>
+        <p>Simulasi industri anime: studio, IP, investor, dan pertumbuhan pasar.</p>
+      </header>
+
+      <section class="toolbar">
+        <button id="tick1">+1 Tick</button>
+        <button id="tick25">+25 Tick</button>
+        <button id="auto">Auto</button>
+        <button id="reset">Reset</button>
+      </section>
+
+      <section id="stats" class="stats"></section>
+      <section>
+        <h2>Top Studio</h2>
+        <ol id="topCompanies" class="list"></ol>
+      </section>
+      <section>
+        <h2>Aktivitas Terbaru</h2>
+        <ul id="feed" class="feed"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="/games/animeindustry/app.js"></script>
+  </body>
+</html>
