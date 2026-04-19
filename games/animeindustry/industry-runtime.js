@@ -6,6 +6,8 @@ import {
 } from '/games/animeindustry/anime-engine.bundle.js';
 
 const MAX_ACTIVE_STUDIOS = 14;
+const INITIAL_ACTIVE_STUDIOS = 10;
+const NPC_TARGET_COUNT = 70;
 
 const STUDIO_BASE_POOL = Object.freeze([
   { id: 'st-1', craft: 72, speed: 58, network: 69, ownership: 'external' },
@@ -28,6 +30,22 @@ const STUDIO_NAME_PART_A = ['Astra', 'Kitsune', 'Mirai', 'Kaze', 'Akari', 'Yoru'
 const STUDIO_NAME_PART_B = ['Frame', 'Works', 'Pictures', 'Motion', 'Atelier', 'Factory', 'Studio', 'Lab', 'House', 'Arts', 'Vision', 'Spark', 'Forge', 'Arc'];
 const STUDIO_NAME_PART_C = ['Collective', 'Guild', 'Division', 'Systems', 'Prime', 'Dynamics', 'Factory'];
 const STUDIO_ONE_WORD_DATASET = ['SHUKARI', 'MAPPEX', 'JPNIME', 'Kaminameta', 'VINIX', 'ANIZEN', 'TOKARU'];
+const MANGA_TITLE_DATASET = [
+  'Astral Manuscript', 'Blue Ember Chronicle', 'Glass Horizon', 'Midnight Conveyor', 'Neon Herbarium', 'Parallel Drifters',
+  'Starless Rondo', 'Velvet Protocol', 'Crimson Index', 'Winter Dial', 'Sunset Cipher', 'Binary Shrine', 'Silent Orbit',
+  'Lantern of Kuro', 'Arcadia Delta', 'Phantom Cartographer', 'Sapphire Verdict', 'Echoes of Aster', 'Rainline Sonata',
+  'Hollow Compass', 'Jade Overclock', 'Myriad Lantern', 'Mosaic Vanguard', 'Last Paladin Memoir', 'Ivory Resonance',
+  'Urban Kitsune Files', 'Signal of the Nine', 'Seafoam Testament', 'Astral Debt', 'Tokyo Skyward Manual', 'Monolith Picnic',
+  'Red Ribbon Riot', 'Pocket Nebula', 'The Indigo Harbor', 'Snowline Engine', 'Cobalt Refrain', 'Helix School Chronicle',
+  'Clockwork Picnic', 'Shatterglass Parade', 'River of Cinders', 'Afterimage Parade', 'Wired Chameleon', 'Daybreak Quarry',
+  'Lunar Proofreader', 'Quartz Frontier', 'Birdsong Firewall', 'Cerulean Compass', 'Night Bloom Engine', 'Peach District Arc',
+  'Raven Elevator', 'Twilight Courier', 'Drift Academy', 'Nebula Baker', 'Yokai Frequency', 'Zero Gravity Band',
+  'Mercury Notation', 'Abyssal Bookmark', 'Harborline Waltz', 'Velvet Sidequest', 'Mirage Courier', 'Silent Academy Loop',
+  'Delta Moon Thesis', 'Garden of Relays', 'Frostlight Sermon', 'Scarlet Tramline', 'Monsoon Archivist', 'Aria of Static',
+  'Cloudline Testament', 'Lantern Frontier', 'Pulse of Kyoto', 'Chrome Sparrow', 'Vortex Homeroom', 'Bamboo Overdrive',
+  'Festival of Aether', 'Hidden Shrine Constructor', 'Ghostwired Utopia', 'Saturn Alley', 'Paper Katana Protocol',
+  'Eclipse Delicatessen', 'Nocturne Salvagers', 'Reactor Blossom', 'Rune of Rainfall', 'Tidal Observatory', 'Misty Cadence',
+];
 
 const INVESTOR_POOL = Object.freeze([
   { id: 'inv-pub', name: 'Penerbit', influence: 72, risk: 45 },
@@ -47,17 +65,21 @@ const NPC_LAST_NAMES = [
 ];
 const NPC_ROLES = ['ceo-studio', 'mangaka', 'novelis', 'animator', 'investor'];
 
-function generateUniqueNpcNames(targetCount) {
-  const usedFirst = new Set();
-  const usedLast = new Set();
+function addUniqueName(usedNames, candidate) {
+  if (usedNames.has(candidate)) return false;
+  usedNames.add(candidate);
+  return true;
+}
+
+function generateUniqueNpcNames(targetCount, usedNames) {
   const names = [];
-  for (let i = 0; i < targetCount; i += 1) {
-    const first = NPC_FIRST_NAMES[i % NPC_FIRST_NAMES.length];
-    const last = NPC_LAST_NAMES[(i * 3) % NPC_LAST_NAMES.length];
-    if (usedFirst.has(first) || usedLast.has(last)) continue;
-    usedFirst.add(first);
-    usedLast.add(last);
-    names.push(`${first} ${last}`);
+  let seed = 0;
+  while (names.length < targetCount && seed < targetCount * 40) {
+    const first = NPC_FIRST_NAMES[seed % NPC_FIRST_NAMES.length];
+    const last = NPC_LAST_NAMES[Math.floor(seed / NPC_FIRST_NAMES.length) % NPC_LAST_NAMES.length];
+    const full = `${first} ${last}`;
+    if (addUniqueName(usedNames, full)) names.push(full);
+    seed += 1;
   }
   return names;
 }
@@ -66,7 +88,7 @@ function randomFrom(pool) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function generateUniqueStudioNames(targetCount) {
+function generateUniqueStudioNames(targetCount, usedNames) {
   const used = new Set();
   const names = [];
   let safety = 0;
@@ -78,18 +100,27 @@ function generateUniqueStudioNames(targetCount) {
     if (wordCount >= 2) parts.push(randomFrom(STUDIO_NAME_PART_B));
     if (wordCount >= 3) parts.push(randomFrom(STUDIO_NAME_PART_C));
     const candidate = parts.join(' ');
-    if (used.has(candidate)) continue;
+    if (used.has(candidate) || usedNames.has(candidate)) continue;
     used.add(candidate);
+    usedNames.add(candidate);
     names.push(candidate);
   }
   return names;
 }
 
-function createNpcAgents(studios) {
-  const generatedNames = generateUniqueNpcNames(20);
+function pickNpcRole(index) {
+  if (index < 42) return 'animator';
+  if (index < 50) return 'ceo-studio';
+  if (index < 56) return 'mangaka';
+  if (index < 62) return 'investor';
+  return 'novelis';
+}
+
+function createNpcAgents(studios, usedNames) {
+  const generatedNames = generateUniqueNpcNames(NPC_TARGET_COUNT, usedNames);
   const npcs = [];
-  for (let i = 0; i < 20; i += 1) {
-    const role = NPC_ROLES[i % NPC_ROLES.length];
+  for (let i = 0; i < NPC_TARGET_COUNT; i += 1) {
+    const role = pickNpcRole(i);
     const name = generatedNames[i];
     const npc = {
       id: `npc-${i + 1}`,
@@ -117,10 +148,10 @@ function createNpcAgents(studios) {
   return npcs;
 }
 
-function createProject(id, medium) {
+function createProject(id, medium, title) {
   return {
     id,
-    title: `${medium === 'novel' ? 'Novel' : 'Manga'} ${id.slice(-4).toUpperCase()}`,
+    title,
     medium,
     stage: 'ideation',
     popularity: 10,
@@ -140,11 +171,47 @@ function createProject(id, medium) {
   };
 }
 
-function createNpcProject(npc, day) {
+function createUniquePlayerProjectTitle(state, medium) {
+  const base = `${medium === 'novel' ? 'Novel' : 'Manga'} ${Math.random().toString(36).slice(-4).toUpperCase()}`;
+  if (!state.usedNames.has(base)) {
+    state.usedNames.add(base);
+    return base;
+  }
+  let seq = 2;
+  let candidate = `${base}-${seq}`;
+  while (state.usedNames.has(candidate)) {
+    seq += 1;
+    candidate = `${base}-${seq}`;
+  }
+  state.usedNames.add(candidate);
+  return candidate;
+}
+
+function generateUniqueMangaTitle(state, npc) {
+  const poolPick = MANGA_TITLE_DATASET[(state.day + npc.id.length + Math.floor(Math.random() * MANGA_TITLE_DATASET.length)) % MANGA_TITLE_DATASET.length];
+  const fallback = `${poolPick} ${npc.id.toUpperCase()}`;
+  if (!state.usedNames.has(poolPick)) {
+    state.usedNames.add(poolPick);
+    return poolPick;
+  }
+  let seq = 2;
+  let candidate = `${poolPick} ${seq}`;
+  while (state.usedNames.has(candidate)) {
+    seq += 1;
+    candidate = `${fallback} ${seq}`;
+  }
+  state.usedNames.add(candidate);
+  return candidate;
+}
+
+function createNpcProject(state, npc, day) {
+  if (!npc.franchiseTitle) npc.franchiseTitle = generateUniqueMangaTitle(state, npc);
+  npc.franchiseIndex = (npc.franchiseIndex ?? 0) + 1;
+  const installment = npc.franchiseIndex === 1 ? 'Main Story' : npc.franchiseIndex === 2 ? 'Sequel Arc' : `Series ${npc.franchiseIndex}`;
   return {
     id: `npc-ip-${npc.id}-${day}`,
     npcId: npc.id,
-    title: `NPC Manga ${npc.name.split(' ')[0]}`,
+    title: `${npc.franchiseTitle} • ${installment}`,
     stage: 'serialization',
     chapters: 6,
     quality: 40 + Math.min(35, Math.round(npc.reputation * 0.4)),
@@ -156,13 +223,14 @@ function createNpcProject(npc, day) {
 }
 
 function createInitialState() {
-  const studioNames = generateUniqueStudioNames(MAX_ACTIVE_STUDIOS);
-  const studios = STUDIO_BASE_POOL.slice(0, MAX_ACTIVE_STUDIOS).map((studio, index) => ({
+  const usedNames = new Set();
+  const studioNames = generateUniqueStudioNames(INITIAL_ACTIVE_STUDIOS, usedNames);
+  const studios = STUDIO_BASE_POOL.slice(0, INITIAL_ACTIVE_STUDIOS).map((studio, index) => ({
     ...studio,
     name: studioNames[index],
     equity: { player: 0, investor: 100 },
   }));
-  const npcs = createNpcAgents(studios);
+  const npcs = createNpcAgents(studios, usedNames);
   return {
     registered: false,
     day: 0,
@@ -185,6 +253,7 @@ function createInitialState() {
     npcs,
     npcProjects: [],
     emails: [],
+    usedNames,
     releases: [],
     feed: ['Day 0: Menunggu registrasi pemain.'],
     cache: { rankedStudios: studios.map((entry) => entry.id), rankedStudiosDay: 0 },
@@ -275,7 +344,7 @@ export function createAnimeIndustryRuntime() {
       state.player.writingMedium = profession === 'Novelis' ? 'novel' : 'manga';
       state.player.career = profession === 'Animator' ? 'animator' : 'creator';
       if (profession === 'Animator') state.player.studioId = state.studios[0]?.id ?? null;
-      state.projects = [createProject(`ip-${Date.now().toString(36).slice(-6)}`, state.player.writingMedium)];
+      state.projects = [createProject(`ip-${Date.now().toString(36).slice(-6)}`, state.player.writingMedium, createUniquePlayerProjectTitle(state, state.player.writingMedium))];
       state.feed = [`Day 0: ${cleanName} memulai karier sebagai ${profession}.`];
       return true;
     });
@@ -312,7 +381,7 @@ export function createAnimeIndustryRuntime() {
   function foundStudioAsCeo(studioName) {
     return withAction('found-studio-as-ceo', () => {
       if (!state.registered || state.studios.length >= MAX_ACTIVE_STUDIOS) return false;
-      const capitalNeed = 6_000_000;
+      const capitalNeed = 1_800_000;
       const personalCapital = Math.max(0, state.cash);
       const investorCapital = Math.max(0, state.player.fundingPool);
       if (personalCapital + investorCapital < capitalNeed) {
@@ -321,6 +390,10 @@ export function createAnimeIndustryRuntime() {
       }
       const id = `st-player-${Math.random().toString(36).slice(-5)}`;
       const name = String(studioName || '').trim() || `Studio ${state.player.name.split(' ')[0]}`;
+      if (state.usedNames.has(name)) {
+        log(state, 'Nama studio sudah dipakai. Gunakan nama lain.');
+        return false;
+      }
       const usePersonal = Math.min(capitalNeed, personalCapital);
       const useInvestor = Math.max(0, capitalNeed - usePersonal);
       const playerShare = useInvestor === 0 ? 100 : Math.max(45, Math.round((usePersonal / capitalNeed) * 100));
@@ -337,6 +410,7 @@ export function createAnimeIndustryRuntime() {
         ceoNpcId: null,
         equity: { player: playerShare, investor: investorShare },
       });
+      state.usedNames.add(name);
       state.player.studioId = id;
       state.player.career = 'studio-founder';
       state.cash -= usePersonal;
@@ -358,7 +432,7 @@ export function createAnimeIndustryRuntime() {
       }
       if (npc.role === 'mangaka' && state.day % 13 === (index % 7)) {
         if (!npc.currentProject) {
-          const npcProject = createNpcProject(npc, state.day);
+          const npcProject = createNpcProject(state, npc, state.day);
           state.npcProjects.push(npcProject);
           npc.currentProject = npcProject.id;
           log(state, `${npc.name} memulai serial baru: ${npcProject.title}.`);
@@ -481,7 +555,7 @@ export function createAnimeIndustryRuntime() {
     return withAction('brainstorm-project', () => {
       if (!state.registered) return false;
       const medium = state.player.writingMedium;
-      state.projects.push(createProject(`ip-${(Math.random() * 1e9).toFixed(0)}`, medium));
+      state.projects.push(createProject(`ip-${(Math.random() * 1e9).toFixed(0)}`, medium, createUniquePlayerProjectTitle(state, medium)));
       state.cash -= medium === 'novel' ? 150_000 : 250_000;
       log(state, `Konsep ${medium} baru dibuat.`);
       return true;
@@ -629,10 +703,10 @@ export function createAnimeIndustryRuntime() {
   function snapshot() {
     const ceoRequirements = {
       wealthNeed: 0,
-      fundingNeed: 6_000_000,
+      fundingNeed: 1_800_000,
       adminNeed: 0,
       wealthOk: true,
-      fundingOk: state.cash + state.player.fundingPool >= 6_000_000,
+      fundingOk: state.cash + state.player.fundingPool >= 1_800_000,
       adminOk: true,
     };
 

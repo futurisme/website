@@ -3,7 +3,7 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 .industry-shell { width: 100vw; height: 100vh; margin: 0; padding: 4px; color: #fff; }
 .industry-shell * { color: #fff; box-sizing: border-box; }
 .frame { display: none; }
-.frame.frame-active { display: block; height: calc(100vh - 12px); animation: fade .18s ease-out; }
+.frame.frame-active { display: block; height: calc(100vh - 12px); animation: fade .18s ease-out; overflow: auto; }
 @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
 .industry-panel { border: 1px solid #9cb7ff55; background: linear-gradient(180deg, #0a1942, #081332); border-radius: 8px; padding: 6px; box-shadow: 0 12px 28px #00000045; min-height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .topline { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; }
@@ -22,6 +22,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-project p { margin: 0; opacity: .9; }
 .actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 5px; margin-top: 6px; }
 .industry-feed, .industry-releases { margin: 6px 0 0; padding-left: 16px; max-height: 60vh; overflow: auto; }
+#industryStudios { max-height: calc(100vh - 150px); overflow-y: auto; padding-bottom: 44px; }
 @media (max-width: 760px) {
   .industry-toolbar { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
