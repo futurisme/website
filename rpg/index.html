@@ -67,6 +67,13 @@
       .chip { border:1px solid #334155; background:#111827; border-radius:999px; padding:2px 7px; font-size:.68rem; color:#cbd5e1; }
       .timeline { margin-top:8px; border:1px solid var(--line); border-radius:9px; background:#070d1d; padding:7px; max-height:170px; overflow:auto; font:12px/1.4 ui-monospace, monospace; }
       .top-actions { margin-top:6px; display:flex; gap:6px; }
+      .location-line { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+      .mini-btn { min-height:24px; padding:2px 8px; font-size:.72rem; width:auto; }
+      .explore-grid { margin-top:8px; display:grid; gap:6px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
+      .explore-card { border:1px solid var(--line); border-radius:9px; background:#0a1226; padding:8px; }
+      .explore-card h3 { margin:0 0 4px; font-size:.84rem; }
+      .explore-card p { margin:0; color:#94a3b8; font-size:.74rem; }
+      .explore-card button { margin-top:6px; }
       .map-wrap { margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#081425; overflow:hidden; height:min(56dvh, 430px); position:relative; touch-action:none; }
       .map-plane { position:absolute; width:1120px; height:760px; background:radial-gradient(circle at 35% 35%, #0f766e, #0f172a 62%); transform-origin:0 0; }
       .map-link { position:absolute; height:2px; background:rgba(148,163,184,.45); transform-origin:0 0; pointer-events:none; }
@@ -158,6 +165,17 @@
         </article>
       </section>
 
+      <section id="frameExplore" class="frame">
+        <article class="card">
+          <div class="topline">
+            <h2 class="title" style="margin:0;">Explore</h2>
+            <button id="backExploreBtn" class="mini-btn">↩ Back</button>
+          </div>
+          <p class="muted" id="exploreLocationText"></p>
+          <div class="explore-grid" id="exploreGrid"></div>
+        </article>
+      </section>
+
       <section id="frameTravelIntro" class="frame">
         <article class="travel-banner">
           <div>
@@ -238,7 +256,7 @@
       }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
       var mapDrag = { active:false, x:0, y:0, moved:false };
-      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro','frameExplore'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
       function createEntropyRng(){
         var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);
         if (window.crypto && window.crypto.getRandomValues) {
@@ -258,7 +276,7 @@
         var yearStr = String(summary.ageYears).padStart(4, '0');
         $('topDate').textContent = dayStr + ', ' + monthNames[monthIndex] + ', ' + yearStr;
         $('identityText').textContent = summary.name + ' · ' + summary.race + ' · Born as ' + summary.bornAs + ' · Lv ' + summary.level + ' · Grade ' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '');
-        $('originMeta').innerHTML = '<strong>Current location</strong><div class="chipline"><span class="chip">' + summary.location + '</span></div>';
+        $('originMeta').innerHTML = '<strong>Current location</strong><div class="location-line"><div class="chipline"><span class="chip">' + summary.location + '</span></div><button id="openExploreBtn" class="mini-btn">Explore</button></div>';
 
         var panels = [
           { title:'Physical', items:[['Strength', summary.stats.strength], ['Agility', summary.stats.agility], ['Durability', summary.stats.durability], ['Stamina', summary.stats.stamina]] },
@@ -276,6 +294,22 @@
           return '<details class=\"stat-panel\" data-panel=\"' + panel.title + '\" ' + (opened ? 'open' : '') + '><summary>' + panel.title + '</summary><div class=\"stat-list\">' + rows + '</div></details>';
         }).join('');
         $('lifeLog').textContent = personalState.logs.slice(-18).join('\n');
+        var exploreBtn = $('openExploreBtn');
+        if (exploreBtn) {
+          exploreBtn.addEventListener('click', safe(function(){
+            renderExplore();
+            openFrame('frameExplore');
+          }), { once: true });
+        }
+      }
+
+      function renderExplore(){
+        if (!personalState) return;
+        var view = lib.getExploreView(personalState);
+        $('exploreLocationText').textContent = 'Buildings in ' + view.locationName;
+        $('exploreGrid').innerHTML = view.buildings.map(function(b){
+          return '<article class="explore-card"><h3>' + b.name + '</h3><p>' + b.description + '</p><button data-building="' + b.id + '" class="mini-btn">Enter</button></article>';
+        }).join('');
       }
 
       function renderMap(){
@@ -426,6 +460,11 @@
         renderMain();
       }));
 
+      $('backExploreBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
       $('continueTravelBtn').addEventListener('click', safe(function(){
         openFrame('frameMain');
         renderMain();
@@ -473,6 +512,26 @@
         if (!details || details.tagName !== 'DETAILS') return;
         panelOpenState[details.dataset.panel] = details.open;
       }), true);
+      $('exploreGrid').addEventListener('click', safe(function(ev){
+        var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';
+        if (!id || !personalState) return;
+        if (id === 'guild') {
+          if (!personalState.adventurer.registered) {
+            var reg = lib.registerAtGuild(personalState, rng);
+            personalState = reg.state;
+            playGuildIntro(reg.lines);
+          } else {
+            personalState.logs.push('Guild: status petualangmu sudah aktif.');
+            openFrame('frameMain');
+            renderMain();
+          }
+          return;
+        }
+        personalState = lib.tickIdleDays(personalState, 1);
+        personalState.logs.push('Kamu mengunjungi ' + id + '.');
+        openFrame('frameMain');
+        renderMain();
+      }));
 
       if (!lib) {
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);

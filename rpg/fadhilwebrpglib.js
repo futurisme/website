@@ -1140,13 +1140,31 @@
     return next;
   }
 
+  function buildingsForLocation(locationType, locationName) {
+    var base = [
+      { id: 'guild', name: 'Adventurer\'s Guild', kind: 'guild', description: 'Pusat registrasi dan lisensi petualang untuk semua wilayah.' },
+      { id: 'inn', name: 'Wayfarer Inn', kind: 'rest', description: 'Tempat beristirahat sebelum petualangan berikutnya.' }
+    ];
+    if (locationType === 'city' || locationType === 'guild') base.push({ id: 'market', name: 'Grand Market', kind: 'trade', description: 'Pusat perdagangan ' + locationName + '.' });
+    if (locationType === 'town' || locationType === 'hometown') base.push({ id: 'training', name: 'Training Yard', kind: 'train', description: 'Arena latihan dasar untuk meningkatkan skill.' });
+    return base;
+  }
+
+  function getExploreView(personalState) {
+    var map = personalState.world.map;
+    var current = map.locations.find(function (loc) { return loc.id === map.currentLocationId; }) || map.locations[0];
+    return {
+      locationId: current.id,
+      locationName: current.name,
+      locationType: current.type,
+      buildings: buildingsForLocation(current.type, current.name)
+    };
+  }
+
   function registerAtGuild(personalState, rng) {
     var rand = rng || Math.random;
     var next = tickIdleDays(personalState, 1);
     var map = next.world.map;
-    if (map.currentLocationId !== 'loc-guild') {
-      return { ok: false, reason: 'Kamu harus tiba di Adventurer\'s Guild.', state: next, lines: [] };
-    }
     if (next.adventurer.registered) {
       return { ok: false, reason: 'Registrasi sudah selesai sebelumnya.', state: next, lines: [] };
     }
@@ -1198,6 +1216,7 @@
     getPersonalMapView: getPersonalMapView,
     movePersonalMapCamera: movePersonalMapCamera,
     travelPersonal: travelPersonal,
+    getExploreView: getExploreView,
     registerAtGuild: registerAtGuild,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue

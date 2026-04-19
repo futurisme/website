@@ -162,3 +162,14 @@ test('registerAtGuild berhasil setelah tiba di guild dan memberi grade', () => {
   assert.ok(Array.isArray(result.lines));
   assert.ok(result.lines.length >= 4);
 });
+
+test('getExploreView selalu menyediakan Adventurer guild di setiap lokasi', () => {
+  const lib = loadLib();
+  const profile = lib.createAdventureProfile({ name: 'Rin', race: 'humans' }, lib.seededRandom(30));
+  let state = lib.createPersonalState(profile, 5, lib.seededRandom(31));
+  const first = lib.getExploreView(state);
+  assert.ok(first.buildings.some((b) => b.id === 'guild'));
+  state = lib.travelPersonal(state, 'loc-river');
+  const second = lib.getExploreView(state);
+  assert.ok(second.buildings.some((b) => b.id === 'guild'));
+});
