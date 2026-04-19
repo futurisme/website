@@ -1,0 +1,306 @@
+{
+  "summary": {
+    "base_url": "https://fadhil.dev",
+    "generated_at": "2026-04-19T05:08:44Z",
+    "active_ok_count": 16,
+    "error_count": 1,
+    "paths_checked": 17
+  },
+  "results": [
+    {
+      "path": "/",
+      "url": "https://fadhil.dev/",
+      "status": 200,
+      "final_url": "https://fadhil.dev/",
+      "time_ms": 106.5,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/Books",
+      "url": "https://fadhil.dev/Books",
+      "status": 200,
+      "final_url": "https://fadhil.dev/Books",
+      "time_ms": 107.9,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/Books/Editor",
+      "url": "https://fadhil.dev/Books/Editor",
+      "status": 200,
+      "final_url": "https://fadhil.dev/Books/Editor",
+      "time_ms": 109.4,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/api/mindmapmaker",
+      "url": "https://fadhil.dev/api/mindmapmaker",
+      "status": "ERR",
+      "error": "HTTP Error 400: Bad Request",
+      "time_ms": 194.5
+    },
+    {
+      "path": "/api/shareideas",
+      "url": "https://fadhil.dev/api/shareideas",
+      "status": 200,
+      "final_url": "https://fadhil.dev/api/shareideas",
+      "time_ms": 702.5,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/dreambusiness",
+      "url": "https://fadhil.dev/dreambusiness",
+      "status": 200,
+      "final_url": "https://fadhil.dev/dreambusiness",
+      "time_ms": 87.1,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/editor",
+      "url": "https://fadhil.dev/editor",
+      "status": 200,
+      "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
+      "time_ms": 197.3,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/games/dreambusiness",
+      "url": "https://fadhil.dev/games/dreambusiness",
+      "status": 200,
+      "final_url": "https://fadhil.dev/games/dreambusiness",
+      "time_ms": 91.2,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/games/rpg",
+      "url": "https://fadhil.dev/games/rpg",
+      "status": 200,
+      "final_url": "https://fadhil.dev/games/rpg",
+      "time_ms": 96.1,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/home",
+      "url": "https://fadhil.dev/home",
+      "status": 200,
+      "final_url": "https://fadhil.dev/home",
+      "time_ms": 94.9,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/mindmapmaker",
+      "url": "https://fadhil.dev/mindmapmaker",
+      "status": 200,
+      "final_url": "https://fadhil.dev/mindmapmaker",
+      "time_ms": 45.4,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/mindmapmaker/editor/1",
+      "url": "https://fadhil.dev/mindmapmaker/editor/1",
+      "status": 200,
+      "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
+      "time_ms": 169.2,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/portfolio",
+      "url": "https://fadhil.dev/portfolio",
+      "status": 200,
+      "final_url": "https://fadhil.dev/portfolio",
+      "time_ms": 129.1,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/portfolio.webp",
+      "url": "https://fadhil.dev/portfolio.webp",
+      "status": 200,
+      "final_url": "https://fadhil.dev/portfolio.webp",
+      "time_ms": 239.4,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/rpg",
+      "url": "https://fadhil.dev/rpg",
+      "status": 200,
+      "final_url": "https://fadhil.dev/rpg",
+      "time_ms": 85.5,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/shareideas",
+      "url": "https://fadhil.dev/shareideas",
+      "status": 200,
+      "final_url": "https://fadhil.dev/shareideas",
+      "time_ms": 50.5,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/shareideas/page/1",
+      "url": "https://fadhil.dev/shareideas/page/1",
+      "status": 200,
+      "final_url": "https://fadhil.dev/shareideas/page/1",
+      "time_ms": 73.2,
+      "content_type": "",
+      "title": "",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    }
+  ]
+}
