@@ -898,10 +898,6 @@
     'Whispercraft'
   ];
 
-  function capitalize(value) {
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }
-
   function randomPick(list, rng) {
     return list[Math.floor(rng() * list.length)];
   }
