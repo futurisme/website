@@ -14,6 +14,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullProfile: root.querySelector('#frameFullProfile'),
     fullProjects: root.querySelector('#frameFullProjects'),
     fullStudios: root.querySelector('#frameFullStudios'),
+    fullEmail: root.querySelector('#frameFullEmail'),
     fullCommittee: root.querySelector('#frameFullCommittee'),
     fullAdmin: root.querySelector('#frameFullAdmin'),
     fullFeed: root.querySelector('#frameFullFeed'),
@@ -24,6 +25,7 @@ export function createIndustryUiController({ root, handlers }) {
   const profileEl = root.querySelector('#industryProfile');
   const projectsEl = root.querySelector('#industryProjects');
   const studiosEl = root.querySelector('#industryStudios');
+  const inboxEl = root.querySelector('#industryInbox');
   const committeeBodyEl = root.querySelector('#committeeBody');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
@@ -61,6 +63,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="to-full-profile"]').addEventListener('click', () => openFrame('fullProfile'));
   root.querySelector('[data-action="to-full-projects"]').addEventListener('click', () => openFrame('fullProjects'));
   root.querySelector('[data-action="to-full-studios"]').addEventListener('click', () => openFrame('fullStudios'));
+  root.querySelector('[data-action="to-full-email"]').addEventListener('click', () => openFrame('fullEmail'));
   root.querySelector('[data-action="to-full-admin"]').addEventListener('click', () => openFrame('fullAdmin'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
@@ -111,6 +114,16 @@ export function createIndustryUiController({ root, handlers }) {
     handlers.onSelectStudio(selectedProjectId, studioId);
   });
 
+  inboxEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const action = target.getAttribute('data-action');
+    if (action !== 'read-email') return;
+    const emailId = target.getAttribute('data-email-id');
+    if (!emailId) return;
+    handlers.onReadEmail(emailId);
+  });
+
   return {
     render(snapshot) {
       currentSnapshot = snapshot;
@@ -155,7 +168,7 @@ export function createIndustryUiController({ root, handlers }) {
       studiosEl.innerHTML = snapshot.studios.map((studio) => `
         <article class="industry-project">
           <h3>${esc(studio.name)}</h3>
-          <p>CEO: ${esc(studio.ceoName)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)}</p>
+          <p>CEO: ${esc(studio.ceoName)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
         </article>
       `).join('') + `
         <article class="industry-project">
@@ -169,6 +182,16 @@ export function createIndustryUiController({ root, handlers }) {
             : 'Belum ada project NPC aktif.'}</p>
         </article>
       `;
+
+      inboxEl.innerHTML = snapshot.unreadEmails?.length
+        ? snapshot.unreadEmails.map((email) => `
+          <article class="industry-project">
+            <h3>${esc(email.subject)}</h3>
+            <p>${esc(email.body)}</p>
+            <button data-action="read-email" data-email-id="${esc(email.id)}">Tandai Read</button>
+          </article>
+        `).join('')
+        : '<p class="empty">Tidak ada email unread.</p>';
 
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {

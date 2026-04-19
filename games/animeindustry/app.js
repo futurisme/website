@@ -40,6 +40,7 @@ if (!appRoot) {
       onCommittee: (projectId) => { runtime.formCommittee(projectId); ui.render(runtime.snapshot()); },
       onCommitteeDiscuss: (projectId) => { runtime.discussCommitteeContract(projectId); ui.render(runtime.snapshot()); },
       onSelectStudio: (projectId, studioId) => { runtime.chooseAdaptationStudio(projectId, studioId); ui.render(runtime.snapshot()); },
+      onReadEmail: (emailId) => { runtime.markEmailRead(emailId); ui.render(runtime.snapshot()); },
       onProduction: (projectId) => { runtime.startProduction(projectId); ui.render(runtime.snapshot()); },
       onLaunch: (projectId) => { runtime.launchAnime(projectId); ui.render(runtime.snapshot()); },
       onReset: () => { runtime.reset(); ui.setAutoState(false); ui.render(runtime.snapshot()); },
