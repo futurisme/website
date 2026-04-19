@@ -18,10 +18,10 @@ const STAGES = Object.freeze([
 ]);
 
 const STUDIO_POOL = Object.freeze([
-  { id: 'st-kagayaki', name: 'Kagayaki Pictures', craft: 72, speed: 58, network: 69 },
-  { id: 'st-sora', name: 'Sora Animation Lab', craft: 80, speed: 46, network: 55 },
-  { id: 'st-tsubasa', name: 'Tsubasa Works', craft: 62, speed: 74, network: 51 },
-  { id: 'st-kairo', name: 'Kairo Visual Dynamics', craft: 69, speed: 67, network: 73 },
+  { id: 'st-kagayaki', name: 'Kagayaki Pictures', craft: 72, speed: 58, network: 69, ownership: 'external' },
+  { id: 'st-sora', name: 'Sora Animation Lab', craft: 80, speed: 46, network: 55, ownership: 'external' },
+  { id: 'st-tsubasa', name: 'Tsubasa Works', craft: 62, speed: 74, network: 51, ownership: 'external' },
+  { id: 'st-kairo', name: 'Kairo Visual Dynamics', craft: 69, speed: 67, network: 73, ownership: 'external' },
 ]);
 
 const INVESTOR_POOL = Object.freeze([
@@ -36,11 +36,12 @@ function pick(arr, seed) {
   return arr[Math.abs(seed) % arr.length];
 }
 
-function createProject(id, day) {
+function createProject(id, day, medium) {
   const genre = pick(['Action', 'Fantasy', 'Slice of Life', 'Mystery', 'Sci-Fi'], id.length + day);
   return {
     id,
-    title: `Project ${id.slice(-4).toUpperCase()}`,
+    title: `${medium === 'novel' ? 'Novel' : 'Manga'} ${id.slice(-4).toUpperCase()}`,
+    medium,
     genre,
     stage: 'ideation',
     popularity: 10,
@@ -48,26 +49,26 @@ function createProject(id, day) {
     chapters: 0,
     studioId: null,
     committeeIds: [],
-    budgetNeed: 12_000_000,
+    budgetNeed: medium === 'novel' ? 9_500_000 : 12_000_000,
     securedBudget: 0,
     productionProgress: 0,
     episodePlan: 12,
     delayRisk: 0.18,
-    distributionHeat: 8,
     releaseScore: 0,
     animeReleased: false,
     archived: false,
   };
 }
 
-function computeStageScore(project, market) {
-  const program = 'core=story*0.52+chapters*1.6+popularity*0.94;marketFit=core+trend*0.76-risk*42';
+function computeStageScore(project, market, player) {
+  const program = 'core=story*0.52+chapters*1.6+popularity*0.94;marketFit=core+trend*0.76-risk*42+credibility*8';
   const scope = evaluateGameMathProgram(program, {
     story: project.scriptQuality,
     chapters: project.chapters,
     popularity: project.popularity,
     trend: market.trend,
     risk: project.delayRisk,
+    credibility: player.reputation / 100,
   });
   return scope.marketFit ?? 0;
 }
@@ -93,18 +94,23 @@ function createInitialState() {
     cash: 35_000_000,
     reputation: 22,
     market: { trend: 1.0, audienceFatigue: 0.1 },
-    projects: [createProject(`manga-${Date.now().toString(36).slice(-6)}`, 0)],
-    studios: STUDIO_POOL,
+    player: {
+      career: 'creator', // creator | animator | studio-founder
+      writingMedium: 'manga', // manga | novel
+      studioId: null,
+    },
+    projects: [createProject(`ip-${Date.now().toString(36).slice(-6)}`, 0, 'manga')],
+    studios: STUDIO_POOL.map((studio) => ({ ...studio })),
     investors: INVESTOR_POOL,
     releases: [],
-    feed: ['Day 0: Studio indie manga didirikan.'],
+    feed: ['Day 0: Karier dimulai di industri anime.'],
     debug: { lastAction: 'bootstrap' },
   };
 }
 
 function log(state, message) {
   state.feed.push(`Day ${state.day}: ${message}`);
-  if (state.feed.length > 120) state.feed.splice(0, state.feed.length - 120);
+  if (state.feed.length > 140) state.feed.splice(0, state.feed.length - 140);
 }
 
 function applyMarketDrift(state) {
@@ -142,6 +148,15 @@ export function createAnimeIndustryRuntime() {
     for (let i = 0; i < days; i += 1) {
       state.day += 1;
       applyMarketDrift(state);
+
+      if (state.player.career === 'animator' && state.player.studioId) {
+        const studio = state.studios.find((entry) => entry.id === state.player.studioId);
+        if (studio) {
+          state.cash += 65_000;
+          studio.craft = Math.min(98, studio.craft + 0.04);
+        }
+      }
+
       state.projects.forEach((project) => {
         if (project.stage === 'production' || project.stage === 'postproduction') {
           const studio = state.studios.find((entry) => entry.id === project.studioId);
@@ -158,12 +173,46 @@ export function createAnimeIndustryRuntime() {
     return state;
   }
 
+  function chooseCareer(career) {
+    return withAction('choose-career', () => {
+      if (!['creator', 'animator', 'studio-founder'].includes(career)) return false;
+      state.player.career = career;
+      if (career === 'animator') {
+        const studio = state.studios.sort((a, b) => b.craft - a.craft)[0];
+        state.player.studioId = studio.id;
+        log(state, `Anda bergabung sebagai animator di ${studio.name}.`);
+      }
+      if (career === 'studio-founder' && !state.player.studioId) {
+        const id = `st-player-${Math.random().toString(36).slice(-5)}`;
+        state.studios.push({ id, name: 'Aoi Foundry Studio', craft: 54, speed: 52, network: 38, ownership: 'player' });
+        state.player.studioId = id;
+        state.cash -= 8_500_000;
+        log(state, 'Anda mendirikan studio anime sendiri: Aoi Foundry Studio.');
+      }
+      if (career === 'creator') {
+        state.player.studioId = null;
+        log(state, 'Anda fokus sebagai penulis IP original.');
+      }
+      return true;
+    });
+  }
+
+  function chooseWritingMedium(medium) {
+    return withAction('choose-writing-medium', () => {
+      if (!['manga', 'novel'].includes(medium)) return false;
+      state.player.writingMedium = medium;
+      log(state, `Fokus tulisan diganti ke ${medium}.`);
+      return true;
+    });
+  }
+
   function brainstormProject() {
     return withAction('brainstorm-project', () => {
-      const project = createProject(`manga-${(Math.random() * 1e9).toFixed(0)}`, state.day);
+      const medium = state.player.writingMedium;
+      const project = createProject(`ip-${(Math.random() * 1e9).toFixed(0)}`, state.day, medium);
       state.projects.push(project);
-      state.cash -= 250_000;
-      log(state, `Konsep manga baru dibuat: ${project.title} (${project.genre}).`);
+      state.cash -= medium === 'novel' ? 150_000 : 250_000;
+      log(state, `Konsep ${medium} baru dibuat: ${project.title} (${project.genre}).`);
       return true;
     });
   }
@@ -175,9 +224,9 @@ export function createAnimeIndustryRuntime() {
       if (!['ideation', 'manga_serialization'].includes(project.stage)) return false;
       project.stage = 'manga_serialization';
       project.chapters += 1;
-      project.scriptQuality = Math.min(100, project.scriptQuality + 1.8);
+      project.scriptQuality = Math.min(100, project.scriptQuality + (project.medium === 'novel' ? 2.2 : 1.8));
       project.popularity = Math.min(100, project.popularity + Math.max(1, 2.4 - state.market.audienceFatigue));
-      state.cash -= 120_000;
+      state.cash -= project.medium === 'novel' ? 80_000 : 120_000;
       if (project.chapters % 6 === 0) {
         state.reputation = Math.min(100, state.reputation + 1);
         log(state, `${project.title} trending setelah chapter ${project.chapters}.`);
@@ -191,17 +240,23 @@ export function createAnimeIndustryRuntime() {
       const project = byId(state, projectId);
       if (!project || project.stage === 'committee_setup') return false;
       if (project.chapters < 8) return false;
-      const score = computeStageScore(project, state.market);
-      const studio = [...state.studios].sort((a, b) => b.network - a.network)[Math.floor(state.day % state.studios.length)];
+
+      const score = computeStageScore(project, state.market, state);
+      const targetStudio = state.player.career === 'studio-founder' && state.player.studioId
+        ? state.studios.find((entry) => entry.id === state.player.studioId)
+        : [...state.studios].sort((a, b) => b.network - a.network)[Math.floor(state.day % state.studios.length)];
+
+      if (!targetStudio) return false;
       if (score < 38) {
-        log(state, `${project.title} ditolak ${studio.name}; minta material manga lebih kuat.`);
+        log(state, `${project.title} ditolak ${targetStudio.name}; minta material lebih kuat.`);
         project.popularity = Math.max(0, project.popularity - 1);
         return false;
       }
+
       project.stage = 'pitching';
-      project.studioId = studio.id;
+      project.studioId = targetStudio.id;
       project.delayRisk = Math.max(0.08, project.delayRisk - 0.03);
-      log(state, `${project.title} dilirik ${studio.name} dan masuk negosiasi adaptasi anime.`);
+      log(state, `${project.title} dilirik ${targetStudio.name} dan masuk negosiasi adaptasi anime.`);
       return true;
     });
   }
@@ -260,6 +315,7 @@ export function createAnimeIndustryRuntime() {
       state.releases.push({
         id: project.id,
         title: project.title,
+        medium: project.medium,
         score,
         revenue,
         studio: studio?.name ?? 'Unknown Studio',
@@ -278,6 +334,11 @@ export function createAnimeIndustryRuntime() {
       reputation: state.reputation,
       trend: state.market.trend,
       fatigue: state.market.audienceFatigue,
+      player: {
+        career: state.player.career,
+        writingMedium: state.player.writingMedium,
+        studioName: state.studios.find((entry) => entry.id === state.player.studioId)?.name ?? '-',
+      },
       projects: state.projects.filter((project) => !project.archived).map((project) => ({
         ...project,
         studioName: state.studios.find((entry) => entry.id === project.studioId)?.name ?? '-',
@@ -319,6 +380,8 @@ export function createAnimeIndustryRuntime() {
       return state;
     },
     toggleAuto,
+    chooseCareer,
+    chooseWritingMedium,
     brainstormProject,
     serializeChapter,
     pitchToStudio,

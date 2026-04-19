@@ -8,6 +8,7 @@
     <meta name="description" content="Simulasi bisnis anime Jepang: manga, komite produksi, studio, produksi, hingga launch anime." />
     <link rel="stylesheet" href="/library/fadhilweblib/styles/theme.css" />
     <link rel="stylesheet" href="/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.css" />
+      <style>body{background:#020817;color:#fff;} button,li,p,h1,h2,h3,small,strong,span{color:#fff;}</style>
   </head>
   <body data-fwlb-theme="utility">
     <main id="animeIndustryApp" class="industry-shell">
@@ -22,6 +23,15 @@
         <button type="button" data-action="brainstorm">Brainstorm Project</button>
         <button type="button" data-action="toggle-auto">Auto Simulate</button>
         <button type="button" data-action="reset">Reset</button>
+      </section>
+
+
+      <section class="industry-toolbar" aria-label="Career and writing mode">
+        <button type="button" data-action="toggle-career-creator">Career: Creator</button>
+        <button type="button" data-action="toggle-career-animator">Career: Animator</button>
+        <button type="button" data-action="toggle-career-founder">Career: Studio Founder</button>
+        <button type="button" data-action="toggle-medium-manga">Write Manga</button>
+        <button type="button" data-action="toggle-medium-novel">Write Novel</button>
       </section>
 
       <section id="industryStats" class="industry-stats" aria-live="polite"></section>

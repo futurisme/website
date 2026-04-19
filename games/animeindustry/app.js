@@ -63,6 +63,14 @@ if (!appRoot) {
             runtime.brainstormProject();
             refresh();
           },
+          onCareer: (career) => {
+            runtime.chooseCareer(career);
+            refresh();
+          },
+          onMedium: (medium) => {
+            runtime.chooseWritingMedium(medium);
+            refresh();
+          },
           onSerialize: (projectId) => {
             runtime.serializeChapter(projectId);
             refresh();

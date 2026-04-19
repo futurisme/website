@@ -14,7 +14,7 @@ function projectCard(project) {
         <h3>${esc(project.title)}</h3>
         <span class="stage">${esc(project.stage)}</span>
       </header>
-      <p>${esc(project.genre)} · Manga chapter ${project.chapters} · Studio ${esc(project.studioName)}</p>
+      <p>${esc(project.medium)} · ${esc(project.genre)} · chapter ${project.chapters} · studio ${esc(project.studioName)}</p>
       <div class="meta-grid">
         <small>Popularity: ${project.popularity.toFixed(1)}</small>
         <small>Script: ${project.scriptQuality.toFixed(1)}</small>
@@ -23,9 +23,9 @@ function projectCard(project) {
         <small>Progress: ${project.productionProgress.toFixed(1)}%</small>
       </div>
       <div class="actions">
-        <button data-action="serialize" ${project.canSerialize ? '' : 'disabled'}>Serialize Chapter</button>
-        <button data-action="pitch" ${project.canPitch ? '' : 'disabled'}>Pitch ke Studio</button>
-        <button data-action="committee" ${project.canCommittee ? '' : 'disabled'}>Buat Komite</button>
+        <button data-action="serialize" ${project.canSerialize ? '' : 'disabled'}>Write Chapter</button>
+        <button data-action="pitch" ${project.canPitch ? '' : 'disabled'}>Pitch Studio</button>
+        <button data-action="committee" ${project.canCommittee ? '' : 'disabled'}>Build Committee</button>
         <button data-action="production" ${project.canProduction ? '' : 'disabled'}>Start Production</button>
         <button data-action="launch" ${project.canLaunch ? '' : 'disabled'}>Launch Anime</button>
       </div>
@@ -48,6 +48,11 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="tick-7"]').addEventListener('click', () => handlers.onTick(7));
   root.querySelector('[data-action="reset"]').addEventListener('click', handlers.onReset);
   root.querySelector('[data-action="brainstorm"]').addEventListener('click', handlers.onBrainstorm);
+  root.querySelector('[data-action="toggle-career-creator"]').addEventListener('click', () => handlers.onCareer('creator'));
+  root.querySelector('[data-action="toggle-career-animator"]').addEventListener('click', () => handlers.onCareer('animator'));
+  root.querySelector('[data-action="toggle-career-founder"]').addEventListener('click', () => handlers.onCareer('studio-founder'));
+  root.querySelector('[data-action="toggle-medium-manga"]').addEventListener('click', () => handlers.onMedium('manga'));
+  root.querySelector('[data-action="toggle-medium-novel"]').addEventListener('click', () => handlers.onMedium('novel'));
   autoBtn.addEventListener('click', handlers.onAutoToggle);
 
   projectsEl.addEventListener('click', (event) => {
@@ -71,7 +76,7 @@ export function createIndustryUiController({ root, handlers }) {
 
   return {
     render(snapshot) {
-      const nextKey = `${snapshot.day}|${snapshot.cashLabel}|${snapshot.projects.length}|${snapshot.releases.length}|${snapshot.feed[0] ?? ''}`;
+      const nextKey = `${snapshot.day}|${snapshot.cashLabel}|${snapshot.projects.length}|${snapshot.releases.length}|${snapshot.feed[0] ?? ''}|${snapshot.player.career}|${snapshot.player.writingMedium}`;
       if (nextKey === renderKey) return;
       renderKey = nextKey;
 
@@ -79,9 +84,9 @@ export function createIndustryUiController({ root, handlers }) {
         <article class="industry-metric"><small>Hari</small><strong>${esc(snapshot.dayLabel)}</strong></article>
         <article class="industry-metric"><small>Cash</small><strong>${esc(snapshot.cashLabel)}</strong></article>
         <article class="industry-metric"><small>Reputation</small><strong>${snapshot.reputation}</strong></article>
-        <article class="industry-metric"><small>Market Trend</small><strong>${snapshot.trend.toFixed(2)}</strong></article>
-        <article class="industry-metric"><small>Audience Fatigue</small><strong>${snapshot.fatigue.toFixed(3)}</strong></article>
-        <article class="industry-metric"><small>Last Action</small><strong>${esc(snapshot.debug.lastAction)}</strong></article>
+        <article class="industry-metric"><small>Career</small><strong>${esc(snapshot.player.career)}</strong></article>
+        <article class="industry-metric"><small>Writing</small><strong>${esc(snapshot.player.writingMedium)}</strong></article>
+        <article class="industry-metric"><small>Studio</small><strong>${esc(snapshot.player.studioName)}</strong></article>
       `;
 
       projectsEl.innerHTML = snapshot.projects.length
@@ -89,7 +94,7 @@ export function createIndustryUiController({ root, handlers }) {
         : '<p class="empty">Belum ada project aktif. Tekan Brainstorm Project.</p>';
 
       releasesEl.innerHTML = snapshot.releases.length
-        ? snapshot.releases.map((item) => `<li><strong>${esc(item.title)}</strong> · score ${item.score.toFixed(1)} · revenue ${item.revenue.toLocaleString()} · ${esc(item.studio)}</li>`).join('')
+        ? snapshot.releases.map((item) => `<li><strong>${esc(item.title)}</strong> · ${esc(item.medium)} · score ${item.score.toFixed(1)} · revenue ${item.revenue.toLocaleString()} · ${esc(item.studio)}</li>`).join('')
         : '<li>Belum ada anime yang tayang.</li>';
 
       feedEl.innerHTML = snapshot.feed.map((entry) => `<li>${esc(entry)}</li>`).join('');
