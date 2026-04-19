@@ -61,6 +61,8 @@
       .bar-track { position:relative; height:12px; border-radius:999px; border:1px solid #334155; background:#0f172a; overflow:hidden; }
       .bar-fill { position:absolute; inset:0 auto 0 0; width:0; background:linear-gradient(90deg,#06b6d4,#2563eb); }
       .bar-value { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.67rem; font-weight:700; color:#e2e8f0; text-shadow:0 1px 1px rgba(0,0,0,.65); }
+      .chipline { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+      .chip { border:1px solid #334155; background:#111827; border-radius:999px; padding:2px 7px; font-size:.68rem; color:#cbd5e1; }
       .timeline { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; max-height:180px; overflow:auto; font:12px/1.45 ui-monospace, monospace; }
       .top-actions { margin-top:8px; display:flex; gap:6px; }
       .map-wrap { margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#081425; overflow:hidden; height:min(56dvh, 430px); position:relative; touch-action:none; }
@@ -209,6 +211,7 @@
       var personalState = null;
       var idleTimer = null;
       var introTimer = null;
+      var panelOpenState = { Physical: true, Mental: false, Social: false };
 
       function $(id){ return document.getElementById(id); }
       function setRuntimeStatus(text, isError){
@@ -236,8 +239,9 @@
         if (!personalState) return;
         var summary = lib.getPersonalSummary(personalState);
         $('identityText').textContent = summary.name + ' · ' + summary.race + ' · Born as ' + summary.bornAs;
-        $('lifeMeta').innerHTML = '<strong>Timeline</strong><br/><span class="muted">' + summary.calendarText + '</span><br/>Total days: ' + summary.totalDays + '<br/>Energy: ' + summary.energy + ' · Mood: ' + summary.mood;
-        $('originMeta').innerHTML = '<strong>Origin</strong><br/><span class="muted">Lahir di ' + summary.location + '</span><br/>Special skill: ' + summary.specialSkill;
+        var dateSimple = 'Y' + summary.ageYears + ' · M' + (Math.floor(summary.ageDays / 30) + 1) + ' · D' + ((summary.ageDays % 30) + 1);
+        $('lifeMeta').innerHTML = '<strong>Timeline</strong><div class="chipline"><span class="chip">Date ' + dateSimple + '</span><span class="chip">Days ' + summary.totalDays + '</span><span class="chip">Energy ' + summary.energy + '</span><span class="chip">Mood ' + summary.mood + '</span></div>';
+        $('originMeta').innerHTML = '<strong>Current location</strong><div class="chipline"><span class="chip">' + summary.location + '</span><span class="chip">' + summary.specialSkill + '</span></div>';
 
         var panels = [
           { title:'Physical', items:[['Strength', summary.stats.strength], ['Agility', summary.stats.agility], ['Durability', summary.stats.durability], ['Stamina', summary.stats.stamina]] },
@@ -248,9 +252,11 @@
           var rows = panel.items.map(function(item){
             var value = Number(item[1]) || 0;
             var width = Math.max(4, Math.min(100, Math.round((value / 20) * 100)));
-            return '<div class=\"stat-row\"><span class=\"stat-name\">' + item[0] + '</span><div class=\"bar-track\"><span class=\"bar-fill\" style=\"width:' + width + '%\"></span><span class=\"bar-value\">' + value + '</span></div></div>';
+            var gradient = width < 35 ? 'linear-gradient(90deg,#7f1d1d,#b91c1c)' : (width < 68 ? 'linear-gradient(90deg,#f97316,#eab308)' : 'linear-gradient(90deg,#06b6d4,#fde047)');
+            return '<div class=\"stat-row\"><span class=\"stat-name\">' + item[0] + '</span><div class=\"bar-track\"><span class=\"bar-fill\" style=\"width:' + width + '%;background:' + gradient + ';\"></span><span class=\"bar-value\">' + value + '</span></div></div>';
           }).join('');
-          return '<details class=\"stat-panel\" ' + (panelIndex === 0 ? 'open' : '') + '><summary>' + panel.title + '</summary><div class=\"stat-list\">' + rows + '</div></details>';
+          var opened = panelOpenState[panel.title] || (panelIndex === 0 && panelOpenState[panel.title] == null);
+          return '<details class=\"stat-panel\" data-panel=\"' + panel.title + '\" ' + (opened ? 'open' : '') + '><summary>' + panel.title + '</summary><div class=\"stat-list\">' + rows + '</div></details>';
         }).join('');
         $('lifeLog').textContent = personalState.logs.slice(-18).join('\n');
       }
@@ -421,6 +427,11 @@
       }));
       $('mapWrap').addEventListener('pointerup', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } setTimeout(function(){ mapDrag.moved = false; }, 0); }));
       $('mapWrap').addEventListener('pointercancel', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } }));
+      $('statsPanels').addEventListener('toggle', safe(function(ev){
+        var details = ev.target;
+        if (!details || details.tagName !== 'DETAILS') return;
+        panelOpenState[details.dataset.panel] = details.open;
+      }), true);
 
       if (!lib) {
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
