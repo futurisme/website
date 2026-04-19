@@ -21,7 +21,7 @@ import {
   transactShares,
   getDisplayCompanies,
   getTopCompaniesSnapshot,
-} from '/dreambusiness/dream-engine.bundle.js';
+} from '/games/dreambusiness/dream-engine.bundle.js';
 
 const statsEl = document.getElementById('stats');
 const autoBtn = document.getElementById('auto');

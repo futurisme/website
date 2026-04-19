@@ -1,6 +1,6 @@
 # fadhilwebrpglib JRPG Lite
 
-Folder `rpg` adalah game Japanese RPG super ringan berbasis JavaScript murni.
+Folder `games/rpg` adalah game Japanese RPG super ringan berbasis JavaScript murni.
 
 - Tidak memakai library eksternal.
 - Sistem battle turn-based, elemental affinity, skill-based combat.
@@ -8,4 +8,4 @@ Folder `rpg` adalah game Japanese RPG super ringan berbasis JavaScript murni.
 - Entry point web ada di `index.html`.
 
 Akses dari folder game shortcut:
-- `games/rpg/index.html` -> redirect ke `rpg/index.html`.
+- `games/rpg/index.html` sebagai entry point game.

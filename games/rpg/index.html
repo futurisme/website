@@ -3,12 +3,665 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Games / RPG</title>
+    <title>FadhiumRPG</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg:#040816;
+        --panel:#0d1528;
+        --line:#334155;
+        --text:#dbeafe;
+        --muted:#94a3b8;
+        --accent:#2563eb;
+      }
+      * { box-sizing:border-box; min-width:0; }
+      html, body { margin:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, sans-serif; }
+      .shell { width:100vw; min-height:100dvh; padding:10px; }
+      .frame { display:none; max-width:920px; margin:0 auto; }
+      .frame.active { display:block; animation:fade .2s ease-out; }
+      .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:10px; outline:1px solid rgba(148,163,184,.15); outline-offset:-1px; }
+      h1,h2,p { margin:0; }
+      .title { font-size:clamp(1.02rem,2.4vw,1.28rem); margin-bottom:4px; }
+      .muted { color:var(--muted); font-size:.8rem; }
+      .form { margin-top:10px; display:grid; gap:8px; }
+      input, select, button {
+        width:100%; border-radius:9px; border:1px solid #415174; background:#111d36; color:#e2e8f0;
+        min-height:34px; padding:6px 10px; font-size:.82rem;
+      }
+      button { cursor:pointer; font-weight:650; }
+      button.primary { background:linear-gradient(90deg,#4f46e5,#2563eb); border-color:transparent; }
+      .split { margin-top:6px; display:grid; gap:6px; grid-template-columns:1fr; }
+      .block { border:1px solid var(--line); border-radius:9px; padding:6px 8px; background:#0a1226; min-height:0; }
+      .topline { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+      .topdate { font-size:.74rem; color:#bfdbfe; white-space:nowrap; }
+      .intro-stage { margin-top:10px; position:relative; min-height:250px; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+      .intro-bg { position:absolute; inset:0; transition:opacity .8s ease; opacity:0; }
+      .intro-bg.active { opacity:1; }
+      .intro-bg.frame-1 { background:radial-gradient(circle at 28% 40%, #38bdf8, #0f172a 62%); }
+      .intro-bg.frame-2 { background:radial-gradient(circle at 70% 35%, #818cf8, #0f172a 66%); }
+      .intro-bg.frame-3 { background:radial-gradient(circle at 42% 65%, #22d3ee, #020617 72%); }
+      .intro-bg.frame-4 { background:radial-gradient(circle at 55% 30%, #f59e0b, #111827 72%); }
+      .intro-bg.frame-5 { background:linear-gradient(140deg,#0f172a,#1e293b,#172554); }
+      .intro-text { position:absolute; inset:0; display:grid; place-items:center; text-align:center; padding:20px; opacity:0; transform:translateY(8px); transition:opacity .7s ease, transform .7s ease; }
+      .intro-text.active { opacity:1; transform:translateY(0); }
+      .intro-text strong { font-size:clamp(1rem,2.8vw,1.35rem); text-shadow:0 6px 24px rgba(0,0,0,.5); }
+      .intro-vignette { position:absolute; inset:0; pointer-events:none; background:radial-gradient(circle at center, rgba(2,6,23,0) 28%, rgba(2,6,23,.58) 68%, rgba(0,0,0,.86) 100%); opacity:.85; transition:opacity .6s ease; }
+      .intro-blackout { position:absolute; inset:0; pointer-events:none; background:#000; opacity:0; transition:opacity .35s ease; }
+      .intro-blackout.flash { opacity:.24; }
+      .intro-meta { margin-top:10px; display:grid; gap:6px; }
+      .identity-card { border:1px solid var(--line); border-radius:10px; padding:10px; background:#0a1226; }
+      .identity-card ul { margin:0; padding-left:16px; }
+      .identity-card li { margin:2px 0; color:#cbd5e1; font-size:.82rem; }
+      .age-pick { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .stats-panels { margin-top:10px; display:grid; gap:8px; }
+      .stat-panel { border:1px solid var(--line); border-radius:10px; background:#0b162a; overflow:hidden; }
+      .stat-panel > summary { list-style:none; cursor:pointer; padding:8px 10px; font-weight:700; font-size:.82rem; background:#0e1a31; }
+      .stat-panel > summary::-webkit-details-marker { display:none; }
+      .stat-list { padding:8px; display:grid; gap:6px; }
+      .stat-row { display:grid; grid-template-columns:minmax(92px, 120px) 1fr; align-items:center; gap:6px; }
+      .stat-name { font-size:.72rem; color:#cbd5e1; white-space:nowrap; }
+      .bar-track { position:relative; height:12px; border-radius:999px; border:1px solid #334155; background:#0f172a; overflow:hidden; }
+      .bar-fill { position:absolute; inset:0 auto 0 0; width:0; background:linear-gradient(90deg,#06b6d4,#2563eb); }
+      .bar-value { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.67rem; font-weight:700; color:#e2e8f0; text-shadow:0 1px 1px rgba(0,0,0,.65); }
+      .chipline { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+      .chip { border:1px solid #334155; background:#111827; border-radius:999px; padding:2px 7px; font-size:.68rem; color:#cbd5e1; }
+      .timeline { margin-top:8px; border:1px solid var(--line); border-radius:9px; background:#070d1d; padding:7px; max-height:170px; overflow:auto; font:12px/1.4 ui-monospace, monospace; }
+      .top-actions { margin-top:6px; display:flex; gap:6px; }
+      .location-line { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+      .mini-btn { min-height:24px; padding:2px 8px; font-size:.72rem; width:auto; }
+      .explore-grid { margin-top:8px; display:grid; gap:6px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); }
+      .explore-card { border:1px solid var(--line); border-radius:9px; background:#0a1226; padding:8px; }
+      .explore-card h3 { margin:0 0 4px; font-size:.84rem; }
+      .explore-card p { margin:0; color:#94a3b8; font-size:.74rem; }
+      .explore-card button { margin-top:6px; }
+      .map-wrap { margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#081425; overflow:hidden; height:min(56dvh, 430px); position:relative; touch-action:none; }
+      .map-plane { position:absolute; width:1120px; height:760px; background:radial-gradient(circle at 35% 35%, #0f766e, #0f172a 62%); transform-origin:0 0; }
+      .map-link { position:absolute; height:2px; background:rgba(148,163,184,.45); transform-origin:0 0; pointer-events:none; }
+      .travel-node { position:absolute; transform:translate(-50%, -50%); border:1px solid #1e293b; border-radius:10px; background:#111827; min-width:120px; padding:6px; text-align:center; }
+      .travel-node.current { outline:2px solid #fbbf24; }
+      .travel-node.locked { opacity:.45; }
+      .travel-node .place { display:block; font-size:.75rem; color:#dbeafe; margin-bottom:4px; }
+      .travel-node button { min-height:26px; font-size:.73rem; padding:4px 6px; display:flex; align-items:center; justify-content:center; gap:5px; }
+      .travel-node button:disabled { opacity:.5; cursor:not-allowed; }
+      .travel-banner { display:grid; place-items:center; min-height:62dvh; text-align:center; background:linear-gradient(180deg,#020617,#111827,#1d4ed8); border:1px solid var(--line); border-radius:12px; padding:18px; }
+      .travel-banner h2 { font-size:clamp(1.2rem,3.8vw,2rem); margin-bottom:10px; }
+      .travel-banner p { color:#bfdbfe; margin-bottom:8px; }
+      .guild-log { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#060b18; min-height:180px; max-height:260px; overflow:auto; padding:8px; white-space:pre-wrap; font:12px/1.45 ui-monospace, monospace; }
+      .transition-frame { display:grid; place-items:center; min-height:80dvh; text-align:center; background:radial-gradient(circle at center,#111827,#020617); border:1px solid var(--line); border-radius:12px; opacity:0; animation:fadePulse .42s ease-out forwards; }
+      .subframe-head { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+      .building-detail { margin-top:8px; border:1px solid var(--line); border-radius:10px; background:#0a1226; padding:8px; }
+      .ranking-list { margin-top:8px; max-height:220px; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; font:12px/1.45 ui-monospace, monospace; }
+      .rank-card { border:1px solid #334155; border-radius:10px; padding:7px; background:#0a1326; outline:1px solid rgba(148,163,184,.16); outline-offset:-1px; margin-bottom:6px; }
+      .rank-card:last-child { margin-bottom:0; }
+      .rank-top { display:flex; justify-content:space-between; gap:6px; font-weight:700; }
+      .rank-meta { margin-top:3px; color:#93c5fd; font-size:.72rem; }
+      @keyframes fadePulse { from { opacity:0; transform:scale(1.02); } to { opacity:1; transform:scale(1); } }
+      @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+      @media (max-width:760px){ .split { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } .stat-row { grid-template-columns:84px 1fr; } }
+    </style>
   </head>
   <body>
-    <p>Membuka modul RPG ringan dari folder root <code>/rpg</code>...</p>
+    <main class="shell">
+      <section id="frameRegister" class="frame active">
+        <article class="card">
+          <h1 class="title">FadhiumRPG</h1>
+          <p class="muted">Petualangan personal. Mulai dari kelahiran, umur, dan takdir milikmu sendiri.</p>
+          <div id="runtimeStatus" class="muted" style="margin-top:6px;">Status: inisialisasi...</div>
+          <div class="form">
+            <label class="muted" for="nameInput">Nama</label>
+            <input id="nameInput" maxlength="32" placeholder="Masukkan nama" autocomplete="off" />
+            <label class="muted" for="raceInput">Race</label>
+            <select id="raceInput">
+              <option value="humans">Humans</option>
+              <option value="elves">Elves</option>
+              <option value="dwarves">Dwarves</option>
+            </select>
+            <button class="primary" id="giveBirthBtn">Give birth</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameIntro" class="frame">
+        <article class="card">
+          <h2 class="title">Cinematic Intro</h2>
+          <p class="muted">Narasi emosional pembukaan hidupmu.</p>
+          <div class="intro-stage" id="introStage">
+            <div class="intro-bg frame-1"></div>
+            <div class="intro-bg frame-2"></div>
+            <div class="intro-bg frame-3"></div>
+            <div class="intro-bg frame-4"></div>
+            <div class="intro-bg frame-5"></div>
+            <div class="intro-text" id="introText"><strong></strong></div>
+            <div class="intro-vignette"></div>
+            <div class="intro-blackout" id="introBlackout"></div>
+          </div>
+          <div class="intro-meta" id="introMeta"></div>
+          <div class="age-pick" id="agePick" style="display:none;">
+            <button data-age="5">Start Age 5</button>
+            <button data-age="6">Start Age 6</button>
+            <button data-age="7">Start Age 7</button>
+            <button data-age="8">Start Age 8</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameMain" class="frame">
+        <article class="card">
+          <div class="topline">
+            <h2 class="title" style="margin:0;">Mainframe</h2>
+            <span class="topdate" id="topDate">01, January, 0001</span>
+          </div>
+          <p class="muted" id="identityText" style="margin-top:2px;"></p>
+          <div class="split">
+            <div class="block" id="originMeta"></div>
+          </div>
+          <section class="stats-panels" id="statsPanels"></section>
+          <div class="top-actions">
+            <button id="restBtn">Rest +1 day</button>
+            <button id="focusBtn">Focus training</button>
+            <button id="openMapBtn">World Map</button>
+          </div>
+          <div class="timeline" id="lifeLog"></div>
+        </article>
+      </section>
+
+      <section id="frameMap" class="frame">
+        <article class="card">
+          <h2 class="title">World Map</h2>
+          <p class="muted">Geser peta 2D. Tap panah Travel here untuk berpindah lokasi tetangga.</p>
+          <div class="top-actions"><button id="backMainBtn">Back</button></div>
+          <div class="map-wrap" id="mapWrap"><div class="map-plane" id="mapPlane"></div></div>
+        </article>
+      </section>
+
+      <section id="frameExplore" class="frame">
+        <article class="card">
+          <div class="topline">
+            <h2 class="title" style="margin:0;">Explore</h2>
+            <button id="backExploreBtn" class="mini-btn">↩ Back</button>
+          </div>
+          <p class="muted" id="exploreLocationText"></p>
+          <div class="explore-grid" id="exploreGrid"></div>
+        </article>
+      </section>
+
+      <section id="frameTravelIntro" class="frame">
+        <article class="travel-banner">
+          <div>
+            <p class="muted">Travel Sequence</p>
+            <h2 id="travelArrivalTitle">You have arrived at ...</h2>
+            <p id="travelArrivalDate">On Year 0 · Month 0 · Day 0</p>
+            <button class="primary" id="continueTravelBtn" style="max-width:240px;margin:0 auto;">Continue Journey</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameGuildIntro" class="frame">
+        <article class="card">
+          <h2 class="title">Adventurer's Guild Registration</h2>
+          <p class="muted">Proses uji dan akumulasi kelayakan petualang.</p>
+          <div class="guild-log" id="guildLog"></div>
+          <div class="top-actions"><button class="primary" id="guildDoneBtn">Finish</button></div>
+        </article>
+      </section>
+
+      <section id="frameTransition" class="frame">
+        <article class="transition-frame">
+          <div>
+            <p class="muted">Entering</p>
+            <h2 class="title" id="transitionTitle">Building...</h2>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameBuilding" class="frame">
+        <article class="card">
+          <div class="subframe-head">
+            <h2 class="title" id="buildingTitle">Building</h2>
+            <button id="backBuildingBtn" class="mini-btn">↩ Back</button>
+          </div>
+          <div class="building-detail" id="buildingDetail"></div>
+          <div class="top-actions" id="buildingActions"></div>
+          <div class="ranking-list" id="buildingExtra" style="display:none;"></div>
+        </article>
+      </section>
+    </main>
+
     <script>
-      window.location.href = '../../rpg/index.html';
+      window.__FWRPG_BOOT__ = {
+        libUrl: new URL('/games/rpg/fadhilwebrpglib.js', window.location.origin).toString()
+      };
+      window.__FWRPG_BOOT__.onLibLoadError = function () {
+        var payload = {
+          system: 'fadhilwebrpglib',
+          kind: 'lib-load-failure',
+          timestamp: new Date().toISOString(),
+          href: window.location.href,
+          attemptedScript: window.__FWRPG_BOOT__.libUrl,
+          causes: [
+            'Path script tidak valid / file tidak tersedia di deployment.',
+            'Resource diblokir (404/403/CSP/MIME).',
+            'Cache lama atau service worker mengarah ke aset tidak sinkron.'
+          ],
+          predictions: [
+            'window.fadhilwebrpglib tetap undefined.',
+            'Skenario kelahiran dan simulasi umur tidak akan berjalan.'
+          ]
+        };
+        var wrap = document.createElement('section');
+        wrap.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483647;background:#140b0b;border:1px solid #ef4444;border-radius:12px;padding:10px;color:#fecaca;font:12px/1.4 ui-monospace,monospace;';
+        var text = document.createElement('pre');
+        text.textContent = JSON.stringify(payload, null, 2);
+        text.style.cssText = 'margin:0;max-height:42vh;overflow:auto;white-space:pre-wrap;word-break:break-word;';
+        var copy = document.createElement('button');
+        copy.textContent = 'Copy Debug';
+        copy.style.cssText = 'margin-top:8px;border:1px solid #f87171;background:#7f1d1d;color:#fee2e2;border-radius:8px;padding:4px 8px;';
+        copy.addEventListener('click', function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text.textContent);
+        }, { passive: true });
+        wrap.appendChild(text);
+        wrap.appendChild(copy);
+        document.body.appendChild(wrap);
+      };
+    </script>
+    <script src="/games/rpg/fadhilwebrpglib.js" onerror="window.__FWRPG_BOOT__ && window.__FWRPG_BOOT__.onLibLoadError && window.__FWRPG_BOOT__.onLibLoadError()"></script>
+    <script>
+      var lib = window.fadhilwebrpglib;
+      var debugAgent = null;
+      var rng = null;
+      var profile = null;
+      var personalState = null;
+      var idleTimer = null;
+      var introTimer = null;
+      var panelOpenState = { Physical: true, Mental: false, Social: false };
+      var activeBuilding = null;
+
+      function $(id){ return document.getElementById(id); }
+      function setRuntimeStatus(text, isError){
+        var el = $('runtimeStatus');
+        if (!el) return;
+        if (!text) { el.textContent = ''; el.style.display = 'none'; el.style.color = ''; return; }
+        el.style.display = '';
+        el.textContent = 'Status: ' + text;
+        el.style.color = isError ? '#fca5a5' : '';
+      }
+      function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
+      function trace(kind, detail){ if (lib && lib.recordDebugTrace) lib.recordDebugTrace(kind, detail || {}); }
+      var mapDrag = { active:false, x:0, y:0, moved:false };
+      function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro','frameExplore','frameTransition','frameBuilding'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
+      function createEntropyRng(){
+        var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);
+        if (window.crypto && window.crypto.getRandomValues) {
+          var arr = new Uint32Array(1);
+          window.crypto.getRandomValues(arr);
+          seed ^= arr[0];
+        }
+        return lib.seededRandom(seed >>> 0);
+      }
+
+      function renderMain(){
+        if (!personalState) return;
+        var summary = lib.getPersonalSummary(personalState);
+        var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        var monthIndex = Math.max(0, Math.min(11, Math.floor(summary.ageDays / 30)));
+        var dayStr = String((summary.ageDays % 30) + 1).padStart(2, '0');
+        var yearStr = String(summary.ageYears).padStart(4, '0');
+        $('topDate').textContent = dayStr + ', ' + monthNames[monthIndex] + ', ' + yearStr;
+        $('identityText').textContent = summary.name + ' · ' + summary.race + ' · Born as ' + summary.bornAs + ' · Lv ' + summary.level + ' · Grade ' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '');
+        $('originMeta').innerHTML = '<strong>Current location</strong><div class="location-line"><div class="chipline"><span class="chip">' + summary.location + '</span></div><button id="openExploreBtn" class="mini-btn">Explore</button></div>';
+
+        var panels = [
+          { title:'Physical', items:[['Strength', summary.stats.strength], ['Agility', summary.stats.agility], ['Durability', summary.stats.durability], ['Stamina', summary.stats.stamina]] },
+          { title:'Mental', items:[['Intelligence', summary.stats.intelligence], ['Wisdom', summary.stats.wisdom], ['Willpower', summary.stats.willpower], ['Perception', summary.stats.perception]] },
+          { title:'Social', items:[['Charisma', summary.stats.charisma], ['Appearance', summary.stats.appearance], ['Wisdom', summary.stats.socialWisdom]] }
+        ];
+        $('statsPanels').innerHTML = panels.map(function(panel, panelIndex){
+          var rows = panel.items.map(function(item){
+            var value = Number(item[1]) || 0;
+            var width = Math.max(4, Math.min(100, Math.round((value / 20) * 100)));
+            var gradient = width < 35 ? 'linear-gradient(90deg,#7f1d1d,#b91c1c)' : (width < 68 ? 'linear-gradient(90deg,#f97316,#eab308)' : 'linear-gradient(90deg,#06b6d4,#fde047)');
+            return '<div class=\"stat-row\"><span class=\"stat-name\">' + item[0] + '</span><div class=\"bar-track\"><span class=\"bar-fill\" style=\"width:' + width + '%;background:' + gradient + ';\"></span><span class=\"bar-value\">' + value + '</span></div></div>';
+          }).join('');
+          var opened = panelOpenState[panel.title] || (panelIndex === 0 && panelOpenState[panel.title] == null);
+          return '<details class=\"stat-panel\" data-panel=\"' + panel.title + '\" ' + (opened ? 'open' : '') + '><summary>' + panel.title + '</summary><div class=\"stat-list\">' + rows + '</div></details>';
+        }).join('');
+        $('lifeLog').textContent = personalState.logs.slice(-18).join('\n');
+        var exploreBtn = $('openExploreBtn');
+        if (exploreBtn) {
+          exploreBtn.addEventListener('click', safe(function(){
+            renderExplore();
+            openFrame('frameExplore');
+          }), { once: true });
+        }
+      }
+
+      function renderExplore(){
+        if (!personalState) return;
+        var view = lib.getExploreView(personalState);
+        $('exploreLocationText').textContent = 'Buildings in ' + view.locationName;
+        $('exploreGrid').innerHTML = view.buildings.map(function(b){
+          return '<article class="explore-card"><h3>' + b.name + '</h3><p>' + b.description + '</p><button data-building="' + b.id + '" class="mini-btn">Enter</button></article>';
+        }).join('');
+      }
+
+      function renderMap(){
+        if (!personalState) return;
+        var view = lib.getPersonalMapView(personalState);
+        var byId = {};
+        view.locations.forEach(function(loc){ byId[loc.id] = loc; });
+        var links = [];
+        view.locations.forEach(function(loc){
+          var full = personalState.world.map.locations.find(function(x){ return x.id === loc.id; }) || { neighbors: [] };
+          (full.neighbors || []).forEach(function(targetId){
+            if (loc.id > targetId || !byId[targetId]) return;
+            var target = byId[targetId];
+            var dx = target.x - loc.x;
+            var dy = target.y - loc.y;
+            var len = Math.sqrt(dx * dx + dy * dy);
+            var ang = Math.atan2(dy, dx) * 180 / Math.PI;
+            links.push('<div class=\"map-link\" style=\"left:' + loc.x + 'px;top:' + loc.y + 'px;width:' + len + 'px;transform:rotate(' + ang + 'deg);\"></div>');
+          });
+        });
+        var nodes = view.locations.map(function(loc){
+          return '<div class=\"travel-node ' + (loc.isCurrent ? 'current' : '') + (loc.reachable ? '' : ' locked') + '\" style=\"left:' + loc.x + 'px;top:' + loc.y + 'px;\">'
+            + '<span class=\"place\">' + loc.name + '</span>'
+            + '<button data-travel=\"' + loc.id + '\" ' + (loc.reachable && !loc.isCurrent ? '' : 'disabled') + '>Travel here ➜</button>'
+            + '</div>';
+        });
+        var plane = $('mapPlane');
+        plane.innerHTML = links.join('') + nodes.join('');
+        plane.style.transform = 'translate3d(' + view.camera.x + 'px,' + view.camera.y + 'px,0)';
+      }
+
+      function startIdleClock(){
+        if (idleTimer) clearInterval(idleTimer);
+        idleTimer = setInterval(function(){
+          if (!$('frameMain').classList.contains('active') || !personalState) return;
+          personalState = lib.tickIdleDays(personalState, 1);
+          if (personalState.totalDays % 5 === 0) personalState.logs.push('Hari ke-' + personalState.totalDays + ': kamu belajar memahami dunia.');
+          renderMain();
+        }, 1000);
+      }
+
+      function playIntro(){
+        openFrame('frameIntro');
+        trace('intro-start', { name: profile.name, race: profile.raceLabel });
+        if (introTimer) { clearInterval(introTimer); introTimer = null; }
+        $('introMeta').innerHTML = '';
+        $('agePick').style.display = 'none';
+        var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));
+        var textStrong = $('introText').querySelector('strong');
+        var textWrap = $('introText');
+        var blackout = $('introBlackout');
+        var frames = [
+          { text: profile.introLines[0] || ('Malam kelahiran mekar di ' + profile.birthPlace + '.'), bg: 0 },
+          { text: profile.name + ' lahir sebagai ' + profile.raceLabel + '.', bg: 1 },
+          { text: 'Keahlian khusus: ' + profile.specialSkill + '.', bg: 2 },
+          { text: 'Lahir sebagai ' + profile.bornAsLabel + '.', bg: 3 },
+          { text: profile.name + ' · ' + profile.birthPlace + ' · ' + profile.raceLabel + ' · ' + profile.specialSkill + ' · ' + profile.bornAsLabel, bg: 4 }
+        ];
+        var idx = 0;
+        var minDuration = 1000;
+        function renderFrame(frameIndex){
+          frameNodes.forEach(function(node, i){ node.classList.toggle('active', i === frames[frameIndex].bg); });
+          blackout.classList.remove('flash');
+          textWrap.classList.remove('active');
+          setTimeout(function(){
+            blackout.classList.add('flash');
+            textStrong.textContent = frames[frameIndex].text;
+            textWrap.classList.add('active');
+            setTimeout(function(){ blackout.classList.remove('flash'); }, 240);
+          }, 100);
+        }
+        renderFrame(idx);
+        introTimer = setInterval(function(){
+          idx += 1;
+          if (idx >= 4) {
+            clearInterval(introTimer);
+            introTimer = null;
+            renderFrame(4);
+            $('introMeta').innerHTML = '<article class=\"identity-card\"><ul>'
+              + '<li>Nama: ' + profile.name + '</li>'
+              + '<li>Tempat Lahir: ' + profile.birthPlace + '</li>'
+              + '<li>Ras: ' + profile.raceLabel + '</li>'
+              + '<li>Keahlian Khusus: ' + profile.specialSkill + '</li>'
+              + '<li>Golongan: ' + profile.bornAsLabel + '</li>'
+              + '</ul></article>';
+            $('agePick').style.display = 'grid';
+            return;
+          }
+          renderFrame(idx);
+        }, minDuration);
+      }
+
+      function playGuildIntro(lines){
+        openFrame('frameGuildIntro');
+        trace('guild-intro', { lineCount: (lines || []).length });
+        $('guildLog').textContent = '';
+        var idx = 0;
+        var seq = lines || [];
+        var timer = setInterval(function(){
+          if (idx >= seq.length) { clearInterval(timer); return; }
+          $('guildLog').textContent += (idx ? '\n\n' : '') + seq[idx];
+          $('guildLog').scrollTop = $('guildLog').scrollHeight;
+          idx += 1;
+        }, 900);
+      }
+
+      function enterBuildingWithTransition(building){
+        activeBuilding = building;
+        trace('enter-building', { buildingId: building.id, location: personalState ? personalState.location : '' });
+        $('transitionTitle').textContent = building.name;
+        openFrame('frameTransition');
+        setTimeout(function(){
+          renderBuildingSubframe();
+          openFrame('frameBuilding');
+        }, 420);
+      }
+
+      function renderBuildingSubframe(){
+        if (!personalState || !activeBuilding) return;
+        var summary = lib.getPersonalSummary(personalState);
+        $('buildingTitle').textContent = activeBuilding.name;
+        $('buildingExtra').style.display = 'none';
+        $('buildingExtra').textContent = '';
+        if (activeBuilding.id === 'guild') {
+          $('buildingDetail').innerHTML = '<strong>Adventurer\'s Guild Branch</strong><br/>Grade kamu: <b>' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '') + '</b><br/>Status: ' + (summary.adventurerRegistered ? 'Registered' : 'Belum terdaftar');
+          $('buildingActions').innerHTML = '<button id=\"guildRegisterBtn\">Register to be an adventurer</button><button id=\"guildRankingBtn\">Ranking</button><button id=\"guildRecheckBtn\">Recheck Grade</button>';
+          return;
+        }
+        if (activeBuilding.id === 'training') {
+          $('buildingDetail').innerHTML = '<strong>Training Yard</strong><br/>Kondisi: ramai, pelatih siap membantu.';
+          $('buildingActions').innerHTML = '<button id=\"buildingTrainBtn\">Quick Drill</button>';
+          return;
+        }
+        if (activeBuilding.id === 'market') {
+          $('buildingDetail').innerHTML = '<strong>Grand Market</strong><br/>Kondisi: stok stabil, harga normal.';
+          $('buildingActions').innerHTML = '<button id=\"buildingTradeBtn\">Browse Market</button>';
+          return;
+        }
+        $('buildingDetail').innerHTML = '<strong>' + activeBuilding.name + '</strong><br/>' + activeBuilding.description;
+        $('buildingActions').innerHTML = '<button id=\"buildingRestBtn\">Take a Rest</button>';
+      }
+
+      $('giveBirthBtn').addEventListener('click', safe(function(){
+        if (!lib) return;
+        rng = createEntropyRng();
+        var name = $('nameInput').value;
+        var race = $('raceInput').value;
+        trace('give-birth-click', { hasName: !!name, race: race });
+        profile = lib.createAdventureProfile({ name:name, race:race }, rng);
+        playIntro();
+      }));
+
+      $('agePick').addEventListener('click', safe(function(ev){
+        var age = ev.target && ev.target.dataset ? Number(ev.target.dataset.age || 0) : 0;
+        if (!age) return;
+        personalState = lib.createPersonalState(profile, age, rng);
+        trace('age-selected', { age: age });
+        personalState.logs.push('Kamu memulai perjalanan pada umur ' + age + '.');
+        openFrame('frameMain');
+        renderMain();
+        startIdleClock();
+      }));
+
+      $('restBtn').addEventListener('click', safe(function(){
+        if (!personalState) return;
+        personalState = lib.tickIdleDays(personalState, 1);
+        personalState.energy = Math.min(100, personalState.energy + 8);
+        personalState.logs.push('Kamu beristirahat, tubuhmu pulih.');
+        renderMain();
+      }));
+
+      $('focusBtn').addEventListener('click', safe(function(){
+        if (!personalState) return;
+        personalState = lib.tickIdleDays(personalState, 1);
+        personalState.stats.intelligence += 1;
+        personalState.mood = Math.max(20, personalState.mood - 1);
+        personalState.logs.push('Latihan fokus meningkatkan Intelligence +1.');
+        renderMain();
+      }));
+
+      $('openMapBtn').addEventListener('click', safe(function(){
+        openFrame('frameMap');
+        renderMap();
+      }));
+
+      $('backMainBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('backExploreBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('continueTravelBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('guildDoneBtn').addEventListener('click', safe(function(){
+        openFrame('frameMain');
+        renderMain();
+      }));
+
+      $('backBuildingBtn').addEventListener('click', safe(function(){
+        renderExplore();
+        openFrame('frameExplore');
+      }));
+
+      $('mapPlane').addEventListener('click', safe(function(ev){
+        if (mapDrag.moved) { mapDrag.moved = false; return; }
+        var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';
+        if (!targetId || !personalState) return;
+        var before = personalState.location;
+        personalState = lib.travelPersonal(personalState, targetId);
+        if (before === personalState.location) return;
+        trace('travel-success', { to: personalState.location });
+        var summary = lib.getPersonalSummary(personalState);
+        $('travelArrivalTitle').textContent = 'You have arrived at ' + personalState.location;
+        $('travelArrivalDate').textContent = 'On ' + summary.calendarText;
+        if (personalState.world.map.currentLocationId === 'loc-guild' && !personalState.adventurer.registered) {
+          var reg = lib.registerAtGuild(personalState, rng);
+          personalState = reg.state;
+          playGuildIntro(reg.lines);
+        } else {
+          openFrame('frameTravelIntro');
+        }
+      }));
+
+      $('mapWrap').addEventListener('pointerdown', safe(function(ev){ mapDrag.active = true; mapDrag.x = ev.clientX; mapDrag.y = ev.clientY; mapDrag.moved = false; if ($('mapWrap').setPointerCapture) $('mapWrap').setPointerCapture(ev.pointerId); }));
+      $('mapWrap').addEventListener('pointermove', safe(function(ev){
+        if (!mapDrag.active || !personalState) return;
+        var dx = ev.clientX - mapDrag.x;
+        var dy = ev.clientY - mapDrag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 2) mapDrag.moved = true;
+        mapDrag.x = ev.clientX;
+        mapDrag.y = ev.clientY;
+        personalState = lib.movePersonalMapCamera(personalState, dx, dy);
+        renderMap();
+      }));
+      $('mapWrap').addEventListener('pointerup', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } setTimeout(function(){ mapDrag.moved = false; }, 0); }));
+      $('mapWrap').addEventListener('pointercancel', safe(function(ev){ mapDrag.active = false; if ($('mapWrap').releasePointerCapture) { try { $('mapWrap').releasePointerCapture(ev.pointerId); } catch (_e) {} } }));
+      $('statsPanels').addEventListener('toggle', safe(function(ev){
+        var details = ev.target;
+        if (!details || details.tagName !== 'DETAILS') return;
+        panelOpenState[details.dataset.panel] = details.open;
+      }), true);
+      $('exploreGrid').addEventListener('click', safe(function(ev){
+        var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';
+        if (!id || !personalState) return;
+        var view = lib.getExploreView(personalState);
+        var building = view.buildings.find(function(item){ return item.id === id; });
+        if (!building) return;
+        enterBuildingWithTransition(building);
+      }));
+
+      $('buildingActions').addEventListener('click', safe(function(ev){
+        var id = ev.target && ev.target.id ? ev.target.id : '';
+        if (!id || !personalState || !activeBuilding) return;
+        if (id === 'guildRegisterBtn') {
+          if (personalState.adventurer.registered) {
+            personalState.logs.push('Kamu sudah terdaftar sebagai petualang.');
+            renderBuildingSubframe();
+            return;
+          }
+          var reg = lib.registerAtGuild(personalState, rng);
+          personalState = reg.state;
+          trace('guild-register', { ok: reg.ok, grade: personalState.adventurer.grade });
+          playGuildIntro(reg.lines);
+          return;
+        }
+        if (id === 'guildRankingBtn') {
+          var ranking = lib.getGuildRanking(personalState, rng, 80);
+          trace('guild-ranking-open', { total: ranking.length });
+          $('buildingExtra').style.display = 'block';
+          $('buildingExtra').innerHTML = ranking.map(function(r){
+            return '<article class=\"rank-card\">'
+              + '<div class=\"rank-top\"><span>#' + r.rank + ' · ' + r.name + (r.isPlayer ? ' ← You' : '') + '</span><span>' + r.grade + '</span></div>'
+              + '<div class=\"rank-meta\">AI style: ' + r.aiStyle + ' · mood: ' + r.aiMood + '</div>'
+              + '<div class=\"rank-meta\">Action: ' + r.aiMove + '</div>'
+              + '</article>';
+          }).join('');
+          return;
+        }
+        if (id === 'guildRecheckBtn') {
+          var re = lib.recheckGrade(personalState, rng);
+          personalState = re.state;
+          trace('guild-recheck', { ok: re.ok, grade: personalState.adventurer.grade });
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingTrainBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.stats.strength += 1;
+          personalState.logs.push('Quick Drill: Strength +1.');
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingTradeBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.logs.push('Kamu meninjau pasar dan menemukan rumor baru.');
+          renderBuildingSubframe();
+          return;
+        }
+        if (id === 'buildingRestBtn') {
+          personalState = lib.tickIdleDays(personalState, 1);
+          personalState.energy = Math.min(100, personalState.energy + 10);
+          personalState.logs.push('Istirahat singkat memulihkan energi.');
+          renderBuildingSubframe();
+        }
+      }));
+
+      if (!lib) {
+        setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
+      } else {
+        debugAgent = lib.installOneShotDebug({ triggerParam: 'rpgdebug' });
+        trace('boot-ready', { href: window.location.href });
+        setRuntimeStatus('', false);
+      }
     </script>
   </body>
 </html>
