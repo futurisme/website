@@ -989,11 +989,17 @@
       energy: 100,
       mood: 72,
       stats: {
-        vitality: stat(6 + raceStats.vitality + (bornAs.bonus.vitality || 0)),
-        intellect: stat(6 + raceStats.intellect + (bornAs.bonus.intellect || 0)),
-        charisma: stat(6 + raceStats.charisma + (bornAs.bonus.charisma || 0)),
-        craft: stat(6 + raceStats.craft + (bornAs.bonus.craft || 0)),
-        fortune: stat(6 + raceStats.fortune + (bornAs.bonus.fortune || 0))
+        strength: stat(7 + raceStats.vitality + (bornAs.bonus.vitality || 0)),
+        agility: stat(7 + raceStats.craft),
+        durability: stat(7 + raceStats.vitality + (bornAs.bonus.vitality || 0)),
+        stamina: stat(7 + raceStats.vitality + raceStats.fortune),
+        intelligence: stat(7 + raceStats.intellect + (bornAs.bonus.intellect || 0)),
+        wisdom: stat(7 + raceStats.intellect),
+        willpower: stat(7 + raceStats.intellect + raceStats.vitality),
+        perception: stat(7 + raceStats.craft + raceStats.intellect),
+        charisma: stat(7 + raceStats.charisma + (bornAs.bonus.charisma || 0)),
+        appearance: stat(7 + raceStats.charisma + raceStats.fortune),
+        socialWisdom: stat(7 + raceStats.charisma + (bornAs.bonus.fortune || 0))
       },
       logs: ['Kehidupan dimulai di umur ' + age + '.']
     };
@@ -1027,11 +1033,17 @@
       energy: personalState.energy,
       mood: personalState.mood,
       stats: {
-        vitality: personalState.stats.vitality,
-        intellect: personalState.stats.intellect,
+        strength: personalState.stats.strength,
+        agility: personalState.stats.agility,
+        durability: personalState.stats.durability,
+        stamina: personalState.stats.stamina,
+        intelligence: personalState.stats.intelligence,
+        wisdom: personalState.stats.wisdom,
+        willpower: personalState.stats.willpower,
+        perception: personalState.stats.perception,
         charisma: personalState.stats.charisma,
-        craft: personalState.stats.craft,
-        fortune: personalState.stats.fortune
+        appearance: personalState.stats.appearance,
+        socialWisdom: personalState.stats.socialWisdom
       },
       logs: personalState.logs.slice(-14)
     };
@@ -1045,7 +1057,7 @@
       next.logs.push('Usia bertambah menjadi ' + next.ageYears + ' tahun.');
     }
     next.energy = Math.max(50, Math.min(100, next.energy - Math.floor(step / 3) + 2));
-    next.mood = Math.max(20, Math.min(100, next.mood + (next.stats.fortune > 9 ? 1 : 0)));
+    next.mood = Math.max(20, Math.min(100, next.mood + (next.stats.socialWisdom > 9 ? 1 : 0)));
     return next;
   }
 

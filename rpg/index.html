@@ -51,10 +51,16 @@
       .identity-card ul { margin:0; padding-left:16px; }
       .identity-card li { margin:2px 0; color:#cbd5e1; font-size:.82rem; }
       .age-pick { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
-      .stats { margin-top:10px; display:grid; gap:6px; grid-template-columns:repeat(4,minmax(0,1fr)); }
-      .stat { border:1px solid var(--line); border-radius:9px; padding:6px; background:#0b162a; }
-      .stat label { color:var(--muted); font-size:.72rem; display:block; }
-      .stat strong { font-size:.85rem; }
+      .stats-panels { margin-top:10px; display:grid; gap:8px; }
+      .stat-panel { border:1px solid var(--line); border-radius:10px; background:#0b162a; overflow:hidden; }
+      .stat-panel > summary { list-style:none; cursor:pointer; padding:8px 10px; font-weight:700; font-size:.82rem; background:#0e1a31; }
+      .stat-panel > summary::-webkit-details-marker { display:none; }
+      .stat-list { padding:8px; display:grid; gap:6px; }
+      .stat-row { display:grid; grid-template-columns:minmax(92px, 120px) 1fr; align-items:center; gap:6px; }
+      .stat-name { font-size:.72rem; color:#cbd5e1; white-space:nowrap; }
+      .bar-track { position:relative; height:12px; border-radius:999px; border:1px solid #334155; background:#0f172a; overflow:hidden; }
+      .bar-fill { position:absolute; inset:0 auto 0 0; width:0; background:linear-gradient(90deg,#06b6d4,#2563eb); }
+      .bar-value { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:.67rem; font-weight:700; color:#e2e8f0; text-shadow:0 1px 1px rgba(0,0,0,.65); }
       .timeline { margin-top:10px; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; max-height:180px; overflow:auto; font:12px/1.45 ui-monospace, monospace; }
       .top-actions { margin-top:8px; display:flex; gap:6px; }
       .map-wrap { margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#081425; overflow:hidden; height:min(56dvh, 430px); position:relative; touch-action:none; }
@@ -70,7 +76,7 @@
       .travel-banner h2 { font-size:clamp(1.2rem,3.8vw,2rem); margin-bottom:10px; }
       .travel-banner p { color:#bfdbfe; margin-bottom:8px; }
       @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-      @media (max-width:760px){ .split, .stats { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } }
+      @media (max-width:760px){ .split { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } .stat-row { grid-template-columns:84px 1fr; } }
     </style>
   </head>
   <body>
@@ -126,7 +132,7 @@
             <div class="block" id="lifeMeta"></div>
             <div class="block" id="originMeta"></div>
           </div>
-          <section class="stats" id="statsGrid"></section>
+          <section class="stats-panels" id="statsPanels"></section>
           <div class="top-actions">
             <button id="restBtn">Rest +1 day</button>
             <button id="focusBtn">Focus training</button>
@@ -233,13 +239,19 @@
         $('lifeMeta').innerHTML = '<strong>Timeline</strong><br/><span class="muted">' + summary.calendarText + '</span><br/>Total days: ' + summary.totalDays + '<br/>Energy: ' + summary.energy + ' · Mood: ' + summary.mood;
         $('originMeta').innerHTML = '<strong>Origin</strong><br/><span class="muted">Lahir di ' + summary.location + '</span><br/>Special skill: ' + summary.specialSkill;
 
-        var entries = [
-          ['Vitality', summary.stats.vitality], ['Intellect', summary.stats.intellect],
-          ['Charisma', summary.stats.charisma], ['Craft', summary.stats.craft],
-          ['Fortune', summary.stats.fortune], ['Age', summary.ageYears + 'y'],
-          ['Race', summary.race], ['Status', 'Alive']
+        var panels = [
+          { title:'Physical', items:[['Strength', summary.stats.strength], ['Agility', summary.stats.agility], ['Durability', summary.stats.durability], ['Stamina', summary.stats.stamina]] },
+          { title:'Mental', items:[['Intelligence', summary.stats.intelligence], ['Wisdom', summary.stats.wisdom], ['Willpower', summary.stats.willpower], ['Perception', summary.stats.perception]] },
+          { title:'Social', items:[['Charisma', summary.stats.charisma], ['Appearance', summary.stats.appearance], ['Wisdom', summary.stats.socialWisdom]] }
         ];
-        $('statsGrid').innerHTML = entries.map(function(entry){ return '<article class="stat"><label>' + entry[0] + '</label><strong>' + entry[1] + '</strong></article>'; }).join('');
+        $('statsPanels').innerHTML = panels.map(function(panel, panelIndex){
+          var rows = panel.items.map(function(item){
+            var value = Number(item[1]) || 0;
+            var width = Math.max(4, Math.min(100, Math.round((value / 20) * 100)));
+            return '<div class=\"stat-row\"><span class=\"stat-name\">' + item[0] + '</span><div class=\"bar-track\"><span class=\"bar-fill\" style=\"width:' + width + '%\"></span><span class=\"bar-value\">' + value + '</span></div></div>';
+          }).join('');
+          return '<details class=\"stat-panel\" ' + (panelIndex === 0 ? 'open' : '') + '><summary>' + panel.title + '</summary><div class=\"stat-list\">' + rows + '</div></details>';
+        }).join('');
         $('lifeLog').textContent = personalState.logs.slice(-18).join('\n');
       }
 
@@ -362,9 +374,9 @@
       $('focusBtn').addEventListener('click', safe(function(){
         if (!personalState) return;
         personalState = lib.tickIdleDays(personalState, 1);
-        personalState.stats.intellect += 1;
+        personalState.stats.intelligence += 1;
         personalState.mood = Math.max(20, personalState.mood - 1);
-        personalState.logs.push('Latihan fokus meningkatkan Intellect +1.');
+        personalState.logs.push('Latihan fokus meningkatkan Intelligence +1.');
         renderMain();
       }));
 

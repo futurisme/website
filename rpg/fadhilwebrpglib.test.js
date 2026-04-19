@@ -116,6 +116,9 @@ test('tickIdleDays menambah hari dan menjaga state personal', () => {
   const summary = lib.getPersonalSummary(next);
   assert.equal(summary.name, 'Nova');
   assert.equal(summary.ageYears, 5);
+  assert.ok(summary.stats.strength > 0);
+  assert.ok(summary.stats.intelligence > 0);
+  assert.ok(summary.stats.socialWisdom > 0);
 });
 
 test('travelPersonal berpindah ke lokasi tetangga dan menambah waktu', () => {
