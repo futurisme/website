@@ -133,6 +133,7 @@ function createNpcAgents(studios, usedNames) {
       mood: 0.5,
       active: true,
       currentProject: null,
+      writesManga: false,
     };
     npcs.push(npc);
   }
@@ -143,6 +144,7 @@ function createNpcAgents(studios, usedNames) {
     studio.ceoNpcId = ceo.id;
     studio.scoutPower = Math.min(95, Math.round((studio.network * 0.62) + (studio.craft * 0.38)));
     ceo.studioId = studio.id;
+    ceo.writesManga = index % 3 === 0;
   });
 
   return npcs;
@@ -446,7 +448,8 @@ export function createAnimeIndustryRuntime() {
           project.popularity = Math.min(100, project.popularity + 1.6 + (npc.reputation / 140));
           if (project.chapters >= 10) {
             project.stage = 'studio-interest';
-            const studio = state.studios.find((entry) => entry.id === rankedStudios[index % rankedStudios.length]);
+            const ownStudio = npc.writesManga && npc.studioId ? state.studios.find((entry) => entry.id === npc.studioId) : null;
+            const studio = ownStudio ?? state.studios.find((entry) => entry.id === rankedStudios[index % rankedStudios.length]);
             project.studioId = studio?.id ?? null;
             log(state, `${project.title} karya ${npc.name} dilirik ${studio?.name ?? 'studio'} untuk adaptasi anime.`);
           }
@@ -584,6 +587,9 @@ export function createAnimeIndustryRuntime() {
 
       const rankedStudios = getRankedStudios(state);
       const interested = rankedStudios.slice(0, Math.max(1, Math.min(3, 1 + Math.floor(score / 55))));
+      if (state.player.career === 'studio-founder' && state.player.studioId && !interested.includes(state.player.studioId)) {
+        interested.unshift(state.player.studioId);
+      }
 
       project.stage = 'studio_interest';
       project.interestedStudioIds = interested;
@@ -700,6 +706,50 @@ export function createAnimeIndustryRuntime() {
     });
   }
 
+  function proposeMergerStudio() {
+    return withAction('propose-merger-studio', () => {
+      if (state.player.career !== 'studio-founder' || !state.player.studioId) return false;
+      const candidates = [...state.studios]
+        .filter((entry) => entry.id !== state.player.studioId)
+        .sort((a, b) => (b.craft + b.network + b.speed) - (a.craft + a.network + a.speed))
+        .slice(0, 2);
+      if (candidates.length < 2) return false;
+      if (Math.random() > 0.08) {
+        log(state, 'Proposal merger ditolak dewan lintas studio (sangat jarang disetujui).');
+        return false;
+      }
+      const newName = `${candidates[0].name.split(' ')[0]} ${candidates[1].name.split(' ')[0]} Alliance`;
+      if (state.usedNames.has(newName)) return false;
+      const id = `st-merger-${Math.random().toString(36).slice(-5)}`;
+      const craft = Math.min(98, Math.round((candidates[0].craft + candidates[1].craft) / 2 + 6));
+      const speed = Math.min(98, Math.round((candidates[0].speed + candidates[1].speed) / 2 + 4));
+      const network = Math.min(99, Math.round((candidates[0].network + candidates[1].network) / 2 + 8));
+      state.studios.push({ id, name: newName, craft, speed, network, ownership: 'merger', scoutPower: 70, ceoNpcId: null, equity: { player: 34, investor: 66 } });
+      state.usedNames.add(newName);
+      log(state, `Merger disetujui. Studio baru ${newName} resmi berdiri.`);
+      return true;
+    });
+  }
+
+  function proposeCoFundedStudio() {
+    return withAction('propose-cofunded-studio', () => {
+      if (state.player.career !== 'studio-founder' || !state.player.studioId) return false;
+      const partners = state.studios.filter((entry) => entry.id !== state.player.studioId).slice(0, 2);
+      if (partners.length < 2) return false;
+      const baseName = `${partners[0].name.split(' ')[0]} Funded Studio`;
+      const name = state.usedNames.has(baseName) ? `${baseName} ${state.day}` : baseName;
+      const id = `st-cofund-${Math.random().toString(36).slice(-5)}`;
+      const contribution = 650_000;
+      const available = state.cash >= contribution;
+      if (!available) return false;
+      state.cash -= contribution;
+      state.studios.push({ id, name, craft: 55, speed: 59, network: 52, ownership: 'cofunded', scoutPower: 58, ceoNpcId: null, equity: { player: 40, investor: 60 } });
+      state.usedNames.add(name);
+      log(state, `${name} dibentuk lewat co-funding multi-studio.`);
+      return true;
+    });
+  }
+
   function buildRankings() {
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
@@ -772,9 +822,14 @@ export function createAnimeIndustryRuntime() {
         fullFeed: true,
         fullFoundStudio: true,
         fullRanking: true,
+        fullManagement: state.player.career === 'studio-founder',
         subProject: true,
       },
       rankings: buildRankings(),
+      management: {
+        isCeo: state.player.career === 'studio-founder',
+        studio: state.studios.find((entry) => entry.id === state.player.studioId) ?? null,
+      },
       studios: state.studios.map((studio) => ({
         ...studio,
         ceoName: state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
@@ -820,6 +875,8 @@ export function createAnimeIndustryRuntime() {
     improveAdministration,
     openStudioPlanning,
     foundStudioAsCeo,
+    proposeMergerStudio,
+    proposeCoFundedStudio,
     chooseAdaptationStudio,
     discussCommitteeContract,
     markEmailRead,

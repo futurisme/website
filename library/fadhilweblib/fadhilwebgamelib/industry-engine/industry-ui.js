@@ -18,6 +18,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullCommittee: root.querySelector('#frameFullCommittee'),
     fullFoundStudio: root.querySelector('#frameFullFoundStudio'),
     fullRanking: root.querySelector('#frameFullRanking'),
+    fullManagement: root.querySelector('#frameFullManagement'),
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
   };
@@ -28,6 +29,7 @@ export function createIndustryUiController({ root, handlers }) {
   const studiosEl = root.querySelector('#industryStudios');
   const inboxEl = root.querySelector('#industryInbox');
   const rankingEl = root.querySelector('#rankingBoard');
+  const managementEl = root.querySelector('#managementBoard');
   const committeeBodyEl = root.querySelector('#committeeBody');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
@@ -68,6 +70,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="to-full-email"]').addEventListener('click', () => openFrame('fullEmail'));
   root.querySelector('[data-action="to-full-found-studio"]').addEventListener('click', () => openFrame('fullFoundStudio'));
   root.querySelector('[data-action="to-full-ranking"]').addEventListener('click', () => openFrame('fullRanking'));
+  root.querySelector('[data-action="to-full-management"]').addEventListener('click', () => openFrame('fullManagement'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
@@ -82,6 +85,8 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="committee-confirm"]').addEventListener('click', () => {
     if (selectedProjectId) handlers.onCommittee(selectedProjectId);
   });
+  root.querySelector('[data-action="management-merger"]')?.addEventListener('click', handlers.onManagementMerger);
+  root.querySelector('[data-action="management-cofund"]')?.addEventListener('click', handlers.onManagementCoFund);
 
   projectsEl.addEventListener('click', (event) => {
     const target = event.target;
@@ -212,6 +217,17 @@ export function createIndustryUiController({ root, handlers }) {
         </article>
       `;
 
+      managementEl.innerHTML = snapshot.management?.isCeo
+        ? `
+          <article class="industry-project">
+            <h3>Kontrol Studio CEO</h3>
+            <p>Studio: ${esc(snapshot.management.studio?.name ?? '-')}</p>
+            <p>Craft/Speed/Network: ${snapshot.management.studio?.craft ?? 0}/${snapshot.management.studio?.speed ?? 0}/${snapshot.management.studio?.network ?? 0}</p>
+            <p>Gunakan proposal merger (sangat jarang lolos) atau co-funding studio baru.</p>
+          </article>
+        `
+        : '<p>Management hanya tersedia untuk pemain yang sudah menjadi CEO studio.</p>';
+
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {
         committeeBodyEl.innerHTML = `
@@ -263,6 +279,7 @@ export function createIndustryUiController({ root, handlers }) {
         const target = button.getAttribute('data-frame-target');
         if (!target) return;
         button.disabled = !canOpenFrame(target);
+        if (target === 'fullManagement') button.style.display = snapshot.management?.isCeo ? '' : 'none';
       });
 
       if (!Object.values(frames).some((frame) => frame?.classList.contains('frame-active'))) openFrame('main');
