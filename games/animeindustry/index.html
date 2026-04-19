@@ -5,34 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AnimeIndustry</title>
     <link rel="canonical" href="https://fadhil.dev/games/animeindustry" />
-    <meta
-      name="description"
-      content="AnimeIndustry adalah simulasi industri anime dengan mekanik pasar, riset, dan investasi berbasis engine khusus industry-engine."
-    />
-    <link rel="stylesheet" href="/games/animeindustry/styles.css" />
+    <meta name="description" content="AnimeIndustry simulator dengan engine khusus dan UI berbasis fadhilweblib." />
+    <link rel="stylesheet" href="/library/fadhilweblib/styles/theme.css" />
+    <link rel="stylesheet" href="/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.css" />
   </head>
-  <body>
-    <main class="shell">
-      <header>
+  <body data-fwlb-theme="utility">
+    <main id="animeIndustryApp" class="industry-shell">
+      <header class="industry-header">
         <h1>AnimeIndustry</h1>
-        <p>Simulasi industri anime: studio, IP, investor, dan pertumbuhan pasar.</p>
+        <p>Engine fokus ke logika industri, UI ditangani oleh fadhilweblib.</p>
       </header>
 
-      <section class="toolbar">
-        <button id="tick1">+1 Tick</button>
-        <button id="tick25">+25 Tick</button>
-        <button id="auto">Auto</button>
-        <button id="reset">Reset</button>
+      <section class="industry-toolbar" aria-label="Game controls">
+        <button type="button" data-action="tick-1">+1 Tick</button>
+        <button type="button" data-action="tick-25">+25 Tick</button>
+        <button type="button" data-action="auto">Auto</button>
+        <button type="button" data-action="reset">Reset</button>
       </section>
 
-      <section id="stats" class="stats"></section>
-      <section>
+      <section id="industryStats" class="industry-stats" aria-live="polite"></section>
+
+      <section class="industry-panel">
         <h2>Top Studio</h2>
-        <ol id="topCompanies" class="list"></ol>
+        <ol id="industryTopCompanies" class="industry-list"></ol>
       </section>
-      <section>
-        <h2>Aktivitas Terbaru</h2>
-        <ul id="feed" class="feed"></ul>
+
+      <section class="industry-panel">
+        <h2>Event Feed</h2>
+        <ul id="industryFeed" class="industry-feed"></ul>
       </section>
     </main>
 

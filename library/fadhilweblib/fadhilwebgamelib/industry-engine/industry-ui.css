@@ -1,0 +1,63 @@
+.industry-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.industry-header h1 { margin: 0 0 8px; }
+.industry-header p { margin: 0 0 14px; opacity: .85; }
+
+.industry-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.industry-toolbar button {
+  border: 1px solid var(--fwlb-color-border-subtle, #2f3154);
+  background: var(--fwlb-color-surface-subtle, #15172b);
+  color: var(--fwlb-color-text-primary, #f6f7ff);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.industry-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.industry-metric,
+.industry-panel {
+  border: 1px solid var(--fwlb-color-border-subtle, #2f3154);
+  background: var(--fwlb-color-surface-subtle, #15172b);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.industry-metric small {
+  display: block;
+  opacity: .75;
+  margin-bottom: 4px;
+}
+
+.industry-list,
+.industry-feed {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.industry-list li,
+.industry-feed li {
+  margin: 6px 0;
+}
+
+.industry-list li span {
+  display: inline-block;
+  margin-left: 8px;
+  opacity: .82;
+}
