@@ -41,7 +41,8 @@
             <button data-action="toggle-auto">Auto</button>
             <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
             <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
-            <button data-action="to-full-admin" data-frame-target="fullAdmin">CEO/Admin</button>
+            <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Dirikan Studio</button>
+            <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
             <button data-action="to-full-studios" data-frame-target="fullStudios">Studios</button>
             <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
             <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
@@ -64,18 +65,24 @@
         </article>
       </section>
 
-      <section id="frameFullAdmin" class="frame">
+      <section id="frameFullFoundStudio" class="frame">
         <article class="industry-panel">
-          <div class="topline"><h2>CEO/Admin Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="topline"><h2>Pendirian Studio</h2><button data-action="back-main">↩</button></div>
           <div id="ceoStatus"></div>
           <div class="industry-toolbar">
             <button data-action="open-studio-planning">Buka Perencanaan Studio</button>
             <button data-action="seek-funding">Cari Pendanaan</button>
-            <button data-action="improve-admin">Upgrade Administrasi</button>
           </div>
           <label>Nama Studio Baru</label>
           <input id="studioNameInput" type="text" placeholder="Contoh: Aurora Frame Studio" />
-          <button data-action="found-studio">Jadi CEO Studio</button>
+          <button data-action="found-studio">Dirikan Studio</button>
+        </article>
+      </section>
+
+      <section id="frameFullRanking" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Ranking Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="rankingBoard" class="industry-projects"></div>
         </article>
       </section>
 

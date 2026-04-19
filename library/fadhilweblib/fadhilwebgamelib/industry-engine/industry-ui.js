@@ -16,7 +16,8 @@ export function createIndustryUiController({ root, handlers }) {
     fullStudios: root.querySelector('#frameFullStudios'),
     fullEmail: root.querySelector('#frameFullEmail'),
     fullCommittee: root.querySelector('#frameFullCommittee'),
-    fullAdmin: root.querySelector('#frameFullAdmin'),
+    fullFoundStudio: root.querySelector('#frameFullFoundStudio'),
+    fullRanking: root.querySelector('#frameFullRanking'),
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
   };
@@ -26,6 +27,7 @@ export function createIndustryUiController({ root, handlers }) {
   const projectsEl = root.querySelector('#industryProjects');
   const studiosEl = root.querySelector('#industryStudios');
   const inboxEl = root.querySelector('#industryInbox');
+  const rankingEl = root.querySelector('#rankingBoard');
   const committeeBodyEl = root.querySelector('#committeeBody');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
@@ -64,15 +66,16 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="to-full-projects"]').addEventListener('click', () => openFrame('fullProjects'));
   root.querySelector('[data-action="to-full-studios"]').addEventListener('click', () => openFrame('fullStudios'));
   root.querySelector('[data-action="to-full-email"]').addEventListener('click', () => openFrame('fullEmail'));
-  root.querySelector('[data-action="to-full-admin"]').addEventListener('click', () => openFrame('fullAdmin'));
+  root.querySelector('[data-action="to-full-found-studio"]').addEventListener('click', () => openFrame('fullFoundStudio'));
+  root.querySelector('[data-action="to-full-ranking"]').addEventListener('click', () => openFrame('fullRanking'));
   root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
 
-  root.querySelector('[data-action="seek-funding"]').addEventListener('click', handlers.onSeekFunding);
-  root.querySelector('[data-action="improve-admin"]').addEventListener('click', handlers.onImproveAdmin);
-  root.querySelector('[data-action="open-studio-planning"]').addEventListener('click', handlers.onOpenStudioPlanning);
-  root.querySelector('[data-action="found-studio"]').addEventListener('click', () => handlers.onFoundStudio(studioNameInput.value));
+  root.querySelector('[data-action="seek-funding"]')?.addEventListener('click', handlers.onSeekFunding);
+  root.querySelector('[data-action="improve-admin"]')?.addEventListener('click', handlers.onImproveAdmin);
+  root.querySelector('[data-action="open-studio-planning"]')?.addEventListener('click', handlers.onOpenStudioPlanning);
+  root.querySelector('[data-action="found-studio"]')?.addEventListener('click', () => handlers.onFoundStudio(studioNameInput.value));
   root.querySelector('[data-action="committee-discuss"]').addEventListener('click', () => {
     if (selectedProjectId) handlers.onCommitteeDiscuss(selectedProjectId);
   });
@@ -193,6 +196,21 @@ export function createIndustryUiController({ root, handlers }) {
           </article>
         `).join('')
         : '<p class="empty">Tidak ada email unread.</p>';
+
+      rankingEl.innerHTML = `
+        <article class="industry-project">
+          <h3>Ranking Manga</h3>
+          <p>${snapshot.rankings.manga.map((entry, idx) => `#${idx + 1} ${esc(entry.title)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada data.'}</p>
+        </article>
+        <article class="industry-project">
+          <h3>Ranking Anime</h3>
+          <p>${snapshot.rankings.anime.map((entry, idx) => `#${idx + 1} ${esc(entry.title)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada rilis.'}</p>
+        </article>
+        <article class="industry-project">
+          <h3>Studio Terbesar / Terkaya</h3>
+          <p>${snapshot.rankings.studio.map((entry, idx) => `#${idx + 1} ${esc(entry.name)} (${entry.score.toFixed(1)})`).join(' · ') || 'Belum ada data studio.'}</p>
+        </article>
+      `;
 
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {
