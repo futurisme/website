@@ -2,7 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "mindmapmaker/mindmapmaker.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "shareideas/shareideas.api.js",
       "use": "@vercel/node"
     },
     {
@@ -38,30 +42,26 @@
       "use": "@vercel/static"
     },
     {
-      "src": "dreambusiness/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "games/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "rpg/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/shareideas",
-      "dest": "/api/shareideas.js"
+      "dest": "/shareideas/shareideas.api.js"
     },
     {
       "src": "/api/shareideas/",
-      "dest": "/api/shareideas.js"
+      "dest": "/shareideas/shareideas.api.js"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.js"
+      "src": "/api/mindmapmaker",
+      "dest": "/mindmapmaker/mindmapmaker.js"
+    },
+    {
+      "src": "/api/mindmapmaker/",
+      "dest": "/mindmapmaker/mindmapmaker.js"
     },
     {
       "src": "/$",
@@ -69,51 +69,51 @@
     },
     {
       "src": "/games/dreambusiness",
-      "dest": "/dreambusiness/index.html"
+      "dest": "/games/dreambusiness/index.html"
     },
     {
       "src": "/games/dreambusiness/",
-      "dest": "/dreambusiness/index.html"
+      "dest": "/games/dreambusiness/index.html"
     },
     {
       "src": "/games/dreambusiness/(.*)",
-      "dest": "/dreambusiness/$1"
+      "dest": "/games/dreambusiness/$1"
     },
     {
       "src": "/games/rpg",
-      "dest": "/rpg/index.html"
+      "dest": "/games/rpg/index.html"
     },
     {
       "src": "/games/rpg/",
-      "dest": "/rpg/index.html"
+      "dest": "/games/rpg/index.html"
     },
     {
       "src": "/games/rpg/(.*)",
-      "dest": "/rpg/$1"
+      "dest": "/games/rpg/$1"
     },
     {
       "src": "/dreambusiness",
-      "dest": "/dreambusiness/index.html"
+      "dest": "/games/dreambusiness/index.html"
     },
     {
       "src": "/dreambusiness/",
-      "dest": "/dreambusiness/index.html"
+      "dest": "/games/dreambusiness/index.html"
     },
     {
       "src": "/dreambusiness/(.*)",
-      "dest": "/dreambusiness/$1"
+      "dest": "/games/dreambusiness/$1"
     },
     {
       "src": "/rpg",
-      "dest": "/rpg/index.html"
+      "dest": "/games/rpg/index.html"
     },
     {
       "src": "/rpg/",
-      "dest": "/rpg/index.html"
+      "dest": "/games/rpg/index.html"
     },
     {
       "src": "/rpg/(.*)",
-      "dest": "/rpg/$1"
+      "dest": "/games/rpg/$1"
     },
     {
       "src": "/home",

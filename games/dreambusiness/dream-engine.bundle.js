@@ -166,6 +166,1175 @@ function generateCatalogCompanyName(params) {
   return `${fallbackPrimary} ${Math.floor(random() * 900 + 100)}`;
 }
 
+// library/fadhilweblib/core/syntax/constants.ts
+var MAX_CACHE_SIZE = 250;
+var parsedStringSyntaxCache = /* @__PURE__ */ new Map();
+var parsedObjectSyntaxCache = /* @__PURE__ */ new WeakMap();
+var EMPTY_PARSED_SYNTAX = Object.freeze({});
+var EMPTY_STYLE = Object.freeze({});
+var EMPTY_SEMANTICS = Object.freeze({});
+var EMPTY_LOGIC = Object.freeze({});
+var EMPTY_ATTRS = Object.freeze({});
+var EMPTY_RESOLVED_SYNTAX = Object.freeze({
+  style: EMPTY_STYLE,
+  semantics: EMPTY_SEMANTICS,
+  logic: EMPTY_LOGIC,
+  attrs: EMPTY_ATTRS
+});
+var KEY_ALIASES = {
+  tone: "tone",
+  size: "size",
+  density: "density",
+  compact: "compact",
+  full: "full",
+  fullwidth: "full",
+  bg: "bg",
+  background: "bg",
+  gradient: "gradient",
+  gradienttext: "gradientText",
+  gtext: "gradientText",
+  bgimage: "bgImage",
+  bgsize: "bgSize",
+  bgposition: "bgPosition",
+  bgpos: "bgPosition",
+  bgrepeat: "bgRepeat",
+  bgclip: "bgClip",
+  bgorigin: "bgOrigin",
+  fg: "fg",
+  color: "fg",
+  border: "border",
+  bordercolor: "border",
+  bw: "borderWidth",
+  borderwidth: "borderWidth",
+  bs: "borderStyle",
+  borderstyle: "borderStyle",
+  shadow: "shadow",
+  ring: "ring",
+  ringcolor: "ringColor",
+  ringoffset: "ringOffset",
+  ringoffsetcolor: "ringOffsetColor",
+  radius: "radius",
+  r: "radius",
+  outlinecolor: "outlineColor",
+  outlinewidth: "outlineWidth",
+  outlineoffset: "outlineOffset",
+  gap: "gap",
+  p: "p",
+  px: "px",
+  py: "py",
+  pt: "pt",
+  pr: "pr",
+  pb: "pb",
+  pl: "pl",
+  m: "m",
+  mx: "mx",
+  my: "my",
+  mt: "mt",
+  mr: "mr",
+  mb: "mb",
+  ml: "ml",
+  w: "w",
+  width: "w",
+  h: "h",
+  height: "h",
+  minw: "minW",
+  maxw: "maxW",
+  minh: "minH",
+  maxh: "maxH",
+  inline: "inlineSize",
+  inlinew: "inlineSize",
+  inlinewidth: "inlineSize",
+  inlinesize: "inlineSize",
+  block: "blockSize",
+  blockh: "blockSize",
+  blockheight: "blockSize",
+  blocksize: "blockSize",
+  mininline: "minInlineSize",
+  mininlinesize: "minInlineSize",
+  maxinline: "maxInlineSize",
+  maxinlinesize: "maxInlineSize",
+  minblock: "minBlockSize",
+  minblocksize: "minBlockSize",
+  maxblock: "maxBlockSize",
+  maxblocksize: "maxBlockSize",
+  fs: "fontSize",
+  fontsize: "fontSize",
+  font: "fontSize",
+  ff: "fontFamily",
+  fontfamily: "fontFamily",
+  fw: "weight",
+  weight: "weight",
+  lh: "lineHeight",
+  lineheight: "lineHeight",
+  tracking: "tracking",
+  ls: "tracking",
+  textalign: "textAlign",
+  ta: "textAlign",
+  texttransform: "textTransform",
+  whitespace: "whiteSpace",
+  ws: "whiteSpace",
+  textwrap: "textWrap",
+  wraptext: "textWrap",
+  truncate: "truncate",
+  clamp: "clampLines",
+  clamplines: "clampLines",
+  opacity: "opacity",
+  accent: "accent",
+  accentcolor: "accent",
+  caret: "caret",
+  caretcolor: "caret",
+  display: "display",
+  direction: "direction",
+  dir: "direction",
+  wrap: "wrap",
+  align: "align",
+  justify: "justify",
+  self: "self",
+  grow: "grow",
+  shrink: "shrink",
+  basis: "basis",
+  order: "order",
+  ord: "order",
+  cols: "cols",
+  columns: "cols",
+  rows: "rows",
+  autoflow: "autoFlow",
+  autocols: "autoCols",
+  autorows: "autoRows",
+  placeitems: "placeItems",
+  placecontent: "placeContent",
+  justifyitems: "justifyItems",
+  justifyself: "justifySelf",
+  gridcolumn: "gridColumn",
+  gridrow: "gridRow",
+  templateareas: "templateAreas",
+  areas: "templateAreas",
+  area: "area",
+  colspan: "colSpan",
+  rowspan: "rowSpan",
+  aspect: "aspect",
+  aspectratio: "aspect",
+  overflow: "overflow",
+  overflowx: "overflowX",
+  ox: "overflowX",
+  overflowy: "overflowY",
+  oy: "overflowY",
+  overscroll: "overscroll",
+  overscrollx: "overscrollX",
+  overscrolly: "overscrollY",
+  scrollbehavior: "scrollBehavior",
+  scrollsnaptype: "scrollSnapType",
+  snaptype: "scrollSnapType",
+  scrollsnapalign: "scrollSnapAlign",
+  snapalign: "scrollSnapAlign",
+  scrollsnapstop: "scrollSnapStop",
+  snapstop: "scrollSnapStop",
+  scrollmargin: "scrollMargin",
+  scrollmarginx: "scrollMarginX",
+  scrollmarginy: "scrollMarginY",
+  scrollpadding: "scrollPadding",
+  scrollpaddingx: "scrollPaddingX",
+  scrollpaddingy: "scrollPaddingY",
+  scrollbargutter: "scrollbarGutter",
+  position: "position",
+  pos: "position",
+  inset: "inset",
+  top: "top",
+  right: "right",
+  bottom: "bottom",
+  left: "left",
+  z: "z",
+  zindex: "z",
+  sticky: "sticky",
+  pin: "pin",
+  cursor: "cursor",
+  pointerevents: "pointerEvents",
+  pe: "pointerEvents",
+  userselect: "userSelect",
+  filter: "filter",
+  backdrop: "backdrop",
+  backdropfilter: "backdrop",
+  blend: "blend",
+  mixblendmode: "blend",
+  isolation: "isolation",
+  transform: "transform",
+  transformorigin: "transformOrigin",
+  origin: "transformOrigin",
+  transition: "transition",
+  duration: "duration",
+  ease: "ease",
+  delay: "delay",
+  animation: "animation",
+  animationduration: "animationDuration",
+  animationdelay: "animationDelay",
+  animationtiming: "animationTiming",
+  willchange: "willChange",
+  scale: "scale",
+  scalex: "scaleX",
+  scaley: "scaleY",
+  rotate: "rotate",
+  translatex: "translateX",
+  tx: "translateX",
+  translatey: "translateY",
+  ty: "translateY",
+  skewx: "skewX",
+  skewy: "skewY",
+  blur: "blur",
+  brightness: "brightness",
+  contrast: "contrast",
+  saturate: "saturate",
+  contain: "contain",
+  contentvisibility: "contentVisibility",
+  cv: "contentVisibility",
+  containintrinsicsize: "containIntrinsicSize",
+  cis: "containIntrinsicSize",
+  role: "role",
+  tabindex: "tabIndex",
+  title: "titleText",
+  titletext: "titleText",
+  inert: "inert",
+  loading: "loading",
+  disabled: "disabled",
+  open: "open",
+  hidden: "hidden",
+  current: "current",
+  interactive: "interactive",
+  focusable: "focusable",
+  visuallyhidden: "visuallyHidden",
+  sronly: "visuallyHidden",
+  presence: "presence"
+};
+var GROUP_ALIASES = {
+  ui: "surface",
+  layout: "layout",
+  arrange: "layout",
+  flow: "layout",
+  size: "layout",
+  sizing: "layout",
+  dimension: "layout",
+  spacing: "spacing",
+  space: "spacing",
+  surface: "surface",
+  box: "surface",
+  visual: "surface",
+  text: "text",
+  typography: "text",
+  fx: "fx",
+  motion: "fx",
+  effects: "fx",
+  logic: "logic",
+  behavior: "logic",
+  aria: "aria",
+  data: "data",
+  vars: "vars",
+  css: "css",
+  attrs: "attrs",
+  attr: "attrs"
+};
+var GROUP_KEYS = {
+  layout: [
+    "display",
+    "direction",
+    "wrap",
+    "align",
+    "justify",
+    "self",
+    "gap",
+    "grow",
+    "shrink",
+    "basis",
+    "order",
+    "cols",
+    "rows",
+    "autoFlow",
+    "autoCols",
+    "autoRows",
+    "placeItems",
+    "placeContent",
+    "justifyItems",
+    "justifySelf",
+    "gridColumn",
+    "gridRow",
+    "templateAreas",
+    "area",
+    "colSpan",
+    "rowSpan",
+    "aspect",
+    "w",
+    "h",
+    "minW",
+    "maxW",
+    "minH",
+    "maxH",
+    "inlineSize",
+    "blockSize",
+    "minInlineSize",
+    "maxInlineSize",
+    "minBlockSize",
+    "maxBlockSize",
+    "overflow",
+    "overflowX",
+    "overflowY",
+    "overscroll",
+    "overscrollX",
+    "overscrollY",
+    "scrollBehavior",
+    "scrollSnapType",
+    "scrollSnapAlign",
+    "scrollSnapStop",
+    "scrollMargin",
+    "scrollMarginX",
+    "scrollMarginY",
+    "scrollPadding",
+    "scrollPaddingX",
+    "scrollPaddingY",
+    "scrollbarGutter",
+    "position",
+    "inset",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "z",
+    "sticky",
+    "pin"
+  ],
+  spacing: [
+    "gap",
+    "p",
+    "px",
+    "py",
+    "pt",
+    "pr",
+    "pb",
+    "pl",
+    "m",
+    "mx",
+    "my",
+    "mt",
+    "mr",
+    "mb",
+    "ml"
+  ],
+  surface: [
+    "tone",
+    "size",
+    "density",
+    "compact",
+    "full",
+    "bg",
+    "gradient",
+    "gradientText",
+    "bgImage",
+    "bgSize",
+    "bgPosition",
+    "bgRepeat",
+    "bgClip",
+    "bgOrigin",
+    "fg",
+    "border",
+    "borderWidth",
+    "borderStyle",
+    "shadow",
+    "ring",
+    "ringColor",
+    "ringOffset",
+    "ringOffsetColor",
+    "radius",
+    "outlineColor",
+    "outlineWidth",
+    "outlineOffset",
+    "opacity"
+  ],
+  text: [
+    "fontSize",
+    "fontFamily",
+    "weight",
+    "lineHeight",
+    "tracking",
+    "textAlign",
+    "textTransform",
+    "whiteSpace",
+    "textWrap",
+    "truncate",
+    "clampLines",
+    "accent",
+    "caret"
+  ],
+  fx: [
+    "cursor",
+    "pointerEvents",
+    "userSelect",
+    "filter",
+    "backdrop",
+    "blend",
+    "isolation",
+    "transform",
+    "transformOrigin",
+    "transition",
+    "duration",
+    "ease",
+    "delay",
+    "animation",
+    "animationDuration",
+    "animationDelay",
+    "animationTiming",
+    "willChange",
+    "scale",
+    "scaleX",
+    "scaleY",
+    "rotate",
+    "translateX",
+    "translateY",
+    "skewX",
+    "skewY",
+    "blur",
+    "brightness",
+    "contrast",
+    "saturate",
+    "contain",
+    "contentVisibility",
+    "containIntrinsicSize"
+  ],
+  logic: [
+    "role",
+    "tabIndex",
+    "titleText",
+    "inert",
+    "loading",
+    "disabled",
+    "open",
+    "hidden",
+    "current",
+    "interactive",
+    "focusable",
+    "visuallyHidden",
+    "presence"
+  ]
+};
+var GROUP_KEY_SETS = Object.freeze({
+  layout: new Set(GROUP_KEYS.layout),
+  spacing: new Set(GROUP_KEYS.spacing),
+  surface: new Set(GROUP_KEYS.surface),
+  text: new Set(GROUP_KEYS.text),
+  fx: new Set(GROUP_KEYS.fx),
+  logic: new Set(GROUP_KEYS.logic)
+});
+function rememberCache(cache, key, value) {
+  if (cache.has(key)) {
+    cache.delete(key);
+  } else if (cache.size >= MAX_CACHE_SIZE) {
+    const firstKey = cache.keys().next().value;
+    if (firstKey) {
+      cache.delete(firstKey);
+    }
+  }
+  cache.set(key, value);
+}
+function normalizeKey(rawKey) {
+  return KEY_ALIASES[rawKey.trim().toLowerCase()];
+}
+function normalizeGroupName(rawGroup) {
+  return GROUP_ALIASES[rawGroup.trim().toLowerCase()];
+}
+function isKnownGroupKey(group, key) {
+  return GROUP_KEY_SETS[group].has(key);
+}
+function isCompiledSyntax(input) {
+  return typeof input === "object" && input !== null && "__fwlbType" in input && input.__fwlbType === "compiled-syntax";
+}
+
+// library/fadhilweblib/core/syntax/parse.ts
+var FadhilWebSyntaxError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "FadhilWebSyntaxError";
+  }
+};
+function createSyntaxError(message) {
+  return new FadhilWebSyntaxError(`fadhilweblib syntax: ${message}`);
+}
+function isScalarValue(value) {
+  return typeof value === "string" || typeof value === "number" || typeof value === "boolean";
+}
+function isPlainObject(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function normalizeScalarMap(value, transformKey, context) {
+  if (!isPlainObject(value)) {
+    return void 0;
+  }
+  const normalized = {};
+  for (const [rawKey, rawValue] of Object.entries(value)) {
+    if (rawValue === void 0 || rawValue === null || rawValue === "") {
+      continue;
+    }
+    if (!isScalarValue(rawValue)) {
+      throw createSyntaxError(`${context} expects scalar values. Key "${rawKey}" is not scalar.`);
+    }
+    const finalKey = transformKey(rawKey);
+    if (!finalKey) {
+      continue;
+    }
+    normalized[finalKey] = rawValue;
+  }
+  return Object.keys(normalized).length ? Object.freeze(normalized) : void 0;
+}
+function parseSyntaxVariables(value) {
+  return normalizeScalarMap(value, (rawKey) => {
+    const trimmed = rawKey.trim();
+    if (!trimmed) {
+      return void 0;
+    }
+    return trimmed.startsWith("--") ? trimmed : `--${trimmed}`;
+  }, 'Syntax group "vars"');
+}
+function parseSyntaxAttributeMap(value, prefix) {
+  return normalizeScalarMap(value, (rawKey) => {
+    const trimmed = rawKey.trim();
+    if (!trimmed) {
+      return void 0;
+    }
+    return trimmed.startsWith(`${prefix}-`) ? trimmed : `${prefix}-${trimmed}`;
+  }, `Syntax group "${prefix}"`);
+}
+function parseSyntaxEscapeMap(value, context) {
+  return normalizeScalarMap(value, (rawKey) => {
+    const trimmed = rawKey.trim();
+    return trimmed || void 0;
+  }, context);
+}
+function freezeParsedSyntax(result) {
+  if (result.vars) {
+    result.vars = Object.freeze(result.vars);
+  }
+  if (result.aria) {
+    result.aria = Object.freeze(result.aria);
+  }
+  if (result.data) {
+    result.data = Object.freeze(result.data);
+  }
+  if (result.css) {
+    result.css = Object.freeze(result.css);
+  }
+  if (result.attrs) {
+    result.attrs = Object.freeze(result.attrs);
+  }
+  return Object.freeze(result);
+}
+function mergeSyntaxMap(target, incoming) {
+  if (!incoming) {
+    return target;
+  }
+  return {
+    ...target ?? {},
+    ...incoming
+  };
+}
+function setSpecialEntry(result, group, rawKey, rawValue) {
+  const trimmedKey = rawKey.trim();
+  if (!trimmedKey) {
+    throw createSyntaxError(`Syntax group "${group}" encountered an empty key.`);
+  }
+  if (group === "vars") {
+    const normalizedKey = trimmedKey.startsWith("--") ? trimmedKey : `--${trimmedKey}`;
+    result.vars = {
+      ...result.vars ?? {},
+      [normalizedKey]: rawValue
+    };
+    return;
+  }
+  if (group === "aria") {
+    const normalizedKey = trimmedKey.startsWith("aria-") ? trimmedKey : `aria-${trimmedKey}`;
+    result.aria = {
+      ...result.aria ?? {},
+      [normalizedKey]: rawValue
+    };
+    return;
+  }
+  if (group === "data") {
+    const normalizedKey = trimmedKey.startsWith("data-") ? trimmedKey : `data-${trimmedKey}`;
+    result.data = {
+      ...result.data ?? {},
+      [normalizedKey]: rawValue
+    };
+    return;
+  }
+  if (group === "css") {
+    result.css = {
+      ...result.css ?? {},
+      [trimmedKey]: rawValue
+    };
+    return;
+  }
+  result.attrs = {
+    ...result.attrs ?? {},
+    [trimmedKey]: rawValue
+  };
+}
+function setFlatEntry(result, rawKey, rawValue, context, allowedGroup) {
+  const trimmedKey = rawKey.trim();
+  if (!trimmedKey) {
+    throw createSyntaxError(`Encountered an empty syntax key in ${context}.`);
+  }
+  if (trimmedKey.startsWith("--")) {
+    setSpecialEntry(result, "vars", trimmedKey, rawValue);
+    return;
+  }
+  if (trimmedKey.startsWith("aria-")) {
+    setSpecialEntry(result, "aria", trimmedKey, rawValue);
+    return;
+  }
+  if (trimmedKey.startsWith("data-")) {
+    setSpecialEntry(result, "data", trimmedKey, rawValue);
+    return;
+  }
+  const normalizedKey = normalizeKey(trimmedKey);
+  if (!normalizedKey) {
+    throw createSyntaxError(`Unknown syntax key "${trimmedKey}" in ${context}.`);
+  }
+  if (allowedGroup && !isKnownGroupKey(allowedGroup, normalizedKey)) {
+    throw createSyntaxError(`Syntax group "${allowedGroup}" does not allow key "${trimmedKey}".`);
+  }
+  Object.assign(result, { [normalizedKey]: rawValue });
+}
+function applySpecialGroupObjectSyntax(result, group, value) {
+  if (!isPlainObject(value)) {
+    throw createSyntaxError(`Syntax group "${group}" expects an object map.`);
+  }
+  if (group === "vars") {
+    result.vars = mergeSyntaxMap(result.vars, parseSyntaxVariables(value));
+    return;
+  }
+  if (group === "aria") {
+    result.aria = mergeSyntaxMap(result.aria, parseSyntaxAttributeMap(value, "aria"));
+    return;
+  }
+  if (group === "data") {
+    result.data = mergeSyntaxMap(result.data, parseSyntaxAttributeMap(value, "data"));
+    return;
+  }
+  if (group === "css") {
+    result.css = mergeSyntaxMap(result.css, parseSyntaxEscapeMap(value, 'Syntax group "css"'));
+    return;
+  }
+  result.attrs = mergeSyntaxMap(result.attrs, parseSyntaxEscapeMap(value, 'Syntax group "attrs"'));
+}
+function applyStructuredGroupObjectSyntax(result, group, value, rawGroup) {
+  if (!isPlainObject(value)) {
+    throw createSyntaxError(`Syntax group "${rawGroup}" expects an object map.`);
+  }
+  for (const [nestedKey, nestedValue] of Object.entries(value)) {
+    if (nestedValue === void 0 || nestedValue === null || nestedValue === "") {
+      continue;
+    }
+    if (typeof nestedValue === "object") {
+      throw createSyntaxError(`Syntax group "${rawGroup}" expects scalar values. Key "${nestedKey}" is not scalar.`);
+    }
+    setFlatEntry(result, nestedKey, nestedValue, `syntax group "${rawGroup}"`, group);
+  }
+}
+function applyGroupObjectSyntax(result, rawGroup, value) {
+  const group = normalizeGroupName(rawGroup);
+  if (!group) {
+    throw createSyntaxError(`Unknown syntax group "${rawGroup}".`);
+  }
+  if (group === "aria" || group === "data" || group === "vars" || group === "css" || group === "attrs") {
+    applySpecialGroupObjectSyntax(result, group, value);
+    return;
+  }
+  applyStructuredGroupObjectSyntax(result, group, value, rawGroup);
+}
+function findTopLevelSeparator(input, separator = ":") {
+  let depth = 0;
+  let bracketDepth = 0;
+  let braceDepth = 0;
+  let quote = null;
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
+    const previous = input[index - 1];
+    if (quote) {
+      if (char === quote && previous !== "\\") {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (char === "(") {
+      depth += 1;
+      continue;
+    }
+    if (char === ")") {
+      depth = Math.max(0, depth - 1);
+      continue;
+    }
+    if (char === "[") {
+      bracketDepth += 1;
+      continue;
+    }
+    if (char === "]") {
+      bracketDepth = Math.max(0, bracketDepth - 1);
+      continue;
+    }
+    if (char === "{") {
+      braceDepth += 1;
+      continue;
+    }
+    if (char === "}") {
+      braceDepth = Math.max(0, braceDepth - 1);
+      continue;
+    }
+    if (char === separator && depth === 0 && bracketDepth === 0 && braceDepth === 0) {
+      return index;
+    }
+  }
+  return -1;
+}
+function splitTopLevelArgs(input, separator = ",") {
+  const parts = [];
+  let current = "";
+  let depth = 0;
+  let bracketDepth = 0;
+  let braceDepth = 0;
+  let quote = null;
+  for (let index = 0; index < input.length; index += 1) {
+    const char = input[index];
+    const previous = input[index - 1];
+    if (quote) {
+      current += char;
+      if (char === quote && previous !== "\\") {
+        quote = null;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      current += char;
+      continue;
+    }
+    if (char === "(") {
+      depth += 1;
+      current += char;
+      continue;
+    }
+    if (char === ")") {
+      depth = Math.max(0, depth - 1);
+      current += char;
+      continue;
+    }
+    if (char === "[") {
+      bracketDepth += 1;
+      current += char;
+      continue;
+    }
+    if (char === "]") {
+      bracketDepth = Math.max(0, bracketDepth - 1);
+      current += char;
+      continue;
+    }
+    if (char === "{") {
+      braceDepth += 1;
+      current += char;
+      continue;
+    }
+    if (char === "}") {
+      braceDepth = Math.max(0, braceDepth - 1);
+      current += char;
+      continue;
+    }
+    if (char === separator && depth === 0 && bracketDepth === 0 && braceDepth === 0) {
+      const trimmed = current.trim();
+      if (trimmed) {
+        parts.push(trimmed);
+      }
+      current = "";
+      continue;
+    }
+    current += char;
+  }
+  const tail = current.trim();
+  if (tail) {
+    parts.push(tail);
+  }
+  return parts;
+}
+function applyGroupStringSyntax(result, rawGroup, body) {
+  const group = normalizeGroupName(rawGroup);
+  if (!group) {
+    throw createSyntaxError(`Unknown syntax group "${rawGroup}".`);
+  }
+  const entries = splitTopLevelArgs(body, ",");
+  if (entries.length === 0) {
+    throw createSyntaxError(`Syntax group "${rawGroup}" cannot be empty.`);
+  }
+  for (const entry of entries) {
+    const separatorIndex = findTopLevelSeparator(entry, ":");
+    if (separatorIndex < 1) {
+      throw createSyntaxError(`Malformed syntax entry "${entry}" inside group "${rawGroup}". Expected key:value.`);
+    }
+    const rawKey = entry.slice(0, separatorIndex).trim();
+    const value = entry.slice(separatorIndex + 1).trim();
+    if (!value) {
+      throw createSyntaxError(`Syntax entry "${entry}" inside group "${rawGroup}" is missing a value.`);
+    }
+    if (group === "aria" || group === "data" || group === "vars" || group === "css" || group === "attrs") {
+      setSpecialEntry(result, group, rawKey, value);
+      continue;
+    }
+    setFlatEntry(result, rawKey, value, `syntax group "${rawGroup}"`, group);
+  }
+}
+function parseObjectSyntax(input) {
+  const cached = parsedObjectSyntaxCache.get(input);
+  if (cached) {
+    return cached;
+  }
+  const result = {};
+  for (const [rawKey, rawValue] of Object.entries(input)) {
+    if (rawValue === void 0 || rawValue === null || rawValue === "") {
+      continue;
+    }
+    const normalizedGroup = normalizeGroupName(rawKey);
+    if (normalizedGroup) {
+      applyGroupObjectSyntax(result, rawKey, rawValue);
+      continue;
+    }
+    if (typeof rawValue === "object") {
+      throw createSyntaxError(`Syntax key "${rawKey}" does not accept nested objects.`);
+    }
+    setFlatEntry(result, rawKey, rawValue, "syntax object");
+  }
+  const normalized = freezeParsedSyntax(result);
+  parsedObjectSyntaxCache.set(input, normalized);
+  return normalized;
+}
+function parseStringSyntax(input) {
+  const cached = parsedStringSyntaxCache.get(input);
+  if (cached) {
+    return cached;
+  }
+  const result = {};
+  for (const segment of splitTopLevelArgs(input, ";")) {
+    const trimmed = segment.trim();
+    if (!trimmed) {
+      continue;
+    }
+    const separatorIndex = findTopLevelSeparator(trimmed, ":");
+    if (separatorIndex === -1) {
+      const groupStartIndex = trimmed.indexOf("(");
+      if (groupStartIndex > 0 && trimmed.endsWith(")")) {
+        const rawGroup = trimmed.slice(0, groupStartIndex).trim();
+        const body = trimmed.slice(groupStartIndex + 1, -1).trim();
+        applyGroupStringSyntax(result, rawGroup, body);
+        continue;
+      }
+      throw createSyntaxError(`Malformed syntax segment "${trimmed}". Expected key:value or group(...).`);
+    }
+    const rawKey = trimmed.slice(0, separatorIndex).trim();
+    const value = trimmed.slice(separatorIndex + 1).trim();
+    if (!value) {
+      throw createSyntaxError(`Syntax key "${rawKey}" is missing a value.`);
+    }
+    setFlatEntry(result, rawKey, value, `syntax segment "${trimmed}"`);
+  }
+  const normalized = freezeParsedSyntax(result);
+  rememberCache(parsedStringSyntaxCache, input, normalized);
+  return normalized;
+}
+function parseSyntaxInput(input) {
+  if (!input) {
+    return EMPTY_PARSED_SYNTAX;
+  }
+  if (isCompiledSyntax(input)) {
+    return input.input;
+  }
+  if (typeof input === "string") {
+    return parseStringSyntax(input);
+  }
+  return parseObjectSyntax(input);
+}
+
+// library/fadhilweblib/fadhilwebgamelib/custom-syntax.ts
+var DEFAULT_RELEASE_PROFILE = Object.freeze({
+  qualityVariantHigh: 72,
+  qualityVariantMid: 56,
+  variantChanceLow: 10,
+  variantChanceMid: 20,
+  variantChanceHigh: 32,
+  staleDaysThreshold: 24,
+  staleDeltaThreshold: 6,
+  stalePenalty: 3.2,
+  qualityPenaltyBase: 58,
+  qualityPenaltyFactor: 0.52,
+  qualityVariantMidGate: 56,
+  qualityVariantHighGate: 72,
+  scoreInnovationWeight: 0.52,
+  scoreResearchWeight: 18,
+  scoreReleaseRatingWeight: 28,
+  scoreFabricationWeight: 12,
+  scoreMarketingWeight: 9
+});
+var RELEASE_PROFILE_SYNTAX = `vars(
+  qualityVariantHigh:72,
+  qualityVariantMid:56,
+  variantChanceLow:10,
+  variantChanceMid:20,
+  variantChanceHigh:32,
+  staleDaysThreshold:24,
+  staleDeltaThreshold:6,
+  stalePenalty:3.2,
+  qualityPenaltyBase:58,
+  qualityPenaltyFactor:0.52,
+  qualityVariantMidGate:56,
+  qualityVariantHighGate:72,
+  scoreInnovationWeight:0.52,
+  scoreResearchWeight:18,
+  scoreReleaseRatingWeight:28,
+  scoreFabricationWeight:12,
+  scoreMarketingWeight:9
+);`;
+function readNumericVar(vars, key, fallback) {
+  const value = vars?.[`--${key}`];
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Number(value.trim());
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return fallback;
+}
+function buildReleaseSyntaxProfile() {
+  try {
+    const parsed = parseSyntaxInput(RELEASE_PROFILE_SYNTAX);
+    const vars = parsed.vars;
+    const profile = {
+      qualityVariantHigh: readNumericVar(vars, "qualityVariantHigh", DEFAULT_RELEASE_PROFILE.qualityVariantHigh),
+      qualityVariantMid: readNumericVar(vars, "qualityVariantMid", DEFAULT_RELEASE_PROFILE.qualityVariantMid),
+      variantChanceLow: readNumericVar(vars, "variantChanceLow", DEFAULT_RELEASE_PROFILE.variantChanceLow),
+      variantChanceMid: readNumericVar(vars, "variantChanceMid", DEFAULT_RELEASE_PROFILE.variantChanceMid),
+      variantChanceHigh: readNumericVar(vars, "variantChanceHigh", DEFAULT_RELEASE_PROFILE.variantChanceHigh),
+      staleDaysThreshold: readNumericVar(vars, "staleDaysThreshold", DEFAULT_RELEASE_PROFILE.staleDaysThreshold),
+      staleDeltaThreshold: readNumericVar(vars, "staleDeltaThreshold", DEFAULT_RELEASE_PROFILE.staleDeltaThreshold),
+      stalePenalty: readNumericVar(vars, "stalePenalty", DEFAULT_RELEASE_PROFILE.stalePenalty),
+      qualityPenaltyBase: readNumericVar(vars, "qualityPenaltyBase", DEFAULT_RELEASE_PROFILE.qualityPenaltyBase),
+      qualityPenaltyFactor: readNumericVar(vars, "qualityPenaltyFactor", DEFAULT_RELEASE_PROFILE.qualityPenaltyFactor),
+      qualityVariantMidGate: readNumericVar(vars, "qualityVariantMidGate", DEFAULT_RELEASE_PROFILE.qualityVariantMidGate),
+      qualityVariantHighGate: readNumericVar(vars, "qualityVariantHighGate", DEFAULT_RELEASE_PROFILE.qualityVariantHighGate),
+      scoreInnovationWeight: readNumericVar(vars, "scoreInnovationWeight", DEFAULT_RELEASE_PROFILE.scoreInnovationWeight),
+      scoreResearchWeight: readNumericVar(vars, "scoreResearchWeight", DEFAULT_RELEASE_PROFILE.scoreResearchWeight),
+      scoreReleaseRatingWeight: readNumericVar(vars, "scoreReleaseRatingWeight", DEFAULT_RELEASE_PROFILE.scoreReleaseRatingWeight),
+      scoreFabricationWeight: readNumericVar(vars, "scoreFabricationWeight", DEFAULT_RELEASE_PROFILE.scoreFabricationWeight),
+      scoreMarketingWeight: readNumericVar(vars, "scoreMarketingWeight", DEFAULT_RELEASE_PROFILE.scoreMarketingWeight)
+    };
+    return Object.freeze(profile);
+  } catch {
+    return DEFAULT_RELEASE_PROFILE;
+  }
+}
+var GAME_RELEASE_SYNTAX_PROFILE = buildReleaseSyntaxProfile();
+var ALLOWED_FUNCTIONS = {
+  clamp: (value, min, max) => Math.min(max, Math.max(min, value)),
+  max: (...args) => Math.max(...args),
+  min: (...args) => Math.min(...args),
+  log10: (value) => Math.log10(value)
+};
+var OP_PRIORITY = {
+  "+": 1,
+  "-": 1,
+  "*": 2,
+  "/": 2
+};
+var expressionCache = /* @__PURE__ */ new Map();
+var programCache = /* @__PURE__ */ new Map();
+function tokenizeExpression(input) {
+  const tokens = [];
+  const source = input.replace(/\s+/g, "");
+  let i = 0;
+  while (i < source.length) {
+    const char = source[i];
+    if (char === "(" || char === ")") {
+      tokens.push({ type: "paren", value: char });
+      i += 1;
+      continue;
+    }
+    if (char === ",") {
+      tokens.push({ type: "comma" });
+      i += 1;
+      continue;
+    }
+    if (char === "+" || char === "*" || char === "/") {
+      tokens.push({ type: "op", value: char });
+      i += 1;
+      continue;
+    }
+    if (char === "-") {
+      const prev = tokens[tokens.length - 1];
+      const unary = !prev || prev.type === "op" || prev.type === "comma" || prev.type === "paren" && prev.value === "(";
+      if (unary) {
+        const numberMatch2 = source.slice(i).match(/^-?\d+(\.\d+)?/);
+        if (numberMatch2) {
+          tokens.push({ type: "number", value: Number(numberMatch2[0]) });
+          i += numberMatch2[0].length;
+          continue;
+        }
+      }
+      tokens.push({ type: "op", value: "-" });
+      i += 1;
+      continue;
+    }
+    const numberMatch = source.slice(i).match(/^\d+(\.\d+)?/);
+    if (numberMatch) {
+      tokens.push({ type: "number", value: Number(numberMatch[0]) });
+      i += numberMatch[0].length;
+      continue;
+    }
+    const identifierMatch = source.slice(i).match(/^[A-Za-z_][A-Za-z0-9_]*/);
+    if (identifierMatch) {
+      const value = identifierMatch[0];
+      const nextChar = source[i + value.length];
+      if (nextChar === "(" && value in ALLOWED_FUNCTIONS) {
+        tokens.push({ type: "fn", value });
+      } else {
+        tokens.push({ type: "identifier", value });
+      }
+      i += value.length;
+      continue;
+    }
+    throw new Error(`Unsupported math syntax near "${source.slice(i, i + 8)}"`);
+  }
+  return tokens;
+}
+function toRpn(tokens) {
+  const output = [];
+  const stack = [];
+  for (const token of tokens) {
+    if (token.type === "number" || token.type === "identifier") {
+      output.push(token);
+      continue;
+    }
+    if (token.type === "fn") {
+      stack.push(token);
+      continue;
+    }
+    if (token.type === "comma") {
+      while (stack.length > 0) {
+        const top = stack[stack.length - 1];
+        if (top.type === "paren" && top.value === "(") break;
+        output.push(stack.pop());
+      }
+      continue;
+    }
+    if (token.type === "op") {
+      while (stack.length > 0) {
+        const top = stack[stack.length - 1];
+        if (top.type === "op" && OP_PRIORITY[top.value] >= OP_PRIORITY[token.value]) {
+          output.push(stack.pop());
+          continue;
+        }
+        if (top.type === "fn") {
+          output.push(stack.pop());
+          continue;
+        }
+        break;
+      }
+      stack.push(token);
+      continue;
+    }
+    if (token.type === "paren" && token.value === "(") {
+      stack.push(token);
+      continue;
+    }
+    if (token.type === "paren" && token.value === ")") {
+      while (stack.length > 0) {
+        const top = stack.pop();
+        if (top.type === "paren" && top.value === "(") break;
+        output.push(top);
+      }
+      if (stack.length > 0 && stack[stack.length - 1]?.type === "fn") {
+        output.push(stack.pop());
+      }
+    }
+  }
+  while (stack.length > 0) {
+    const token = stack.pop();
+    if (token.type !== "paren") output.push(token);
+  }
+  return output;
+}
+function evalRpn(tokens, scope) {
+  const stack = [];
+  for (const token of tokens) {
+    if (token.type === "number") {
+      stack.push(token.value);
+      continue;
+    }
+    if (token.type === "identifier") {
+      stack.push(Number(scope[token.value] ?? 0));
+      continue;
+    }
+    if (token.type === "op") {
+      const right = stack.pop() ?? 0;
+      const left = stack.pop() ?? 0;
+      if (token.value === "+") stack.push(left + right);
+      if (token.value === "-") stack.push(left - right);
+      if (token.value === "*") stack.push(left * right);
+      if (token.value === "/") stack.push(right === 0 ? 0 : left / right);
+      continue;
+    }
+    if (token.type === "fn") {
+      if (token.value === "log10") {
+        const value = stack.pop() ?? 0;
+        stack.push(ALLOWED_FUNCTIONS.log10(Math.max(1e-9, value)));
+        continue;
+      }
+      if (token.value === "clamp") {
+        const max = stack.pop() ?? 0;
+        const min = stack.pop() ?? 0;
+        const value = stack.pop() ?? 0;
+        stack.push(ALLOWED_FUNCTIONS.clamp(value, min, max));
+        continue;
+      }
+      if (token.value === "max" || token.value === "min") {
+        const right = stack.pop() ?? 0;
+        const left = stack.pop() ?? 0;
+        stack.push(ALLOWED_FUNCTIONS[token.value](left, right));
+      }
+    }
+  }
+  return stack.pop() ?? 0;
+}
+function evaluateGameMathExpression(expression, scope) {
+  const cached = expressionCache.get(expression);
+  if (cached) return evalRpn(cached, scope);
+  const rpn = toRpn(tokenizeExpression(expression));
+  expressionCache.set(expression, rpn);
+  return evalRpn(rpn, scope);
+}
+function evaluateGameMathProgram(program, scope) {
+  const cached = programCache.get(program);
+  const instructions = cached ?? program.split(";").map((segment) => segment.trim()).filter(Boolean).map((segment) => {
+    const index = segment.indexOf("=");
+    if (index <= 0) throw new Error(`Invalid math program segment "${segment}"`);
+    return {
+      key: segment.slice(0, index).trim(),
+      expression: segment.slice(index + 1).trim()
+    };
+  });
+  if (!cached) programCache.set(program, instructions);
+  const nextScope = { ...scope };
+  instructions.forEach((instruction) => {
+    nextScope[instruction.key] = evaluateGameMathExpression(instruction.expression, nextScope);
+  });
+  return nextScope;
+}
+var GAME_MATH_EXPRESSIONS = Object.freeze({
+  releasedProductScore: "max(1, cpuScore*scoreInnovationWeight + researchPerDay*scoreResearchWeight + releaseRating*scoreReleaseRatingWeight + fabricationCount*scoreFabricationWeight + marketingCount*scoreMarketingWeight + priceDiscipline)",
+  releaseActionScore: "urgentCashPressure*7.6 + cpuDelta*0.042 + staleness*1.65 + releaseCadencePressure*2.1 + normalCadenceBoost*1.6 + upgradeMomentumPressure*1.7 + marketNeed*1.4 + reputationNeed*0.8 + researchOverflow*0.32 + npcIntelligence*0.44 + launchRevenueSignal*0.9 + releaseRating*0.035 + crisisBoost - qualityGatePenalty - staleSpecPenalty - repeatedSpecPenalty",
+  releaseSignalProgram: "marketNeed=clamp((18-marketShare)/18,0,1.2);reputationNeed=clamp((50-reputation)/50,0,1);staleness=clamp(daysSinceRelease/90,0,2.2);launchRevenueSignal=log10(1+max(0,launchRevenue));qualitySignal=releaseRating+cpuDelta*0.18+researchPerDay*1.4"
+});
+
 // library/fadhilweblib/fadhilwebgamelib/business-engine.ts
 var TICK_MS = 200;
 var START_DATE_UTC = Date.UTC(2e3, 0, 1);
@@ -457,6 +1626,35 @@ function formatDateFromDays(daysElapsed) {
 }
 function normalizeCompanyNameWords(value) {
   return value.trim().replace(/\s+/g, " ").split(" ").map((part) => part.trim()).filter(Boolean);
+}
+function createProductName(company, releaseNumber, qualitySignal = 0) {
+  const companyToken = company.name.trim().split(/\s+/).filter(Boolean).slice(0, 1).join("");
+  const seriesSeeds = company.field === "game" ? ["Arena", "Quest", "Pulse", "Nova"] : company.field === "software" ? ["Suite", "Flow", "Sync", "Core"] : ["Core", "Fusion", "Vector", "Prime"];
+  const seedNumber = `${company.key}-${releaseNumber}`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
+  const baseName = `${companyToken} ${seriesToken} ${releaseNumber}`;
+  const variantTokens = ["Pro", "Ultra", "Max"];
+  const variantSeed = `${company.name}-${company.key}-${releaseNumber}-variant`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const variantChance = variantSeed % 100;
+  const shouldAddVariant = qualitySignal >= GAME_RELEASE_SYNTAX_PROFILE.qualityVariantHighGate ? variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceHigh : qualitySignal >= GAME_RELEASE_SYNTAX_PROFILE.qualityVariantMidGate ? variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceMid : variantChance < GAME_RELEASE_SYNTAX_PROFILE.variantChanceLow;
+  if (!shouldAddVariant) return baseName;
+  return `${baseName} ${variantTokens[variantSeed % variantTokens.length]}`;
+}
+function computeReleasedProductScore(company, cpuScore, releaseRating, priceIndex) {
+  const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
+  return evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releasedProductScore, {
+    cpuScore,
+    researchPerDay: company.researchPerDay,
+    releaseRating: releaseRating.rating,
+    fabricationCount: company.teams.fabrication.count,
+    marketingCount: company.teams.marketing.count,
+    priceDiscipline,
+    scoreInnovationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight,
+    scoreResearchWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight,
+    scoreReleaseRatingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight,
+    scoreFabricationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight,
+    scoreMarketingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight
+  });
 }
 function hasCompanyWordCollision(game, candidateName) {
   const candidateWords = normalizeCompanyNameWords(candidateName).map((word) => word.toLowerCase());
@@ -1376,10 +2574,14 @@ function createCompany(config) {
   const marketPoolShares = Math.max(0, shareSheetTotal - founderShares);
   const revenuePerDay = calculateRevenuePerDay(config.teams, config.upgrades, config.marketShare, config.reputation, boardMood);
   const researchPerDay = calculateResearchPerDay(config.teams, config.upgrades);
+  const field = config.field ?? "semiconductor";
+  const firstToken = config.name.trim().split(/\s+/).filter(Boolean)[0] ?? config.name.trim();
+  const initialCategory = field === "game" ? "Game" : field === "software" ? "App" : "Chip";
+  const initialProductName = `${firstToken} Prime ${initialCategory} 1`;
   return {
     company: {
       key: config.key,
-      field: config.field ?? "semiconductor",
+      field,
       softwareSpecialization: config.field === "software" ? config.softwareSpecialization ?? "utility-apps" : null,
       name: config.name,
       founder: config.founder,
@@ -1395,6 +2597,8 @@ function createCompany(config) {
       bestCpuScore: calculateCpuScore(config.upgrades),
       revenuePerDay,
       researchPerDay,
+      lastProductName: initialProductName,
+      lastProductScore: calculateCpuScore(config.upgrades) * 0.5 + researchPerDay * 18 + config.marketShare * 8 + config.reputation * 5,
       lastRelease: config.lastRelease,
       focus: config.focus,
       lastReleaseDay: 0,
@@ -2010,6 +3214,8 @@ function progressCompanyPlans(game) {
       marketShare: Math.max(2.5, plan.pledgedCapital / 22),
       reputation: Math.max(8, 6 + plan.pledgedCapital / 12),
       releaseCount: 1,
+      lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === "game" ? "Game" : plan.field === "software" ? "App" : "Chip"} 1`,
+      lastProductScore: Math.max(1, plan.pledgedCapital * 2.1),
       revenuePerDay: Math.max(2.2, plan.pledgedCapital / 18),
       researchPerDay: Math.max(1.4, plan.pledgedCapital / 28),
       payoutRatio: 0.1,
@@ -2254,6 +3460,8 @@ function progressCommunityPlans(game) {
         marketShare: clamp(plan.pledgedCapital / 30, 2.4, 11),
         reputation: clamp(8 + plan.pledgedCapital / 18, 8, 34),
         releaseCount: 1,
+        lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === "game" ? "Game" : plan.field === "software" ? "App" : "Chip"} 1`,
+        lastProductScore: Math.max(1, plan.pledgedCapital * 2),
         bestCpuScore: calculateCpuScore(seededUpgrades),
         revenuePerDay: Math.max(1.8, plan.pledgedCapital / 24),
         researchPerDay: Math.max(1.1, plan.pledgedCapital / 34),
@@ -3005,25 +4213,6 @@ function getNpcReleasePressure(game, npc, company) {
     gameExecutiveManaged
   };
 }
-function createProductName(company, releaseNumber, qualitySignal = 0) {
-  const companyToken = company.name.trim().split(/\s+/).filter(Boolean).slice(0, 1).join("");
-  const seriesSeeds = company.field === "game" ? ["Arena", "Quest", "Pulse", "Nova"] : company.field === "software" ? ["Suite", "Flow", "Sync", "Core"] : ["Core", "Fusion", "Vector", "Prime"];
-  const seedNumber = `${company.key}-${releaseNumber}`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-  const seriesToken = seriesSeeds[seedNumber % seriesSeeds.length];
-  const baseName = `${companyToken} ${seriesToken} ${releaseNumber}`;
-  const variantTokens = ["Pro", "Ultra", "Max"];
-  const variantSeed = `${company.name}-${company.key}-${releaseNumber}-variant`.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-  const variantChance = variantSeed % 100;
-  const shouldAddVariant = qualitySignal >= 72 ? variantChance < 32 : qualitySignal >= 56 ? variantChance < 20 : variantChance < 10;
-  if (!shouldAddVariant) return baseName;
-  return `${baseName} ${variantTokens[variantSeed % variantTokens.length]}`;
-}
-function computeReleasedProductScore(company, cpuScore, releaseRating, priceIndex) {
-  const innovationSignal = cpuScore * 0.52 + company.researchPerDay * 18;
-  const executionSignal = releaseRating.rating * 28 + company.teams.fabrication.count * 12 + company.teams.marketing.count * 9;
-  const priceDiscipline = priceIndex === company.lastReleasePriceIndex ? 2 : 7;
-  return Math.max(1, innovationSignal + executionSignal + priceDiscipline);
-}
 function scoreNpcReleaseAction(game, npc, company) {
   const pressure = getNpcReleasePressure(game, npc, company);
   const {
@@ -3042,10 +4231,7 @@ function scoreNpcReleaseAction(game, npc, company) {
     releaseDistance,
     gameExecutiveManaged
   } = pressure;
-  const marketNeed = clamp((18 - company.marketShare) / 18, 0, 1.2);
-  const reputationNeed = clamp((50 - company.reputation) / 50, 0, 1);
   const priceIndex = chooseNpcReleasePriceIndex(npc, company, cpuDelta, cashEmergency);
-  const staleness = clamp(daysSinceRelease / 90, 0, 2.2);
   const inNormalCadenceMode = !cashMeltdown;
   if (company.field === "game" && !gameExecutiveManaged) return null;
   if (company.field === "game" && inNormalCadenceMode && daysSinceRelease < 90) return null;
@@ -3057,16 +4243,45 @@ function scoreNpcReleaseAction(game, npc, company) {
   const pricePreset = PRICE_PRESETS[priceIndex];
   const releaseRating = evaluateCpuReleaseRating(game, company, priceIndex, currentCpuScore);
   const launchRevenue = calculateLaunchRevenue(currentCpuScore, company.teams, company.marketShare, company.reputation, pricePreset.factor) * releaseRating.salesMultiplier;
-  const launchRevenueSignal = Math.log10(1 + Math.max(0, launchRevenue));
+  const releaseSignals = evaluateGameMathProgram(GAME_MATH_EXPRESSIONS.releaseSignalProgram, {
+    marketShare: company.marketShare,
+    reputation: company.reputation,
+    daysSinceRelease,
+    launchRevenue,
+    releaseRating: releaseRating.rating,
+    cpuDelta,
+    researchPerDay: company.researchPerDay
+  });
+  const marketNeed = releaseSignals.marketNeed ?? 0;
+  const reputationNeed = releaseSignals.reputationNeed ?? 0;
+  const staleness = releaseSignals.staleness ?? 0;
+  const launchRevenueSignal = releaseSignals.launchRevenueSignal ?? 0;
   const releaseCadencePressure = clamp((daysSinceRelease - releaseWindow) / Math.max(8, releaseWindow), 0, 2.4);
   const upgradeMomentumPressure = clamp((releaseCadenceTarget - daysSinceRelease) / Math.max(6, releaseCadenceTarget), 0, 1.2) * (cpuDelta > 6 ? 1 : 0);
-  const qualitySignal = releaseRating.rating + cpuDelta * 0.18 + company.researchPerDay * 1.4;
-  const qualityGatePenalty = !canForceRelease && qualitySignal < 58 ? (58 - qualitySignal) * 0.52 : 0;
-  const staleSpecPenalty = !canForceRelease && daysSinceRelease < 24 && cpuDelta < 6 ? 3.2 : 0;
+  const qualitySignal = releaseSignals.qualitySignal ?? 0;
+  const qualityGatePenalty = !canForceRelease && qualitySignal < GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase ? (GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyBase - qualitySignal) * GAME_RELEASE_SYNTAX_PROFILE.qualityPenaltyFactor : 0;
+  const staleSpecPenalty = !canForceRelease && daysSinceRelease < GAME_RELEASE_SYNTAX_PROFILE.staleDaysThreshold && cpuDelta < GAME_RELEASE_SYNTAX_PROFILE.staleDeltaThreshold ? GAME_RELEASE_SYNTAX_PROFILE.stalePenalty : 0;
   const urgentCashPressure = Math.max(cashEmergency, cashReserveGap * 0.9);
   const crisisBoost = canForceRelease ? 9 + Math.max(0, 1.6 - company.cash) * 0.7 : 0;
   const normalCadenceBoost = inNormalCadenceMode ? clamp((daysSinceRelease - 28) / 32, 0, 1.8) : 0;
-  const score = urgentCashPressure * 7.6 + cpuDelta * 0.042 + staleness * 1.65 + releaseCadencePressure * 2.1 + normalCadenceBoost * 1.6 + upgradeMomentumPressure * 1.7 + marketNeed * 1.4 + reputationNeed * 0.8 + management.researchOverflow * 0.32 + npc.intelligence * 0.44 + launchRevenueSignal * 0.9 + releaseRating.rating * 0.035 + crisisBoost - qualityGatePenalty - staleSpecPenalty - repeatedSpecPenalty;
+  const score = evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releaseActionScore, {
+    urgentCashPressure,
+    cpuDelta,
+    staleness,
+    releaseCadencePressure,
+    normalCadenceBoost,
+    upgradeMomentumPressure,
+    marketNeed,
+    reputationNeed,
+    researchOverflow: management.researchOverflow,
+    npcIntelligence: npc.intelligence,
+    launchRevenueSignal,
+    releaseRating: releaseRating.rating,
+    crisisBoost,
+    qualityGatePenalty,
+    staleSpecPenalty,
+    repeatedSpecPenalty
+  });
   if (score < 0.9 && cashEmergency < 0.45 && cpuDelta < 12 && daysSinceRelease < (company.field === "game" ? 180 : 70) && !canForceRelease) return null;
   const releaseNumber = company.releaseCount + 1;
   const productName = createProductName(company, releaseNumber, qualitySignal);
@@ -3802,7 +5017,19 @@ function buildRichestPeopleRows(game, getInvestorHoldingsValue2, maxRows = 10) {
 function buildProductRankingRows(game, getCompanyValuation2, maxRows = 10) {
   return Object.values(game.companies).filter((company) => company.isEstablished).map((company) => {
     const productName = company.lastProductName || `${company.name} Core ${Math.max(1, company.releaseCount)}`;
-    const score = Number.isFinite(company.lastProductScore) ? company.lastProductScore : getCompanyValuation2(company) * 0.25 + company.marketShare * 20 + company.reputation * 8 + company.releaseCount * 40 + company.researchPerDay * 30;
+    const score = Number.isFinite(company.lastProductScore) ? company.lastProductScore : evaluateGameMathExpression(GAME_MATH_EXPRESSIONS.releasedProductScore, {
+      cpuScore: Math.max(1, company.bestCpuScore),
+      researchPerDay: company.researchPerDay,
+      releaseRating: company.releaseCount * (GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight / 2.2),
+      fabricationCount: company.teams.fabrication.count,
+      marketingCount: company.teams.marketing.count,
+      priceDiscipline: 4,
+      scoreInnovationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreInnovationWeight,
+      scoreResearchWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreResearchWeight,
+      scoreReleaseRatingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreReleaseRatingWeight,
+      scoreFabricationWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreFabricationWeight,
+      scoreMarketingWeight: GAME_RELEASE_SYNTAX_PROFILE.scoreMarketingWeight
+    });
     return {
       rank: 0,
       name: productName,

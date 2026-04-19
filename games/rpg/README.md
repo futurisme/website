@@ -8,4 +8,4 @@ Folder `rpg` adalah game Japanese RPG super ringan berbasis JavaScript murni.
 - Entry point web ada di `index.html`.
 
 Akses dari folder game shortcut:
-- `games/rpg/index.html` -> redirect ke `rpg/index.html`.
+- `games/rpg/index.html` -> entry point utama game.
