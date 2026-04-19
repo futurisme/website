@@ -40,6 +40,10 @@ export function createIndustryUiController({ root, handlers }) {
   const releasesEl = root.querySelector('#industryReleases');
   const autoBtn = root.querySelector('[data-action="toggle-auto"]');
 
+  if (!statsEl || !projectsEl || !feedEl || !releasesEl || !autoBtn) {
+    throw new Error('Industry UI root is missing required containers/actions.');
+  }
+
   root.querySelector('[data-action="tick-1"]').addEventListener('click', () => handlers.onTick(1));
   root.querySelector('[data-action="tick-7"]').addEventListener('click', () => handlers.onTick(7));
   root.querySelector('[data-action="reset"]').addEventListener('click', handlers.onReset);
