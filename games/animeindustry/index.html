@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AnimeIndustry</title>
     <link rel="canonical" href="https://fadhil.dev/games/animeindustry" />
-    <meta name="description" content="AnimeIndustry simulator dengan engine khusus dan UI berbasis fadhilweblib." />
+    <meta name="description" content="Simulasi bisnis anime Jepang: manga, komite produksi, studio, produksi, hingga launch anime." />
     <link rel="stylesheet" href="/library/fadhilweblib/styles/theme.css" />
     <link rel="stylesheet" href="/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.css" />
   </head>
@@ -13,26 +13,31 @@
     <main id="animeIndustryApp" class="industry-shell">
       <header class="industry-header">
         <h1>AnimeIndustry</h1>
-        <p>Engine fokus ke logika industri, UI ditangani oleh fadhilweblib.</p>
+        <p>Alur realistis: kreator manga → pitch studio → komite produksi → produksi anime → rilis.</p>
       </header>
 
-      <section class="industry-toolbar" aria-label="Game controls">
-        <button type="button" data-action="tick-1">+1 Tick</button>
-        <button type="button" data-action="tick-25">+25 Tick</button>
-        <button type="button" data-action="auto">Auto</button>
+      <section class="industry-toolbar" aria-label="Top actions">
+        <button type="button" data-action="tick-1">Advance +1 Day</button>
+        <button type="button" data-action="tick-7">Advance +7 Day</button>
+        <button type="button" data-action="brainstorm">Brainstorm Project</button>
+        <button type="button" data-action="toggle-auto">Auto Simulate</button>
         <button type="button" data-action="reset">Reset</button>
       </section>
 
       <section id="industryStats" class="industry-stats" aria-live="polite"></section>
 
-      <section class="industry-panel">
-        <h2>Top Studio</h2>
-        <ol id="industryTopCompanies" class="industry-list"></ol>
-      </section>
+      <section class="industry-grid">
+        <section class="industry-panel">
+          <h2>Pipeline Project</h2>
+          <div id="industryProjects" class="industry-projects"></div>
+        </section>
 
-      <section class="industry-panel">
-        <h2>Event Feed</h2>
-        <ul id="industryFeed" class="industry-feed"></ul>
+        <section class="industry-panel">
+          <h2>Anime Releases</h2>
+          <ul id="industryReleases" class="industry-releases"></ul>
+          <h2 style="margin-top:14px;">Chronicle Feed</h2>
+          <ul id="industryFeed" class="industry-feed"></ul>
+        </section>
       </section>
     </main>
 

@@ -1,43 +1,97 @@
-function metricCard(label, value) {
-  return `<article class="industry-metric"><small>${label}</small><strong>${value}</strong></article>`;
+function esc(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
-export function createIndustryUiController({ root, onTick, onReset, onAutoToggle }) {
+function projectCard(project) {
+  return `
+    <article class="industry-project" data-project-id="${esc(project.id)}">
+      <header>
+        <h3>${esc(project.title)}</h3>
+        <span class="stage">${esc(project.stage)}</span>
+      </header>
+      <p>${esc(project.genre)} · Manga chapter ${project.chapters} · Studio ${esc(project.studioName)}</p>
+      <div class="meta-grid">
+        <small>Popularity: ${project.popularity.toFixed(1)}</small>
+        <small>Script: ${project.scriptQuality.toFixed(1)}</small>
+        <small>Committee: ${project.committeeIds.length}</small>
+        <small>Budget: ${project.securedBudget.toLocaleString()} / ${project.budgetNeed.toLocaleString()}</small>
+        <small>Progress: ${project.productionProgress.toFixed(1)}%</small>
+      </div>
+      <div class="actions">
+        <button data-action="serialize" ${project.canSerialize ? '' : 'disabled'}>Serialize Chapter</button>
+        <button data-action="pitch" ${project.canPitch ? '' : 'disabled'}>Pitch ke Studio</button>
+        <button data-action="committee" ${project.canCommittee ? '' : 'disabled'}>Buat Komite</button>
+        <button data-action="production" ${project.canProduction ? '' : 'disabled'}>Start Production</button>
+        <button data-action="launch" ${project.canLaunch ? '' : 'disabled'}>Launch Anime</button>
+      </div>
+    </article>
+  `;
+}
+
+export function createIndustryUiController({ root, handlers }) {
   const statsEl = root.querySelector('#industryStats');
-  const topCompaniesEl = root.querySelector('#industryTopCompanies');
+  const projectsEl = root.querySelector('#industryProjects');
   const feedEl = root.querySelector('#industryFeed');
-  const autoButton = root.querySelector('[data-action="auto"]');
+  const releasesEl = root.querySelector('#industryReleases');
+  const autoBtn = root.querySelector('[data-action="toggle-auto"]');
 
-  root.querySelector('[data-action="tick-1"]').addEventListener('click', () => onTick(1));
-  root.querySelector('[data-action="tick-25"]').addEventListener('click', () => onTick(25));
-  root.querySelector('[data-action="reset"]').addEventListener('click', onReset);
-  autoButton.addEventListener('click', onAutoToggle);
+  root.querySelector('[data-action="tick-1"]').addEventListener('click', () => handlers.onTick(1));
+  root.querySelector('[data-action="tick-7"]').addEventListener('click', () => handlers.onTick(7));
+  root.querySelector('[data-action="reset"]').addEventListener('click', handlers.onReset);
+  root.querySelector('[data-action="brainstorm"]').addEventListener('click', handlers.onBrainstorm);
+  autoBtn.addEventListener('click', handlers.onAutoToggle);
 
-  let lastRenderKey = '';
+  projectsEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const action = target.getAttribute('data-action');
+    if (!action) return;
+    const projectCardEl = target.closest('[data-project-id]');
+    if (!(projectCardEl instanceof HTMLElement)) return;
+    const projectId = projectCardEl.getAttribute('data-project-id');
+    if (!projectId) return;
+
+    if (action === 'serialize') handlers.onSerialize(projectId);
+    if (action === 'pitch') handlers.onPitch(projectId);
+    if (action === 'committee') handlers.onCommittee(projectId);
+    if (action === 'production') handlers.onProduction(projectId);
+    if (action === 'launch') handlers.onLaunch(projectId);
+  });
+
+  let renderKey = '';
 
   return {
     render(snapshot) {
-      const nextKey = `${snapshot.dayLabel}|${snapshot.tickCount}|${snapshot.playerCashLabel}|${snapshot.feed[0] ?? ''}`;
-      if (nextKey === lastRenderKey) return;
-      lastRenderKey = nextKey;
+      const nextKey = `${snapshot.day}|${snapshot.cashLabel}|${snapshot.projects.length}|${snapshot.releases.length}|${snapshot.feed[0] ?? ''}`;
+      if (nextKey === renderKey) return;
+      renderKey = nextKey;
 
-      statsEl.innerHTML = [
-        metricCard('Hari', snapshot.dayLabel),
-        metricCard('Kas Pemain', snapshot.playerCashLabel),
-        metricCard('Total Tick', snapshot.tickCount),
-        metricCard('Industry Pulse', snapshot.industryPulse.toFixed(2)),
-      ].join('');
+      statsEl.innerHTML = `
+        <article class="industry-metric"><small>Hari</small><strong>${esc(snapshot.dayLabel)}</strong></article>
+        <article class="industry-metric"><small>Cash</small><strong>${esc(snapshot.cashLabel)}</strong></article>
+        <article class="industry-metric"><small>Reputation</small><strong>${snapshot.reputation}</strong></article>
+        <article class="industry-metric"><small>Market Trend</small><strong>${snapshot.trend.toFixed(2)}</strong></article>
+        <article class="industry-metric"><small>Audience Fatigue</small><strong>${snapshot.fatigue.toFixed(3)}</strong></article>
+        <article class="industry-metric"><small>Last Action</small><strong>${esc(snapshot.debug.lastAction)}</strong></article>
+      `;
 
-      topCompaniesEl.innerHTML = snapshot.topCompanies
-        .map((row) => `<li><strong>${row.rank}. ${row.name}</strong><span>${row.value}</span></li>`)
-        .join('');
+      projectsEl.innerHTML = snapshot.projects.length
+        ? snapshot.projects.map(projectCard).join('')
+        : '<p class="empty">Belum ada project aktif. Tekan Brainstorm Project.</p>';
 
-      feedEl.innerHTML = snapshot.feed
-        .map((entry) => `<li>${entry}</li>`)
-        .join('');
+      releasesEl.innerHTML = snapshot.releases.length
+        ? snapshot.releases.map((item) => `<li><strong>${esc(item.title)}</strong> · score ${item.score.toFixed(1)} · revenue ${item.revenue.toLocaleString()} · ${esc(item.studio)}</li>`).join('')
+        : '<li>Belum ada anime yang tayang.</li>';
+
+      feedEl.innerHTML = snapshot.feed.map((entry) => `<li>${esc(entry)}</li>`).join('');
     },
-    setAutoState(active) {
-      autoButton.textContent = active ? 'Stop Auto' : 'Auto';
+    setAutoState(isActive) {
+      autoBtn.textContent = isActive ? 'Stop Auto' : 'Auto Simulate';
     },
   };
 }
