@@ -282,6 +282,7 @@
         el.style.color = isError ? '#fca5a5' : '';
       }
       function safe(fn){ return function(ev){ try { fn(ev); } catch (err) { setRuntimeStatus('error runtime - ' + err.message, true); if (debugAgent && debugAgent.report) debugAgent.report('interaction-error', { message: err.message, stack: err.stack || '', eventType: ev && ev.type ? ev.type : '' }); console.error(err); } }; }
+      function trace(kind, detail){ if (lib && lib.recordDebugTrace) lib.recordDebugTrace(kind, detail || {}); }
       var mapDrag = { active:false, x:0, y:0, moved:false };
       function openFrame(id){ ['frameRegister','frameIntro','frameMain','frameMap','frameTravelIntro','frameGuildIntro','frameExplore','frameTransition','frameBuilding'].forEach(function(fid){ $(fid).classList.toggle('active', fid === id); }); }
       function createEntropyRng(){
@@ -380,6 +381,7 @@
 
       function playIntro(){
         openFrame('frameIntro');
+        trace('intro-start', { name: profile.name, race: profile.raceLabel });
         if (introTimer) { clearInterval(introTimer); introTimer = null; }
         $('introMeta').innerHTML = '';
         $('agePick').style.display = 'none';
@@ -430,6 +432,7 @@
 
       function playGuildIntro(lines){
         openFrame('frameGuildIntro');
+        trace('guild-intro', { lineCount: (lines || []).length });
         $('guildLog').textContent = '';
         var idx = 0;
         var seq = lines || [];
@@ -443,6 +446,7 @@
 
       function enterBuildingWithTransition(building){
         activeBuilding = building;
+        trace('enter-building', { buildingId: building.id, location: personalState ? personalState.location : '' });
         $('transitionTitle').textContent = building.name;
         openFrame('frameTransition');
         setTimeout(function(){
@@ -458,7 +462,7 @@
         $('buildingExtra').style.display = 'none';
         $('buildingExtra').textContent = '';
         if (activeBuilding.id === 'guild') {
-          $('buildingDetail').innerHTML = '<strong>Adventurer\\'s Guild Branch</strong><br/>Grade kamu: <b>' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '') + '</b><br/>Status: ' + (summary.adventurerRegistered ? 'Registered' : 'Belum terdaftar');
+          $('buildingDetail').innerHTML = '<strong>Adventurer\'s Guild Branch</strong><br/>Grade kamu: <b>' + summary.grade + (summary.gradeDelta ? ' ' + summary.gradeDelta : '') + '</b><br/>Status: ' + (summary.adventurerRegistered ? 'Registered' : 'Belum terdaftar');
           $('buildingActions').innerHTML = '<button id=\"guildRegisterBtn\">Register to be an adventurer</button><button id=\"guildRankingBtn\">Ranking</button><button id=\"guildRecheckBtn\">Recheck Grade</button>';
           return;
         }
@@ -481,6 +485,7 @@
         rng = createEntropyRng();
         var name = $('nameInput').value;
         var race = $('raceInput').value;
+        trace('give-birth-click', { hasName: !!name, race: race });
         profile = lib.createAdventureProfile({ name:name, race:race }, rng);
         playIntro();
       }));
@@ -489,6 +494,7 @@
         var age = ev.target && ev.target.dataset ? Number(ev.target.dataset.age || 0) : 0;
         if (!age) return;
         personalState = lib.createPersonalState(profile, age, rng);
+        trace('age-selected', { age: age });
         personalState.logs.push('Kamu memulai perjalanan pada umur ' + age + '.');
         openFrame('frameMain');
         renderMain();
@@ -549,6 +555,7 @@
         var before = personalState.location;
         personalState = lib.travelPersonal(personalState, targetId);
         if (before === personalState.location) return;
+        trace('travel-success', { to: personalState.location });
         var summary = lib.getPersonalSummary(personalState);
         $('travelArrivalTitle').textContent = 'You have arrived at ' + personalState.location;
         $('travelArrivalDate').textContent = 'On ' + summary.calendarText;
@@ -599,11 +606,13 @@
           }
           var reg = lib.registerAtGuild(personalState, rng);
           personalState = reg.state;
+          trace('guild-register', { ok: reg.ok, grade: personalState.adventurer.grade });
           playGuildIntro(reg.lines);
           return;
         }
         if (id === 'guildRankingBtn') {
           var ranking = lib.getGuildRanking(personalState, rng, 80);
+          trace('guild-ranking-open', { total: ranking.length });
           $('buildingExtra').style.display = 'block';
           $('buildingExtra').textContent = ranking.map(function(r){ return (r.rank + '. ' + r.name + ' · ' + r.grade + (r.isPlayer ? ' ← You' : '')); }).join('\\n');
           return;
@@ -611,6 +620,7 @@
         if (id === 'guildRecheckBtn') {
           var re = lib.recheckGrade(personalState, rng);
           personalState = re.state;
+          trace('guild-recheck', { ok: re.ok, grade: personalState.adventurer.grade });
           renderBuildingSubframe();
           return;
         }
@@ -639,6 +649,7 @@
         setRuntimeStatus('gagal load fadhilwebrpglib.js', true);
       } else {
         debugAgent = lib.installOneShotDebug({ triggerParam: 'rpgdebug' });
+        trace('boot-ready', { href: window.location.href });
         setRuntimeStatus('', false);
       }
     </script>

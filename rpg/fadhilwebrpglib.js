@@ -1,6 +1,7 @@
 (function (global) {
   var DEBUG_SESSION_KEY = '__fwrpg_debug_once__';
   var DEBUG_DOM_ID = 'fwrpg-debug-once';
+  var DEBUG_HISTORY_LIMIT = 220;
 
   function safeStringify(value) {
     try {
@@ -44,6 +45,22 @@
       predictions.push('Kegagalan berulang mungkin muncul ketika pemicu yang sama terjadi lagi.');
     }
     return predictions;
+  }
+
+  function getDebugHistory() {
+    if (!global.__fwrpgDebugHistory) global.__fwrpgDebugHistory = [];
+    return global.__fwrpgDebugHistory;
+  }
+
+  function recordDebugTrace(kind, detail) {
+    var history = getDebugHistory();
+    history.push({
+      kind: kind,
+      timestamp: new Date().toISOString(),
+      detail: detail || {}
+    });
+    if (history.length > DEBUG_HISTORY_LIMIT) history.splice(0, history.length - DEBUG_HISTORY_LIMIT);
+    return history.length;
   }
 
   function hasTriggeredDebug() {
@@ -115,6 +132,7 @@
 
   function buildDebugPayload(kind, detail) {
     var info = detail || {};
+    var history = getDebugHistory();
     var payload = {
       system: 'fadhilwebrpglib',
       version: '2026.04.18-debug-once',
@@ -123,7 +141,8 @@
       href: global.location && global.location.href ? global.location.href : '',
       causes: [],
       predictions: [],
-      detail: info
+      detail: info,
+      history: history.slice(-60)
     };
     payload.causes = buildLikelyCauses(payload);
     payload.predictions = buildPredictions(payload);
@@ -131,6 +150,7 @@
   }
 
   function reportDebugIssue(kind, detail) {
+    recordDebugTrace(kind, detail);
     var payload = buildDebugPayload(kind, detail);
     openDebugContainer(payload);
     return payload;
@@ -146,6 +166,9 @@
     var search = (global.location && global.location.search) || '';
     if (search.indexOf(param + '=1') >= 0) {
       reportDebugIssue('manual-trigger', { source: 'query-param' });
+    }
+    if (search.indexOf(param + '=timeline') >= 0) {
+      reportDebugIssue('timeline-trigger', { source: 'query-param-timeline' });
     }
 
     global.addEventListener('error', function (event) {
@@ -1267,6 +1290,7 @@
     registerAtGuild: registerAtGuild,
     recheckGrade: recheckGrade,
     getGuildRanking: getGuildRanking,
+    recordDebugTrace: recordDebugTrace,
     installOneShotDebug: installOneShotDebug,
     reportDebugIssue: reportDebugIssue
   };
