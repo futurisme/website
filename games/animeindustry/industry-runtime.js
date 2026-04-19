@@ -27,6 +27,7 @@ const STUDIO_BASE_POOL = Object.freeze([
 const STUDIO_NAME_PART_A = ['Astra', 'Kitsune', 'Mirai', 'Kaze', 'Akari', 'Yoru', 'Shiro', 'Sora', 'Ryu', 'Nami', 'Hoshi', 'Aoi', 'Kumo', 'Suzu', 'Rei', 'Tora', 'Mizu', 'Kage', 'Nova', 'Kairo'];
 const STUDIO_NAME_PART_B = ['Frame', 'Works', 'Pictures', 'Motion', 'Atelier', 'Factory', 'Studio', 'Lab', 'House', 'Arts', 'Vision', 'Spark', 'Forge', 'Arc'];
 const STUDIO_NAME_PART_C = ['Collective', 'Guild', 'Division', 'Systems', 'Prime', 'Dynamics', 'Factory'];
+const STUDIO_ONE_WORD_DATASET = ['SHUKARI', 'MAPPEX', 'JPNIME', 'Kaminameta', 'VINIX', 'ANIZEN', 'TOKARU'];
 
 const INVESTOR_POOL = Object.freeze([
   { id: 'inv-pub', name: 'Penerbit', influence: 72, risk: 45 },
@@ -72,8 +73,8 @@ function generateUniqueStudioNames(targetCount) {
   while (names.length < targetCount && safety < targetCount * 80) {
     safety += 1;
     const roll = Math.random();
-    const wordCount = roll < 0.7 ? 1 : roll < 0.95 ? 2 : 3;
-    const parts = [randomFrom(STUDIO_NAME_PART_A)];
+    const wordCount = roll < 0.16 ? 1 : roll < 0.94 ? 2 : 3;
+    const parts = [wordCount === 1 ? randomFrom(STUDIO_ONE_WORD_DATASET) : randomFrom(STUDIO_NAME_PART_A)];
     if (wordCount >= 2) parts.push(randomFrom(STUDIO_NAME_PART_B));
     if (wordCount >= 3) parts.push(randomFrom(STUDIO_NAME_PART_C));
     const candidate = parts.join(' ');
@@ -176,6 +177,7 @@ function createInitialState() {
       studioId: null,
       adminScore: 0,
       fundingPool: 0,
+      studioPlanningOpen: false,
     },
     projects: [],
     studios,
@@ -298,6 +300,15 @@ export function createAnimeIndustryRuntime() {
     });
   }
 
+  function openStudioPlanning() {
+    return withAction('open-studio-planning', () => {
+      if (!state.registered) return false;
+      state.player.studioPlanningOpen = true;
+      addEmail(state, 'system', 'Perencanaan studio dibuka', 'Inbox investasi pendirian studio sekarang aktif. Anda dapat menerima tawaran investor secara berkala.');
+      return true;
+    });
+  }
+
   function foundStudioAsCeo(studioName) {
     return withAction('found-studio-as-ceo', () => {
       if (!state.registered || state.studios.length >= MAX_ACTIVE_STUDIOS) return false;
@@ -408,7 +419,7 @@ export function createAnimeIndustryRuntime() {
       }
     });
 
-    if (state.registered && state.day % 9 === 0) {
+    if (state.registered && state.player.studioPlanningOpen && state.day % 9 === 0) {
       const investor = state.investors[state.day % state.investors.length];
       const amount = 1_100_000 + ((state.day % 5) * 350_000);
       state.player.fundingPool += amount;
@@ -641,6 +652,7 @@ export function createAnimeIndustryRuntime() {
         studioName: state.studios.find((entry) => entry.id === state.player.studioId)?.name ?? '-',
         adminScore: state.player.adminScore,
         fundingPool: state.player.fundingPool,
+        studioPlanningOpen: state.player.studioPlanningOpen,
       },
       ceoRequirements,
       visualAccess: {
@@ -697,6 +709,7 @@ export function createAnimeIndustryRuntime() {
     registerPlayer,
     seekFunding,
     improveAdministration,
+    openStudioPlanning,
     foundStudioAsCeo,
     chooseAdaptationStudio,
     discussCommitteeContract,

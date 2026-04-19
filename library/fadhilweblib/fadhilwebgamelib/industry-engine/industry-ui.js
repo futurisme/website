@@ -71,6 +71,7 @@ export function createIndustryUiController({ root, handlers }) {
 
   root.querySelector('[data-action="seek-funding"]').addEventListener('click', handlers.onSeekFunding);
   root.querySelector('[data-action="improve-admin"]').addEventListener('click', handlers.onImproveAdmin);
+  root.querySelector('[data-action="open-studio-planning"]').addEventListener('click', handlers.onOpenStudioPlanning);
   root.querySelector('[data-action="found-studio"]').addEventListener('click', () => handlers.onFoundStudio(studioNameInput.value));
   root.querySelector('[data-action="committee-discuss"]').addEventListener('click', () => {
     if (selectedProjectId) handlers.onCommitteeDiscuss(selectedProjectId);
@@ -217,6 +218,7 @@ export function createIndustryUiController({ root, handlers }) {
           <li>Kekayaan ≥ ${snapshot.ceoRequirements.wealthNeed.toLocaleString()} (${snapshot.ceoRequirements.wealthOk ? '✅' : '❌'})</li>
           <li>Pendanaan ≥ ${snapshot.ceoRequirements.fundingNeed.toLocaleString()} (${snapshot.ceoRequirements.fundingOk ? '✅' : '❌'})</li>
           <li>Administrasi ≥ ${snapshot.ceoRequirements.adminNeed} (${snapshot.ceoRequirements.adminOk ? '✅' : '❌'})</li>
+          <li>Perencanaan Studio Dibuka: ${snapshot.player.studioPlanningOpen ? '✅' : '❌'}</li>
         </ul>
       `;
 

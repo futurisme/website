@@ -29,9 +29,9 @@ if (!appRoot) {
       },
       onSeekFunding: () => { runtime.seekFunding(); ui.render(runtime.snapshot()); },
       onImproveAdmin: () => { runtime.improveAdministration(); ui.render(runtime.snapshot()); },
+      onOpenStudioPlanning: () => { runtime.openStudioPlanning(); ui.render(runtime.snapshot()); },
       onFoundStudio: (studioName) => {
-        const ok = runtime.foundStudioAsCeo(studioName);
-        if (!ok) report('mechanism-warning', { message: 'CEO requirement not met' });
+        runtime.foundStudioAsCeo(studioName);
         ui.render(runtime.snapshot());
       },
       onOpenProject: () => {},
