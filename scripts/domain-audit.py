@@ -43,8 +43,8 @@ def fetch_path(path: str):
         with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
             status = response.getcode()
             final_url = response.geturl()
-            headers = dict(response.headers.items())
-            content_type = headers.get('Content-Type', '')
+            headers = {k.lower(): v for k, v in response.headers.items()}
+            content_type = headers.get('content-type', '')
             body = response.read(450_000).decode('utf-8', 'ignore') if 'text/html' in content_type.lower() else ''
     except Exception as exc:
         return {
