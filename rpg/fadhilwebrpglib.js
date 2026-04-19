@@ -1244,13 +1244,37 @@
     var rand = rng || Math.random;
     var limit = Math.max(1, Math.min(80, maxEntries || 80));
     var list = [];
+    var npcStyles = ['aggressive', 'analyst', 'risk-controller', 'support-core', 'tempo-runner'];
+    var npcMoods = ['fokus', 'tenang', 'adaptif', 'kompetitif', 'eksperimental'];
+    var npcMoves = ['menyusun rute farming', 'menyesuaikan build equipment', 'menganalisis pola boss', 'menjaga stamina tim', 'mencari peluang event'];
     for (var i = 0; i < limit - 1; i += 1) {
       var score = Math.max(0, Math.min(11.999, sampleRandom(rand) * 12));
       var meta = scoreToGrade(score);
-      list.push({ name: 'NPC-' + String(i + 1).padStart(2, '0'), grade: meta.grade, gradeDelta: meta.delta, score: score, isPlayer: false });
+      var style = npcStyles[Math.floor(sampleRandom(rand) * npcStyles.length)];
+      var mood = npcMoods[Math.floor(sampleRandom(rand) * npcMoods.length)];
+      var move = npcMoves[Math.floor(sampleRandom(rand) * npcMoves.length)];
+      list.push({
+        name: 'NPC-' + String(i + 1).padStart(2, '0'),
+        grade: meta.grade,
+        gradeDelta: meta.delta,
+        score: score,
+        isPlayer: false,
+        aiStyle: style,
+        aiMood: mood,
+        aiMove: move
+      });
     }
     if (personalState.adventurer && personalState.adventurer.registered) {
-      list.push({ name: personalState.profile.name, grade: personalState.adventurer.grade, gradeDelta: personalState.adventurer.gradeDelta, score: personalState.adventurer.score, isPlayer: true });
+      list.push({
+        name: personalState.profile.name,
+        grade: personalState.adventurer.grade,
+        gradeDelta: personalState.adventurer.gradeDelta,
+        score: personalState.adventurer.score,
+        isPlayer: true,
+        aiStyle: 'player',
+        aiMood: 'aktif',
+        aiMove: 'menentukan strategi pribadi'
+      });
     }
     list.sort(function (a, b) { return b.score - a.score; });
     return list.slice(0, limit).map(function (entry, idx) {
@@ -1258,7 +1282,10 @@
         rank: idx + 1,
         name: entry.name,
         grade: entry.grade + (entry.gradeDelta ? ' ' + entry.gradeDelta : ''),
-        isPlayer: entry.isPlayer
+        isPlayer: entry.isPlayer,
+        aiStyle: entry.aiStyle,
+        aiMood: entry.aiMood,
+        aiMove: entry.aiMove
       };
     });
   }

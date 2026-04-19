@@ -91,6 +91,10 @@
       .subframe-head { display:flex; align-items:center; justify-content:space-between; gap:6px; }
       .building-detail { margin-top:8px; border:1px solid var(--line); border-radius:10px; background:#0a1226; padding:8px; }
       .ranking-list { margin-top:8px; max-height:220px; overflow:auto; border:1px solid var(--line); border-radius:10px; background:#070d1d; padding:8px; font:12px/1.45 ui-monospace, monospace; }
+      .rank-card { border:1px solid #334155; border-radius:10px; padding:7px; background:#0a1326; outline:1px solid rgba(148,163,184,.16); outline-offset:-1px; margin-bottom:6px; }
+      .rank-card:last-child { margin-bottom:0; }
+      .rank-top { display:flex; justify-content:space-between; gap:6px; font-weight:700; }
+      .rank-meta { margin-top:3px; color:#93c5fd; font-size:.72rem; }
       @keyframes fadePulse { from { opacity:0; transform:scale(1.02); } to { opacity:1; transform:scale(1); } }
       @keyframes fade { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
       @media (max-width:760px){ .split { grid-template-columns:1fr 1fr; } .age-pick { grid-template-columns:1fr 1fr; } .stat-row { grid-template-columns:84px 1fr; } }
@@ -614,7 +618,13 @@
           var ranking = lib.getGuildRanking(personalState, rng, 80);
           trace('guild-ranking-open', { total: ranking.length });
           $('buildingExtra').style.display = 'block';
-          $('buildingExtra').textContent = ranking.map(function(r){ return (r.rank + '. ' + r.name + ' · ' + r.grade + (r.isPlayer ? ' ← You' : '')); }).join('\\n');
+          $('buildingExtra').innerHTML = ranking.map(function(r){
+            return '<article class=\"rank-card\">'
+              + '<div class=\"rank-top\"><span>#' + r.rank + ' · ' + r.name + (r.isPlayer ? ' ← You' : '') + '</span><span>' + r.grade + '</span></div>'
+              + '<div class=\"rank-meta\">AI style: ' + r.aiStyle + ' · mood: ' + r.aiMood + '</div>'
+              + '<div class=\"rank-meta\">Action: ' + r.aiMove + '</div>'
+              + '</article>';
+          }).join('');
           return;
         }
         if (id === 'guildRecheckBtn') {
