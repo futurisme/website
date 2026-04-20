@@ -5,7 +5,7 @@
   "description": "Production signaling server for ChartMaker (y-webrtc).",
   "scripts": {
     "start": "HOST=0.0.0.0 y-websocket-server",
-    "dev": "HOST=0.0.0.0 y-websocket-server"
+    "dev": "npm run start"
   },
   "engines": {
     "node": ">=18"
