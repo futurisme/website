@@ -1,3 +1,1 @@
-export function cx(...parts: Array<string | false | null | undefined>) {
-  return parts.filter(Boolean).join(' ');
-}
+export * from '../../../../../../library/fadhilweblib/core/cx.ts';
