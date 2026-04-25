@@ -510,6 +510,7 @@ export function createIndustryUiController({ root, handlers }) {
       const visualReadiness = Math.min(100, Math.round(project.popularity * 0.44 + (project.productionProgress ?? 0) * 0.56));
       const handoffReady = project.stage === 'committee_setup' || project.canProduction || ['production', 'postproduction', 'release'].includes(project.stage);
       const studioLabel = project.studioName && project.studioName !== '-' ? project.studioName : 'Belum ada studio';
+      const writeLabel = project.medium === 'movie' ? 'Develop Film' : 'Develop';
       return `
         <article class="industry-project industry-project-rich" data-project-id="${esc(project.id)}">
           <h3>${esc(project.title)}</h3>
@@ -523,6 +524,8 @@ export function createIndustryUiController({ root, handlers }) {
           </div>
           <div class="actions">
             <button data-action="open-sub">Detail</button>
+            <button data-action="serialize" ${project.canSerialize ? '' : 'disabled'}>${writeLabel}</button>
+            <button data-action="pitch" ${project.canPitch ? '' : 'disabled'}>Pitch</button>
             <button data-action="committee" ${project.canCommittee ? '' : 'disabled'}>Committee</button>
             <button data-action="production" ${project.canProduction ? '' : 'disabled'}>Production</button>
             <button data-action="launch" ${project.canLaunch ? '' : 'disabled'}>Launch</button>

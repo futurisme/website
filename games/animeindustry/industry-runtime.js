@@ -188,6 +188,13 @@ function createMetadataSignature({ title, genre, theme, targetAudience }) {
   return Math.abs(hash >>> 0);
 }
 
+function getPitchReadinessThreshold(project) {
+  if (!project) return 8;
+  if (project.medium === 'movie') return 5;
+  if (project.medium === 'anime') return 6;
+  return 8;
+}
+
 function createUniquePlayerProjectTitle(state, medium) {
   const base = `${medium === 'novel' ? 'Novel' : 'Manga'} ${Math.random().toString(36).slice(-4).toUpperCase()}`;
   if (!state.usedNames.has(base)) {
@@ -665,9 +672,7 @@ export function createAnimeIndustryRuntime() {
       project.scriptQuality = clamp(project.scriptQuality + realismBoost + (medium === 'movie' ? 4 : medium === 'anime' ? 3 : 2), 8, 45);
       project.popularity = clamp(project.popularity + (signature % 9) + (targetAudience.length > 10 ? 2 : 0), 6, 40);
       project.chapters = medium === 'anime' ? 2 : medium === 'movie' ? 3 : 0;
-      if (medium === 'anime' || medium === 'movie') {
-        project.stage = 'manga_serialization';
-      }
+      if (medium === 'anime' || medium === 'movie') project.stage = 'manga_serialization';
 
       state.projects.push(project);
       state.usedNames.add(title);
@@ -683,9 +688,10 @@ export function createAnimeIndustryRuntime() {
       if (!project || !['ideation', 'manga_serialization'].includes(project.stage)) return false;
       project.stage = 'manga_serialization';
       project.chapters += 1;
-      project.scriptQuality = Math.min(100, project.scriptQuality + (project.medium === 'novel' ? 2.2 : 1.8));
+      const qualityBoost = project.medium === 'novel' ? 2.2 : project.medium === 'movie' ? 1.6 : project.medium === 'anime' ? 1.7 : 1.8;
+      project.scriptQuality = Math.min(100, project.scriptQuality + qualityBoost);
       project.popularity = Math.min(100, project.popularity + Math.max(1, 2.4 - state.market.audienceFatigue));
-      state.cash -= project.medium === 'novel' ? 80_000 : 120_000;
+      state.cash -= project.medium === 'novel' ? 80_000 : project.medium === 'anime' ? 170_000 : project.medium === 'movie' ? 240_000 : 120_000;
       return true;
     });
   }
@@ -693,7 +699,8 @@ export function createAnimeIndustryRuntime() {
   function pitchToStudio(projectId) {
     return withAction('pitch-to-studio', () => {
       const project = byId(state, projectId);
-      if (!project || project.chapters < 8) return false;
+      const pitchThreshold = getPitchReadinessThreshold(project);
+      if (!project || project.chapters < pitchThreshold) return false;
       const score = computeStageScore(project, state.market, state);
       if (score < 38) return false;
 
@@ -707,7 +714,8 @@ export function createAnimeIndustryRuntime() {
       project.interestedStudioIds = interested;
       project.studioId = interested.length === 1 ? interested[0] : null;
       project.delayRisk = Math.max(0.08, project.delayRisk - 0.03);
-      log(state, `${project.title} dilirik ${interested.length} studio untuk adaptasi anime.`);
+      const destination = project.medium === 'movie' ? 'film anime' : 'adaptasi anime';
+      log(state, `${project.title} dilirik ${interested.length} studio untuk ${destination}.`);
       addEmail(state, 'studio-offer', `Inbox: Tawaran studio untuk ${project.title}`, `${interested.length} studio tertarik. Buka Production Committee untuk memilih partner studio.`);
       return true;
     });
@@ -1085,7 +1093,7 @@ export function createAnimeIndustryRuntime() {
           return { id, name: studio?.name ?? id };
         }),
         canSerialize: ['ideation', 'manga_serialization'].includes(project.stage),
-        canPitch: project.chapters >= 8 && ['manga_serialization', 'pitching', 'studio_interest'].includes(project.stage),
+        canPitch: project.chapters >= getPitchReadinessThreshold(project) && ['manga_serialization', 'pitching', 'studio_interest'].includes(project.stage),
         canCommittee: ['studio_interest', 'committee_setup'].includes(project.stage),
         canProduction: project.committeeApproved && project.securedBudget >= project.budgetNeed * 0.78 && ['committee_setup', 'preproduction'].includes(project.stage),
         canLaunch: ['postproduction', 'release'].includes(project.stage),
@@ -1131,7 +1139,6 @@ export function createAnimeIndustryRuntime() {
       return state;
     },
     toggleAuto,
-    brainstormProject,
     createProjectFromDraft,
     serializeChapter,
     pitchToStudio,
