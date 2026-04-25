@@ -97,6 +97,18 @@ body {
   background: #08334466;
 }
 
+.toolbar-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#manual-open-btn {
+  width: auto;
+  font-size: 0.76rem;
+  padding: 7px 10px;
+}
+
 input,
 textarea,
 button {

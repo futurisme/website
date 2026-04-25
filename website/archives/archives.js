@@ -17,6 +17,7 @@ import {
 const searchEl = document.getElementById('archive-search');
 const listEl = document.getElementById('archives-list');
 const createBtn = document.getElementById('create-archive-btn');
+const manualOpenBtn = document.getElementById('manual-open-btn');
 const manualModal = document.getElementById('manual-modal');
 const manualContainerEl = document.getElementById('manual-container');
 const manualStatusEl = document.getElementById('manual-status');
@@ -94,7 +95,9 @@ function openManualModal() {
   if (!manualContainerEl?.value.trim()) {
     manualContainerEl.value = buildManualSnapshot();
   }
-  manualModal.showModal();
+  if (!manualModal.open) {
+    manualModal.showModal();
+  }
   setManualStatus('Manual save/load siap. Data memakai container .fadhil.');
 }
 
@@ -133,9 +136,27 @@ function parseManualSnapshot(raw) {
   return payload;
 }
 
+function listStoredArchiveKeys() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i);
+    if (typeof key === 'string' && key.startsWith('fadhil-archive:')) {
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+
 function applyManualSnapshot(raw) {
   const payload = parseManualSnapshot(raw);
   const documentsBySlug = new Map(payload.documents.map((doc) => [doc?.slug, doc]));
+  const snapshotKeys = new Set(payload.registry.map((entry) => archiveStorageKey(entry?.slug)).filter(Boolean));
+
+  for (const existingKey of listStoredArchiveKeys()) {
+    if (!snapshotKeys.has(existingKey)) {
+      localStorage.removeItem(existingKey);
+    }
+  }
 
   localStorage.setItem('fadhil-archives-registry-v1', JSON.stringify(payload.registry));
 
@@ -166,6 +187,8 @@ createBtn?.addEventListener('click', () => {
   const { slug } = upsertArchiveMeta(name);
   goToArchive(slug);
 });
+
+manualOpenBtn?.addEventListener('click', openManualModal);
 
 manualGenerateBtn?.addEventListener('click', () => {
   manualContainerEl.value = buildManualSnapshot();
@@ -212,6 +235,11 @@ document.addEventListener('touchend', (event) => {
   const touch = event.changedTouches?.[0];
   if (!touch) return;
   registerRightSwipe(touch.clientX, touch.clientY);
+}, { passive: true });
+
+document.addEventListener('touchcancel', () => {
+  touchStartX = null;
+  touchStartY = null;
 }, { passive: true });
 
 renderArchives();
