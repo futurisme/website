@@ -226,6 +226,11 @@ function createProject(id, medium, title) {
     stage: 'ideation',
     popularity: 10,
     scriptQuality: 12,
+    visualQuality: medium === 'novel' ? 24 : 18,
+    plotQuality: 16,
+    competitiveness: 28,
+    imdbScore: 5.2,
+    ratingsCount: 0,
     chapters: 0,
     studioId: null,
     interestedStudioIds: [],
@@ -312,6 +317,11 @@ function createNpcProject(state, npc, day) {
     stage: 'serialization',
     chapters: 6,
     quality: 40 + Math.min(35, Math.round(npc.reputation * 0.4)),
+    visualQuality: 38 + Math.min(30, Math.round(npc.reputation * 0.32)),
+    plotQuality: 41 + Math.min(30, Math.round(npc.ambition * 0.28)),
+    competitiveness: 35,
+    imdbScore: 5.4,
+    ratingsCount: 0,
     popularity: 32 + Math.min(35, Math.round(npc.ambition * 0.35)),
     studioId: null,
     productionProgress: 0,
@@ -441,8 +451,11 @@ function computeStageScore(project, market, state) {
 }
 
 function computeReleaseScore(project, studio, market) {
-  return evaluateGameMathExpression('max(1,script*0.64 + popularity*0.48 + studioCraft*0.33 + studioNetwork*0.28 + committee*0.19 + trend*7.2 - delayRisk*17)', {
+  return evaluateGameMathExpression('max(1,plot*0.34 + visual*0.29 + script*0.24 + competitiveness*0.18 + popularity*0.31 + studioCraft*0.27 + studioNetwork*0.22 + committee*0.16 + trend*7.0 - delayRisk*16)', {
+    plot: project.plotQuality ?? project.scriptQuality,
+    visual: project.visualQuality ?? project.scriptQuality,
     script: project.scriptQuality,
+    competitiveness: project.competitiveness ?? 40,
     popularity: project.popularity,
     studioCraft: studio?.craft ?? 40,
     studioNetwork: studio?.network ?? 30,
@@ -450,6 +463,25 @@ function computeReleaseScore(project, studio, market) {
     trend: market.trend,
     delayRisk: project.delayRisk,
   });
+}
+
+function computeAudienceImdbSignal({ visualQuality, plotQuality, competitiveness, trend, uniqueness, mediumBoost = 0 }) {
+  const normalizedVisual = clamp((Number(visualQuality) || 0) / 100, 0, 1);
+  const normalizedPlot = clamp((Number(plotQuality) || 0) / 100, 0, 1);
+  const normalizedCompetition = clamp((Number(competitiveness) || 0) / 100, 0, 1);
+  const normalizedTrend = clamp((Number(trend) || 1) / 1.6, 0, 1);
+  const normalizedUniqueness = clamp((Number(uniqueness) || 0) / 100, 0, 1);
+  const base = 4.8 + normalizedVisual * 1.72 + normalizedPlot * 1.92 + normalizedCompetition * 1.12 + normalizedTrend * 0.74 + normalizedUniqueness * 0.62 + mediumBoost;
+  return clamp(base, 1, 9.9);
+}
+
+function computeCompetitivePressure(state, medium) {
+  const peer = state.releases
+    .filter((entry) => (medium === 'movie' ? String(entry.title || '').toLowerCase().includes('movie') : !String(entry.title || '').toLowerCase().includes('movie')))
+    .slice(-14);
+  if (!peer.length) return 0;
+  const avgScore = peer.reduce((sum, row) => sum + (Number(row.score) || 0), 0) / peer.length;
+  return clamp((avgScore - 60) / 40, -0.5, 0.6);
 }
 
 function computeStudioValuation(studio, studioReleaseScore = 0) {
@@ -709,6 +741,9 @@ export function createAnimeIndustryRuntime() {
         const writingBoost = 1 + (npc.ambition > 62 ? 1 : 0) + (kernel.discipline > 0.7 ? 1 : 0);
         project.chapters += writingBoost;
         project.quality = clamp(project.quality + 1.1 + (npc.ambition / 130) + kernel.discipline * 0.7 + affinity * 0.45 + liveAudienceDemand * 0.015, 1, 100);
+        project.plotQuality = clamp((project.plotQuality ?? project.quality) + 0.94 + kernel.discipline * 0.42 + affinity * 0.32, 1, 100);
+        project.visualQuality = clamp((project.visualQuality ?? project.quality) + 0.72 + (npc.reputation / 210) + liveAudienceDemand * 0.01, 1, 100);
+        project.competitiveness = clamp((project.competitiveness ?? 34) + 0.58 + kernel.riskBudget * 0.34, 1, 100);
         project.popularity = clamp(project.popularity + 0.85 + (npc.reputation / 190) + kernel.riskBudget * 0.5 + affinity * 0.55 + liveAudienceDemand * 0.03, 1, 100);
         if (project.chapters >= 10) {
           project.stage = 'studio-interest';
@@ -734,12 +769,25 @@ export function createAnimeIndustryRuntime() {
         project.launched = true;
         const studio = studioById.get(project.studioId);
         const affinity = computeGenreAudienceAffinity(project.genre, project.targetAudience, npc);
-        const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2) + kernel.discipline * 3.2 + affinity * 3.4);
+        const releaseScore = Math.max(52, project.quality * 0.24 + (project.plotQuality ?? project.quality) * 0.31 + (project.visualQuality ?? project.quality) * 0.29 + (project.competitiveness ?? 30) * 0.16 + project.popularity * 0.33 + ((studio?.craft ?? 60) * 0.2) + kernel.discipline * 3.2 + affinity * 3.4);
+        const uniqueness = clamp((project.competitiveness ?? 30) + affinity * 20, 5, 100);
+        const imdbScore = computeAudienceImdbSignal({
+          visualQuality: project.visualQuality ?? project.quality,
+          plotQuality: project.plotQuality ?? project.quality,
+          competitiveness: project.competitiveness ?? 30,
+          trend: state.market.trend,
+          uniqueness,
+          mediumBoost: 0.08,
+        });
+        project.imdbScore = imdbScore;
+        project.ratingsCount = Math.round(4_000 + releaseScore * 120);
         state.releases.push({
           id: project.id,
           title: project.title,
           medium: 'manga-npc',
           score: releaseScore,
+          imdb: imdbScore,
+          ratings: project.ratingsCount,
           revenue: Math.round(1_600_000 + releaseScore * 55_000),
           studio: studio?.name ?? 'Unknown Studio',
           day: state.day,
@@ -873,6 +921,8 @@ export function createAnimeIndustryRuntime() {
           const studio = state.studios.find((entry) => entry.id === project.studioId);
           const speed = (studio?.speed ?? 50) / 100;
           project.productionProgress = Math.min(100, project.productionProgress + 1.5 + speed * 2.8);
+          project.visualQuality = Math.min(100, (project.visualQuality ?? project.scriptQuality) + 0.24 + (studio?.craft ?? 50) * 0.004);
+          project.competitiveness = Math.min(100, (project.competitiveness ?? 35) + 0.08 + (studio?.network ?? 50) * 0.0015);
           project.delayRisk = Math.max(0.03, project.delayRisk - 0.002 + (state.market.audienceFatigue - 0.2) * 0.001);
           if (project.productionProgress >= 100 && project.stage === 'production') {
             project.stage = 'postproduction';
@@ -917,6 +967,9 @@ export function createAnimeIndustryRuntime() {
       project.theme = theme;
       project.targetAudience = targetAudience;
       project.scriptQuality = clamp(project.scriptQuality + realismBoost + (medium === 'movie' ? 4 : medium === 'anime' ? 3 : 2), 8, 45);
+      project.plotQuality = clamp(project.scriptQuality + (signature % 11) * 0.7 + (medium === 'novel' ? 4 : 2), 10, 64);
+      project.visualQuality = clamp((project.visualQuality ?? 18) + (signature % 9) * 0.8 + (medium === 'movie' ? 6 : medium === 'anime' ? 5 : medium === 'manga' ? 4 : 2), 14, 66);
+      project.competitiveness = clamp((project.competitiveness ?? 28) + (signature % 13) * 0.9 + state.reputation * 0.08, 18, 72);
       project.popularity = clamp(project.popularity + (signature % 9) + (targetAudience.length > 10 ? 2 : 0), 6, 40);
       project.chapters = medium === 'anime' ? 2 : medium === 'movie' ? 3 : 0;
       if (medium === 'anime' || medium === 'movie') project.stage = 'manga_serialization';
@@ -937,6 +990,8 @@ export function createAnimeIndustryRuntime() {
       project.chapters += 1;
       const qualityBoost = project.medium === 'novel' ? 2.2 : project.medium === 'movie' ? 1.6 : project.medium === 'anime' ? 1.7 : 1.8;
       project.scriptQuality = Math.min(100, project.scriptQuality + qualityBoost);
+      project.plotQuality = Math.min(100, (project.plotQuality ?? project.scriptQuality) + qualityBoost * 1.14);
+      project.competitiveness = Math.min(100, (project.competitiveness ?? 30) + 0.7 + (project.popularity / 250));
       project.popularity = Math.min(100, project.popularity + Math.max(1, 2.4 - state.market.audienceFatigue));
       state.cash -= project.medium === 'novel' ? 80_000 : project.medium === 'anime' ? 170_000 : project.medium === 'movie' ? 240_000 : 120_000;
       return true;
@@ -1053,13 +1108,28 @@ export function createAnimeIndustryRuntime() {
       const project = byId(state, projectId);
       if (!project || !['postproduction', 'release'].includes(project.stage)) return false;
       const studio = state.studios.find((entry) => entry.id === project.studioId);
-      const score = computeReleaseScore(project, studio, state.market);
+      const competitionPressure = computeCompetitivePressure(state, project.medium);
+      const score = computeReleaseScore(project, studio, state.market) - competitionPressure * 6.2;
       project.archived = true;
       const creatorRatio = project.contractDraft.creatorShare / 100;
       const revenue = Math.floor((2_800_000 + score * 92_000) * creatorRatio);
+      const uniqueness = clamp((project.competitiveness ?? 35) - competitionPressure * 24 + ((project.genre || '').length % 6) * 2.4, 5, 100);
+      const imdb = computeAudienceImdbSignal({
+        visualQuality: project.visualQuality ?? project.scriptQuality,
+        plotQuality: project.plotQuality ?? project.scriptQuality,
+        competitiveness: project.competitiveness ?? 35,
+        trend: state.market.trend,
+        uniqueness,
+        mediumBoost: project.medium === 'movie' ? 0.16 : 0.05,
+      });
+      const ratings = Math.max(850, Math.round(6_500 + score * 190 + (project.popularity || 0) * 65));
+      const previousImdb = Number(project.imdbScore) || 5.2;
+      const previousRatings = Number(project.ratingsCount) || 0;
+      project.ratingsCount = previousRatings + ratings;
+      project.imdbScore = clamp(((previousImdb * previousRatings) + (imdb * ratings)) / Math.max(1, project.ratingsCount), 1, 9.9);
       state.cash += revenue;
       state.reputation = Math.min(100, state.reputation + (score >= 88 ? 8 : score >= 65 ? 5 : 2));
-      state.releases.push({ id: project.id, title: project.title, medium: project.medium, score, revenue, studio: studio?.name ?? 'Unknown Studio', day: state.day });
+      state.releases.push({ id: project.id, title: project.title, medium: project.medium, score, imdb: project.imdbScore, ratings: project.ratingsCount, revenue, studio: studio?.name ?? 'Unknown Studio', day: state.day });
       return true;
     });
   }
@@ -1091,10 +1161,10 @@ export function createAnimeIndustryRuntime() {
           sp: !!state.player.studioPlanningOpen,
         },
         s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0, fd: entry.funds ?? 0 })),
-        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience })),
+        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, vq: entry.visualQuality, pq: entry.plotQuality, cp: entry.competitiveness, im: entry.imdbScore, rc: entry.ratingsCount, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience })),
         iv: state.studioInvestments.slice(-500).map((entry) => ({ id: entry.id, iid: entry.investorId, sid: entry.studioId, am: entry.amount, d: entry.day })),
         fl: state.studioFinanceLedger.slice(-600).map((entry) => ({ d: entry.day, sid: entry.studioId, i: entry.income, e: entry.expense, n: entry.net, f: entry.funds })),
-        rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, rv: entry.revenue, st: entry.studio, d: entry.day })),
+        rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, im: entry.imdb, rt: entry.ratings, rv: entry.revenue, st: entry.studio, d: entry.day })),
         em: state.emails.slice(-40).map((entry) => ({ id: entry.id, s: entry.subject, b: entry.body, r: entry.read, t: entry.type, d: entry.day })),
       };
       return `AI26:${JSON.stringify(compact)}`;
@@ -1131,6 +1201,8 @@ export function createAnimeIndustryRuntime() {
       })) : fresh.studios;
       fresh.projects = Array.isArray(data.pj) ? data.pj.map((entry) => ({
         id: entry.id, title: entry.t, medium: entry.m, stage: entry.st, popularity: Number(entry.p) || 0, scriptQuality: Number(entry.q) || 0,
+        visualQuality: Number(entry.vq) || Number(entry.q) || 0, plotQuality: Number(entry.pq) || Number(entry.q) || 0, competitiveness: Number(entry.cp) || 30,
+        imdbScore: Number(entry.im) || 5.2, ratingsCount: Number(entry.rc) || 0,
         chapters: Number(entry.ch) || 0, studioId: entry.sid ?? null, interestedStudioIds: Array.isArray(entry.ints) ? entry.ints : [],
         committeeIds: Array.isArray(entry.cm) ? entry.cm : [], committeeNegotiationLog: [], contractDraft: entry.cd ?? { creatorShare: 38, studioShare: 42, investorShare: 20 },
         committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0,
@@ -1151,7 +1223,7 @@ export function createAnimeIndustryRuntime() {
         net: Number(entry.n) || 0,
         funds: Number(entry.f) || 0,
       })) : [];
-      fresh.releases = Array.isArray(data.rl) ? data.rl.map((entry) => ({ id: entry.id, title: entry.t, score: Number(entry.s) || 0, revenue: Number(entry.rv) || 0, studio: entry.st ?? 'Unknown', day: Number(entry.d) || 0, medium: 'manga' })) : [];
+      fresh.releases = Array.isArray(data.rl) ? data.rl.map((entry) => ({ id: entry.id, title: entry.t, score: Number(entry.s) || 0, imdb: Number(entry.im) || 0, ratings: Number(entry.rt) || 0, revenue: Number(entry.rv) || 0, studio: entry.st ?? 'Unknown', day: Number(entry.d) || 0, medium: 'manga' })) : [];
       fresh.emails = Array.isArray(data.em) ? data.em.map((entry) => ({ id: entry.id, subject: entry.s, body: entry.b, read: !!entry.r, type: entry.t ?? 'system', day: Number(entry.d) || 0 })) : [];
       fresh.feed = [`Day ${fresh.day}: Save berhasil di-load.`];
       fresh.usedNames = new Set([...fresh.studios.map((s) => s.name), ...fresh.projects.map((p) => p.title), ...fresh.npcs.map((n) => n.name)]);
@@ -1209,17 +1281,29 @@ export function createAnimeIndustryRuntime() {
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
-        score: entry.scriptQuality * 0.6 + entry.popularity * 0.4 + entry.chapters,
+        score: (entry.plotQuality ?? entry.scriptQuality) * 0.34 + (entry.visualQuality ?? entry.scriptQuality) * 0.28 + (entry.scriptQuality * 0.2) + (entry.competitiveness ?? 30) * 0.18 + entry.popularity * 0.22 + entry.chapters,
         popularity: clamp(entry.popularity, 0, 100),
-        imdb: clamp(5 + ((entry.scriptQuality * 0.62 + entry.popularity * 0.38) / 100) * 4.7, 1, 9.9),
+        imdb: clamp(entry.imdbScore || computeAudienceImdbSignal({
+          visualQuality: entry.visualQuality ?? entry.scriptQuality,
+          plotQuality: entry.plotQuality ?? entry.scriptQuality,
+          competitiveness: entry.competitiveness ?? 30,
+          trend: state.market.trend,
+          uniqueness: (entry.competitiveness ?? 30) * 0.92,
+        }), 1, 9.9),
         volume: entry.chapters,
         format: entry.medium === 'novel' ? 'Novel' : 'Manga',
       })),
       ...state.npcProjects.filter((entry) => !entry.launched).map((entry) => ({
         title: entry.title,
-        score: entry.quality * 0.62 + entry.popularity * 0.38 + entry.chapters,
+        score: entry.quality * 0.22 + (entry.plotQuality ?? entry.quality) * 0.33 + (entry.visualQuality ?? entry.quality) * 0.28 + (entry.competitiveness ?? 30) * 0.17 + entry.popularity * 0.2 + entry.chapters,
         popularity: clamp(entry.popularity, 0, 100),
-        imdb: clamp(5 + ((entry.quality * 0.58 + entry.popularity * 0.42) / 100) * 4.7, 1, 9.9),
+        imdb: clamp(entry.imdbScore || computeAudienceImdbSignal({
+          visualQuality: entry.visualQuality ?? entry.quality,
+          plotQuality: entry.plotQuality ?? entry.quality,
+          competitiveness: entry.competitiveness ?? 30,
+          trend: state.market.trend,
+          uniqueness: (entry.competitiveness ?? 30) * 0.95,
+        }), 1, 9.9),
         volume: entry.chapters,
         format: 'Manga',
       })),
@@ -1237,7 +1321,7 @@ export function createAnimeIndustryRuntime() {
         title: entry.title,
         score: entry.score,
         popularity: clamp(entry.score * 0.93, 0, 100),
-        imdb: clamp(5 + (entry.score / 100) * 4.8, 1, 9.9),
+        imdb: clamp(Number(entry.imdb) || (5 + (entry.score / 100) * 4.8), 1, 9.9),
         series: `Series ${releaseCountByTitle.get(entry.title) ?? 1}`,
         format: String(entry.title || '').toLowerCase().includes('movie') ? 'Movie' : 'Anime',
       }))
