@@ -48,6 +48,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullSettings: root.querySelector('#frameFullSettings'),
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
+    subProjectCreate: root.querySelector('#frameSubProjectCreate'),
   };
 
   const statsEl = root.querySelector('#industryStats');
@@ -64,6 +65,8 @@ export function createIndustryUiController({ root, handlers }) {
   const topDateEl = root.querySelector('#topDate');
   const subTitleEl = root.querySelector('#subProjectTitle');
   const subBodyEl = root.querySelector('#subProjectBody');
+  const subProjectCreateTitleEl = root.querySelector('#subProjectCreateTitle');
+  const subProjectCreateBodyEl = root.querySelector('#subProjectCreateBody');
   const studioNameInput = root.querySelector('#studioNameInput');
   const savePayloadInput = root.querySelector('#savePayloadInput');
   const registerSaveInput = root.querySelector('#registerSaveInput');
@@ -73,6 +76,8 @@ export function createIndustryUiController({ root, handlers }) {
   let selectedOwnership = 'personal';
   let selectedRanking = 'studio';
   let popupTimer = null;
+  let selectedCreateMedium = null;
+  let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
 
   function showPopup(message, tone = 'error') {
     let popup = root.querySelector('#industryInlinePopup');
@@ -108,7 +113,6 @@ export function createIndustryUiController({ root, handlers }) {
 
   root.querySelector('[data-action="tick-1"]').addEventListener('click', () => handlers.onTick(1));
   root.querySelector('[data-action="tick-7"]').addEventListener('click', () => handlers.onTick(7));
-  root.querySelector('[data-action="brainstorm"]').addEventListener('click', handlers.onBrainstorm);
   root.querySelector('[data-action="toggle-auto"]').addEventListener('click', handlers.onAutoToggle);
 
   root.querySelector('[data-action="to-full-profile"]').addEventListener('click', () => openFrame('fullProfile'));
@@ -122,6 +126,12 @@ export function createIndustryUiController({ root, handlers }) {
   document.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
+  root.querySelector('[data-action="cancel-create-project"]')?.addEventListener('click', () => {
+    selectedCreateMedium = null;
+    pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
+    renderProjectCreateSubframe();
+    openFrame('fullProjects');
+  });
 
   root.querySelector('[data-action="seek-funding"]')?.addEventListener('click', () => {
     const ok = handlers.onSeekFunding();
@@ -217,6 +227,53 @@ export function createIndustryUiController({ root, handlers }) {
       return;
     }
     const action = target.getAttribute('data-action');
+    if (action === 'open-create-project') {
+      selectedCreateMedium = null;
+      pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
+      renderProjectCreateSubframe();
+      openFrame('subProjectCreate');
+      return;
+    }
+    if (action === 'select-create-medium') {
+      selectedCreateMedium = target.getAttribute('data-medium');
+      renderProjectCreateSubframe();
+      return;
+    }
+    if (action === 'cancel-create-project-inline') {
+      selectedCreateMedium = null;
+      pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
+      renderProjectCreateSubframe();
+      openFrame('fullProjects');
+      return;
+    }
+    if (action === 'confirm-create-project') {
+      if (!selectedCreateMedium) {
+        showPopup('Pilih jenis project terlebih dahulu.', 'error');
+        return;
+      }
+      const projectTitle = root.querySelector('#createProjectTitleInput')?.value?.trim() || '';
+      const projectGenre = root.querySelector('#createProjectGenreInput')?.value?.trim() || '';
+      const projectTheme = root.querySelector('#createProjectThemeInput')?.value?.trim() || '';
+      const projectAudience = root.querySelector('#createProjectAudienceInput')?.value?.trim() || '';
+      pendingCreateDraft = { title: projectTitle, genre: projectGenre, theme: projectTheme, targetAudience: projectAudience };
+      const ok = handlers.onCreateProject?.({
+        medium: selectedCreateMedium,
+        title: projectTitle,
+        genre: projectGenre,
+        theme: projectTheme,
+        targetAudience: projectAudience,
+      });
+      if (!ok) {
+        showPopup('Gagal membuat project. Pastikan semua field terisi, judul unik, dan dana cukup.', 'error');
+        return;
+      }
+      showPopup('Project baru berhasil ditambahkan ke pipeline.', 'success');
+      selectedCreateMedium = null;
+      pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
+      renderProjectCreateSubframe();
+      openFrame('fullProjects');
+      return;
+    }
     const card = target.closest('[data-project-id]');
     if (!(card instanceof HTMLElement)) return;
     const projectId = card.getAttribute('data-project-id');
@@ -294,6 +351,7 @@ export function createIndustryUiController({ root, handlers }) {
       `;
 
       renderProjectsBoard(snapshot);
+      renderProjectCreateSubframe();
 
       studiosEl.innerHTML = snapshot.studios.map((studio) => `
         <article class="industry-project">
@@ -375,6 +433,7 @@ export function createIndustryUiController({ root, handlers }) {
           subTitleEl.textContent = project.title;
           subBodyEl.innerHTML = `
             <p>Medium: ${esc(project.medium)}</p>
+            <p>Genre: ${esc(project.genre || '-')} · Theme: ${esc(project.theme || '-')} · Audience: ${esc(project.targetAudience || '-')}</p>
             <p>Stage: ${esc(project.stage)}</p>
             <p>Popularity: ${project.popularity.toFixed(1)}</p>
             <p>Script Quality: ${project.scriptQuality.toFixed(1)}</p>
@@ -415,7 +474,7 @@ export function createIndustryUiController({ root, handlers }) {
     const scopedProjects = snapshot.projects.filter((project) => (selectedOwnership === 'studio' ? isStudioOwned(project) : !isStudioOwned(project)));
 
     const mangaNovelProjects = scopedProjects.filter((project) => ['manga', 'novel'].includes(project.medium));
-    const animeProjects = scopedProjects.filter((project) => project.chapters >= 2 || !['ideation'].includes(project.stage));
+    const animeProjects = scopedProjects.filter((project) => ['anime', 'movie'].includes(project.medium) || project.chapters >= 2 || !['ideation'].includes(project.stage));
 
     const mangaNovelCards = mangaNovelProjects.map((project) => {
       const complexity = Math.min(100, Math.round(project.scriptQuality * 0.52 + project.chapters * 2.3 + project.popularity * 0.36));
@@ -425,6 +484,7 @@ export function createIndustryUiController({ root, handlers }) {
         <article class="industry-project industry-project-rich" data-project-id="${esc(project.id)}">
           <h3>${esc(project.title)}</h3>
           <p>${esc(project.medium)} · stage: ${esc(project.stage)} · chapter: ${project.chapters}</p>
+          <p>Genre: ${esc(project.genre || '-')} · Theme: ${esc(project.theme || '-')} · Audience: ${esc(project.targetAudience || '-')}</p>
           <div class="industry-progress">
             <small>Complexity ${complexity}%</small>
             <progress max="100" value="${complexity}"></progress>
@@ -453,7 +513,8 @@ export function createIndustryUiController({ root, handlers }) {
       return `
         <article class="industry-project industry-project-rich" data-project-id="${esc(project.id)}">
           <h3>${esc(project.title)}</h3>
-          <p>Anime Track · ${handoffReady ? `handoff ke studio: ${esc(studioLabel)}` : 'masih personal (scripts/naskah/gambaran)'}</p>
+          <p>${esc(project.medium === 'movie' ? 'Movie Track' : 'Anime Track')} · ${handoffReady ? `handoff ke studio: ${esc(studioLabel)}` : 'masih personal (scripts/naskah/gambaran)'}</p>
+          <p>Genre: ${esc(project.genre || '-')} · Theme: ${esc(project.theme || '-')} · Audience: ${esc(project.targetAudience || '-')}</p>
           <div class="industry-progress">
             <small>Script/Naskah Readiness ${scriptReadiness}%</small>
             <progress max="100" value="${scriptReadiness}"></progress>
@@ -476,6 +537,9 @@ export function createIndustryUiController({ root, handlers }) {
         <button type="button" data-ownership-switch="personal" ${selectedOwnership === 'personal' ? 'data-active="true"' : ''}>Personal</button>
         <button type="button" data-ownership-switch="studio" ${selectedOwnership === 'studio' ? 'data-active="true"' : ''}>Studio</button>
       </section>
+      <div class="industry-toolbar">
+        <button type="button" data-action="open-create-project">Create a new project</button>
+      </div>
       <details class="industry-expandable" open>
         <summary>Manga/Novel (${mangaNovelProjects.length})</summary>
         <div class="industry-expandable-body">${mangaNovelCards || empty}</div>
@@ -484,6 +548,39 @@ export function createIndustryUiController({ root, handlers }) {
         <summary>Anime (${animeProjects.length})</summary>
         <div class="industry-expandable-body">${animeCards || empty}</div>
       </details>
+    `;
+  }
+
+  function renderProjectCreateSubframe() {
+    if (!subProjectCreateBodyEl) return;
+    if (!selectedCreateMedium) {
+      if (subProjectCreateTitleEl) subProjectCreateTitleEl.textContent = 'Create New Project';
+      subProjectCreateBodyEl.innerHTML = `
+        <p>Pilih jenis project yang ingin dibuat:</p>
+        <div class="industry-toolbar">
+          <button type="button" data-action="select-create-medium" data-medium="manga">Manga</button>
+          <button type="button" data-action="select-create-medium" data-medium="novel">Novel</button>
+          <button type="button" data-action="select-create-medium" data-medium="anime">Anime</button>
+          <button type="button" data-action="select-create-medium" data-medium="movie">Movie</button>
+        </div>
+      `;
+      return;
+    }
+    const mediumLabel = selectedCreateMedium[0].toUpperCase() + selectedCreateMedium.slice(1);
+    if (subProjectCreateTitleEl) subProjectCreateTitleEl.textContent = `${mediumLabel} Development Brief`;
+    subProjectCreateBodyEl.innerHTML = `
+      <label>Nama karya</label>
+      <input id="createProjectTitleInput" type="text" maxlength="80" placeholder="Masukkan judul karya" value="${esc(pendingCreateDraft.title)}" />
+      <label>Genre</label>
+      <input id="createProjectGenreInput" type="text" maxlength="64" placeholder="Contoh: Action Fantasy" value="${esc(pendingCreateDraft.genre)}" />
+      <label>Tema</label>
+      <input id="createProjectThemeInput" type="text" maxlength="72" placeholder="Contoh: Ambisi, persahabatan, moralitas" value="${esc(pendingCreateDraft.theme)}" />
+      <label>Target audience</label>
+      <input id="createProjectAudienceInput" type="text" maxlength="64" placeholder="Contoh: Teens & Young Adults" value="${esc(pendingCreateDraft.targetAudience)}" />
+      <div class="industry-toolbar">
+        <button type="button" data-action="confirm-create-project">Confirm</button>
+        <button type="button" data-action="cancel-create-project-inline">Cancel</button>
+      </div>
     `;
   }
 

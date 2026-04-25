@@ -145,6 +145,14 @@ function createNpcAgents(studios, usedNames) {
 }
 
 function createProject(id, medium, title) {
+  const tunedBudgetNeed = medium === 'novel'
+    ? 9_500_000
+    : medium === 'anime'
+      ? 26_000_000
+      : medium === 'movie'
+        ? 44_000_000
+        : 12_000_000;
+  const tunedDelayRisk = medium === 'movie' ? 0.32 : medium === 'anime' ? 0.24 : 0.18;
   return {
     id,
     title,
@@ -159,12 +167,25 @@ function createProject(id, medium, title) {
     committeeNegotiationLog: [],
     contractDraft: { creatorShare: 38, studioShare: 42, investorShare: 20 },
     committeeApproved: false,
-    budgetNeed: medium === 'novel' ? 9_500_000 : 12_000_000,
+    budgetNeed: tunedBudgetNeed,
     securedBudget: 0,
     productionProgress: 0,
-    delayRisk: 0.18,
+    delayRisk: tunedDelayRisk,
     archived: false,
+    genre: '',
+    theme: '',
+    targetAudience: '',
   };
+}
+
+function createMetadataSignature({ title, genre, theme, targetAudience }) {
+  const src = `${title}|${genre}|${theme}|${targetAudience}`;
+  let hash = 2166136261;
+  for (let i = 0; i < src.length; i += 1) {
+    hash ^= src.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return Math.abs(hash >>> 0);
 }
 
 function createUniquePlayerProjectTitle(state, medium) {
@@ -620,6 +641,42 @@ export function createAnimeIndustryRuntime() {
     });
   }
 
+  function createProjectFromDraft(draft) {
+    return withAction('create-project-from-draft', () => {
+      if (!state.registered) return false;
+      const mediumInput = String(draft?.medium || '').trim().toLowerCase();
+      const medium = ['manga', 'novel', 'anime', 'movie'].includes(mediumInput) ? mediumInput : null;
+      const title = String(draft?.title || '').trim();
+      const genre = String(draft?.genre || '').trim();
+      const theme = String(draft?.theme || '').trim();
+      const targetAudience = String(draft?.targetAudience || '').trim();
+      if (!medium || !title || !genre || !theme || !targetAudience) return false;
+      if (state.usedNames.has(title)) return false;
+
+      const conceptCost = medium === 'novel' ? 160_000 : medium === 'manga' ? 260_000 : medium === 'anime' ? 680_000 : 1_050_000;
+      if (state.cash < conceptCost) return false;
+
+      const project = createProject(`ip-${(Math.random() * 1e9).toFixed(0)}`, medium, title);
+      const signature = createMetadataSignature({ title, genre, theme, targetAudience });
+      const realismBoost = ((signature % 17) + state.reputation * 0.06 + state.player.adminScore * 0.1) * 0.35;
+      project.genre = genre;
+      project.theme = theme;
+      project.targetAudience = targetAudience;
+      project.scriptQuality = clamp(project.scriptQuality + realismBoost + (medium === 'movie' ? 4 : medium === 'anime' ? 3 : 2), 8, 45);
+      project.popularity = clamp(project.popularity + (signature % 9) + (targetAudience.length > 10 ? 2 : 0), 6, 40);
+      project.chapters = medium === 'anime' ? 2 : medium === 'movie' ? 3 : 0;
+      if (medium === 'anime' || medium === 'movie') {
+        project.stage = 'manga_serialization';
+      }
+
+      state.projects.push(project);
+      state.usedNames.add(title);
+      state.cash -= conceptCost;
+      log(state, `${title} (${medium}) resmi masuk pipeline. Genre: ${genre}; Tema: ${theme}; Audience: ${targetAudience}.`);
+      return true;
+    });
+  }
+
   function serializeChapter(projectId) {
     return withAction('serialize-chapter', () => {
       const project = byId(state, projectId);
@@ -779,7 +836,7 @@ export function createAnimeIndustryRuntime() {
           sp: !!state.player.studioPlanningOpen,
         },
         s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0 })),
-        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived })),
+        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience })),
         rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, rv: entry.revenue, st: entry.studio, d: entry.day })),
         em: state.emails.slice(-40).map((entry) => ({ id: entry.id, s: entry.subject, b: entry.body, r: entry.read, t: entry.type, d: entry.day })),
       };
@@ -820,7 +877,7 @@ export function createAnimeIndustryRuntime() {
         chapters: Number(entry.ch) || 0, studioId: entry.sid ?? null, interestedStudioIds: Array.isArray(entry.ints) ? entry.ints : [],
         committeeIds: Array.isArray(entry.cm) ? entry.cm : [], committeeNegotiationLog: [], contractDraft: entry.cd ?? { creatorShare: 38, studioShare: 42, investorShare: 20 },
         committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0,
-        delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar,
+        delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar, genre: entry.g ?? '', theme: entry.th ?? '', targetAudience: entry.ta ?? '',
       })) : [];
       fresh.releases = Array.isArray(data.rl) ? data.rl.map((entry) => ({ id: entry.id, title: entry.t, score: Number(entry.s) || 0, revenue: Number(entry.rv) || 0, studio: entry.st ?? 'Unknown', day: Number(entry.d) || 0, medium: 'manga' })) : [];
       fresh.emails = Array.isArray(data.em) ? data.em.map((entry) => ({ id: entry.id, subject: entry.s, body: entry.b, read: !!entry.r, type: entry.t ?? 'system', day: Number(entry.d) || 0 })) : [];
@@ -1075,6 +1132,7 @@ export function createAnimeIndustryRuntime() {
     },
     toggleAuto,
     brainstormProject,
+    createProjectFromDraft,
     serializeChapter,
     pitchToStudio,
     formCommittee,

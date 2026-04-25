@@ -37,7 +37,7 @@ if (!appRoot) {
         if (ok) ui.openMain();
       },
       onTick: (days) => { runtime.tick(days); renderAndPersist(); },
-      onBrainstorm: () => { runtime.brainstormProject(); renderAndPersist(); },
+      onCreateProject: (draft) => { const ok = runtime.createProjectFromDraft(draft); renderAndPersist(); return ok; },
       onAutoToggle: () => {
         const active = runtime.toggleAuto((snapshot) => {
           ui.render(snapshot);
