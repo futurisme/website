@@ -1,0 +1,42 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--fwlb-font-family, system-ui, sans-serif);
+  color: var(--fwlb-text-strong, #e2f8ff);
+  background:
+    radial-gradient(circle at 15% 20%, rgb(124 58 237 / 0.25), transparent 36%),
+    radial-gradient(circle at 80% 0%, rgb(34 211 238 / 0.2), transparent 32%),
+    var(--fwlb-surface-sunken, #020617);
+}
+.mindmap-shell { width: min(980px, 100% - 2rem); margin: 1.5rem auto; display: grid; gap: 1rem; }
+.panel {
+  background: color-mix(in oklab, var(--fwlb-surface-elevated, #0f172a) 94%, transparent);
+  border: 1px solid var(--fwlb-border-soft, rgb(148 163 184 / 0.3));
+  border-radius: var(--fwlb-radius-panel, 1.25rem);
+  padding: 1rem;
+  box-shadow: var(--fwlb-shadow-panel, 0 30px 80px rgb(15 23 42 / 0.4));
+}
+.eyebrow { margin: 0; text-transform: uppercase; letter-spacing: .14em; color: var(--fwlb-text-accent); font-size: .75rem; }
+h1 { margin: .45rem 0; font-size: clamp(1.7rem, 7vw, 2.4rem); }
+.copy { margin: 0; color: color-mix(in oklab, var(--fwlb-text-soft, #dbeafe) 92%, transparent); line-height: 1.45; }
+.launch-grid { display: grid; gap: .8rem; margin-top: .65rem; }
+.input-row { display: grid; gap: .35rem; }
+.row-wrap { display: flex; gap: .55rem; flex-wrap: wrap; }
+.input {
+  flex: 1 1 180px; min-height: 2.7rem; border-radius: var(--fwlb-radius-control, .875rem);
+  border: 1px solid var(--fwlb-control-border, rgba(56,189,248,.24));
+  background: var(--fwlb-control-bg, rgba(8,13,31,.94)); color: var(--fwlb-control-text, #e2f8ff);
+  padding: .65rem .8rem;
+}
+.btn {
+  min-height: 2.7rem; border: 1px solid var(--fwlb-tone-brand-border); border-radius: var(--fwlb-radius-control, .875rem);
+  background: var(--fwlb-tone-brand-bg); color: var(--fwlb-tone-brand-fg, #04111f); font-weight: 700;
+  padding: .65rem .92rem; cursor: pointer;
+}
+.shortcut-grid { margin-top: .7rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip {
+  text-decoration: none; color: inherit; border: 1px solid var(--fwlb-border-strong); border-radius: var(--fwlb-radius-pill, 999px);
+  background: color-mix(in oklab, var(--fwlb-surface-base, #1e293b) 92%, transparent); padding: .35rem .78rem;
+}

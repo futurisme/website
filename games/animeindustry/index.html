@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AnimeIndustry</title>
+    <link rel="canonical" href="https://fadhil.dev/games/animeindustry" />
+    <meta name="description" content="Simulasi bisnis anime Jepang: register karier, bangun IP, produksi, dan rilis." />
+    <link rel="stylesheet" href="/library/fadhilweblib/styles/theme.css" />
+    <link rel="stylesheet" href="/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.css" />
+  </head>
+  <body data-fwlb-theme="utility">
+    <main id="animeIndustryApp" class="industry-shell">
+      <section id="frameRegister" class="frame frame-active">
+        <article class="industry-panel">
+          <h1>AnimeIndustry</h1>
+          <p>Register dulu untuk mulai simulasi.</p>
+          <label>Nama</label>
+          <input id="registerName" type="text" placeholder="Masukkan nama" />
+          <label>Profesi awal</label>
+          <select id="registerProfession">
+            <option>Mangaka</option>
+            <option>Novelis</option>
+            <option>Animator</option>
+          </select>
+          <label>Load Save Cepat (AI26)</label>
+          <textarea id="registerSaveInput" rows="4" placeholder="Tempel save AI26 di sini untuk langsung load dari awal"></textarea>
+          <button data-action="load-save-register">Load Save dari Register</button>
+          <button data-action="register">Mulai Simulasi</button>
+        </article>
+      </section>
+
+      <section id="frameMain" class="frame">
+        <article class="industry-panel">
+          <div class="topline">
+            <h1>Mainframe</h1>
+            <small id="topDate"></small>
+          </div>
+          <div id="industryStats" class="industry-stats"></div>
+          <div class="industry-toolbar">
+            <button data-action="tick-1">+1 Day</button>
+            <button data-action="tick-7">+7 Day</button>
+            <button data-action="brainstorm">Brainstorm IP</button>
+            <button data-action="toggle-auto">Auto</button>
+            <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
+            <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
+            <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Dirikan Studio</button>
+            <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
+            <button data-action="to-full-studios" data-frame-target="fullStudios">Studios</button>
+            <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
+            <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
+            <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
+          </div>
+        </article>
+      </section>
+
+
+      <section id="frameFullProfile" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Profile Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="industryProfile" class="industry-stats"></div>
+        </article>
+      </section>
+
+      <section id="frameFullProjects" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Projects Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="industryProjects" class="industry-projects"></div>
+        </article>
+      </section>
+
+      <section id="frameFullFoundStudio" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Pendirian Studio</h2><button data-action="back-main">↩</button></div>
+          <div id="ceoStatus"></div>
+          <div class="industry-toolbar">
+            <button data-action="open-studio-planning">Buka Perencanaan Studio</button>
+            <button data-action="seek-funding">Cari Pendanaan</button>
+          </div>
+          <label>Nama Studio Baru</label>
+          <input id="studioNameInput" type="text" placeholder="Contoh: Aurora Frame Studio" />
+          <button data-action="found-studio">Dirikan Studio</button>
+        </article>
+      </section>
+
+      <section id="frameFullRanking" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Ranking Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="rankingBoard" class="industry-projects"></div>
+        </article>
+      </section>
+
+      <section id="frameFullFeed" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Feed Fullframe</h2><button data-action="back-main">↩</button></div>
+          <ul id="industryFeed" class="industry-feed"></ul>
+          <h3>Releases</h3>
+          <ul id="industryReleases" class="industry-releases"></ul>
+        </article>
+      </section>
+
+
+      <section id="frameFullStudios" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Studios Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="industryStudios" class="industry-projects"></div>
+        </article>
+      </section>
+
+      <section id="frameFullEmail" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Email Inbox (Unread)</h2><button data-action="back-main">↩</button></div>
+          <div id="industryInbox" class="industry-projects"></div>
+        </article>
+      </section>
+
+      <section id="frameFullCommittee" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Production Committee</h2><button data-action="back-projects">↩</button></div>
+          <div id="committeeBody"></div>
+          <div class="industry-toolbar">
+            <button data-action="committee-discuss">Diskusi AI NPC</button>
+            <button data-action="committee-confirm">Bentuk Komite</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullManagement" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Management Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div id="managementBoard"></div>
+          <div class="industry-toolbar">
+            <button data-action="management-merger">Proposal Merger Studio</button>
+            <button data-action="management-cofund">Co-Funding Studio Baru</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameSubProject" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2 id="subProjectTitle">Project</h2><button data-action="back-projects">↩</button></div>
+          <div id="subProjectBody"></div>
+        </article>
+      </section>
+
+      <section id="frameFullSettings" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Settings Save/Load</h2><button data-action="back-main">↩</button></div>
+          <p>Format save: teks ringkas yang bisa dibaca dan diedit manual.</p>
+          <textarea id="savePayloadInput" rows="8" placeholder="AI26:{...}"></textarea>
+          <div class="industry-toolbar">
+            <button data-action="export-save">Generate Save</button>
+            <button data-action="download-save">Download Save</button>
+            <button data-action="load-save">Load Save</button>
+          </div>
+        </article>
+      </section>
+    </main>
+    <button id="settingsDockButton" data-action="to-full-settings" class="settings-dock-btn">Settings</button>
+
+    <script type="module" src="/games/animeindustry/app.js"></script>
+  </body>
+</html>

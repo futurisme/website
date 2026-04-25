@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books</title>
+    <link rel="canonical" href="https://fadhil.dev/books" />
+    <meta name="description" content="Books reader berbasis canvas untuk membaca dan membalik halaman secara interaktif." />
+    <link rel="stylesheet" href="/books/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <h1 data-slot="book-title">Books</h1>
+        <a class="btn" href="/books/editor">Editor Buku</a>
+      </header>
+
+      <section class="bookstage" aria-label="Book viewer">
+        <p class="book-hint">Canvas flipbook: swipe-hold bisa dari tengah atau tepi. Kanan→kiri next, kiri→kanan previous.</p>
+        <div class="page-frame" data-slot="page-frame">
+          <canvas class="book-canvas" data-slot="book-canvas" aria-label="Canvas flipbook"></canvas>
+        </div>
+      </section>
+
+      <footer class="statusbar">
+        <p class="counter" data-slot="page-number">1 / 1</p>
+      </footer>
+    </main>
+
+    <script type="module">
+      import { createBooksApp } from '/books/lib/fadhilebooklib-browser.js';
+      const root = document.querySelector('.shell');
+      createBooksApp(root);
+    </script>
+  </body>
+</html>

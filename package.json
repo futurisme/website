@@ -1,13 +1,9 @@
 {
-  "name": "database-templates-web-monorepo",
+  "name": "futurisme-website-api",
   "private": true,
-  "scripts": {
-    "dev": "cd database && npm run dev",
-    "build": "cd database && npm run build",
-    "start": "cd database && npm run start",
-    "lint": "cd database && npm run lint"
-  },
-  "devDependencies": {
-    "next": "^14.2.35"
+  "version": "1.0.0",
+  "description": "Serverless API helpers for static website deployment",
+  "dependencies": {
+    "pg": "^8.16.0"
   }
 }

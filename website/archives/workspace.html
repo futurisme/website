@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Archive Workspace</title>
+    <link rel="stylesheet" href="/archives/archives.css" />
+  </head>
+  <body>
+    <main class="app" id="workspace-app">
+      <header class="hero card">
+        <div>
+          <a class="link" href="/archives">← Back to archives</a>
+          <h1 id="workspace-title">Archive Workspace</h1>
+          <p class="sub">Editor modern ringan dengan sistem save/load human-readable memakai ekstensi <strong>.fadhil</strong>.</p>
+        </div>
+        <div class="chip" id="layout-state">Style check: pending</div>
+      </header>
+
+      <section class="card">
+        <label for="archive-title">Archive title</label>
+        <input id="archive-title" type="text" maxlength="80" />
+
+        <label for="archive-notes">Archive notes</label>
+        <textarea id="archive-notes" rows="12" placeholder="Tulis isi arsip Anda di sini..."></textarea>
+
+        <div class="toolbar">
+          <button id="save-local" type="button">Save Local</button>
+          <button id="save-file" type="button">Export .fadhil</button>
+          <button id="load-file" type="button">Import .fadhil</button>
+          <button id="copy-file" type="button">Copy .fadhil</button>
+          <button id="load-container" type="button">Load from Container</button>
+          <input id="load-input" type="file" accept=".fadhil,.json" hidden />
+        </div>
+
+        <label for="fadhil-container">.fadhil container input</label>
+        <textarea id="fadhil-container" rows="10" placeholder="Konten .fadhil akan muncul di sini saat klik Copy .fadhil"></textarea>
+
+        <p id="status" class="hint"></p>
+      </section>
+    </main>
+
+    <script type="module" src="/archives/workspace.js"></script>
+  </body>
+</html>

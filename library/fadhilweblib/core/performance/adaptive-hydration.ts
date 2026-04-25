@@ -1,4 +1,4 @@
-export type AdaptiveHydrationTarget = {
+export type AdaptiveHydrationtarget = {
   selector: string;
   loader: () => Promise<unknown>;
 };
@@ -9,7 +9,7 @@ export type AdaptiveHydrationOptions = {
 };
 
 export function createAdaptiveHydrationEngine(
-  targets: AdaptiveHydrationTarget[],
+  targets: AdaptiveHydrationtarget[],
   options: AdaptiveHydrationOptions = {}
 ): () => void {
   if (typeof document === 'undefined' || typeof IntersectionObserver === 'undefined') {

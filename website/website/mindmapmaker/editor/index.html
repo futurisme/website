@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Mindmapmaker Workspace</title>
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #020617; color: #e2f8ff; }
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+    <link rel="preload" href="/mindmapmaker/theme.css" as="style" />
+    <link rel="preload" href="/mindmapmaker/editor/editor.css" as="style" />
+    <link rel="stylesheet" href="/mindmapmaker/theme.css" />
+    <link rel="stylesheet" href="/mindmapmaker/editor/editor.css" />
+  </head>
+  <body>
+    <main class="editor-shell" data-fwlb-theme="game" data-slot="theme-scope">
+      <section class="workspace panel">
+        <div class="help" id="status">Pan canvas: drag empty area. Select node: tap/click. Drag node: drag selected node.</div>
+        <div id="viewport" class="viewport" aria-label="Mindmap canvas">
+          <div id="workspace-boundary" class="workspace-boundary" aria-hidden="true"></div>
+          <svg id="edges" class="edges" aria-hidden="true"></svg>
+          <div id="nodes" class="nodes"></div>
+        </div>
+      </section>
+
+      <footer class="bottombar panel">
+        <div class="meta">
+          <button class="setting-chip" type="button" aria-label="Setting panel">Setting</button>
+          <p class="eyebrow">Map <strong id="map-id">--</strong></p>
+          <div class="presence-chip">
+            <span class="status-dot" id="sync-status-dot" data-online="false" aria-label="Offline" title="Offline"></span>
+            <strong>Database</strong>
+            <span class="presence-count">1 Active</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="add-node" class="btn tone-add" type="button">Add</button>
+          <button id="connect-node" class="btn tone-connect" type="button">Connect</button>
+          <button id="save-csv" class="btn tone-warning" type="button">Export .csv</button>
+          <button id="save-fdhl" class="btn tone-export" type="button">Export</button>
+          <button id="undo-node" class="btn secondary" type="button" disabled>Undo</button>
+          <button id="redo-node" class="btn secondary" type="button" disabled>Redo</button>
+          <button id="load-map" class="btn tone-import" type="button">Import</button>
+          <a class="btn tone-connect" href="/mindmapmaker">Menu</a>
+          <button id="remove-node" class="btn tone-delete" type="button">Delete</button>
+          <input id="load-input" type="file" accept=".csv,.fdhl,.fadhil,.fAdHiL,.cws" hidden />
+        </div>
+      </footer>
+    </main>
+
+    <script type="module" src="/mindmapmaker/editor/editor.js"></script>
+  </body>
+</html>

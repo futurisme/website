@@ -1,0 +1,1011 @@
+{
+  "summary": {
+    "base_url": "https://fadhil.dev",
+    "generated_at": "2026-04-21T11:50:18Z",
+    "paths_checked": 14,
+    "http_200_count": 14,
+    "redirect_count": 0,
+    "error_count": 0,
+    "missing_meta_description_count": 1,
+    "missing_canonical_count": 2,
+    "missing_h1_count": 1,
+    "non_https_final_count": 0,
+    "duplicate_groups": 65,
+    "safe_delete_candidate_groups": 0
+  },
+  "results": [
+    {
+      "path": "/",
+      "url": "https://fadhil.dev/",
+      "status": 200,
+      "final_url": "https://fadhil.dev/",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 467.1,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 4729,
+      "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 3,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/animeindustry",
+      "url": "https://fadhil.dev/animeindustry",
+      "status": 200,
+      "final_url": "https://fadhil.dev/animeindustry",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/animeindustry",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 384.5,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 7757,
+      "title": "AnimeIndustry",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/games/animeindustry",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 2
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/books",
+      "url": "https://fadhil.dev/books",
+      "status": 200,
+      "final_url": "https://fadhil.dev/books",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/books",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 281.1,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 1331,
+      "title": "Books",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/Books",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/books/editor",
+      "url": "https://fadhil.dev/books/editor",
+      "status": 200,
+      "final_url": "https://fadhil.dev/books/editor",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/books/editor",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 345.8,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 1321,
+      "title": "Books Editor",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/Books/Editor",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/games/animeindustry",
+      "url": "https://fadhil.dev/games/animeindustry",
+      "status": 200,
+      "final_url": "https://fadhil.dev/games/animeindustry",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/games/animeindustry",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 198.0,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 7757,
+      "title": "AnimeIndustry",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/games/animeindustry",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 2
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/games/dreambusiness",
+      "url": "https://fadhil.dev/games/dreambusiness",
+      "status": 200,
+      "final_url": "https://fadhil.dev/games/dreambusiness",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/games/dreambusiness",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 260.9,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 4903,
+      "title": "DreamBusiness",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/games/dreambusiness",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/games/rpg",
+      "url": "https://fadhil.dev/games/rpg",
+      "status": 200,
+      "final_url": "https://fadhil.dev/games/rpg",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/games/rpg",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 291.7,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 37627,
+      "title": "FadhiumRPG",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/games/rpg",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 3,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/home",
+      "url": "https://fadhil.dev/home",
+      "status": 200,
+      "final_url": "https://fadhil.dev/home",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/home",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 149.9,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 2450,
+      "title": "Home | Website Hub",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/home",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 0,
+        "stylesheet_links": 2
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/mindmapmaker",
+      "url": "https://fadhil.dev/mindmapmaker",
+      "status": 200,
+      "final_url": "https://fadhil.dev/mindmapmaker",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/mindmapmaker",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 150.1,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 2641,
+      "title": "Mindmapmaker Menu",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": false,
+        "canonical_href": "",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 2
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/mindmapmaker/editor/1",
+      "url": "https://fadhil.dev/mindmapmaker/editor/1",
+      "status": 200,
+      "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/mindmapmaker/editor/1",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 145.0,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 2832,
+      "title": "Mindmapmaker Workspace",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false,
+        "canonical_href": "",
+        "has_h1": false,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 2
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/portfolio",
+      "url": "https://fadhil.dev/portfolio",
+      "status": 200,
+      "final_url": "https://fadhil.dev/portfolio",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/portfolio",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 120.2,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 4729,
+      "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 3,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/rpg",
+      "url": "https://fadhil.dev/rpg",
+      "status": 200,
+      "final_url": "https://fadhil.dev/rpg",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/rpg",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 104.7,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 37627,
+      "title": "FadhiumRPG",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/games/rpg",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 3,
+        "stylesheet_links": 0
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/shareideas",
+      "url": "https://fadhil.dev/shareideas",
+      "status": 200,
+      "final_url": "https://fadhil.dev/shareideas",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/shareideas",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 283.2,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 6529,
+      "title": "ShareIdeas — Home",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/shareideas",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/shareideas/page/1",
+      "url": "https://fadhil.dev/shareideas/page/1",
+      "status": 200,
+      "final_url": "https://fadhil.dev/shareideas/page/1",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/shareideas/page/1",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 159.9,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 2993,
+      "title": "ShareIdeas",
+      "seo_basics": {
+        "meta_description": true,
+        "canonical": true,
+        "canonical_href": "https://fadhil.dev/shareideas/page/1",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    }
+  ],
+  "duplicate_analysis": [
+    {
+      "group_size": 2,
+      "group_total_bytes": 519876,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "assets/public/images/shareideas-2.webp",
+          "size_bytes": 259938,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 3,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "assets/public/images/shareideas-2.webp",
+          "size_bytes": 259938,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 3,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 4,
+      "group_total_bytes": 238528,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "assets/public/images/mindmapmaker.webp",
+          "size_bytes": 59632,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/portfolio/testing/images/mindmapmaker.webp",
+          "size_bytes": 59632,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/portfolio/testing/images/portfolio.webp",
+          "size_bytes": 59632,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/portfolio/testing/images/share-ideas.webp",
+          "size_bytes": 59632,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 2,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 3,
+      "group_total_bytes": 29067,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/styles/theme.css",
+          "size_bytes": 9689,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 15,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/home/theme.css",
+          "size_bytes": 9689,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 15,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/website/mindmapmaker/theme.css",
+          "size_bytes": 9689,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 15,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 12364,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/types/hooks.ts",
+          "size_bytes": 6182,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts",
+          "size_bytes": 6182,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 10924,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-dialog.ts",
+          "size_bytes": 5462,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts",
+          "size_bytes": 5462,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 9980,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/syntax/expression.ts",
+          "size_bytes": 4990,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts",
+          "size_bytes": 4990,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 9740,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/collapsible-panel.tsx",
+          "size_bytes": 4870,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx",
+          "size_bytes": 4870,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 9532,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/state-syntax.ts",
+          "size_bytes": 4766,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts",
+          "size_bytes": 4766,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 9166,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/overlay/drawer.tsx",
+          "size_bytes": 4583,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx",
+          "size_bytes": 4583,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 8828,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/overlay/dialog.tsx",
+          "size_bytes": 4414,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx",
+          "size_bytes": 4414,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 8142,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-roving-focus.ts",
+          "size_bytes": 4071,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts",
+          "size_bytes": 4071,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 7236,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/layout/section.tsx",
+          "size_bytes": 3618,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx",
+          "size_bytes": 3618,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 6900,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/button.tsx",
+          "size_bytes": 3450,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 8,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx",
+          "size_bytes": 3450,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 8,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 6406,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/navigation/tabs.tsx",
+          "size_bytes": 3203,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/tabs.tsx",
+          "size_bytes": 3203,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 6388,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/forms/field.tsx",
+          "size_bytes": 3194,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/field.tsx",
+          "size_bytes": 3194,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5970,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-tabs.ts",
+          "size_bytes": 2985,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-tabs.ts",
+          "size_bytes": 2985,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5828,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/recipe.ts",
+          "size_bytes": 2914,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/recipe.ts",
+          "size_bytes": 2914,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5662,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-disclosure.ts",
+          "size_bytes": 2831,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-disclosure.ts",
+          "size_bytes": 2831,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5488,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/presets/index.ts",
+          "size_bytes": 2744,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts",
+          "size_bytes": 2744,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5472,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/header-shell.tsx",
+          "size_bytes": 2736,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/header-shell.tsx",
+          "size_bytes": 2736,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5434,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/forms/switch.tsx",
+          "size_bytes": 2717,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/switch.tsx",
+          "size_bytes": 2717,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5012,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/forms/checkbox.tsx",
+          "size_bytes": 2506,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/checkbox.tsx",
+          "size_bytes": 2506,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4966,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/navigation/segmented-control.tsx",
+          "size_bytes": 2483,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/segmented-control.tsx",
+          "size_bytes": 2483,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4888,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/icon-button.tsx",
+          "size_bytes": 2444,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/icon-button.tsx",
+          "size_bytes": 2444,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4368,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/feedback/progress-bar.tsx",
+          "size_bytes": 2184,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/progress-bar.tsx",
+          "size_bytes": 2184,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    }
+  ]
+}

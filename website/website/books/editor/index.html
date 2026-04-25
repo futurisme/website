@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Books Editor</title>
+    <link rel="canonical" href="https://fadhil.dev/books/editor" />
+    <meta name="description" content="Books Editor untuk membuat dan mengelola konten halaman buku berbasis JSON." />
+    <link rel="stylesheet" href="/books/editor/styles.css" />
+  </head>
+  <body>
+    <main class="editor-shell">
+      <header>
+        <h1>Books Editor</h1>
+        <a class="btn" href="/books">Kembali ke books</a>
+      </header>
+
+      <section class="panel">
+        <label class="row">Judul Buku
+          <input id="book-title" type="text" />
+        </label>
+        <label class="row">Data Halaman (JSON)
+          <textarea id="book-pages" spellcheck="false"></textarea>
+        </label>
+        <p class="hint">Tips: viewer menampilkan rasio book container 16:9 dengan gesture hold + drag dari tepi halaman.</p>
+        <div class="actions">
+          <button id="format-json" class="btn" type="button">Format JSON</button>
+          <button id="save-book" class="btn btn-primary" type="button">Simpan Buku</button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/books/editor/editor.js"></script>
+  </body>
+</html>

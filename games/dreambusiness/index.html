@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DreamBusiness</title>
+    <link rel="canonical" href="https://fadhil.dev/games/dreambusiness" />
+    <meta name="description" content="Simulasi bisnis interaktif DreamBusiness untuk strategi produk, ranking, dan investasi." />
+    <link rel="stylesheet" href="/games/dreambusiness/styles.css" />
+  </head>
+  <body data-fwlb-theme="utility">
+    <main class="shell">
+      <section id="frameMain" class="frame frame-active">
+        <header class="header">
+          <h1>DreamBusiness</h1>
+          <p>Mainframe • business simulator powered by dream-engine.</p>
+          <div class="actions">
+            <button id="tick1">Simulate 1 Tick</button>
+            <button id="tick25">Simulate 25 Tick</button>
+            <button id="auto">Start Auto</button>
+            <button id="reset">Reset</button>
+            <button id="toInvestment">Investment</button>
+            <button id="toRanking">Ranking</button>
+            <button id="toFullframe">Companies</button>
+            <button id="toNews">News</button>
+          </div>
+        </header>
+
+        <section class="stats" id="stats"></section>
+
+        <section class="grid">
+          <article class="card">
+            <h2>Mainframe Notice</h2>
+            <p>Use News to read 5 major events only, while other fullframes focus on deeper analysis.</p>
+          </article>
+        </section>
+      </section>
+
+      <section id="frameNews" class="frame">
+        <button id="backFromNews" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe news-panel">
+          <h2>News Fullframe (Latest Major 5)</h2>
+          <p>Smart filter hanya menampilkan peristiwa besar agar tidak spam.</p>
+          <div id="newsTimeline" class="news-timeline"></div>
+        </article>
+      </section>
+
+      <section id="frameFull" class="frame">
+        <button id="backFromFull" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Companies Fullframe</h2>
+          <p>Tap any company card to open the detailed sub-frame.</p>
+          <div id="companyFrameList" class="company-frame-list"></div>
+        </article>
+      </section>
+
+      <section id="frameRanking" class="frame">
+        <button id="backFromRanking" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Ranking Fullframe</h2>
+          <div class="button-row">
+            <button id="rankingTopCompanies">Top Companies</button>
+            <button id="rankingRichest">Top Richest People</button>
+            <button id="rankingProducts">Product Ranking</button>
+          </div>
+          <ol id="rankingList" class="ranking-list"></ol>
+        </article>
+      </section>
+
+      <section id="frameInvestment" class="frame">
+        <button id="backFromInvestment" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Investment Fullframe</h2>
+          <p>Investment focus, buy/sell controls, and plan actions in one compact panel.</p>
+          <div class="control-grid">
+            <div>
+              <label>Company</label>
+              <select id="companySelect"></select>
+            </div>
+            <div>
+              <label>Investment Slider</label>
+              <div class="button-row slider-switch-row">
+                <button id="sliderModeInvest" class="switch-active">Invest</button>
+                <button id="sliderModeSell">Sell</button>
+              </div>
+              <input id="investSlider" type="range" min="0" max="100" step="1" value="25" />
+              <small id="sliderValueLabel"></small><br />
+              <small id="sharePercentPreview"></small>
+            </div>
+            <div class="button-row">
+              <button id="buyBtn">Buy (Auto)</button>
+              <button id="sellBtn">Sell (Auto)</button>
+              <button id="investPlanBtn">Invest Plan</button>
+            </div>
+            <div class="button-row">
+              <button id="licenseBtn">License Flow</button>
+              <button id="communityBtn">Community Plan</button>
+            </div>
+            <p id="actionStatus" class="status"></p>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameSub" class="frame">
+        <button id="backFromSub" class="frame-back" aria-label="Back to fullframe">↩</button>
+        <article class="card fullframe">
+          <h2 id="companyDetailTitle">Company Subfullframe</h2>
+          <div id="companyDetailBody" class="company-detail-body"></div>
+        </article>
+      </section>
+    </main>
+
+    <script type="module" src="/games/dreambusiness/app.js"></script>
+  </body>
+</html>

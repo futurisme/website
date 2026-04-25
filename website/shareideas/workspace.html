@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ShareIdeas workspace: ringkas, cepat, dan mobile-first untuk mengelola folder serta kartu ide." />
+    <meta name="robots" content="index,follow" />
+    <title>ShareIdeas</title>
+    <link rel="canonical" href="https://fadhil.dev/shareideas/page/1" />
+    <link rel="stylesheet" href="/shareideas/shareideas.css" />
+  </head>
+  <body>
+    <main class="shell" aria-label="ShareIdeas">
+      <header class="topbar">
+        <p class="credit">By Fadhil Akbar</p>
+        <h1 class="app-title" id="app-title" title="Triple tap untuk ganti judul">ShareIdeas</h1>
+        <span class="status-dot" id="sync-status-dot" aria-label="Status koneksi" title="Status koneksi"></span>
+      </header>
+
+      <section class="board" id="board" aria-live="polite"></section>
+
+      <div class="fab-wrap" id="fab-wrap">
+        <div class="fab-panel fab-panel-left" id="fab-panel-left" aria-hidden="true">
+          <button class="fab-mini-btn" type="button" id="open-help" title="List Control for PC and Mobile">?</button>
+        </div>
+        <button class="fab-main" type="button" id="fab-toggle" aria-expanded="false" aria-controls="fab-panel-left fab-panel-right">
+          <span class="fab-icon" aria-hidden="true">☰</span>
+          <span class="fab-label">Actions</span>
+        </button>
+        <div class="fab-panel fab-panel-right" id="fab-panel-right" aria-hidden="true">
+          <button class="add-btn" type="button" id="open-add" title="Add">+</button>
+        </div>
+      </div>
+    </main>
+
+    <template id="folder-template">
+      <article class="folder">
+        <header class="folder-header">
+          <h2 class="folder-title"></h2>
+          <div class="folder-tools">
+            <span class="folder-count"></span>
+            <button class="ghost-btn folder-edit" type="button">Edit</button>
+            <button class="ghost-btn folder-toggle" type="button">▲ Collapse</button>
+          </div>
+        </header>
+        <div class="folder-content"></div>
+      </article>
+    </template>
+
+    <template id="item-template">
+      <article class="idea-item">
+        <div class="idea-topline">
+          <div class="idea-heading">
+            <h3 class="idea-title"></h3>
+            <span class="idea-progress" aria-label="Status persentase"></span>
+          </div>
+          <div class="item-tools">
+            <button class="ghost-btn item-edit" type="button">Edit</button>
+            <button class="ghost-btn detail-toggle" type="button">▲ Collapse</button>
+          </div>
+        </div>
+        <p class="idea-description"></p>
+      </article>
+    </template>
+
+    <div class="modal-layer is-hidden" id="modal-layer" aria-hidden="true">
+      <div class="modal" id="modal"></div>
+    </div>
+
+    <script src="/shareideas/shareideas.js" type="module"></script>
+  </body>
+</html>

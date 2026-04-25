@@ -1,0 +1,39 @@
+{
+  "name": "mindmapmaker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:signaling": "npm --prefix signaling-server run start",
+    "install:signaling": "npm --prefix signaling-server install",
+    "build": "npx prisma generate && node scripts/prisma-migrate-on-build.mjs && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:unit": "tsx --test src/features/flow/*.test.ts src/lib/fadhilweblib/core/*.test.ts",
+    "scan:fadhilai": "tsx scripts/fadhilai-scan.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.7.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "next": "^14.0.0",
+    "postcss": "^8.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reactflow": "^11.9.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0",
+    "web-vitals": "^5.1.0",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.0"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6",
+    "eslint": "^8.48.0",
+    "eslint-config-next": "14.0.0",
+    "prisma": "^5.7.0",
+    "tsx": "^4.20.3"
+  }
+}

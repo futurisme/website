@@ -35,3 +35,13 @@ export { ProgressBar } from './components/feedback/ProgressBar';
 export { Skeleton } from './components/feedback/Skeleton';
 
 export * from './core/performance';
+export * from './core/compiler';
+export * from './fadhilailib';
+
+export * from './fadhilmindmaplib';
+
+export * from './fadhilebooklib';
+
+export * from './fadhilwebgamelib';
+
+export * from './fadhilwebrpglib';

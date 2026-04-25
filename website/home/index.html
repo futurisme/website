@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home | Website Hub</title>
+    <link rel="canonical" href="https://fadhil.dev/home" />
+    <meta name="description" content="Home hub untuk akses cepat seluruh subdirektori website fadhil.dev." />
+    <style>
+      html, body { margin: 0; min-height: 100%; background: #020617; color: #e2f8ff; }
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+    <link rel="preload" href="/home/theme.css" as="style" />
+    <link rel="preload" href="/home/home.css" as="style" />
+    <link rel="stylesheet" href="/home/theme.css" />
+    <link rel="stylesheet" href="/home/home.css" />
+  </head>
+  <body>
+    <main class="home-shell" aria-label="Website home navigation" data-fwlb-theme="game" data-slot="theme-scope">
+      <header class="hero panel">
+        <p class="hero-eyebrow">fadhilweblib navigation shell</p>
+        <h1>Home</h1>
+        <p class="hero-copy">
+          Central menu for present and future subdirectories. This is a lightweight entry point with shortcut cards.
+        </p>
+      </header>
+
+      <section class="panel" aria-labelledby="shortcuts-heading">
+        <div class="section-head">
+          <h2 id="shortcuts-heading">Shortcuts</h2>
+          <span class="status-chip">Ready</span>
+        </div>
+        <nav class="shortcut-grid" aria-label="Primary shortcuts">
+          <a class="shortcut-card" href="/portfolio">
+            <span class="shortcut-title">Portfolio</span>
+            <span class="shortcut-desc">Open existing portfolio pages.</span>
+          </a>
+          <a class="shortcut-card" href="/mindmapmaker">
+            <span class="shortcut-title">Mindmapmaker</span>
+            <span class="shortcut-desc">Open rebuilt menu and editor launcher.</span>
+          </a>
+          <a class="shortcut-card" href="/shareideas">
+            <span class="shortcut-title">ShareIdeas</span>
+            <span class="shortcut-desc">Open lightweight Share Ideas creator.</span>
+          </a>
+          <button class="shortcut-card is-disabled" type="button" disabled>
+            <span class="shortcut-title">Future space</span>
+            <span class="shortcut-desc">Reserved for upcoming subdirectories.</span>
+          </button>
+        </nav>
+      </section>
+    </main>
+  </body>
+</html>

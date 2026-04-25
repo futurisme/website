@@ -1,15 +1,251 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "installCommand": "npm ci && cd database && npm ci",
-  "buildCommand": "cd database && npm run build",
-  "devCommand": "cd database && npm run dev",
-  "outputDirectory": "database/.next",
-  "redirects": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/Portfolio",
-      "destination": "/portfolio",
-      "permanent": true
+      "src": "website/mindmapmaker/mindmapmaker.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "website/shareideas/shareideas-api.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "website/home/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/portfolio/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/portfolio/testing/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/website/mindmapmaker/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/website/books/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/shareideas/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/archives/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "library/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "assets/public/images/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "games/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "extension/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/shareideas",
+      "dest": "/website/shareideas/shareideas-api.js"
+    },
+    {
+      "src": "/api/shareideas/",
+      "dest": "/website/shareideas/shareideas-api.js"
+    },
+    {
+      "src": "/api/mindmapmaker",
+      "dest": "/website/mindmapmaker/mindmapmaker.js"
+    },
+    {
+      "src": "/api/mindmapmaker/",
+      "dest": "/website/mindmapmaker/mindmapmaker.js"
+    },
+    {
+      "src": "/$",
+      "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/games/dreambusiness",
+      "dest": "/games/dreambusiness/index.html"
+    },
+    {
+      "src": "/games/dreambusiness/",
+      "dest": "/games/dreambusiness/index.html"
+    },
+    {
+      "src": "/games/dreambusiness/(.*)",
+      "dest": "/games/dreambusiness/$1"
+    },
+    {
+      "src": "/games/animeindustry",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/games/animeindustry/",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/games/animeindustry/(.*)",
+      "dest": "/games/animeindustry/$1"
+    },
+    {
+      "src": "/animeindustry",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/animeindustry/",
+      "dest": "/games/animeindustry/index.html"
+    },
+    {
+      "src": "/animeindustry/(.*)",
+      "dest": "/games/animeindustry/$1"
+    },
+    {
+      "src": "/games/rpg",
+      "dest": "/games/rpg/index.html"
+    },
+    {
+      "src": "/games/rpg/",
+      "dest": "/games/rpg/index.html"
+    },
+    {
+      "src": "/games/rpg/(.*)",
+      "dest": "/games/rpg/$1"
+    },
+    {
+      "src": "/rpg",
+      "dest": "/games/rpg/index.html"
+    },
+    {
+      "src": "/rpg/",
+      "dest": "/games/rpg/index.html"
+    },
+    {
+      "src": "/rpg/(.*)",
+      "dest": "/games/rpg/$1"
+    },
+    {
+      "src": "/home",
+      "dest": "/website/home/index.html"
+    },
+    {
+      "src": "/home/",
+      "dest": "/website/home/index.html"
+    },
+    {
+      "src": "/home/(.*)",
+      "dest": "/website/home/$1"
+    },
+    {
+      "src": "/portfolio",
+      "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/portfolio/",
+      "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/portfolio/testing/(.*)",
+      "dest": "/website/portfolio/testing/$1"
+    },
+    {
+      "src": "/mindmapmaker",
+      "dest": "/website/website/mindmapmaker/index.html"
+    },
+    {
+      "src": "/mindmapmaker/",
+      "dest": "/website/website/mindmapmaker/index.html"
+    },
+    {
+      "src": "/mindmapmaker/editor/([0-9]+)",
+      "dest": "/website/website/mindmapmaker/editor/index.html"
+    },
+    {
+      "src": "/editor/([0-9]+)",
+      "dest": "/website/website/mindmapmaker/editor/index.html"
+    },
+    {
+      "src": "/books",
+      "dest": "/website/website/books/index.html"
+    },
+    {
+      "src": "/books/",
+      "dest": "/website/website/books/index.html"
+    },
+    {
+      "src": "/books/editor",
+      "dest": "/website/website/books/editor/index.html"
+    },
+    {
+      "src": "/books/editor/",
+      "dest": "/website/website/books/editor/index.html"
+    },
+    {
+      "src": "/books/(.*)",
+      "dest": "/website/website/books/$1"
+    },
+    {
+      "src": "/shareideas",
+      "dest": "/website/shareideas/index.html"
+    },
+    {
+      "src": "/shareideas/",
+      "dest": "/website/shareideas/index.html"
+    },
+    {
+      "src": "/shareideas/page/([0-9]+)",
+      "dest": "/website/shareideas/workspace.html"
+    },
+    {
+      "src": "/shareideas/(.*)",
+      "dest": "/website/shareideas/$1"
+    },
+    {
+      "src": "/archives",
+      "dest": "/website/archives/index.html"
+    },
+    {
+      "src": "/archives/",
+      "dest": "/website/archives/index.html"
+    },
+    {
+      "src": "/archives/([^/.]+)",
+      "dest": "/website/archives/workspace.html"
+    },
+    {
+      "src": "/archives/(.*)",
+      "dest": "/website/archives/$1"
+    },
+    {
+      "src": "/library/(.*)",
+      "dest": "/library/$1"
+    },
+    {
+      "src": "/mindmapmaker/(.*)",
+      "dest": "/website/website/mindmapmaker/$1"
+    },
+    {
+      "src": "/assets/public/images/(.*)",
+      "dest": "/assets/public/images/$1"
+    },
+    {
+      "src": "/portfolio.webp",
+      "dest": "/assets/public/images/portfolio.webp"
+    },
+    {
+      "src": "/extension/(.*)",
+      "dest": "/extension/$1"
     }
   ]
 }

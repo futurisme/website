@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fadhil Archives</title>
+    <link rel="stylesheet" href="/archives/archives.css" />
+  </head>
+  <body>
+    <main class="archives-page" id="archives-app">
+      <header class="compact-header">
+        <h1>Fadhil Archives</h1>
+        <p>Modern archive workspace with adaptive in-container scrolling.</p>
+      </header>
+
+      <section class="compact-block" aria-label="Search archives">
+        <input id="archive-search" type="search" placeholder="Search" autocomplete="off" />
+      </section>
+
+      <section class="compact-block" aria-label="List of archives">
+        <div class="section-head">
+          <h2>List of archives</h2>
+          <span class="pill">In-container scroll</span>
+        </div>
+        <div class="archives-scroll" role="region" aria-label="Archives list scroll container">
+          <ul id="archives-list" class="list"></ul>
+        </div>
+      </section>
+
+      <section class="compact-action" aria-label="Create archive">
+        <button id="create-archive-btn" type="button">Create a new archive</button>
+      </section>
+
+      <footer class="compact-footer">© 2026 Fadhil Akbar Cariearsa. Some Rights Reserved.</footer>
+    </main>
+
+    <script type="module" src="/archives/archives.js"></script>
+  </body>
+</html>

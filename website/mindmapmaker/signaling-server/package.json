@@ -1,0 +1,16 @@
+{
+  "name": "chartmaker-signaling",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production signaling server for ChartMaker (y-webrtc).",
+  "scripts": {
+    "start": "HOST=0.0.0.0 y-websocket-server",
+    "dev": "npm run start"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@y/websocket-server": "^0.1.1"
+  }
+}

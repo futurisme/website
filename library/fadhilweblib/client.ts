@@ -24,3 +24,7 @@ export { useStepper } from './core/use-stepper';
 export { useTabs } from './core/use-tabs';
 
 export * from './core/performance';
+export * from './core/compiler';
+export * from './fadhilailib';
+
+export * from './fadhilebooklib';
