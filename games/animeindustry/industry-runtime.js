@@ -402,7 +402,12 @@ function createInitialState() {
     usedNames,
     releases: [],
     feed: ['Day 0: Menunggu registrasi pemain.'],
-    cache: { rankedStudios: studios.map((entry) => entry.id), rankedStudiosDay: 0 },
+    cache: {
+      rankedStudios: studios.map((entry) => entry.id),
+      rankedStudiosDay: 0,
+      intelligence: null,
+      intelligenceDay: -1,
+    },
     debug: { lastAction: 'bootstrap' },
   };
 }
@@ -431,7 +436,7 @@ function byId(state, projectId) {
 
 function getRankedStudios(state) {
   if (state.cache.rankedStudiosDay === state.day) return state.cache.rankedStudios;
-  const intelligence = buildStudioIntelligenceContext(state);
+  const intelligence = getStudioIntelligence(state);
   state.cache.rankedStudios = [...state.studios]
     .sort((a, b) => {
       const ratingA = intelligence.ratingsByStudioId.get(a.id)?.overall ?? 0;
@@ -679,6 +684,16 @@ function buildStudioIntelligenceContext(state) {
   };
 }
 
+function getStudioIntelligence(state, forceRefresh = false) {
+  if (!forceRefresh && state.cache.intelligence && state.cache.intelligenceDay === state.day) {
+    return state.cache.intelligence;
+  }
+  const intelligence = buildStudioIntelligenceContext(state);
+  state.cache.intelligence = intelligence;
+  state.cache.intelligenceDay = state.day;
+  return intelligence;
+}
+
 function computeInitialStudioFunds(studio) {
   return Math.round((studio.craft + studio.speed + studio.network) * 24_000 + 1_400_000);
 }
@@ -812,7 +827,7 @@ export function createAnimeIndustryRuntime() {
   function tickNpcEcosystem() {
     const rankedStudios = getRankedStudios(state);
     const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
-    const studioRatingsById = buildStudioIntelligenceContext(state).ratingsByStudioId;
+    const studioRatingsById = getStudioIntelligence(state, true).ratingsByStudioId;
     const projectById = new Map(state.npcProjects.map((project) => [project.id, project]));
     const audienceSignal = state.projects.reduce((acc, project) => {
       if (project.archived || !project.targetAudience) return acc;
@@ -1010,7 +1025,7 @@ export function createAnimeIndustryRuntime() {
       acc.set(release.studio, (acc.get(release.studio) ?? 0) + release.score * attention);
       return acc;
     }, new Map());
-    const studioRatingsById = buildStudioIntelligenceContext(state).ratingsByStudioId;
+    const studioRatingsById = getStudioIntelligence(state, true).ratingsByStudioId;
 
     for (let i = 0; i < state.studios.length; i += 1) {
       const studio = state.studios[i];
@@ -1458,7 +1473,7 @@ export function createAnimeIndustryRuntime() {
 
   function buildRankings() {
     const TOP_CONTENT_LIMIT = 50;
-    const intelligence = buildStudioIntelligenceContext(state);
+    const intelligence = getStudioIntelligence(state);
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
@@ -1573,7 +1588,7 @@ export function createAnimeIndustryRuntime() {
       adminOk: true,
     };
 
-    const intelligence = buildStudioIntelligenceContext(state);
+    const intelligence = getStudioIntelligence(state);
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
       acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
       return acc;

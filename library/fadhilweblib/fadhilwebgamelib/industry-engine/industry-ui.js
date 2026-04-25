@@ -84,6 +84,47 @@ function titleToken(token) {
 }
 
 export function createIndustryUiController({ root, handlers }) {
+  const report = (kind, detail) => {
+    window.fadhilAnimeDebugger?.report?.(kind, detail);
+  };
+
+  function reportUiContractIssue(selector, message, severity = 'high') {
+    report('ui-contract-issue', {
+      message,
+      selector,
+      action: 'watchdog-ui-contract',
+      severity,
+      href: window.location?.href ?? '',
+      day: currentSnapshot?.day ?? 0,
+    });
+  }
+
+  function bindAction(action, handler, options = {}) {
+    const scope = options.scope ?? root;
+    const selector = `[data-action="${action}"]`;
+    const element = scope.querySelector(selector);
+    if (!element) {
+      reportUiContractIssue(selector, 'Required UI selector missing');
+      return null;
+    }
+    element.addEventListener('click', handler);
+    return element;
+  }
+
+  function ensureActionSentinel(action) {
+    const selector = `[data-action="${action}"]`;
+    if (root.querySelector(selector)) return;
+    const sentinel = document.createElement('button');
+    sentinel.type = 'button';
+    sentinel.hidden = true;
+    sentinel.tabIndex = -1;
+    sentinel.setAttribute('aria-hidden', 'true');
+    sentinel.setAttribute('data-ui-contract-sentinel', action);
+    sentinel.setAttribute('data-action', action);
+    root.appendChild(sentinel);
+    reportUiContractIssue(selector, 'UI contract sentinel auto-created', 'medium');
+  }
+
   const frames = {
     register: root.querySelector('#frameRegister'),
     main: root.querySelector('#frameMain'),
@@ -133,6 +174,21 @@ export function createIndustryUiController({ root, handlers }) {
   let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
   let studioReturnFrame = 'fullStudios';
 
+  [
+    ['#industryStats', statsEl],
+    ['#industryProfile', profileEl],
+    ['#industryProjects', projectsEl],
+    ['#industryStudios', studiosEl],
+    ['#industryInbox', inboxEl],
+    ['#rankingBoard', rankingEl],
+    ['#committeeBody', committeeBodyEl],
+    ['#topDate', topDateEl],
+  ].forEach(([selector, element]) => {
+    if (!element) reportUiContractIssue(selector, 'Required root element missing');
+  });
+
+  ensureActionSentinel('open-create-project');
+
   function showPopup(message, tone = 'error') {
     let popup = root.querySelector('#industryInlinePopup');
     if (!popup) {
@@ -159,24 +215,24 @@ export function createIndustryUiController({ root, handlers }) {
     frames[key]?.classList.add('frame-active');
   }
 
-  root.querySelector('[data-action="register"]').addEventListener('click', () => {
+  bindAction('register', () => {
     const name = root.querySelector('#registerName').value;
     const profession = root.querySelector('#registerProfession').value;
     handlers.onRegister(name, profession);
   });
 
-  root.querySelector('[data-action="tick-1"]').addEventListener('click', () => handlers.onTick(1));
-  root.querySelector('[data-action="tick-7"]').addEventListener('click', () => handlers.onTick(7));
-  root.querySelector('[data-action="toggle-auto"]').addEventListener('click', handlers.onAutoToggle);
+  bindAction('tick-1', () => handlers.onTick(1));
+  bindAction('tick-7', () => handlers.onTick(7));
+  bindAction('toggle-auto', handlers.onAutoToggle);
 
-  root.querySelector('[data-action="to-full-profile"]').addEventListener('click', () => openFrame('fullProfile'));
-  root.querySelector('[data-action="to-full-projects"]').addEventListener('click', () => openFrame('fullProjects'));
-  root.querySelector('[data-action="to-full-studios"]').addEventListener('click', () => openFrame('fullStudios'));
-  root.querySelector('[data-action="to-full-email"]').addEventListener('click', () => openFrame('fullEmail'));
-  root.querySelector('[data-action="to-full-found-studio"]').addEventListener('click', () => openFrame('fullFoundStudio'));
-  root.querySelector('[data-action="to-full-ranking"]').addEventListener('click', () => openFrame('fullRanking'));
-  root.querySelector('[data-action="to-full-management"]').addEventListener('click', () => openFrame('fullManagement'));
-  root.querySelector('[data-action="to-full-feed"]').addEventListener('click', () => openFrame('fullFeed'));
+  bindAction('to-full-profile', () => openFrame('fullProfile'));
+  bindAction('to-full-projects', () => openFrame('fullProjects'));
+  bindAction('to-full-studios', () => openFrame('fullStudios'));
+  bindAction('to-full-email', () => openFrame('fullEmail'));
+  bindAction('to-full-found-studio', () => openFrame('fullFoundStudio'));
+  bindAction('to-full-ranking', () => openFrame('fullRanking'));
+  bindAction('to-full-management', () => openFrame('fullManagement'));
+  bindAction('to-full-feed', () => openFrame('fullFeed'));
   document.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
@@ -206,10 +262,10 @@ export function createIndustryUiController({ root, handlers }) {
       showPopup('Gagal mendirikan studio.', 'error');
     }
   });
-  root.querySelector('[data-action="committee-discuss"]').addEventListener('click', () => {
+  bindAction('committee-discuss', () => {
     if (selectedProjectId) handlers.onCommitteeDiscuss(selectedProjectId);
   });
-  root.querySelector('[data-action="committee-confirm"]').addEventListener('click', () => {
+  bindAction('committee-confirm', () => {
     if (selectedProjectId) handlers.onCommittee(selectedProjectId);
   });
   root.querySelector('[data-action="management-merger"]')?.addEventListener('click', () => {
@@ -325,7 +381,7 @@ export function createIndustryUiController({ root, handlers }) {
     return false;
   }
 
-  projectsEl.addEventListener('click', (event) => {
+  projectsEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     if (target.matches('[data-ownership-switch]')) {
@@ -379,7 +435,7 @@ export function createIndustryUiController({ root, handlers }) {
     if (target.id === 'createProjectAudienceInput') pendingCreateDraft.targetAudience = target.value;
   });
 
-  committeeBodyEl.addEventListener('click', (event) => {
+  committeeBodyEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const action = target.getAttribute('data-action');
@@ -389,7 +445,7 @@ export function createIndustryUiController({ root, handlers }) {
     handlers.onSelectStudio(selectedProjectId, studioId);
   });
 
-  inboxEl.addEventListener('click', (event) => {
+  inboxEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const action = target.getAttribute('data-action');
@@ -398,7 +454,7 @@ export function createIndustryUiController({ root, handlers }) {
     if (!emailId) return;
     handlers.onReadEmail(emailId);
   });
-  studiosEl.addEventListener('click', (event) => {
+  studiosEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const card = target.closest('[data-studio-id]');
@@ -410,7 +466,7 @@ export function createIndustryUiController({ root, handlers }) {
     openFrame('subStudio');
   });
 
-  rankingEl.addEventListener('click', (event) => {
+  rankingEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const switchButton = target.closest('[data-ranking-switch]');
@@ -421,7 +477,7 @@ export function createIndustryUiController({ root, handlers }) {
     if (currentSnapshot) renderRankingBoard(currentSnapshot);
     return;
   });
-  rankingEl.addEventListener('click', (event) => {
+  rankingEl?.addEventListener('click', (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const card = target.closest('[data-studio-id]');
@@ -436,6 +492,10 @@ export function createIndustryUiController({ root, handlers }) {
   return {
     render(snapshot) {
       currentSnapshot = snapshot;
+      if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl) {
+        reportUiContractIssue('#animeIndustryApp', 'Render skipped: critical UI nodes missing');
+        return;
+      }
 
       if (!snapshot.registered) {
         openFrame('register');
@@ -659,6 +719,9 @@ export function createIndustryUiController({ root, handlers }) {
         <div class="industry-expandable-body">${animeCards || empty}</div>
       </details>
     `;
+    if (!projectsEl.querySelector('[data-action="open-create-project"]')) {
+      reportUiContractIssue('[data-action="open-create-project"]', 'Create project trigger missing after projects render');
+    }
   }
 
   function renderProjectCreateSubframe() {
