@@ -216,40 +216,33 @@ export function createIndustryUiController({ root, handlers }) {
     }
   });
 
-  projectsEl.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-    if (target.matches('[data-ownership-switch]')) {
-      selectedOwnership = target.getAttribute('data-ownership-switch') === 'studio' ? 'studio' : 'personal';
-      if (currentSnapshot) {
-        renderProjectsBoard(currentSnapshot);
-      }
-      return;
-    }
+  function handleProjectCreationAction(target) {
     const action = target.getAttribute('data-action');
     if (action === 'open-create-project') {
       selectedCreateMedium = null;
       pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
       renderProjectCreateSubframe();
       openFrame('subProjectCreate');
-      return;
+      return true;
     }
     if (action === 'select-create-medium') {
-      selectedCreateMedium = target.getAttribute('data-medium');
+      const medium = target.getAttribute('data-medium');
+      if (!medium) return true;
+      selectedCreateMedium = medium;
       renderProjectCreateSubframe();
-      return;
+      return true;
     }
     if (action === 'cancel-create-project-inline') {
       selectedCreateMedium = null;
       pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
       renderProjectCreateSubframe();
       openFrame('fullProjects');
-      return;
+      return true;
     }
     if (action === 'confirm-create-project') {
       if (!selectedCreateMedium) {
         showPopup('Pilih jenis project terlebih dahulu.', 'error');
-        return;
+        return true;
       }
       const projectTitle = root.querySelector('#createProjectTitleInput')?.value?.trim() || '';
       const projectGenre = root.querySelector('#createProjectGenreInput')?.value?.trim() || '';
@@ -265,15 +258,30 @@ export function createIndustryUiController({ root, handlers }) {
       });
       if (!ok) {
         showPopup('Gagal membuat project. Pastikan semua field terisi, judul unik, dan dana cukup.', 'error');
-        return;
+        return true;
       }
       showPopup('Project baru berhasil ditambahkan ke pipeline.', 'success');
       selectedCreateMedium = null;
       pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
       renderProjectCreateSubframe();
       openFrame('fullProjects');
+      return true;
+    }
+    return false;
+  }
+
+  projectsEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.matches('[data-ownership-switch]')) {
+      selectedOwnership = target.getAttribute('data-ownership-switch') === 'studio' ? 'studio' : 'personal';
+      if (currentSnapshot) {
+        renderProjectsBoard(currentSnapshot);
+      }
       return;
     }
+    const action = target.getAttribute('data-action');
+    if (handleProjectCreationAction(target)) return;
     const card = target.closest('[data-project-id]');
     if (!(card instanceof HTMLElement)) return;
     const projectId = card.getAttribute('data-project-id');
@@ -293,6 +301,12 @@ export function createIndustryUiController({ root, handlers }) {
     }
     if (action === 'production') handlers.onProduction(projectId);
     if (action === 'launch') handlers.onLaunch(projectId);
+  });
+
+  subProjectCreateBodyEl?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    handleProjectCreationAction(target);
   });
 
   committeeBodyEl.addEventListener('click', (event) => {
