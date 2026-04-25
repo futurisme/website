@@ -1,6 +1,6 @@
 # fadhil.dev URL Audit
 
-Generated: 2026-04-25T09:17:55Z
+Generated: 2026-04-25T23:16:04Z
 
 - Base URL: `https://fadhil.dev`
 - Paths checked: 16
@@ -16,22 +16,22 @@ Generated: 2026-04-25T09:17:55Z
 
 | Path | Status | Redirect | Redirect target | Time (ms) | Meta Desc | Canonical | H1 | Noindex | HTTPS Final | Deprecated |
 |---|---:|:---:|---|---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | `—` | 455.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/animeindustry` | 200 | — | `—` | 304.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/archives` | 200 | — | `—` | 232.5 | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | `—` | 240.1 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | `—` | 259.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/books/editor` | 200 | — | `—` | 248.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/animeindustry` | 200 | — | `—` | 160.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/dreambusiness` | 200 | — | `—` | 217.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/rpg` | 200 | — | `—` | 265.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/home` | 200 | — | `—` | 183.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker` | 200 | — | `—` | 239.4 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | `—` | 153.5 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| `/portfolio` | 200 | — | `—` | 97.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/rpg` | 200 | — | `—` | 157.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas` | 200 | — | `—` | 173.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas/page/1` | 200 | — | `—` | 266.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/` | 200 | — | `—` | 623.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/animeindustry` | 200 | — | `—` | 476.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/archives` | 200 | — | `—` | 302.7 | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | `—` | 257.9 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | `—` | 361.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/books/editor` | 200 | — | `—` | 203.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/animeindustry` | 200 | — | `—` | 176.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/dreambusiness` | 200 | — | `—` | 268.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/rpg` | 200 | — | `—` | 244.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/home` | 200 | — | `—` | 184.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker` | 200 | — | `—` | 202.5 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | `—` | 235.5 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| `/portfolio` | 200 | — | `—` | 151.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/rpg` | 200 | — | `—` | 87.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas` | 200 | — | `—` | 136.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas/page/1` | 200 | — | `—` | 156.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Error details
 
@@ -58,9 +58,9 @@ Generated: 2026-04-25T09:17:55Z
 ### Group 3 — files: 3, bytes: 29067
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/styles/theme.css` | 4 | 19 | ✅ | ❌ |
-| `website/home/theme.css` | 2 | 19 | ✅ | ❌ |
-| `website/website/mindmapmaker/theme.css` | 2 | 19 | ✅ | ❌ |
+| `library/fadhilweblib/styles/theme.css` | 4 | 15 | ✅ | ❌ |
+| `website/home/theme.css` | 2 | 15 | ✅ | ❌ |
+| `website/website/mindmapmaker/theme.css` | 2 | 15 | ✅ | ❌ |
 
 ### Group 4 — files: 2, bytes: 12364
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -77,8 +77,8 @@ Generated: 2026-04-25T09:17:55Z
 ### Group 6 — files: 2, bytes: 9980
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/syntax/expression.ts` | 2 | 5 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts` | 2 | 5 | ✅ | ❌ |
+| `library/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
 
 ### Group 7 — files: 2, bytes: 9740
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -113,8 +113,8 @@ Generated: 2026-04-25T09:17:55Z
 ### Group 12 — files: 2, bytes: 7236
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/layout/section.tsx` | 2 | 6 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx` | 2 | 6 | ✅ | ❌ |
+| `library/fadhilweblib/components/layout/section.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx` | 2 | 4 | ✅ | ❌ |
 
 ### Group 13 — files: 2, bytes: 6900
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -155,8 +155,8 @@ Generated: 2026-04-25T09:17:55Z
 ### Group 19 — files: 2, bytes: 5488
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/presets/index.ts` | 2 | 351 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts` | 2 | 351 | ✅ | ❌ |
+| `library/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
 
 ### Group 20 — files: 2, bytes: 5472
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |

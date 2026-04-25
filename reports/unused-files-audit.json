@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-04-25T23:15:43Z",
+  "summary": {
+    "tracked_files": 470,
+    "candidate_files": 69,
+    "used_via_vercel_config": 69,
+    "used_via_exact_references": 0,
+    "potential_unused_files": 0
+  },
+  "potential_unused_by_extension": {},
+  "potential_unused_files": [],
+  "notes": [
+    "Audit scope is intentionally limited to static delivery folders to minimize false positives.",
+    "A file is considered used when matched by vercel routes/builds or referenced by exact repository path.",
+    "Dynamic runtime fetches may not be detected; validate before deletion."
+  ]
+}

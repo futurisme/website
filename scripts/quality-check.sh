@@ -3,10 +3,10 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-echo "[1/5] Validate vercel.json"
+echo "[1/6] Validate vercel.json"
 node -e "JSON.parse(require('fs').readFileSync('${ROOT_DIR}/vercel.json','utf8')); console.log('vercel.json valid')"
 
-echo "[2/5] Build DreamBusiness engine bundle"
+echo "[2/6] Build DreamBusiness engine bundle"
 cd "${ROOT_DIR}"
 npx --yes esbuild games/dreambusiness/dream-engine.ts \
   --bundle \
@@ -16,14 +16,19 @@ npx --yes esbuild games/dreambusiness/dream-engine.ts \
   --outfile=games/dreambusiness/dream-engine-bundle.js > /tmp/dreambusiness-esbuild.log
 tail -n 2 /tmp/dreambusiness-esbuild.log || true
 
-echo "[3/5] JS syntax check (DreamBusiness app)"
+echo "[3/6] JS syntax check (DreamBusiness app)"
 node --check games/dreambusiness/app.js
 
-echo "[4/5] JS syntax check (DreamBusiness bundle)"
+echo "[4/6] JS syntax check (DreamBusiness bundle)"
 node --check games/dreambusiness/dream-engine-bundle.js
 
-echo "[5/5] Lint mindmapmaker"
+echo "[5/6] Lint mindmapmaker"
 cd "${ROOT_DIR}/website/mindmapmaker"
 npm run -s lint
+
+echo "[6/6] High-confidence unused static file audit"
+cd "${ROOT_DIR}"
+python3 scripts/unused-file-audit.py > /tmp/unused-file-audit.log
+tail -n 2 /tmp/unused-file-audit.log || true
 
 echo "Quality check finished successfully."
