@@ -1,6 +1,6 @@
 # fadhil.dev URL Audit
 
-Generated: 2026-04-25T07:57:37Z
+Generated: 2026-04-25T08:06:45Z
 
 - Base URL: `https://fadhil.dev`
 - Paths checked: 16
@@ -16,22 +16,22 @@ Generated: 2026-04-25T07:57:37Z
 
 | Path | Status | Redirect | Redirect target | Time (ms) | Meta Desc | Canonical | H1 | Noindex | HTTPS Final | Deprecated |
 |---|---:|:---:|---|---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | `—` | 409.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/animeindustry` | 200 | — | `—` | 364.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/archives` | 200 | — | `—` | 373.7 | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | `—` | 268.5 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | `—` | 229.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/books/editor` | 200 | — | `—` | 164.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/animeindustry` | 200 | — | `—` | 172.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/dreambusiness` | 200 | — | `—` | 276.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/rpg` | 200 | — | `—` | 198.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/home` | 200 | — | `—` | 184.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker` | 200 | — | `—` | 179.1 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | `—` | 293.2 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| `/portfolio` | 200 | — | `—` | 183.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/rpg` | 200 | — | `—` | 136.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas` | 200 | — | `—` | 161.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas/page/1` | 200 | — | `—` | 161.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/` | 200 | — | `—` | 184.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/animeindustry` | 200 | — | `—` | 278.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/archives` | 200 | — | `—` | 210.8 | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | `—` | 117.1 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | `—` | 169.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/books/editor` | 200 | — | `—` | 201.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/animeindustry` | 200 | — | `—` | 146.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/dreambusiness` | 200 | — | `—` | 230.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/rpg` | 200 | — | `—` | 612.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/home` | 200 | — | `—` | 171.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker` | 200 | — | `—` | 142.3 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | `—` | 185.8 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| `/portfolio` | 200 | — | `—` | 92.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/rpg` | 200 | — | `—` | 98.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas` | 200 | — | `—` | 182.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas/page/1` | 200 | — | `—` | 159.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Error details
 
@@ -44,8 +44,8 @@ Generated: 2026-04-25T07:57:37Z
 ### Group 1 — files: 2, bytes: 519876
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `assets/public/images/shareideas-2.webp` | 6 | 6 | ✅ | ❌ |
-| `assets/public/images/shareideas.webp` | 0 | 0 | ✅ | ❌ |
+| `assets/public/images/shareideas-2.webp` | 4 | 4 | ✅ | ❌ |
+| `assets/public/images/shareideas.webp` | 2 | 2 | ✅ | ❌ |
 
 ### Group 2 — files: 4, bytes: 238528
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
