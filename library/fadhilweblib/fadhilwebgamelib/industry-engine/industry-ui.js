@@ -729,7 +729,10 @@ export function createIndustryUiController({ root, handlers }) {
         <h3>${esc(detail.name)}</h3>
         <p>Pendiri: ${esc(detail.founderName)} · CEO: ${esc(detail.ceoName)}</p>
         <p>Kategori: ${esc(detail.category)} · Kelas/Tingkat: ${esc(detail.tier)}</p>
-        <p>Valuasi: ${Number(detail.valuation || 0).toLocaleString()}</p>
+        <p>Valuasi: ${Number(detail.valuation || 0).toLocaleString()} · Dana Studio: ${Number(detail.funds || 0).toLocaleString()}</p>
+        ${detail.finance
+          ? `<p>Keuangan Terakhir — Income: ${Number(detail.finance.income || 0).toLocaleString()} · Expense: ${Number(detail.finance.expense || 0).toLocaleString()} · Net: ${Number(detail.finance.net || 0).toLocaleString()}</p>`
+          : '<p>Keuangan Terakhir: belum tersedia.</p>'}
       </article>
       <article class="industry-project">
         <h3>Aset Studio</h3>
