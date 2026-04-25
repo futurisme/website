@@ -488,25 +488,53 @@ export function createIndustryUiController({ root, handlers }) {
         title: 'Ranking Manga/Novel',
         empty: 'Belum ada data.',
         list: snapshot.rankings.manga ?? [],
-        renderLine: (entry) => `${esc(entry.title)} <strong>${entry.score.toFixed(1)}</strong>`,
+        renderLine: (entry, rank) => `
+          <div class="industry-ranking-row">
+            <span class="industry-ranking-rank">#${rank}</span>
+            <span class="industry-ranking-name">${esc(entry.title)}</span>
+            <span class="industry-ranking-role">Manga/Novel</span>
+            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          </div>
+        `,
       },
       anime: {
         title: 'Ranking Anime',
         empty: 'Belum ada rilis.',
         list: snapshot.rankings.anime ?? [],
-        renderLine: (entry) => `${esc(entry.title)} <strong>${entry.score.toFixed(1)}</strong>`,
+        renderLine: (entry, rank) => `
+          <div class="industry-ranking-row">
+            <span class="industry-ranking-rank">#${rank}</span>
+            <span class="industry-ranking-name">${esc(entry.title)}</span>
+            <span class="industry-ranking-role">Anime</span>
+            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          </div>
+        `,
       },
       studio: {
         title: 'Ranking Studio',
         empty: 'Belum ada data studio.',
         list: snapshot.rankings.studio ?? [],
-        renderLine: (entry) => `${esc(entry.name)} <strong>${entry.score.toFixed(1)}</strong>`,
+        renderLine: (entry, rank) => `
+          <div class="industry-ranking-row">
+            <span class="industry-ranking-rank">#${rank}</span>
+            <span class="industry-ranking-name">${esc(entry.name)}</span>
+            <span class="industry-ranking-role">Studio</span>
+            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          </div>
+        `,
       },
       individual: {
         title: 'Ranking Kekayaan Individu',
         empty: 'Belum ada data individu.',
         list: snapshot.rankings.individual ?? [],
-        renderLine: (entry) => `${esc(entry.name)} <small>(${esc(getNpcRoleLabel(entry.role))})</small> <strong>${Number(entry.score || 0).toLocaleString()}</strong>`,
+        renderLine: (entry, rank) => `
+          <div class="industry-ranking-row">
+            <span class="industry-ranking-rank">#${rank}</span>
+            <span class="industry-ranking-name">${esc(entry.name)}</span>
+            <span class="industry-ranking-role">${esc(getNpcRoleLabel(entry.role))}</span>
+            <strong class="industry-ranking-score">${Number(entry.score || 0).toLocaleString()}</strong>
+          </div>
+        `,
       },
     };
 
@@ -521,8 +549,8 @@ export function createIndustryUiController({ root, handlers }) {
       <article class="industry-project">
         <h3>${activeConfig.title}</h3>
         <ol class="industry-ranking-list">${activeConfig.list.length
-          ? activeConfig.list.map((entry) => `<li>${activeConfig.renderLine(entry)}</li>`).join('')
-          : `<li>${activeConfig.empty}</li>`}
+          ? activeConfig.list.map((entry, index) => `<li>${activeConfig.renderLine(entry, index + 1)}</li>`).join('')
+          : `<li class="industry-ranking-empty">${activeConfig.empty}</li>`}
         </ol>
       </article>
     `;

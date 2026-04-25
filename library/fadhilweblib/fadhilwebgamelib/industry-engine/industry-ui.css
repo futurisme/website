@@ -105,23 +105,45 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   margin: 4px 0 0;
   padding-left: 0;
   display: grid;
-  gap: 4px;
+  gap: 6px;
   list-style: none;
-  counter-reset: ranking-position;
 }
 .industry-ranking-list li {
-  line-height: 1.25;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
-  counter-increment: ranking-position;
+  line-height: 1.2;
+  border: 1px solid #ffffff3d;
+  border-radius: 8px;
+  background: #0b1a41;
+  padding: 6px 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
-.industry-ranking-list li::before {
-  content: "#" counter(ranking-position);
-  min-width: 34px;
+.industry-ranking-empty {
+  text-align: center;
   opacity: 0.9;
+  justify-content: center;
+}
+.industry-ranking-row {
+  display: grid;
+  grid-template-columns: minmax(54px, auto) minmax(180px, 1fr) minmax(128px, max-content) minmax(110px, max-content);
+  align-items: center;
+  gap: 8px;
+  min-width: 100%;
+  width: max-content;
+  white-space: nowrap;
+}
+.industry-ranking-rank {
+  opacity: 0.92;
+  font-weight: 700;
+}
+.industry-ranking-name {
+  font-weight: 600;
+}
+.industry-ranking-role {
+  opacity: 0.9;
+}
+.industry-ranking-score {
+  justify-self: end;
+  letter-spacing: 0.01em;
 }
 .industry-popup {
   position: fixed;
