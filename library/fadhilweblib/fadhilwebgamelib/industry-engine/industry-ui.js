@@ -99,6 +99,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullFeed: root.querySelector('#frameFullFeed'),
     subProject: root.querySelector('#frameSubProject'),
     subProjectCreate: root.querySelector('#frameSubProjectCreate'),
+    subStudio: root.querySelector('#frameSubStudio'),
   };
 
   const statsEl = root.querySelector('#industryStats');
@@ -117,6 +118,8 @@ export function createIndustryUiController({ root, handlers }) {
   const subBodyEl = root.querySelector('#subProjectBody');
   const subProjectCreateTitleEl = root.querySelector('#subProjectCreateTitle');
   const subProjectCreateBodyEl = root.querySelector('#subProjectCreateBody');
+  const subStudioTitleEl = root.querySelector('#subStudioTitle');
+  const subStudioBodyEl = root.querySelector('#subStudioBody');
   const studioNameInput = root.querySelector('#studioNameInput');
   const savePayloadInput = root.querySelector('#savePayloadInput');
   const registerSaveInput = root.querySelector('#registerSaveInput');
@@ -128,6 +131,7 @@ export function createIndustryUiController({ root, handlers }) {
   let popupTimer = null;
   let selectedCreateMedium = null;
   let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
+  let studioReturnFrame = 'fullStudios';
 
   function showPopup(message, tone = 'error') {
     let popup = root.querySelector('#industryInlinePopup');
@@ -176,6 +180,7 @@ export function createIndustryUiController({ root, handlers }) {
   document.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
+  root.querySelector('[data-action="back-studio-source"]')?.addEventListener('click', () => openFrame(studioReturnFrame));
   root.querySelector('[data-action="cancel-create-project"]')?.addEventListener('click', () => {
     selectedCreateMedium = null;
     pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
@@ -393,6 +398,17 @@ export function createIndustryUiController({ root, handlers }) {
     if (!emailId) return;
     handlers.onReadEmail(emailId);
   });
+  studiosEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const card = target.closest('[data-studio-id]');
+    if (!(card instanceof HTMLElement)) return;
+    const studioId = card.getAttribute('data-studio-id');
+    if (!studioId || !currentSnapshot?.studioDetails?.[studioId]) return;
+    studioReturnFrame = 'fullStudios';
+    renderStudioDetail(currentSnapshot, studioId);
+    openFrame('subStudio');
+  });
 
   rankingEl.addEventListener('click', (event) => {
     const target = event.target;
@@ -403,6 +419,18 @@ export function createIndustryUiController({ root, handlers }) {
     if (!nextRanking || nextRanking === selectedRanking) return;
     selectedRanking = nextRanking;
     if (currentSnapshot) renderRankingBoard(currentSnapshot);
+    return;
+  });
+  rankingEl.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const card = target.closest('[data-studio-id]');
+    if (!(card instanceof HTMLElement)) return;
+    const studioId = card.getAttribute('data-studio-id');
+    if (!studioId || !currentSnapshot?.studioDetails?.[studioId]) return;
+    studioReturnFrame = 'fullRanking';
+    renderStudioDetail(currentSnapshot, studioId);
+    openFrame('subStudio');
   });
 
   return {
@@ -433,9 +461,9 @@ export function createIndustryUiController({ root, handlers }) {
       renderProjectCreateSubframe();
 
       studiosEl.innerHTML = snapshot.studios.map((studio) => `
-        <article class="industry-project">
+        <article class="industry-project" data-studio-id="${esc(studio.id)}">
           <h3>${esc(studio.name)}</h3>
-          <p>CEO: ${esc(studio.ceoName)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
+          <p>CEO: ${esc(studio.ceoName)} · Tier ${esc(studio.tier)} · ${esc(studio.category)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
         </article>
       `).join('') + `
         <article class="industry-project">
@@ -687,6 +715,43 @@ export function createIndustryUiController({ root, handlers }) {
     `;
   }
 
+  function renderStudioDetail(snapshot, studioId) {
+    if (!subStudioBodyEl || !subStudioTitleEl) return;
+    const detail = snapshot.studioDetails?.[studioId];
+    if (!detail) {
+      subStudioTitleEl.textContent = 'Studio Detail';
+      subStudioBodyEl.innerHTML = '<p>Data studio tidak ditemukan.</p>';
+      return;
+    }
+    subStudioTitleEl.textContent = detail.name;
+    subStudioBodyEl.innerHTML = `
+      <article class="industry-project">
+        <h3>${esc(detail.name)}</h3>
+        <p>Pendiri: ${esc(detail.founderName)} · CEO: ${esc(detail.ceoName)}</p>
+        <p>Kategori: ${esc(detail.category)} · Kelas/Tingkat: ${esc(detail.tier)}</p>
+        <p>Valuasi: ${Number(detail.valuation || 0).toLocaleString()}</p>
+      </article>
+      <article class="industry-project">
+        <h3>Aset Studio</h3>
+        <p><strong>Anime</strong>: ${(detail.assets?.anime || []).length ? detail.assets.anime.map((name) => esc(name)).join(' · ') : '-'}</p>
+        <p><strong>Manga/Novel</strong>: ${(detail.assets?.manga || []).length ? detail.assets.manga.map((name) => esc(name)).join(' · ') : '-'}</p>
+        <p><strong>Movies</strong>: ${(detail.assets?.movie || []).length ? detail.assets.movie.map((name) => esc(name)).join(' · ') : '-'}</p>
+      </article>
+      <article class="industry-project">
+        <h3>Staff Studio (Animator)</h3>
+        ${(detail.staff || []).length
+          ? `<ul class="industry-feed">${detail.staff.map((staff) => `<li>${esc(staff.name)} · Rep ${Number(staff.reputation || 0).toFixed(1)} · Mood ${(Number(staff.mood || 0) * 100).toFixed(0)}%</li>`).join('')}</ul>`
+          : '<p>Tidak ada staff animator tercatat.</p>'}
+      </article>
+      <article class="industry-project">
+        <h3>Investor Ranking (Studio)</h3>
+        ${(detail.investors || []).length
+          ? `<ol class="industry-ranking-list">${detail.investors.map((inv, index) => `<li>#${index + 1} · ${esc(inv.name)} · Score ${(Number(inv.score) || 0).toFixed(2)} · Influence ${Math.round(Number(inv.influence) || 0)}</li>`).join('')}</ol>`
+          : '<p>Belum ada investor aktif pada studio ini.</p>'}
+      </article>
+    `;
+  }
+
   function renderRankingBoard(snapshot) {
     const rankingTabs = [
       { id: 'studio', label: 'Studio' },
@@ -745,7 +810,7 @@ export function createIndustryUiController({ root, handlers }) {
         empty: 'Belum ada data studio.',
         list: snapshot.rankings.studio ?? [],
         renderLine: (entry, rank) => `
-          <div class="industry-ranking-row industry-ranking-row-double">
+          <div class="industry-ranking-row industry-ranking-row-double" data-studio-id="${esc(entry.id)}">
             <div class="industry-ranking-line">
               <span class="industry-ranking-rank">#${rank}</span>
               <span class="industry-ranking-name">${esc(entry.name)}</span>

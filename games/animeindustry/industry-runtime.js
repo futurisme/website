@@ -449,6 +449,22 @@ function computeReleaseScore(project, studio, market) {
   });
 }
 
+function computeStudioValuation(studio, studioReleaseScore = 0) {
+  return Math.round((studio.craft + studio.speed + studio.network + studio.scoutPower) * 42_000 + studioReleaseScore * 35_000);
+}
+
+function classifyStudio(studio, valuation) {
+  const category = studio.ownership === 'player'
+    ? 'Founder-led'
+    : studio.ownership === 'cofunded'
+      ? 'Co-Funded'
+      : studio.ownership === 'merger'
+        ? 'Merged Alliance'
+        : 'Independent';
+  const tier = valuation >= 26_000_000 ? 'S' : valuation >= 18_000_000 ? 'A' : valuation >= 11_000_000 ? 'B' : valuation >= 6_000_000 ? 'C' : 'D';
+  return { category, tier };
+}
+
 export function createAnimeIndustryRuntime() {
   let state = createInitialState();
   let timer = null;
@@ -560,6 +576,11 @@ export function createAnimeIndustryRuntime() {
     const rankedStudios = getRankedStudios(state);
     const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
     const projectById = new Map(state.npcProjects.map((project) => [project.id, project]));
+    const audienceSignal = state.projects.reduce((acc, project) => {
+      if (project.archived || !project.targetAudience) return acc;
+      acc.set(project.targetAudience, (acc.get(project.targetAudience) ?? 0) + project.popularity * 0.05 + project.scriptQuality * 0.03);
+      return acc;
+    }, new Map());
 
     for (let index = 0; index < state.npcs.length; index += 1) {
       const npc = state.npcs[index];
@@ -571,8 +592,9 @@ export function createAnimeIndustryRuntime() {
       if (npc.role === 'investor') {
         const investorIncome = Math.floor(34_000 + npc.ambition * 180 + kernel.discipline * 16_000);
         npc.cash += investorIncome;
+        const investorPulse = 0.5 + kernel.riskBudget * 0.35 + kernel.discipline * 0.15;
         if (state.player.studioPlanningOpen && npc.cash > 3_000_000 && index % 3 === state.day % 3) {
-          const amount = Math.floor((180_000 + npc.ambition * 1700) * (0.82 + kernel.riskBudget * 0.32));
+          const amount = Math.floor((180_000 + npc.ambition * 1700) * (0.72 + investorPulse));
           state.player.fundingPool += amount;
           npc.cash -= amount;
         }
@@ -597,6 +619,11 @@ export function createAnimeIndustryRuntime() {
       const isWriter = npc.role === 'mangaka' || npc.writesManga || npc.role === 'novelis';
       if (!isWriter) continue;
       if (!npc.currentProject) {
+        const launchIntent = kernel.discipline * 0.58 + kernel.riskBudget * 0.42 + (npc.ambition / 100) * 0.24;
+        if (launchIntent < 0.52) {
+          npc.reputation = clamp(npc.reputation + 0.04, 1, 99);
+          continue;
+        }
         const npcProject = createNpcProject(state, npc, state.day);
         state.npcProjects.push(npcProject);
         projectById.set(npcProject.id, npcProject);
@@ -613,10 +640,11 @@ export function createAnimeIndustryRuntime() {
 
       if (project.stage === 'serialization') {
         const affinity = computeGenreAudienceAffinity(project.genre, project.targetAudience, npc);
+        const liveAudienceDemand = audienceSignal.get(project.targetAudience) ?? 0;
         const writingBoost = 1 + (npc.ambition > 62 ? 1 : 0) + (kernel.discipline > 0.7 ? 1 : 0);
         project.chapters += writingBoost;
-        project.quality = clamp(project.quality + 1.1 + (npc.ambition / 130) + kernel.discipline * 0.7 + affinity * 0.45, 1, 100);
-        project.popularity = clamp(project.popularity + 0.85 + (npc.reputation / 190) + kernel.riskBudget * 0.5 + affinity * 0.55, 1, 100);
+        project.quality = clamp(project.quality + 1.1 + (npc.ambition / 130) + kernel.discipline * 0.7 + affinity * 0.45 + liveAudienceDemand * 0.015, 1, 100);
+        project.popularity = clamp(project.popularity + 0.85 + (npc.reputation / 190) + kernel.riskBudget * 0.5 + affinity * 0.55 + liveAudienceDemand * 0.03, 1, 100);
         if (project.chapters >= 10) {
           project.stage = 'studio-interest';
           const ownStudio = npc.writesManga && npc.studioId ? studioById.get(npc.studioId) : null;
@@ -1069,6 +1097,7 @@ export function createAnimeIndustryRuntime() {
 
     const studio = state.studios
       .map((entry) => ({
+        id: entry.id,
         name: entry.name,
         score: entry.craft + entry.speed + entry.network + entry.scoutPower + (studioReleaseScore.get(entry.name) ?? 0),
         popularity: clamp((entry.network * 0.52) + (entry.craft * 0.28) + (entry.speed * 0.2), 0, 100),
@@ -1079,7 +1108,7 @@ export function createAnimeIndustryRuntime() {
     const studioValueById = new Map(
       state.studios.map((entry) => [
         entry.id,
-        Math.round((entry.craft + entry.speed + entry.network + entry.scoutPower) * 42_000 + (studioReleaseScore.get(entry.name) ?? 0) * 35_000),
+        computeStudioValuation(entry, studioReleaseScore.get(entry.name) ?? 0),
       ]),
     );
 
@@ -1119,6 +1148,54 @@ export function createAnimeIndustryRuntime() {
       adminOk: true,
     };
 
+    const studioReleaseScore = state.releases.reduce((acc, rel) => {
+      acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
+      return acc;
+    }, new Map());
+    const studioDetailsMap = {};
+    state.studios.forEach((studio) => {
+      const valuation = computeStudioValuation(studio, studioReleaseScore.get(studio.name) ?? 0);
+      const profile = classifyStudio(studio, valuation);
+      const founderName = studio.ownership === 'player' || (state.player.studioId === studio.id)
+        ? state.player.name
+        : state.npcs.find((entry) => entry.id === studio.ceoNpcId)?.name ?? 'Board Consortium';
+      const ceoName = state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD');
+      const activeProjects = state.projects.filter((project) => project.studioId === studio.id && !project.archived);
+      const npcProjects = state.npcProjects.filter((entry) => entry.studioId === studio.id && !entry.launched);
+      const animeAssets = activeProjects.filter((project) => ['anime', 'movie'].includes(project.medium)).map((project) => project.title);
+      const mangaAssets = activeProjects.filter((project) => ['manga', 'novel'].includes(project.medium)).map((project) => project.title)
+        .concat(npcProjects.map((entry) => entry.title));
+      const movieAssets = activeProjects.filter((project) => project.medium === 'movie').map((project) => project.title);
+      const staff = state.npcs.filter((npc) => npc.role === 'animator' && npc.studioId === studio.id)
+        .map((npc) => ({ id: npc.id, name: npc.name, reputation: npc.reputation, mood: npc.mood }));
+      const investorScores = new Map();
+      state.projects.forEach((project) => {
+        if (project.studioId !== studio.id) return;
+        (project.committeeIds || []).forEach((investorId) => {
+          investorScores.set(investorId, (investorScores.get(investorId) ?? 0) + 1 + (project.securedBudget / Math.max(1, project.budgetNeed)));
+        });
+      });
+      const investors = [...investorScores.entries()]
+        .map(([investorId, score]) => {
+          const investor = state.investors.find((entry) => entry.id === investorId);
+          return { id: investorId, name: investor?.name ?? investorId, score: Number(score) || 0, influence: investor?.influence ?? 0 };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 6);
+      studioDetailsMap[studio.id] = {
+        id: studio.id,
+        name: studio.name,
+        founderName,
+        ceoName,
+        category: profile.category,
+        tier: profile.tier,
+        valuation,
+        assets: { anime: animeAssets.slice(0, 8), manga: mangaAssets.slice(0, 10), movie: movieAssets.slice(0, 6) },
+        staff: staff.slice(0, 12),
+        investors,
+      };
+    });
+
     return {
       registered: state.registered,
       day: state.day,
@@ -1150,6 +1227,7 @@ export function createAnimeIndustryRuntime() {
         fullRanking: true,
         fullManagement: state.player.career === 'studio-founder',
         subProject: true,
+        subStudio: true,
       },
       rankings: buildRankings(),
       management: {
@@ -1159,7 +1237,11 @@ export function createAnimeIndustryRuntime() {
       studios: state.studios.map((studio) => ({
         ...studio,
         ceoName: state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
+        valuation: studioDetailsMap[studio.id]?.valuation ?? 0,
+        category: studioDetailsMap[studio.id]?.category ?? 'Independent',
+        tier: studioDetailsMap[studio.id]?.tier ?? 'C',
       })),
+      studioDetails: studioDetailsMap,
       npcs: state.npcs.slice(0, 12),
       npcProjects: state.npcProjects.filter((entry) => !entry.launched).slice(-8),
       unreadEmails: state.emails.filter((entry) => !entry.read).slice(-40).reverse(),
