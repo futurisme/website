@@ -876,6 +876,7 @@ export function createAnimeIndustryRuntime() {
   }
 
   function buildRankings() {
+    const TOP_CONTENT_LIMIT = 50;
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
@@ -885,12 +886,14 @@ export function createAnimeIndustryRuntime() {
         title: entry.title,
         score: entry.quality * 0.62 + entry.popularity * 0.38 + entry.chapters,
       })),
-    ].sort((a, b) => b.score - a.score).slice(0, 8);
+    ]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, TOP_CONTENT_LIMIT);
 
     const anime = state.releases
       .map((entry) => ({ title: entry.title, score: entry.score }))
       .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+      .slice(0, TOP_CONTENT_LIMIT);
 
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
       acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
@@ -902,8 +905,7 @@ export function createAnimeIndustryRuntime() {
         name: entry.name,
         score: entry.craft + entry.speed + entry.network + entry.scoutPower + (studioReleaseScore.get(entry.name) ?? 0),
       }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+      .sort((a, b) => b.score - a.score);
 
     const studioValueById = new Map(
       state.studios.map((entry) => [
@@ -925,7 +927,7 @@ export function createAnimeIndustryRuntime() {
         score: entry.cash + (entry.studioId ? Math.round((studioValueById.get(entry.studioId) ?? 0) * (entry.role === 'ceo-studio' ? 0.38 : 0.1)) : 0),
         isPlayer: false,
       })),
-    ];
+    ].filter((entry) => entry && typeof entry.name === 'string' && entry.name.trim() && Number.isFinite(entry.score));
 
     const ceoRows = individual
       .filter((entry) => entry.role === 'ceo-studio')
@@ -933,9 +935,9 @@ export function createAnimeIndustryRuntime() {
     const nonCeoRows = individual
       .filter((entry) => entry.role !== 'ceo-studio')
       .sort((a, b) => b.score - a.score);
-    const topIndividual = [...ceoRows, ...nonCeoRows].slice(0, 12);
+    const rankedIndividuals = [...ceoRows, ...nonCeoRows];
 
-    return { manga, anime, studio, individual: topIndividual };
+    return { manga, anime, studio, individual: rankedIndividuals };
   }
 
   function snapshot() {
