@@ -313,6 +313,7 @@ function createNpcProject(state, npc, day) {
   return {
     id: `npc-ip-${npc.id}-${day}`,
     npcId: npc.id,
+    medium: mediumByRole,
     title: `${npc.franchiseTitle} • ${installment}`,
     stage: 'serialization',
     chapters: 6,
@@ -492,6 +493,106 @@ function computeCompetitivePressure(state, medium) {
   if (!peer.length) return 0;
   const avgScore = peer.reduce((sum, row) => sum + (Number(row.score) || 0), 0) / peer.length;
   return clamp((avgScore - 60) / 40, -0.5, 0.6);
+}
+
+function getPopularitySegment(medium) {
+  if (medium === 'movie') return 'movie';
+  if (medium === 'anime') return 'anime';
+  return 'manga_novel';
+}
+
+function extractFranchiseKey(title) {
+  const normalized = String(title || '').toLowerCase()
+    .replace(/series\s*\d+/g, '')
+    .replace(/sequel|main story|arc|season\s*\d+/g, '')
+    .replace(/[•:|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!normalized) return 'untitled';
+  return normalized.split(' ').slice(0, 4).join(' ');
+}
+
+function computePopularityDemand(entry, state) {
+  const stage = String(entry.stage || 'ideation');
+  const qualityCore = ((entry.plotQuality ?? entry.quality ?? entry.scriptQuality ?? 20) * 0.42)
+    + ((entry.visualQuality ?? entry.quality ?? entry.scriptQuality ?? 20) * 0.34)
+    + ((entry.scriptQuality ?? entry.quality ?? 20) * 0.24);
+  const engagement = (Number(entry.chapters) || 0) * 1.6 + (Number(entry.productionProgress) || 0) * 0.22 + (Number(entry.competitiveness) || 30) * 0.3;
+  const inertia = (Number(entry.popularity) || 8) * 0.56;
+  const stageFactor = stage === 'serialization' ? 1.08
+    : stage === 'manga_serialization' ? 1.04
+      : stage === 'production' ? 0.94
+        : stage === 'postproduction' ? 0.82
+          : stage === 'release' || stage === 'launch-ready' ? 0.7
+            : stage === 'ideation' ? 0.56 : 0.76;
+  const noContinuationPenalty = ((stage === 'release' || stage === 'launch-ready') && (entry.chapters || 0) < 3) ? 0.74 : 1;
+  const fatiguePenalty = clamp(1 - state.market.audienceFatigue * 0.35, 0.62, 1.02);
+  return Math.max(0.1, (qualityCore + engagement + inertia) * stageFactor * noContinuationPenalty * fatiguePenalty);
+}
+
+function rebalancePopularityMarkets(state) {
+  const entries = [];
+  state.projects.forEach((project) => {
+    if (project.archived) return;
+    entries.push({
+      ref: project,
+      segment: getPopularitySegment(project.medium),
+      franchise: extractFranchiseKey(project.title),
+      stage: project.stage,
+      popularity: project.popularity,
+      scriptQuality: project.scriptQuality,
+      visualQuality: project.visualQuality,
+      plotQuality: project.plotQuality,
+      competitiveness: project.competitiveness,
+      chapters: project.chapters,
+      productionProgress: project.productionProgress,
+    });
+  });
+  state.npcProjects.forEach((project) => {
+    if (project.launched) return;
+    entries.push({
+      ref: project,
+      segment: getPopularitySegment(project.medium || 'manga'),
+      franchise: extractFranchiseKey(project.title),
+      stage: project.stage,
+      popularity: project.popularity,
+      quality: project.quality,
+      visualQuality: project.visualQuality,
+      plotQuality: project.plotQuality,
+      competitiveness: project.competitiveness,
+      chapters: project.chapters,
+      productionProgress: project.productionProgress,
+    });
+  });
+  const segmentMap = new Map([['manga_novel', []], ['anime', []], ['movie', []]]);
+  entries.forEach((entry) => {
+    if (!segmentMap.has(entry.segment)) segmentMap.set(entry.segment, []);
+    segmentMap.get(entry.segment).push(entry);
+  });
+
+  const franchiseStrength = entries.reduce((acc, entry) => {
+    const key = `${entry.segment}:${entry.franchise}`;
+    const demand = computePopularityDemand(entry, state);
+    acc.set(key, (acc.get(key) ?? 0) + demand);
+    return acc;
+  }, new Map());
+
+  segmentMap.forEach((rows, segment) => {
+    if (!rows.length) return;
+    const weighted = rows.map((entry) => {
+      const demand = computePopularityDemand(entry, state);
+      const crossBoost = segment === 'anime'
+        ? (franchiseStrength.get(`manga_novel:${entry.franchise}`) ?? 0) * 0.18
+        : segment === 'manga_novel'
+          ? (franchiseStrength.get(`anime:${entry.franchise}`) ?? 0) * 0.12
+          : ((franchiseStrength.get(`anime:${entry.franchise}`) ?? 0) + (franchiseStrength.get(`manga_novel:${entry.franchise}`) ?? 0)) * 0.1;
+      return { entry, demand: Math.max(0.1, demand + crossBoost) };
+    });
+    const totalDemand = weighted.reduce((sum, row) => sum + row.demand, 0) || 1;
+    weighted.forEach((row) => {
+      row.entry.ref.popularity = clamp((row.demand / totalDemand) * 100, 0.05, 100);
+    });
+  });
 }
 
 function computeStudioValuation(studio, studioReleaseScore = 0) {
@@ -1125,6 +1226,8 @@ export function createAnimeIndustryRuntime() {
           }
         }
       });
+
+      rebalancePopularityMarkets(state);
     }
     return state;
   }
@@ -1501,7 +1604,7 @@ export function createAnimeIndustryRuntime() {
           uniqueness: (entry.competitiveness ?? 30) * 0.95,
         }), 1, 9.9),
         volume: entry.chapters,
-        format: 'Manga',
+        format: entry.medium === 'novel' ? 'Novel' : entry.medium === 'anime' ? 'Anime Draft' : 'Manga',
       })),
     ]
       .sort((a, b) => b.score - a.score)
@@ -1587,6 +1690,7 @@ export function createAnimeIndustryRuntime() {
       fundingOk: state.cash + state.player.fundingPool >= 1_800_000,
       adminOk: true,
     };
+    rebalancePopularityMarkets(state);
 
     const intelligence = getStudioIntelligence(state);
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
