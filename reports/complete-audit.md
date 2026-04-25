@@ -1,45 +1,47 @@
-# fadhil.dev URL Audit
+# Complete Audit — fadhil.dev
 
-Generated: 2026-04-25T23:16:04Z
+Generated: 2026-04-25T23:36:09Z
+
+## Executive Summary
 
 - Base URL: `https://fadhil.dev`
 - Paths checked: 16
 - HTTP 200: 15
-- Redirects detected: 0
-- Non-200/Redirect errors: 1
-- Missing meta description (200 pages): 2
-- Missing canonical (200 pages): 3
-- Missing H1 (200 pages): 1
-- Final URL not HTTPS (200 pages): 0
-- Duplicate file groups (top 25 shown): 65
-- Safe delete candidate groups: 0
+- Errors (non-200/redirect): 1
+- Missing meta description: 2
+- Missing canonical: 3
+- Missing H1: 1
+- Duplicate file groups (all): 65
+- Potential unused static files: 0
 
-| Path | Status | Redirect | Redirect target | Time (ms) | Meta Desc | Canonical | H1 | Noindex | HTTPS Final | Deprecated |
-|---|---:|:---:|---|---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | `—` | 623.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/animeindustry` | 200 | — | `—` | 476.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/archives` | 200 | — | `—` | 302.7 | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | `—` | 257.9 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | `—` | 361.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/books/editor` | 200 | — | `—` | 203.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/animeindustry` | 200 | — | `—` | 176.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/dreambusiness` | 200 | — | `—` | 268.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/rpg` | 200 | — | `—` | 244.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/home` | 200 | — | `—` | 184.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker` | 200 | — | `—` | 202.5 | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | `—` | 235.5 | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ |
-| `/portfolio` | 200 | — | `—` | 151.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/rpg` | 200 | — | `—` | 87.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas` | 200 | — | `—` | 136.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas/page/1` | 200 | — | `—` | 156.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+## Domain Route Audit
 
-## Error details
+| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | Deprecated |
+|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|
+| `/` | 200 | — | 99.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/animeindustry` | 200 | — | 95.5 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/archives` | 200 | — | 42.2 | ❌ | ❌ | ✅ | ✅ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | 78.0 | ❌ | ❌ | ❌ | ❌ | ✅ |
+| `/books` | 200 | — | 148.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/books/editor` | 200 | — | 96.2 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/animeindustry` | 200 | — | 98.2 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/dreambusiness` | 200 | — | 145.5 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/games/rpg` | 200 | — | 57.3 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/home` | 200 | — | 53.7 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker` | 200 | — | 86.1 | ✅ | ❌ | ✅ | ✅ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 46.1 | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `/portfolio` | 200 | — | 82.0 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/rpg` | 200 | — | 81.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas` | 200 | — | 44.4 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas/page/1` | 200 | — | 81.4 | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+### Route Errors
 
 | Path | Status | Error |
 |---|---:|---|
 | `/archives/([^/.]+)` | 404 | `HTTP Error 404: Not Found` |
 
-## Duplicate analysis (top 25 by total bytes)
+## Duplicate File Analysis (Top 25)
 
 ### Group 1 — files: 2, bytes: 519876
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -194,3 +196,21 @@ Generated: 2026-04-25T23:16:04Z
 | `library/fadhilweblib/components/feedback/progress-bar.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/feedback/progress-bar.tsx` | 2 | 4 | ✅ | ❌ |
 
+## Static Unused File Audit (High Confidence)
+
+- Candidate files scanned: 69
+- Used via vercel config: 69
+- Used via exact references: 0
+- Potential unused files: 0
+
+| Extension | Count |
+|---|---:|
+
+| Potential unused file | Exact path refs |
+|---|---:|
+
+### Notes
+
+- Audit scope is intentionally limited to static delivery folders to minimize false positives.
+- A file is considered used when matched by vercel routes/builds or referenced by exact repository path.
+- Dynamic runtime fetches may not be detected; validate before deletion.

@@ -26,9 +26,9 @@ echo "[5/6] Lint mindmapmaker"
 cd "${ROOT_DIR}/website/mindmapmaker"
 npm run -s lint
 
-echo "[6/6] High-confidence unused static file audit"
+echo "[6/6] Complete audit (domain + duplicates + static-unused)"
 cd "${ROOT_DIR}"
-python3 scripts/unused-file-audit.py > /tmp/unused-file-audit.log
-tail -n 2 /tmp/unused-file-audit.log || true
+python3 scripts/complete-audit.py > /tmp/complete-audit.log
+tail -n 2 /tmp/complete-audit.log || true
 
 echo "Quality check finished successfully."
