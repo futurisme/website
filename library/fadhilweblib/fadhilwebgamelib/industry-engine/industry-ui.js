@@ -626,7 +626,8 @@ export function createIndustryUiController({ root, handlers }) {
       if (!Object.values(frames).some((frame) => frame?.classList.contains('frame-active'))) openFrame('main');
     },
     setAutoState(active) {
-      root.querySelector('[data-action="toggle-auto"]').textContent = active ? 'Stop Auto' : 'Auto';
+      const autoToggleButton = root.querySelector('[data-action="toggle-auto"]');
+      if (autoToggleButton) autoToggleButton.textContent = active ? 'Stop Auto' : 'Auto';
     },
     openMain() {
       openFrame('main');

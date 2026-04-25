@@ -516,6 +516,13 @@ function log(state, message) {
   if (state.feed.length > 200) state.feed.splice(0, state.feed.length - 200);
 }
 
+function invalidateDerivedCaches(state) {
+  if (!state?.cache) return;
+  state.cache.intelligence = null;
+  state.cache.intelligenceDay = -1;
+  state.cache.rankedStudiosDay = -1;
+}
+
 function addEmail(state, type, subject, body) {
   const email = {
     id: `mail-${state.day}-${Math.random().toString(36).slice(2, 7)}`,
@@ -629,6 +636,7 @@ function computePopularityDemand(entry, state) {
 }
 
 function rebalancePopularityMarkets(state) {
+  let changed = false;
   const entries = [];
   state.projects.forEach((project) => {
     if (project.archived) return;
@@ -688,9 +696,12 @@ function rebalancePopularityMarkets(state) {
     });
     const totalDemand = weighted.reduce((sum, row) => sum + row.demand, 0) || 1;
     weighted.forEach((row) => {
-      row.entry.ref.popularity = clamp((row.demand / totalDemand) * 100, 0.05, 100);
+      const nextPopularity = clamp((row.demand / totalDemand) * 100, 0.05, 100);
+      if (Math.abs((row.entry.ref.popularity ?? 0) - nextPopularity) > 0.0001) changed = true;
+      row.entry.ref.popularity = nextPopularity;
     });
   });
+  return changed;
 }
 
 function computeStudioValuation(studio, studioReleaseScore = 0) {
@@ -808,6 +819,8 @@ function computeStudioRating(state, studio, context = null) {
 }
 
 function buildStudioIntelligenceContext(state) {
+  const investorById = new Map(state.investors.map((entry) => [entry.id, entry]));
+  const npcById = new Map(state.npcs.map((entry) => [entry.id, entry]));
   const releasesByStudioName = state.releases.reduce((acc, release) => {
     if (!acc.has(release.studio)) acc.set(release.studio, []);
     acc.get(release.studio).push(release);
@@ -834,8 +847,8 @@ function buildStudioIntelligenceContext(state) {
   const investorRowsByStudio = new Map();
   state.studioInvestments.forEach((entry) => {
     if (!investorRowsByStudio.has(entry.studioId)) investorRowsByStudio.set(entry.studioId, []);
-    const investor = state.investors.find((row) => row.id === entry.investorId);
-    const investorNpc = state.npcs.find((row) => row.id === entry.investorId);
+    const investor = investorById.get(entry.investorId);
+    const investorNpc = npcById.get(entry.investorId);
     investorRowsByStudio.get(entry.studioId).push({
       investorId: entry.investorId,
       name: investor?.name ?? investorNpc?.name ?? entry.investorId,
@@ -848,8 +861,8 @@ function buildStudioIntelligenceContext(state) {
     if (!investorRowsByStudio.has(project.studioId)) investorRowsByStudio.set(project.studioId, []);
     const studioRows = investorRowsByStudio.get(project.studioId);
     project.committeeIds.forEach((investorId) => {
-      const investor = state.investors.find((row) => row.id === investorId);
-      const investorNpc = state.npcs.find((row) => row.id === investorId);
+      const investor = investorById.get(investorId);
+      const investorNpc = npcById.get(investorId);
       studioRows.push({
         investorId,
         name: investor?.name ?? investorNpc?.name ?? investorId,
@@ -923,6 +936,7 @@ export function createAnimeIndustryRuntime() {
     try {
       const result = handler();
       state.debug.lastAction = action;
+      if (result) invalidateDerivedCaches(state);
       return result;
     } catch (error) {
       state.debug.lastAction = `${action}:failed`;
@@ -1283,6 +1297,7 @@ export function createAnimeIndustryRuntime() {
   function tick(days = 1) {
     for (let i = 0; i < days; i += 1) {
       state.day += 1;
+      invalidateDerivedCaches(state);
       state.market.trend = Math.max(0.55, Math.min(1.55, 1 + Math.sin(state.day / 17) * 0.18 - state.market.audienceFatigue * 0.12));
       state.market.audienceFatigue = Math.max(0.05, Math.min(0.72, state.market.audienceFatigue + 0.002));
 
@@ -1348,7 +1363,8 @@ export function createAnimeIndustryRuntime() {
         }
       });
 
-      rebalancePopularityMarkets(state);
+      const popularityChanged = rebalancePopularityMarkets(state);
+      if (popularityChanged) invalidateDerivedCaches(state);
     }
     return state;
   }
@@ -1859,7 +1875,8 @@ export function createAnimeIndustryRuntime() {
       fundingOk: state.cash + state.player.fundingPool >= 1_800_000,
       adminOk: true,
     };
-    rebalancePopularityMarkets(state);
+    const popularityChanged = rebalancePopularityMarkets(state);
+    if (popularityChanged) invalidateDerivedCaches(state);
 
     const intelligence = getStudioIntelligence(state);
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
