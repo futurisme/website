@@ -463,7 +463,7 @@ export function createIndustryUiController({ root, handlers }) {
       studiosEl.innerHTML = snapshot.studios.map((studio) => `
         <article class="industry-project" data-studio-id="${esc(studio.id)}">
           <h3>${esc(studio.name)}</h3>
-          <p>CEO: ${esc(studio.ceoName)} · Tier ${esc(studio.tier)} · ${esc(studio.category)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
+          <p>CEO: ${esc(studio.ceoName)} · Tier ${esc(studio.tier)} · Rating ${Number(studio.rating || 0).toFixed(1)} · ${esc(studio.category)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
         </article>
       `).join('') + `
         <article class="industry-project">
@@ -728,7 +728,9 @@ export function createIndustryUiController({ root, handlers }) {
       <article class="industry-project">
         <h3>${esc(detail.name)}</h3>
         <p>Pendiri: ${esc(detail.founderName)} · CEO: ${esc(detail.ceoName)}</p>
-        <p>Kategori: ${esc(detail.category)} · Kelas/Tingkat: ${esc(detail.tier)}</p>
+        <p>Kategori: ${esc(detail.category)} · Kelas/Tingkat: ${esc(detail.tier)} · Rating Studio ${Number(detail.rating?.overall || 0).toFixed(2)}</p>
+        <p>Komponen Rating — Rilis ${Number(detail.rating?.components?.releaseQuality || 0).toFixed(1)} · Produksi ${Number(detail.rating?.components?.productionQuality || 0).toFixed(1)} · Kompetensi ${Number(detail.rating?.components?.competence || 0).toFixed(1)} · Reliabilitas ${Number(detail.rating?.components?.reliability || 0).toFixed(1)} · TierScore ${Number(detail.rating?.components?.studioTier || 0).toFixed(1)}</p>
+        <p>Efek Rating — Investor ×${Number(detail.rating?.multipliers?.investorAttractiveness || 1).toFixed(2)} · Momentum Proyek ×${Number(detail.rating?.multipliers?.projectMomentum || 1).toFixed(2)} · Efisiensi Marketing ×${Number(detail.rating?.multipliers?.marketingEfficiency || 1).toFixed(2)}</p>
         <p>Valuasi: ${Number(detail.valuation || 0).toLocaleString()} · Dana Studio: ${Number(detail.funds || 0).toLocaleString()}</p>
         ${detail.finance
           ? `<p>Keuangan Terakhir — Income: ${Number(detail.finance.income || 0).toLocaleString()} · Expense: ${Number(detail.finance.expense || 0).toLocaleString()} · Net: ${Number(detail.finance.net || 0).toLocaleString()}</p>`
@@ -818,6 +820,8 @@ export function createIndustryUiController({ root, handlers }) {
               <span class="industry-ranking-rank">#${rank}</span>
               <span class="industry-ranking-name">${esc(entry.name)}</span>
               <span class="industry-ranking-tag">Studio</span>
+              <span class="industry-ranking-tag">Rating ${(Number(entry.rating) || 0).toFixed(1)}</span>
+              <span class="industry-ranking-tag">Tier ${esc(entry.tier || '-')}</span>
             </div>
             <div class="industry-ranking-line industry-ranking-line-sub">
               <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} val</strong>

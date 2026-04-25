@@ -432,7 +432,11 @@ function byId(state, projectId) {
 function getRankedStudios(state) {
   if (state.cache.rankedStudiosDay === state.day) return state.cache.rankedStudios;
   state.cache.rankedStudios = [...state.studios]
-    .sort((a, b) => (b.network + b.scoutPower + b.craft) - (a.network + a.scoutPower + a.craft))
+    .sort((a, b) => {
+      const ratingA = computeStudioRating(state, a).overall;
+      const ratingB = computeStudioRating(state, b).overall;
+      return (ratingB + b.network * 0.12 + b.scoutPower * 0.08) - (ratingA + a.network * 0.12 + a.scoutPower * 0.08);
+    })
     .map((entry) => entry.id);
   state.cache.rankedStudiosDay = state.day;
   return state.cache.rankedStudios;
@@ -506,6 +510,96 @@ function getTierFinanceProfile(tier) {
   if (tier === 'B') return { support: 26_000, salaryBase: 112_000, maintenance: 72_000, taxRate: 0.118 };
   if (tier === 'C') return { support: 18_000, salaryBase: 90_000, maintenance: 56_000, taxRate: 0.102 };
   return { support: 11_000, salaryBase: 74_000, maintenance: 42_000, taxRate: 0.09 };
+}
+
+function tierToScore(tier) {
+  if (tier === 'S') return 100;
+  if (tier === 'A') return 86;
+  if (tier === 'B') return 72;
+  if (tier === 'C') return 58;
+  return 45;
+}
+
+function computeStudioRating(state, studio, context = null) {
+  const ctx = context ?? {};
+  const releases = (ctx.releases ?? state.releases).filter((entry) => entry.studio === studio.name);
+  const studioProjects = (ctx.projects ?? state.projects).filter((entry) => entry.studioId === studio.id && !entry.archived);
+  const studioNpcProjects = (ctx.npcProjects ?? state.npcProjects).filter((entry) => entry.studioId === studio.id);
+  const studioStaff = (ctx.staffByStudio?.get(studio.id))
+    ?? state.npcs.filter((entry) => entry.role === 'animator' && entry.studioId === studio.id);
+  const investorRows = (ctx.investorRowsByStudio?.get(studio.id)) ?? [];
+
+  const releaseQualityScore = releases.length
+    ? releases.reduce((sum, entry) => {
+      const releaseScore = Number(entry.score) || 0;
+      const imdb = Number(entry.imdb) || 0;
+      const ratings = Math.log10(1 + Math.max(0, Number(entry.ratings) || 0));
+      return sum + (releaseScore * 0.58) + ((imdb * 10) * 0.32) + (ratings * 14.2);
+    }, 0) / releases.length
+    : 0;
+  const productionQualityPool = [
+    ...studioProjects.map((entry) => ((entry.visualQuality ?? 0) * 0.5) + ((entry.plotQuality ?? entry.scriptQuality ?? 0) * 0.5)),
+    ...studioNpcProjects.map((entry) => ((entry.visualQuality ?? entry.quality ?? 0) * 0.52) + ((entry.plotQuality ?? entry.quality ?? 0) * 0.48)),
+  ];
+  const productionQualityScore = productionQualityPool.length
+    ? productionQualityPool.reduce((sum, value) => sum + value, 0) / productionQualityPool.length
+    : ((studio.craft * 0.65) + (studio.speed * 0.35));
+  const competenceSentiment = clamp(
+    (studioStaff.length
+      ? studioStaff.reduce((sum, entry) => sum + (entry.reputation * 0.72) + (entry.mood * 100 * 0.28), 0) / studioStaff.length
+      : ((studio.craft * 0.6) + (studio.network * 0.4)))
+      + (investorRows.length ? investorRows.reduce((sum, row) => sum + (row.influence * 0.45) + (row.score * 4.4), 0) / investorRows.length : 0) * 0.35,
+    1,
+    100,
+  );
+  const valuation = ctx.valuationByStudioId?.get(studio.id) ?? computeStudioValuation(studio, releaseQualityScore);
+  const tier = classifyStudio(studio, valuation).tier;
+  const tierScore = tierToScore(tier);
+  const reliability = clamp((100 - (studioProjects.reduce((sum, entry) => sum + (entry.delayRisk ?? 0), 0) / Math.max(1, studioProjects.length)) * 100), 30, 100);
+
+  const overall = clamp(
+    (releaseQualityScore * 0.33)
+    + (productionQualityScore * 0.27)
+    + (competenceSentiment * 0.2)
+    + (tierScore * 0.12)
+    + (reliability * 0.08),
+    1,
+    99.9,
+  );
+
+  const investorAttractiveness = clamp(
+    0.58 + ((overall - 50) / 100) * 0.8 + (tierScore / 100) * 0.18 + (Math.log10(Math.max(1, valuation)) / 8.5),
+    0.35,
+    2.2,
+  );
+  const projectMomentum = clamp(
+    0.55 + ((overall - 45) / 100) * 0.72 + (productionQualityScore / 100) * 0.22 + (studio.network / 100) * 0.12,
+    0.4,
+    1.95,
+  );
+  const marketingEfficiency = clamp(
+    0.52 + ((overall - 40) / 100) * 0.88 + (studio.network / 100) * 0.2 + (releaseQualityScore / 100) * 0.14,
+    0.45,
+    2.1,
+  );
+
+  return {
+    overall,
+    tier,
+    valuation,
+    components: {
+      releaseQuality: clamp(releaseQualityScore, 1, 100),
+      productionQuality: clamp(productionQualityScore, 1, 100),
+      competence: competenceSentiment,
+      studioTier: tierScore,
+      reliability,
+    },
+    multipliers: {
+      investorAttractiveness,
+      projectMomentum,
+      marketingEfficiency,
+    },
+  };
 }
 
 function computeInitialStudioFunds(studio) {
@@ -641,6 +735,7 @@ export function createAnimeIndustryRuntime() {
   function tickNpcEcosystem() {
     const rankedStudios = getRankedStudios(state);
     const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
+    const studioRatingsById = new Map(state.studios.map((studio) => [studio.id, computeStudioRating(state, studio)]));
     const projectById = new Map(state.npcProjects.map((project) => [project.id, project]));
     const audienceSignal = state.projects.reduce((acc, project) => {
       if (project.archived || !project.targetAudience) return acc;
@@ -664,8 +759,10 @@ export function createAnimeIndustryRuntime() {
           const preferredStudioId = pickStudioForAnimator(state, { ...npc, mood: kernel.discipline, ambition: npc.ambition });
           const targetStudio = state.studios.find((studio) => studio.id === preferredStudioId) || state.studios[index % state.studios.length];
           if (targetStudio) {
+            const studioRating = studioRatingsById.get(targetStudio.id);
+            const investmentPull = studioRating?.multipliers?.investorAttractiveness ?? 1;
             const influence = investorRef?.influence ?? npc.reputation ?? 40;
-            const amount = Math.round((120_000 + influence * 10_000) * (0.68 + investorPulse));
+            const amount = Math.round((120_000 + influence * 10_000) * (0.68 + investorPulse) * investmentPull);
             const cappedAmount = Math.min(amount, Math.max(0, npc.cash - 500_000));
             if (cappedAmount > 0) {
               npc.cash -= cappedAmount;
@@ -760,7 +857,8 @@ export function createAnimeIndustryRuntime() {
       }
       if (project.stage === 'production') {
         const studio = studioById.get(project.studioId);
-        const speed = ((studio?.speed ?? 50) / 100) * 3.1;
+        const studioMomentum = studio ? (studioRatingsById.get(studio.id)?.multipliers?.projectMomentum ?? 1) : 1;
+        const speed = ((studio?.speed ?? 50) / 100) * 3.1 * studioMomentum;
         project.productionProgress = clamp(project.productionProgress + 1.8 + speed + npc.mood + kernel.discipline * 0.6, 0, 100);
         if (project.productionProgress >= 100) project.stage = 'launch-ready';
         continue;
@@ -835,6 +933,7 @@ export function createAnimeIndustryRuntime() {
       acc.set(release.studio, (acc.get(release.studio) ?? 0) + release.score * attention);
       return acc;
     }, new Map());
+    const studioRatingsById = new Map(state.studios.map((studio) => [studio.id, computeStudioRating(state, studio)]));
 
     for (let i = 0; i < state.studios.length; i += 1) {
       const studio = state.studios[i];
@@ -844,17 +943,21 @@ export function createAnimeIndustryRuntime() {
       const finance = getTierFinanceProfile(tier);
       const staffCount = animatorCountByStudio.get(studio.id) ?? 0;
       const projects = activeProjectsByStudio.get(studio.id) ?? [];
+      const studioRating = studioRatingsById.get(studio.id);
+      const marketingEfficiency = studioRating?.multipliers?.marketingEfficiency ?? 1;
+      const investorAttractiveness = studioRating?.multipliers?.investorAttractiveness ?? 1;
 
       const governmentSupport = finance.support + Math.round((studio.network + studio.scoutPower) * 90);
-      const volumeSales = projects
+      const volumeSalesBase = projects
         .filter((project) => ['manga', 'novel'].includes(project.medium))
         .reduce((sum, project) => sum + (28_000 + project.chapters * 8_500 + project.popularity * 1_100), 0);
-      const screeningRevenue = Math.round((releaseSignalByStudioName.get(studio.name) ?? 0) * 2_650);
-      const investorIncome = todaysInvestments.get(studio.id) ?? 0;
+      const volumeSales = Math.round(volumeSalesBase * marketingEfficiency);
+      const screeningRevenue = Math.round((releaseSignalByStudioName.get(studio.name) ?? 0) * 2_650 * marketingEfficiency);
+      const investorIncome = Math.round((todaysInvestments.get(studio.id) ?? 0) * investorAttractiveness);
       const income = governmentSupport + volumeSales + screeningRevenue + investorIncome;
 
       const salaryExpense = staffCount * finance.salaryBase + 76_000;
-      const marketingExpense = projects.reduce((sum, project) => sum + (22_000 + project.popularity * 360 + (project.medium === 'movie' ? 18_000 : 0)), 0);
+      const marketingExpense = Math.round(projects.reduce((sum, project) => sum + (22_000 + project.popularity * 360 + (project.medium === 'movie' ? 18_000 : 0)), 0) * clamp(1.05 - (marketingEfficiency - 1) * 0.14, 0.72, 1.18));
       const productionExpense = projects.reduce((sum, project) => sum + (
         ['production', 'postproduction'].includes(project.stage) ? 145_000 : ['preproduction', 'committee_setup'].includes(project.stage) ? 92_000 : 38_000
       ), 0);
@@ -1338,13 +1441,18 @@ export function createAnimeIndustryRuntime() {
     }, new Map());
 
     const studio = state.studios
-      .map((entry) => ({
-        id: entry.id,
-        name: entry.name,
-        score: entry.craft + entry.speed + entry.network + entry.scoutPower + (studioReleaseScore.get(entry.name) ?? 0) + Math.max(0, (entry.funds ?? 0) / 220_000),
-        popularity: clamp((entry.network * 0.52) + (entry.craft * 0.28) + (entry.speed * 0.2), 0, 100),
-        totalAnime: studioReleaseCount.get(entry.name) ?? 0,
-      }))
+      .map((entry) => {
+        const rating = computeStudioRating(state, entry);
+        return {
+          id: entry.id,
+          name: entry.name,
+          score: entry.craft + entry.speed + entry.network + entry.scoutPower + (studioReleaseScore.get(entry.name) ?? 0) + Math.max(0, (entry.funds ?? 0) / 220_000) + rating.overall * 1.7,
+          popularity: clamp((entry.network * 0.42) + (entry.craft * 0.22) + (entry.speed * 0.16) + rating.overall * 0.2, 0, 100),
+          totalAnime: studioReleaseCount.get(entry.name) ?? 0,
+          rating: rating.overall,
+          tier: rating.tier,
+        };
+      })
       .sort((a, b) => b.score - a.score);
 
     const studioValueById = new Map(
@@ -1398,6 +1506,7 @@ export function createAnimeIndustryRuntime() {
     state.studios.forEach((studio) => {
       const valuation = computeStudioValuation(studio, studioReleaseScore.get(studio.name) ?? 0);
       const profile = classifyStudio(studio, valuation);
+      const rating = computeStudioRating(state, studio, { valuationByStudioId: new Map([[studio.id, valuation]]) });
       const founderName = studio.ownership === 'player' || (state.player.studioId === studio.id)
         ? state.player.name
         : state.npcs.find((entry) => entry.id === studio.ceoNpcId)?.name ?? 'Board Consortium';
@@ -1440,6 +1549,7 @@ export function createAnimeIndustryRuntime() {
         ceoName,
         category: profile.category,
         tier: profile.tier,
+        rating,
         valuation,
         assets: { anime: animeAssets.slice(0, 8), manga: mangaAssets.slice(0, 10), movie: movieAssets.slice(0, 6) },
         staff: staff.slice(0, 12),
@@ -1493,6 +1603,7 @@ export function createAnimeIndustryRuntime() {
         valuation: studioDetailsMap[studio.id]?.valuation ?? 0,
         category: studioDetailsMap[studio.id]?.category ?? 'Independent',
         tier: studioDetailsMap[studio.id]?.tier ?? 'C',
+        rating: studioDetailsMap[studio.id]?.rating?.overall ?? 0,
         funds: Math.round(studio.funds ?? 0),
       })),
       studioDetails: studioDetailsMap,
