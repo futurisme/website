@@ -184,6 +184,24 @@ def percentile(values: list[float], p: float) -> float:
     return ordered[idx]
 
 
+def fetch_text_endpoint(url: str, timeout: int) -> dict[str, Any]:
+    started = time.perf_counter()
+    req = urllib.request.Request(url, headers={'User-Agent': 'futurisme-complete-audit/1.0'})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            status = response.getcode()
+            body = response.read().decode('utf-8', 'ignore')
+            headers = {k.lower(): v for k, v in response.headers.items()}
+            duration_ms = round((time.perf_counter() - started) * 1000, 1)
+            return {'url': url, 'status': status, 'body': body, 'headers': headers, 'time_ms': duration_ms}
+    except urllib.error.HTTPError as exc:
+        duration_ms = round((time.perf_counter() - started) * 1000, 1)
+        return {'url': url, 'status': exc.code, 'error': str(exc), 'body': '', 'headers': {}, 'time_ms': duration_ms}
+    except Exception as exc:  # noqa: BLE001
+        duration_ms = round((time.perf_counter() - started) * 1000, 1)
+        return {'url': url, 'status': 'ERR', 'error': str(exc), 'body': '', 'headers': {}, 'time_ms': duration_ms}
+
+
 def safe_rg_count(root: Path, pattern: str, file_self: str, fixed: bool = False) -> int:
     cmd = ['rg', '-n']
     if fixed:
@@ -406,6 +424,7 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     domain = report['domain']
     static = report['static_unused_audit']
     vercel_cfg = report['vercel_target_audit']
+    crawl = report['crawl_support_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -428,6 +447,10 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- P95 response time (ms): {domain['summary']['p95_response_time_ms']}",
         f"- Vercel route target issues: {vercel_cfg['summary']['route_target_issues']}",
         f"- Vercel build glob issues: {vercel_cfg['summary']['build_glob_issues']}",
+        f"- robots.txt status: {crawl['robots']['status']}",
+        f"- sitemap.xml status: {crawl['sitemap']['status']}",
+        f"- Sitemap URL count: {crawl['summary']['sitemap_url_count']}",
+        f"- Sitemap coverage gap (audited routes not in sitemap): {crawl['summary']['audited_route_not_in_sitemap_count']}",
         '',
         '## Domain Route Audit',
         '',
@@ -479,6 +502,20 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
 
     lines.extend([
         '',
+        '## Crawl Support Audit (robots + sitemap)',
+        '',
+        '| Endpoint | Status | Time (ms) | Notes |',
+        '|---|---:|---:|---|',
+        f"| `/robots.txt` | {crawl['robots']['status']} | {crawl['robots']['time_ms']} | `{crawl['summary']['robots_note']}` |",
+        f"| `/sitemap.xml` | {crawl['sitemap']['status']} | {crawl['sitemap']['time_ms']} | `{crawl['summary']['sitemap_note']}` |",
+    ])
+    if crawl['audited_routes_missing_in_sitemap']:
+        lines.extend(['', '| Audited route missing in sitemap |', '|---|'])
+        for route in crawl['audited_routes_missing_in_sitemap']:
+            lines.append(f'| `{route}` |')
+
+    lines.extend([
+        '',
         f'## Duplicate File Analysis (Top {top_duplicates})',
         '',
     ])
@@ -522,6 +559,52 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     return '\n'.join(lines) + '\n'
 
 
+def audit_crawl_support(base_url: str, timeout: int, audited_paths: list[str]) -> dict[str, Any]:
+    robots = fetch_text_endpoint(f'{base_url}/robots.txt', timeout)
+    sitemap = fetch_text_endpoint(f'{base_url}/sitemap.xml', timeout)
+
+    robots_body = robots.get('body', '')
+    sitemap_body = sitemap.get('body', '')
+
+    has_user_agent = bool(re.search(r'(?im)^User-agent\\s*:\\s*\\*', robots_body))
+    has_sitemap_line = bool(re.search(r'(?im)^Sitemap\\s*:\\s*https?://', robots_body))
+    sitemap_urls = sorted(set(re.findall(r'<loc>(https?://[^<]+)</loc>', sitemap_body)))
+    sitemap_paths = {normalize_path(urllib.parse.urlparse(url).path or '/') for url in sitemap_urls}
+
+    expected_paths = {
+        path for path in audited_paths
+        if path not in {'/archives/([^/.]+)', '/mindmapmaker/editor/1', '/shareideas/page/1'}
+    }
+    missing_in_sitemap = sorted(path for path in expected_paths if path not in sitemap_paths)
+
+    robots_note_parts = []
+    robots_note_parts.append('user-agent-ok' if has_user_agent else 'user-agent-missing')
+    robots_note_parts.append('sitemap-ok' if has_sitemap_line else 'sitemap-missing')
+    sitemap_note = f'url-count={len(sitemap_urls)}'
+
+    return {
+        'robots': {
+            'status': robots.get('status'),
+            'time_ms': robots.get('time_ms', 0),
+            'has_user_agent_wildcard': has_user_agent,
+            'has_sitemap_directive': has_sitemap_line,
+        },
+        'sitemap': {
+            'status': sitemap.get('status'),
+            'time_ms': sitemap.get('time_ms', 0),
+            'url_count': len(sitemap_urls),
+        },
+        'sitemap_urls': sitemap_urls,
+        'audited_routes_missing_in_sitemap': missing_in_sitemap,
+        'summary': {
+            'robots_note': ','.join(robots_note_parts),
+            'sitemap_note': sitemap_note,
+            'sitemap_url_count': len(sitemap_urls),
+            'audited_route_not_in_sitemap_count': len(missing_in_sitemap),
+        },
+    }
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -534,6 +617,7 @@ def main() -> None:
     duplicate_analysis, duplicate_groups_total = find_duplicate_files(root, args.top_duplicate_groups)
     static_unused = find_potential_unused_static_files(root, vercel_data)
     vercel_target_audit = audit_vercel_targets(root, vercel_data)
+    crawl_support_audit = audit_crawl_support(args.base_url, args.timeout, paths)
 
     successful_rows = [row for row in domain_results if row.get('status') == 200]
     response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
@@ -568,6 +652,7 @@ def main() -> None:
         'duplicate_analysis': duplicate_analysis,
         'static_unused_audit': static_unused,
         'vercel_target_audit': vercel_target_audit,
+        'crawl_support_audit': crawl_support_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'

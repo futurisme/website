@@ -14,6 +14,14 @@
       "use": "@vercel/static"
     },
     {
+      "src": "website/*.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/*.xml",
+      "use": "@vercel/static"
+    },
+    {
       "src": "website/portfolio/**/*.html",
       "use": "@vercel/static"
     },
@@ -74,6 +82,14 @@
     {
       "src": "/$",
       "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/website/robots.txt"
+    },
+    {
+      "src": "/sitemap.xml",
+      "dest": "/website/sitemap.xml"
     },
     {
       "src": "/games/dreambusiness",

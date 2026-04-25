@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Keep crawl budget focused on canonical public URLs.
+Disallow: /api/
+Disallow: /extension/
+
+Sitemap: https://fadhil.dev/sitemap.xml
