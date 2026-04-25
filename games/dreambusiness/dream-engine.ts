@@ -15,7 +15,7 @@ export {
   requestAppStoreLicense,
   simulateTick,
   transactShares,
-} from '../../library/fadhilweblib/fadhilwebgamelib';
+} from '../../library/fadhilweblib/fadhilwebgamelib/business-engine';
 
 export {
   buildProductRankingRows,
@@ -26,4 +26,4 @@ export {
   getTopCompaniesSnapshot,
   runTicksBatched,
   withGameAction,
-} from '../../library/fadhilweblib/fadhilwebgamelib';
+} from '../../library/fadhilweblib/fadhilwebgamelib/runtime-kit';
