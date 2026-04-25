@@ -109,13 +109,12 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   list-style: none;
 }
 .industry-ranking-list li {
-  line-height: 1.2;
+  line-height: 1.22;
   border: 1px solid #ffffff3d;
   border-radius: 8px;
   background: #0b1a41;
-  padding: 6px 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  padding: 7px 8px;
+  overflow: hidden;
 }
 .industry-ranking-empty {
   text-align: center;
@@ -124,12 +123,21 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 .industry-ranking-row {
   display: grid;
-  grid-template-columns: minmax(54px, auto) minmax(180px, 1fr) minmax(128px, max-content) minmax(110px, max-content);
-  align-items: center;
+  gap: 4px;
+}
+.industry-ranking-row-double {
+  gap: 6px;
+}
+.industry-ranking-line {
+  display: grid;
+  grid-template-columns: minmax(46px, auto) minmax(0, 1fr) repeat(2, max-content);
+  align-items: baseline;
   gap: 8px;
-  min-width: 100%;
-  width: max-content;
-  white-space: nowrap;
+}
+.industry-ranking-line-sub {
+  grid-template-columns: minmax(120px, max-content) repeat(2, max-content);
+  justify-content: space-between;
+  padding-left: 46px;
 }
 .industry-ranking-rank {
   opacity: 0.92;
@@ -137,13 +145,42 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 .industry-ranking-name {
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
-.industry-ranking-role {
+.industry-ranking-tag {
+  opacity: 0.92;
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid #ffffff33;
+  border-radius: 999px;
+  background: #102453;
+}
+.industry-ranking-meta {
   opacity: 0.9;
+  font-size: 12px;
 }
 .industry-ranking-score {
-  justify-self: end;
   letter-spacing: 0.01em;
+  justify-self: end;
+}
+@media (max-width: 620px) {
+  .industry-ranking-line {
+    grid-template-columns: minmax(42px, auto) minmax(0, 1fr);
+  }
+  .industry-ranking-line .industry-ranking-tag,
+  .industry-ranking-line .industry-ranking-score {
+    grid-column: auto;
+    justify-self: start;
+  }
+  .industry-ranking-line-sub {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding-left: 42px;
+    justify-content: start;
+  }
+  .industry-ranking-line-sub .industry-ranking-score {
+    justify-self: start;
+  }
 }
 .industry-popup {
   position: fixed;

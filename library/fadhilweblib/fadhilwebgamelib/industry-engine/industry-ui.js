@@ -17,6 +17,22 @@ function getNpcRoleLabel(role) {
   return role || 'NPC';
 }
 
+function formatCompactValuation(value) {
+  const units = [
+    { unit: 'QA', div: 1e15 },
+    { unit: 'T', div: 1e12 },
+    { unit: 'B', div: 1e9 },
+    { unit: 'M', div: 1e6 },
+    { unit: 'K', div: 1e3 },
+  ];
+  const amount = Number(value) || 0;
+  const abs = Math.abs(amount);
+  for (const { unit, div } of units) {
+    if (abs >= div) return `${(amount / div).toFixed(2)}${unit}`;
+  }
+  return amount.toFixed(2);
+}
+
 export function createIndustryUiController({ root, handlers }) {
   const frames = {
     register: root.querySelector('#frameRegister'),
@@ -489,11 +505,18 @@ export function createIndustryUiController({ root, handlers }) {
         empty: 'Belum ada data.',
         list: snapshot.rankings.manga ?? [],
         renderLine: (entry, rank) => `
-          <div class="industry-ranking-row">
-            <span class="industry-ranking-rank">#${rank}</span>
-            <span class="industry-ranking-name">${esc(entry.title)}</span>
-            <span class="industry-ranking-role">Manga/Novel</span>
-            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          <div class="industry-ranking-row industry-ranking-row-double">
+            <div class="industry-ranking-line">
+              <span class="industry-ranking-rank">#${rank}</span>
+              <span class="industry-ranking-name">${esc(entry.title)}</span>
+              <span class="industry-ranking-tag">Vol ${Math.max(0, Math.floor(entry.volume ?? 0))}</span>
+              <span class="industry-ranking-tag">${esc(entry.format || 'Manga/Novel')}</span>
+            </div>
+            <div class="industry-ranking-line industry-ranking-line-sub">
+              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
+              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
+            </div>
           </div>
         `,
       },
@@ -502,11 +525,18 @@ export function createIndustryUiController({ root, handlers }) {
         empty: 'Belum ada rilis.',
         list: snapshot.rankings.anime ?? [],
         renderLine: (entry, rank) => `
-          <div class="industry-ranking-row">
-            <span class="industry-ranking-rank">#${rank}</span>
-            <span class="industry-ranking-name">${esc(entry.title)}</span>
-            <span class="industry-ranking-role">Anime</span>
-            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          <div class="industry-ranking-row industry-ranking-row-double">
+            <div class="industry-ranking-line">
+              <span class="industry-ranking-rank">#${rank}</span>
+              <span class="industry-ranking-name">${esc(entry.title)}</span>
+              <span class="industry-ranking-tag">${esc(entry.series || 'Series 1')}</span>
+              <span class="industry-ranking-tag">${esc(entry.format || 'Anime')}</span>
+            </div>
+            <div class="industry-ranking-line industry-ranking-line-sub">
+              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
+              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
+            </div>
           </div>
         `,
       },
@@ -515,11 +545,17 @@ export function createIndustryUiController({ root, handlers }) {
         empty: 'Belum ada data studio.',
         list: snapshot.rankings.studio ?? [],
         renderLine: (entry, rank) => `
-          <div class="industry-ranking-row">
-            <span class="industry-ranking-rank">#${rank}</span>
-            <span class="industry-ranking-name">${esc(entry.name)}</span>
-            <span class="industry-ranking-role">Studio</span>
-            <strong class="industry-ranking-score">${entry.score.toFixed(1)}</strong>
+          <div class="industry-ranking-row industry-ranking-row-double">
+            <div class="industry-ranking-line">
+              <span class="industry-ranking-rank">#${rank}</span>
+              <span class="industry-ranking-name">${esc(entry.name)}</span>
+              <span class="industry-ranking-tag">Studio</span>
+            </div>
+            <div class="industry-ranking-line industry-ranking-line-sub">
+              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} val</strong>
+              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">Total Anime ${Math.max(0, Math.floor(entry.totalAnime ?? 0))}</span>
+            </div>
           </div>
         `,
       },
@@ -529,10 +565,12 @@ export function createIndustryUiController({ root, handlers }) {
         list: snapshot.rankings.individual ?? [],
         renderLine: (entry, rank) => `
           <div class="industry-ranking-row">
-            <span class="industry-ranking-rank">#${rank}</span>
-            <span class="industry-ranking-name">${esc(entry.name)}</span>
-            <span class="industry-ranking-role">${esc(getNpcRoleLabel(entry.role))}</span>
-            <strong class="industry-ranking-score">${Number(entry.score || 0).toLocaleString()}</strong>
+            <div class="industry-ranking-line">
+              <span class="industry-ranking-rank">#${rank}</span>
+              <span class="industry-ranking-name">${esc(entry.name)}</span>
+              <span class="industry-ranking-tag">${esc(getNpcRoleLabel(entry.role))}</span>
+              <strong class="industry-ranking-score">${formatCompactValuation(entry.score)} (Harta/Valuasi)</strong>
+            </div>
           </div>
         `,
       },

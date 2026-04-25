@@ -881,17 +881,37 @@ export function createAnimeIndustryRuntime() {
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
         score: entry.scriptQuality * 0.6 + entry.popularity * 0.4 + entry.chapters,
+        popularity: clamp(entry.popularity, 0, 100),
+        imdb: clamp(5 + ((entry.scriptQuality * 0.62 + entry.popularity * 0.38) / 100) * 4.7, 1, 9.9),
+        volume: entry.chapters,
+        format: entry.medium === 'novel' ? 'Novel' : 'Manga',
       })),
       ...state.npcProjects.filter((entry) => !entry.launched).map((entry) => ({
         title: entry.title,
         score: entry.quality * 0.62 + entry.popularity * 0.38 + entry.chapters,
+        popularity: clamp(entry.popularity, 0, 100),
+        imdb: clamp(5 + ((entry.quality * 0.58 + entry.popularity * 0.42) / 100) * 4.7, 1, 9.9),
+        volume: entry.chapters,
+        format: 'Manga',
       })),
     ]
       .sort((a, b) => b.score - a.score)
       .slice(0, TOP_CONTENT_LIMIT);
 
+    const releaseCountByTitle = state.releases.reduce((acc, entry) => {
+      acc.set(entry.title, (acc.get(entry.title) ?? 0) + 1);
+      return acc;
+    }, new Map());
+
     const anime = state.releases
-      .map((entry) => ({ title: entry.title, score: entry.score }))
+      .map((entry) => ({
+        title: entry.title,
+        score: entry.score,
+        popularity: clamp(entry.score * 0.93, 0, 100),
+        imdb: clamp(5 + (entry.score / 100) * 4.8, 1, 9.9),
+        series: `Series ${releaseCountByTitle.get(entry.title) ?? 1}`,
+        format: String(entry.title || '').toLowerCase().includes('movie') ? 'Movie' : 'Anime',
+      }))
       .sort((a, b) => b.score - a.score)
       .slice(0, TOP_CONTENT_LIMIT);
 
@@ -899,11 +919,17 @@ export function createAnimeIndustryRuntime() {
       acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
       return acc;
     }, new Map());
+    const studioReleaseCount = state.releases.reduce((acc, rel) => {
+      acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + 1);
+      return acc;
+    }, new Map());
 
     const studio = state.studios
       .map((entry) => ({
         name: entry.name,
         score: entry.craft + entry.speed + entry.network + entry.scoutPower + (studioReleaseScore.get(entry.name) ?? 0),
+        popularity: clamp((entry.network * 0.52) + (entry.craft * 0.28) + (entry.speed * 0.2), 0, 100),
+        totalAnime: studioReleaseCount.get(entry.name) ?? 0,
       }))
       .sort((a, b) => b.score - a.score);
 
