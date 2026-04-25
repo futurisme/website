@@ -381,6 +381,7 @@ function createInitialState() {
       studioPlanningOpen: false,
     },
     projects: [],
+    studioInvestments: [],
     studios,
     investors: INVESTOR_POOL,
     npcs,
@@ -463,6 +464,24 @@ function classifyStudio(studio, valuation) {
         : 'Independent';
   const tier = valuation >= 26_000_000 ? 'S' : valuation >= 18_000_000 ? 'A' : valuation >= 11_000_000 ? 'B' : valuation >= 6_000_000 ? 'C' : 'D';
   return { category, tier };
+}
+
+function pickStudioForAnimator(state, npc, preferredStudioId = null) {
+  const studioOccupancy = state.npcs.reduce((acc, row) => {
+    if (row.role !== 'animator' || !row.studioId) return acc;
+    acc.set(row.studioId, (acc.get(row.studioId) ?? 0) + 1);
+    return acc;
+  }, new Map());
+  const candidates = state.studios.map((studio) => {
+    const occupancy = studioOccupancy.get(studio.id) ?? 0;
+    const fit = studio.speed * 0.36 + studio.craft * 0.34 + studio.network * 0.18 + studio.scoutPower * 0.12;
+    const familiarity = preferredStudioId === studio.id ? 10 : 0;
+    const fatiguePenalty = occupancy * 7.5;
+    const motivation = (npc.mood * 12) + (npc.ambition * 0.2);
+    return { id: studio.id, score: fit + familiarity + motivation - fatiguePenalty };
+  });
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0]?.id ?? null;
 }
 
 export function createAnimeIndustryRuntime() {
@@ -593,10 +612,41 @@ export function createAnimeIndustryRuntime() {
         const investorIncome = Math.floor(34_000 + npc.ambition * 180 + kernel.discipline * 16_000);
         npc.cash += investorIncome;
         const investorPulse = 0.5 + kernel.riskBudget * 0.35 + kernel.discipline * 0.15;
+        if (state.day % 4 === index % 4 && npc.cash > 1_500_000 && state.studios.length) {
+          const investorRef = state.investors[index % state.investors.length];
+          const preferredStudioId = pickStudioForAnimator(state, { ...npc, mood: kernel.discipline, ambition: npc.ambition });
+          const targetStudio = state.studios.find((studio) => studio.id === preferredStudioId) || state.studios[index % state.studios.length];
+          if (targetStudio) {
+            const influence = investorRef?.influence ?? npc.reputation ?? 40;
+            const amount = Math.round((120_000 + influence * 10_000) * (0.68 + investorPulse));
+            const cappedAmount = Math.min(amount, Math.max(0, npc.cash - 500_000));
+            if (cappedAmount > 0) {
+              npc.cash -= cappedAmount;
+              state.studioInvestments.push({
+                id: `inv-${investorRef?.id ?? npc.id}-${targetStudio.id}-${state.day}`,
+                investorId: investorRef?.id ?? npc.id,
+                studioId: targetStudio.id,
+                amount: cappedAmount,
+                day: state.day,
+              });
+              if (state.studioInvestments.length > 500) state.studioInvestments.splice(0, state.studioInvestments.length - 500);
+            }
+          }
+        }
         if (state.player.studioPlanningOpen && npc.cash > 3_000_000 && index % 3 === state.day % 3) {
           const amount = Math.floor((180_000 + npc.ambition * 1700) * (0.72 + investorPulse));
           state.player.fundingPool += amount;
           npc.cash -= amount;
+        }
+      }
+
+      if (npc.role === 'animator') {
+        if (!npc.studioId || (state.day + index) % 17 === 0) {
+          const nextStudioId = pickStudioForAnimator(state, npc, npc.studioId);
+          if (nextStudioId && nextStudioId !== npc.studioId) {
+            npc.studioId = nextStudioId;
+            if ((state.day + index) % 17 === 0) log(state, `${npc.name} berpindah ke ${studioById.get(nextStudioId)?.name ?? 'studio baru'} untuk proyek yang lebih cocok.`);
+          }
         }
       }
 
@@ -951,6 +1001,7 @@ export function createAnimeIndustryRuntime() {
         },
         s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0 })),
         pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience })),
+        iv: state.studioInvestments.slice(-500).map((entry) => ({ id: entry.id, iid: entry.investorId, sid: entry.studioId, am: entry.amount, d: entry.day })),
         rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, rv: entry.revenue, st: entry.studio, d: entry.day })),
         em: state.emails.slice(-40).map((entry) => ({ id: entry.id, s: entry.subject, b: entry.body, r: entry.read, t: entry.type, d: entry.day })),
       };
@@ -992,6 +1043,13 @@ export function createAnimeIndustryRuntime() {
         committeeIds: Array.isArray(entry.cm) ? entry.cm : [], committeeNegotiationLog: [], contractDraft: entry.cd ?? { creatorShare: 38, studioShare: 42, investorShare: 20 },
         committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0,
         delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar, genre: entry.g ?? '', theme: entry.th ?? '', targetAudience: entry.ta ?? '',
+      })) : [];
+      fresh.studioInvestments = Array.isArray(data.iv) ? data.iv.map((entry) => ({
+        id: entry.id ?? `inv-${entry.iid ?? 'x'}-${entry.sid ?? 'x'}-${Number(entry.d) || 0}`,
+        investorId: entry.iid ?? '',
+        studioId: entry.sid ?? '',
+        amount: Number(entry.am) || 0,
+        day: Number(entry.d) || 0,
       })) : [];
       fresh.releases = Array.isArray(data.rl) ? data.rl.map((entry) => ({ id: entry.id, title: entry.t, score: Number(entry.s) || 0, revenue: Number(entry.rv) || 0, studio: entry.st ?? 'Unknown', day: Number(entry.d) || 0, medium: 'manga' })) : [];
       fresh.emails = Array.isArray(data.em) ? data.em.map((entry) => ({ id: entry.id, subject: entry.s, body: entry.b, read: !!entry.r, type: entry.t ?? 'system', day: Number(entry.d) || 0 })) : [];
@@ -1162,13 +1220,20 @@ export function createAnimeIndustryRuntime() {
       const ceoName = state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD');
       const activeProjects = state.projects.filter((project) => project.studioId === studio.id && !project.archived);
       const npcProjects = state.npcProjects.filter((entry) => entry.studioId === studio.id && !entry.launched);
-      const animeAssets = activeProjects.filter((project) => ['anime', 'movie'].includes(project.medium)).map((project) => project.title);
+      const releaseAssets = state.releases.filter((entry) => entry.studio === studio.name);
+      const animeAssets = activeProjects.filter((project) => ['anime', 'movie'].includes(project.medium)).map((project) => project.title)
+        .concat(releaseAssets.filter((entry) => !String(entry.title || '').toLowerCase().includes('movie')).map((entry) => `${entry.title} (Released)`));
       const mangaAssets = activeProjects.filter((project) => ['manga', 'novel'].includes(project.medium)).map((project) => project.title)
         .concat(npcProjects.map((entry) => entry.title));
-      const movieAssets = activeProjects.filter((project) => project.medium === 'movie').map((project) => project.title);
+      const movieAssets = activeProjects.filter((project) => project.medium === 'movie').map((project) => project.title)
+        .concat(releaseAssets.filter((entry) => String(entry.title || '').toLowerCase().includes('movie')).map((entry) => `${entry.title} (Released)`));
       const staff = state.npcs.filter((npc) => npc.role === 'animator' && npc.studioId === studio.id)
         .map((npc) => ({ id: npc.id, name: npc.name, reputation: npc.reputation, mood: npc.mood }));
       const investorScores = new Map();
+      state.studioInvestments.forEach((entry) => {
+        if (entry.studioId !== studio.id) return;
+        investorScores.set(entry.investorId, (investorScores.get(entry.investorId) ?? 0) + Math.max(0.25, entry.amount / 350_000));
+      });
       state.projects.forEach((project) => {
         if (project.studioId !== studio.id) return;
         (project.committeeIds || []).forEach((investorId) => {
@@ -1178,7 +1243,8 @@ export function createAnimeIndustryRuntime() {
       const investors = [...investorScores.entries()]
         .map(([investorId, score]) => {
           const investor = state.investors.find((entry) => entry.id === investorId);
-          return { id: investorId, name: investor?.name ?? investorId, score: Number(score) || 0, influence: investor?.influence ?? 0 };
+          const investorNpc = state.npcs.find((entry) => entry.id === investorId);
+          return { id: investorId, name: investor?.name ?? investorNpc?.name ?? investorId, score: Number(score) || 0, influence: investor?.influence ?? investorNpc?.reputation ?? 0 };
         })
         .sort((a, b) => b.score - a.score)
         .slice(0, 6);
