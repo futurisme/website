@@ -240,6 +240,29 @@ function createProject(id, medium, title) {
     committeeApproved: false,
     budgetNeed: tunedBudgetNeed,
     securedBudget: 0,
+    plannedEpisodes: medium === 'anime' ? 12 : medium === 'movie' ? 1 : 0,
+    committeeFinance: {
+      committeeBudget: tunedBudgetNeed,
+      spent: 0,
+      debtToCommittee: 0,
+      topUpRounds: 0,
+      allocations: {
+        visual: 0.36,
+        plot: 0.24,
+        audio: 0.16,
+        marketing: 0.14,
+        administration: 0.1,
+      },
+      allocationSpent: {
+        visual: 0,
+        plot: 0,
+        audio: 0,
+        marketing: 0,
+        administration: 0,
+      },
+      committeeContributions: {},
+      reviewHistory: [],
+    },
     productionProgress: 0,
     delayRisk: tunedDelayRisk,
     archived: false,
@@ -257,6 +280,81 @@ function createMetadataSignature({ title, genre, theme, targetAudience }) {
     hash = Math.imul(hash, 16777619);
   }
   return Math.abs(hash >>> 0);
+}
+
+function buildCommitteeBudgetBlueprint(project, studio, state) {
+  const medium = project.medium;
+  const baseEpisodes = medium === 'anime'
+    ? clamp(10 + Math.round((project.popularity + project.competitiveness) / 38), 10, 14)
+    : medium === 'movie'
+      ? 1
+      : 0;
+  const plannedEpisodes = Math.max(1, Math.round(project.plannedEpisodes || baseEpisodes || 1));
+  const perEpisode = medium === 'anime'
+    ? Math.round(1_250_000 + (project.scriptQuality + project.visualQuality + project.plotQuality) * 8_200 + (studio?.craft ?? 50) * 11_500)
+    : medium === 'movie'
+      ? Math.round(21_000_000 + (project.scriptQuality + project.visualQuality + project.plotQuality) * 21_000 + (studio?.craft ?? 50) * 16_000)
+      : Math.round(project.budgetNeed || 8_000_000);
+  const subtotal = perEpisode * plannedEpisodes;
+  const contingency = Math.round(subtotal * (medium === 'movie' ? 0.16 : 0.12));
+  const adminRiskBuffer = Math.round(subtotal * (0.05 + (state.player.adminScore < 25 ? 0.03 : 0)));
+  const committeeBudget = subtotal + contingency + adminRiskBuffer;
+  return {
+    plannedEpisodes,
+    perEpisode,
+    committeeBudget,
+    allocations: {
+      visual: 0.37,
+      plot: 0.23,
+      audio: 0.15,
+      marketing: 0.14,
+      administration: 0.11,
+    },
+  };
+}
+
+function requestCommitteeTopUp(project, state, shortfall) {
+  const committee = project.committeeFinance;
+  if (!committee) return 0;
+  const committeePower = project.committeeIds.reduce((sum, id) => {
+    const investor = state.investors.find((row) => row.id === id);
+    return sum + (investor?.influence ?? 35);
+  }, 0);
+  const topUp = Math.round(shortfall * clamp(0.7 + committeePower / 380, 0.72, 1.25));
+  committee.topUpRounds = (committee.topUpRounds || 0) + 1;
+  committee.debtToCommittee = (committee.debtToCommittee || 0) + topUp;
+  committee.committeeBudget += topUp;
+  project.securedBudget += topUp;
+  project.committeeNegotiationLog.push(`Rapat tambahan komite menyetujui top-up ${formatMoneyCompact(topUp)}. Top-up menjadi utang studio.`);
+  if (project.committeeNegotiationLog.length > 10) project.committeeNegotiationLog.shift();
+  return topUp;
+}
+
+function runCommitteeQualityReview(project, state, studio) {
+  const committee = project.committeeFinance;
+  const spentRatio = committee ? (committee.spent / Math.max(1, committee.committeeBudget)) : 0.9;
+  const debtRatio = committee ? ((committee.debtToCommittee || 0) / Math.max(1, committee.committeeBudget)) : 0;
+  const qualityScore = (
+    (project.visualQuality ?? project.scriptQuality) * 0.38
+    + (project.plotQuality ?? project.scriptQuality) * 0.37
+    + project.scriptQuality * 0.12
+    + (project.competitiveness ?? 35) * 0.08
+    + (studio?.craft ?? 50) * 0.05
+  );
+  const budgetDiscipline = clamp(100 - Math.abs(1 - spentRatio) * 90 - debtRatio * 35, 25, 100);
+  const reviewScore = qualityScore * 0.82 + budgetDiscipline * 0.18 - project.delayRisk * 35;
+  const passThreshold = project.medium === 'movie' ? 76 : 72;
+  const passed = reviewScore >= passThreshold;
+  if (committee) {
+    committee.reviewHistory.push({
+      day: state.day,
+      score: reviewScore,
+      passed,
+      budgetDiscipline,
+    });
+    if (committee.reviewHistory.length > 8) committee.reviewHistory.shift();
+  }
+  return { passed, reviewScore, budgetDiscipline };
 }
 
 function getPitchReadinessThreshold(project) {
@@ -1205,9 +1303,10 @@ export function createAnimeIndustryRuntime() {
             const investor = state.investors.find((entry) => entry.id === id);
             return sum + (investor ? investor.influence : 0);
           }, 0);
-          const fundingTick = 120_000 + committeeStrength * 1100 + state.player.adminScore * 520;
+          const fundingGap = Math.max(0, project.budgetNeed - project.securedBudget);
+          const fundingTick = Math.min(fundingGap, Math.round(160_000 + committeeStrength * 1400 + state.player.adminScore * 620));
           project.securedBudget = Math.min(project.budgetNeed, project.securedBudget + fundingTick);
-          if (project.securedBudget >= project.budgetNeed * 0.78 && project.committeeApproved) {
+          if (project.securedBudget >= project.budgetNeed * 0.8 && project.committeeApproved) {
             project.stage = 'preproduction';
             log(state, `${project.title} lolos komite dan masuk pre-production.`);
           }
@@ -1216,9 +1315,31 @@ export function createAnimeIndustryRuntime() {
         if (project.stage === 'production' || project.stage === 'postproduction') {
           const studio = state.studios.find((entry) => entry.id === project.studioId);
           const speed = (studio?.speed ?? 50) / 100;
+          const committee = project.committeeFinance;
+          const episodeBudget = (committee?.committeeBudget ?? project.budgetNeed) / Math.max(1, project.plannedEpisodes || 12);
+          const burnRate = project.stage === 'production' ? 0.9 : 0.45;
+          const burnCost = Math.round(episodeBudget * burnRate * (project.medium === 'movie' ? 1.18 : 1));
+          if (committee) {
+            const projectedSpent = committee.spent + burnCost;
+            if (projectedSpent > project.securedBudget) {
+              const shortfall = projectedSpent - project.securedBudget;
+              requestCommitteeTopUp(project, state, shortfall);
+            }
+            committee.spent += burnCost;
+            committee.allocationSpent.visual += burnCost * committee.allocations.visual;
+            committee.allocationSpent.plot += burnCost * committee.allocations.plot;
+            committee.allocationSpent.audio += burnCost * committee.allocations.audio;
+            committee.allocationSpent.marketing += burnCost * committee.allocations.marketing;
+            committee.allocationSpent.administration += burnCost * committee.allocations.administration;
+          }
+          if (studio) studio.funds = (studio.funds || 0) - burnCost * 0.08;
+
           project.productionProgress = Math.min(100, project.productionProgress + 1.5 + speed * 2.8);
-          project.visualQuality = Math.min(100, (project.visualQuality ?? project.scriptQuality) + 0.24 + (studio?.craft ?? 50) * 0.004);
-          project.competitiveness = Math.min(100, (project.competitiveness ?? 35) + 0.08 + (studio?.network ?? 50) * 0.0015);
+          const visualBudgetQualityBoost = committee ? clamp((committee.allocations.visual * 1.45) - 0.28, 0.12, 0.42) : 0.24;
+          const plotBudgetQualityBoost = committee ? clamp((committee.allocations.plot * 1.35) - 0.2, 0.1, 0.34) : 0.18;
+          project.visualQuality = Math.min(100, (project.visualQuality ?? project.scriptQuality) + visualBudgetQualityBoost + (studio?.craft ?? 50) * 0.004);
+          project.plotQuality = Math.min(100, (project.plotQuality ?? project.scriptQuality) + plotBudgetQualityBoost + (studio?.craft ?? 50) * 0.0032);
+          project.competitiveness = Math.min(100, (project.competitiveness ?? 35) + 0.08 + (studio?.network ?? 50) * 0.0015 + (committee?.allocations.marketing ?? 0.14) * 0.4);
           project.delayRisk = Math.max(0.03, project.delayRisk - 0.002 + (state.market.audienceFatigue - 0.2) * 0.001);
           if (project.productionProgress >= 100 && project.stage === 'production') {
             project.stage = 'postproduction';
@@ -1338,18 +1459,34 @@ export function createAnimeIndustryRuntime() {
       const project = byId(state, projectId);
       if (!project || !['studio_interest', 'committee_setup'].includes(project.stage)) return false;
       if (!project.studioId) return false;
+      const studio = state.studios.find((entry) => entry.id === project.studioId);
+      const blueprint = buildCommitteeBudgetBlueprint(project, studio, state);
       project.stage = 'committee_setup';
       project.delayRisk = Math.max(0.05, project.delayRisk - 0.02);
+      project.plannedEpisodes = blueprint.plannedEpisodes;
+      project.budgetNeed = blueprint.committeeBudget;
+      project.committeeFinance = {
+        committeeBudget: blueprint.committeeBudget,
+        spent: 0,
+        debtToCommittee: 0,
+        topUpRounds: 0,
+        allocations: blueprint.allocations,
+        allocationSpent: { visual: 0, plot: 0, audio: 0, marketing: 0, administration: 0 },
+        committeeContributions: {},
+        reviewHistory: [],
+      };
       while (project.committeeIds.length < 3) {
         const candidate = state.investors[(state.day + project.committeeIds.length) % state.investors.length];
         if (!project.committeeIds.includes(candidate.id)) project.committeeIds.push(candidate.id);
       }
       const raised = project.committeeIds.reduce((sum, id) => {
         const inv = state.investors.find((entry) => entry.id === id);
-        return sum + (inv ? 2_300_000 + inv.influence * 9_000 : 0);
+        const contribution = inv ? Math.round(2_300_000 + inv.influence * 9_000) : 0;
+        project.committeeFinance.committeeContributions[id] = contribution;
+        return sum + contribution;
       }, 0);
       project.securedBudget = Math.min(project.budgetNeed, raised);
-      project.committeeNegotiationLog.push('Komite dibentuk. Mulai diskusi kontrak dengan CEO studio & investor.');
+      project.committeeNegotiationLog.push(`Komite dibentuk. Target ${project.plannedEpisodes} episode, kebutuhan anggaran ${formatMoneyCompact(project.budgetNeed)}.`);
       return true;
     });
   }
@@ -1380,7 +1517,10 @@ export function createAnimeIndustryRuntime() {
       if (project.committeeNegotiationLog.length > 7) project.committeeNegotiationLog.shift();
 
       if (project.committeeNegotiationLog.length >= 3) {
-        project.committeeApproved = true;
+        project.committeeApproved = project.securedBudget >= project.budgetNeed * 0.68;
+        if (!project.committeeApproved) {
+          project.committeeNegotiationLog.push('Draft disetujui, namun dana belum cukup. Komite menunggu putaran pendanaan berikutnya.');
+        }
       }
       return true;
     });
@@ -1393,8 +1533,18 @@ export function createAnimeIndustryRuntime() {
       if (project.stage === 'committee_setup') project.stage = 'preproduction';
       if (project.stage === 'preproduction') {
         project.stage = 'production';
-        state.cash -= 1_850_000;
-        log(state, `${project.title} resmi mulai produksi anime.`);
+        const committee = project.committeeFinance;
+        const studio = state.studios.find((entry) => entry.id === project.studioId);
+        const prepCost = Math.round((project.budgetNeed || 0) * 0.08);
+        if (committee) {
+          committee.spent += prepCost;
+          committee.allocationSpent.administration += prepCost * 0.42;
+          committee.allocationSpent.visual += prepCost * 0.28;
+          committee.allocationSpent.plot += prepCost * 0.2;
+          committee.allocationSpent.audio += prepCost * 0.1;
+        }
+        if (studio) studio.funds = (studio.funds || 0) - prepCost * 0.06;
+        log(state, `${project.title} resmi mulai produksi (${project.plannedEpisodes} episode).`);
         return true;
       }
       return false;
@@ -1404,8 +1554,20 @@ export function createAnimeIndustryRuntime() {
   function launchAnime(projectId) {
     return withAction('launch-anime', () => {
       const project = byId(state, projectId);
-      if (!project || !['postproduction', 'release'].includes(project.stage)) return false;
+      if (!project || !['postproduction', 'committee_review', 'release'].includes(project.stage)) return false;
       const studio = state.studios.find((entry) => entry.id === project.studioId);
+      if (project.stage === 'postproduction' || project.stage === 'committee_review') {
+        const review = runCommitteeQualityReview(project, state, studio);
+        if (!review.passed) {
+          project.stage = 'production';
+          project.productionProgress = Math.max(58, project.productionProgress - 24);
+          project.delayRisk = clamp(project.delayRisk + 0.025, 0.03, 0.52);
+          project.committeeNegotiationLog.push(`Review komite menolak rilis (score ${review.reviewScore.toFixed(1)}). Studio wajib revisi kualitas visual/alur.`);
+          if (project.committeeNegotiationLog.length > 10) project.committeeNegotiationLog.shift();
+          return false;
+        }
+        project.stage = 'release';
+      }
       const competitionPressure = computeCompetitivePressure(state, project.medium);
       const score = computeReleaseScore(project, studio, state.market) - competitionPressure * 6.2;
       project.archived = true;
@@ -1426,6 +1588,12 @@ export function createAnimeIndustryRuntime() {
       project.ratingsCount = previousRatings + ratings;
       project.imdbScore = clamp(((previousImdb * previousRatings) + (imdb * ratings)) / Math.max(1, project.ratingsCount), 1, 9.9);
       state.cash += revenue;
+      if (project.committeeFinance?.debtToCommittee) {
+        const debtPayment = Math.round(project.committeeFinance.debtToCommittee * 0.38);
+        const paid = Math.min(revenue, debtPayment);
+        state.cash -= paid;
+        project.committeeFinance.debtToCommittee = Math.max(0, project.committeeFinance.debtToCommittee - paid);
+      }
       state.reputation = Math.min(100, state.reputation + (score >= 88 ? 8 : score >= 65 ? 5 : 2));
       state.releases.push({ id: project.id, title: project.title, medium: project.medium, score, imdb: project.imdbScore, ratings: project.ratingsCount, revenue, studio: studio?.name ?? 'Unknown Studio', day: state.day });
       return true;
@@ -1459,7 +1627,7 @@ export function createAnimeIndustryRuntime() {
           sp: !!state.player.studioPlanningOpen,
         },
         s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0, fd: entry.funds ?? 0 })),
-        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, vq: entry.visualQuality, pq: entry.plotQuality, cp: entry.competitiveness, im: entry.imdbScore, rc: entry.ratingsCount, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience })),
+        pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, vq: entry.visualQuality, pq: entry.plotQuality, cp: entry.competitiveness, im: entry.imdbScore, rc: entry.ratingsCount, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience, pe: entry.plannedEpisodes, cf: entry.committeeFinance })),
         iv: state.studioInvestments.slice(-500).map((entry) => ({ id: entry.id, iid: entry.investorId, sid: entry.studioId, am: entry.amount, d: entry.day })),
         fl: state.studioFinanceLedger.slice(-600).map((entry) => ({ d: entry.day, sid: entry.studioId, i: entry.income, e: entry.expense, n: entry.net, f: entry.funds })),
         rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, im: entry.imdb, rt: entry.ratings, rv: entry.revenue, st: entry.studio, d: entry.day })),
@@ -1503,7 +1671,8 @@ export function createAnimeIndustryRuntime() {
         imdbScore: Number(entry.im) || 5.2, ratingsCount: Number(entry.rc) || 0,
         chapters: Number(entry.ch) || 0, studioId: entry.sid ?? null, interestedStudioIds: Array.isArray(entry.ints) ? entry.ints : [],
         committeeIds: Array.isArray(entry.cm) ? entry.cm : [], committeeNegotiationLog: [], contractDraft: entry.cd ?? { creatorShare: 38, studioShare: 42, investorShare: 20 },
-        committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0,
+        committeeApproved: !!entry.ca, budgetNeed: Number(entry.bn) || 10_000_000, securedBudget: Number(entry.sb) || 0, productionProgress: Number(entry.pp) || 0, plannedEpisodes: Number(entry.pe) || (entry.m === 'anime' ? 12 : entry.m === 'movie' ? 1 : 0),
+        committeeFinance: entry.cf ?? { committeeBudget: Number(entry.bn) || 10_000_000, spent: 0, debtToCommittee: 0, topUpRounds: 0, allocations: { visual: 0.37, plot: 0.23, audio: 0.15, marketing: 0.14, administration: 0.11 }, allocationSpent: { visual: 0, plot: 0, audio: 0, marketing: 0, administration: 0 }, committeeContributions: {}, reviewHistory: [] },
         delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar, genre: entry.g ?? '', theme: entry.th ?? '', targetAudience: entry.ta ?? '',
       })) : [];
       fresh.studioInvestments = Array.isArray(data.iv) ? data.iv.map((entry) => ({
@@ -1809,7 +1978,7 @@ export function createAnimeIndustryRuntime() {
         canPitch: project.chapters >= getPitchReadinessThreshold(project) && ['manga_serialization', 'pitching', 'studio_interest'].includes(project.stage),
         canCommittee: ['studio_interest', 'committee_setup'].includes(project.stage),
         canProduction: project.committeeApproved && project.securedBudget >= project.budgetNeed * 0.78 && ['committee_setup', 'preproduction'].includes(project.stage),
-        canLaunch: ['postproduction', 'release'].includes(project.stage),
+        canLaunch: ['postproduction', 'committee_review', 'release'].includes(project.stage),
       })),
       releases: state.releases.slice(-8).reverse(),
       feed: state.feed.slice(-20).reverse(),

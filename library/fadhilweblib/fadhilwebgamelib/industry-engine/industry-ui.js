@@ -563,10 +563,17 @@ export function createIndustryUiController({ root, handlers }) {
 
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {
+        const committeeFinance = committeeProject.committeeFinance || {};
+        const alloc = committeeFinance.allocations || {};
+        const allocSpent = committeeFinance.allocationSpent || {};
         committeeBodyEl.innerHTML = `
           <article class="industry-project">
             <h3>${esc(committeeProject.title)}</h3>
             <p>Studio dipilih: ${esc(committeeProject.studioName)}</p>
+            <p>Rencana Episode: ${Math.max(1, Number(committeeProject.plannedEpisodes || 0))} episode · Budget Need ${Number(committeeProject.budgetNeed || 0).toLocaleString()} · Secured ${Number(committeeProject.securedBudget || 0).toLocaleString()}</p>
+            <p>Anggaran/Episode: ${Math.round((Number(committeeFinance.committeeBudget || committeeProject.budgetNeed || 0)) / Math.max(1, Number(committeeProject.plannedEpisodes || 1))).toLocaleString()} · Spent ${Number(committeeFinance.spent || 0).toLocaleString()} · Debt Top-up ${Number(committeeFinance.debtToCommittee || 0).toLocaleString()}</p>
+            <p>Alokasi (Visual/Alur/Suara/Marketing/Admin): ${(Number(alloc.visual || 0) * 100).toFixed(1)}% / ${(Number(alloc.plot || 0) * 100).toFixed(1)}% / ${(Number(alloc.audio || 0) * 100).toFixed(1)}% / ${(Number(alloc.marketing || 0) * 100).toFixed(1)}% / ${(Number(alloc.administration || 0) * 100).toFixed(1)}%</p>
+            <p>Pemakaian Alokasi: V ${Math.round(Number(allocSpent.visual || 0)).toLocaleString()} · A ${Math.round(Number(allocSpent.plot || 0)).toLocaleString()} · S ${Math.round(Number(allocSpent.audio || 0)).toLocaleString()} · M ${Math.round(Number(allocSpent.marketing || 0)).toLocaleString()} · Ad ${Math.round(Number(allocSpent.administration || 0)).toLocaleString()}</p>
             <p>Draft Bagi Hasil (Creator/Studio/Investor): ${committeeProject.contractDraft.creatorShare}% / ${committeeProject.contractDraft.studioShare}% / ${committeeProject.contractDraft.investorShare}%</p>
             <p>Komite approval: ${committeeProject.committeeApproved ? '✅ Ready' : '⏳ Diskusi berjalan'}</p>
             <div class="actions">
@@ -635,6 +642,7 @@ export function createIndustryUiController({ root, handlers }) {
       preproduction: 70,
       production: 84,
       postproduction: 95,
+      committee_review: 97,
       release: 100,
     };
     const isStudioOwned = (project) => ['production', 'postproduction', 'release'].includes(project.stage) || (project.studioId && project.committeeApproved);
