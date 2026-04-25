@@ -13,20 +13,22 @@
     <main id="animeIndustryApp" class="industry-shell">
       <section id="frameRegister" class="frame frame-active">
         <article class="industry-panel">
-          <h1>AnimeIndustry</h1>
-          <p>Register dulu untuk mulai simulasi.</p>
-          <label>Nama</label>
-          <input id="registerName" type="text" placeholder="Masukkan nama" />
-          <label>Profesi awal</label>
-          <select id="registerProfession">
-            <option>Mangaka</option>
-            <option>Novelis</option>
-            <option>Animator</option>
-          </select>
-          <label>Load Save Cepat (AI26)</label>
-          <textarea id="registerSaveInput" rows="4" placeholder="Tempel save AI26 di sini untuk langsung load dari awal"></textarea>
-          <button data-action="load-save-register">Load Save dari Register</button>
-          <button data-action="register">Mulai Simulasi</button>
+          <div class="frame-content-scroll">
+            <h1>AnimeIndustry</h1>
+            <p>Register dulu untuk mulai simulasi.</p>
+            <label>Nama</label>
+            <input id="registerName" type="text" placeholder="Masukkan nama" />
+            <label>Profesi awal</label>
+            <select id="registerProfession">
+              <option>Mangaka</option>
+              <option>Novelis</option>
+              <option>Animator</option>
+            </select>
+            <label>Load Save Cepat (AI26)</label>
+            <textarea id="registerSaveInput" rows="4" placeholder="Tempel save AI26 di sini untuk langsung load dari awal"></textarea>
+            <button data-action="load-save-register">Load Save dari Register</button>
+            <button data-action="register">Mulai Simulasi</button>
+          </div>
         </article>
       </section>
 
@@ -58,44 +60,54 @@
       <section id="frameFullProfile" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Profile Fullframe</h2><button data-action="back-main">↩</button></div>
-          <div id="industryProfile" class="industry-stats"></div>
+          <div class="frame-content-scroll">
+            <div id="industryProfile" class="industry-stats"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullProjects" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Projects Fullframe</h2><button data-action="back-main">↩</button></div>
-          <div id="industryProjects" class="industry-projects"></div>
+          <div class="frame-content-scroll">
+            <div id="industryProjects" class="industry-projects"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullFoundStudio" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Pendirian Studio</h2><button data-action="back-main">↩</button></div>
-          <div id="ceoStatus"></div>
-          <div class="industry-toolbar">
-            <button data-action="open-studio-planning">Buka Perencanaan Studio</button>
-            <button data-action="seek-funding">Cari Pendanaan</button>
+          <div class="frame-content-scroll">
+            <div id="ceoStatus"></div>
+            <div class="industry-toolbar">
+              <button data-action="open-studio-planning">Buka Perencanaan Studio</button>
+              <button data-action="seek-funding">Cari Pendanaan</button>
+            </div>
+            <label>Nama Studio Baru</label>
+            <input id="studioNameInput" type="text" placeholder="Contoh: Aurora Frame Studio" />
+            <button data-action="found-studio">Dirikan Studio</button>
           </div>
-          <label>Nama Studio Baru</label>
-          <input id="studioNameInput" type="text" placeholder="Contoh: Aurora Frame Studio" />
-          <button data-action="found-studio">Dirikan Studio</button>
         </article>
       </section>
 
       <section id="frameFullRanking" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Ranking Fullframe</h2><button data-action="back-main">↩</button></div>
-          <div id="rankingBoard" class="industry-projects"></div>
+          <div class="frame-content-scroll">
+            <div id="rankingBoard" class="industry-projects"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullFeed" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Feed Fullframe</h2><button data-action="back-main">↩</button></div>
-          <ul id="industryFeed" class="industry-feed"></ul>
-          <h3>Releases</h3>
-          <ul id="industryReleases" class="industry-releases"></ul>
+          <div class="frame-content-scroll">
+            <ul id="industryFeed" class="industry-feed"></ul>
+            <h3>Releases</h3>
+            <ul id="industryReleases" class="industry-releases"></ul>
+          </div>
         </article>
       </section>
 
@@ -103,24 +115,30 @@
       <section id="frameFullStudios" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Studios Fullframe</h2><button data-action="back-main">↩</button></div>
-          <div id="industryStudios" class="industry-projects"></div>
+          <div class="frame-content-scroll">
+            <div id="industryStudios" class="industry-projects"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullEmail" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Email Inbox (Unread)</h2><button data-action="back-main">↩</button></div>
-          <div id="industryInbox" class="industry-projects"></div>
+          <div class="frame-content-scroll">
+            <div id="industryInbox" class="industry-projects"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullCommittee" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Production Committee</h2><button data-action="back-projects">↩</button></div>
-          <div id="committeeBody"></div>
-          <div class="industry-toolbar">
-            <button data-action="committee-discuss">Diskusi AI NPC</button>
-            <button data-action="committee-confirm">Bentuk Komite</button>
+          <div class="frame-content-scroll">
+            <div id="committeeBody"></div>
+            <div class="industry-toolbar">
+              <button data-action="committee-discuss">Diskusi AI NPC</button>
+              <button data-action="committee-confirm">Bentuk Komite</button>
+            </div>
           </div>
         </article>
       </section>
@@ -128,10 +146,12 @@
       <section id="frameFullManagement" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Management Fullframe</h2><button data-action="back-main">↩</button></div>
-          <div id="managementBoard"></div>
-          <div class="industry-toolbar">
-            <button data-action="management-merger">Proposal Merger Studio</button>
-            <button data-action="management-cofund">Co-Funding Studio Baru</button>
+          <div class="frame-content-scroll">
+            <div id="managementBoard"></div>
+            <div class="industry-toolbar">
+              <button data-action="management-merger">Proposal Merger Studio</button>
+              <button data-action="management-cofund">Co-Funding Studio Baru</button>
+            </div>
           </div>
         </article>
       </section>
@@ -139,19 +159,23 @@
       <section id="frameSubProject" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2 id="subProjectTitle">Project</h2><button data-action="back-projects">↩</button></div>
-          <div id="subProjectBody"></div>
+          <div class="frame-content-scroll">
+            <div id="subProjectBody"></div>
+          </div>
         </article>
       </section>
 
       <section id="frameFullSettings" class="frame">
         <article class="industry-panel">
           <div class="topline"><h2>Settings Save/Load</h2><button data-action="back-main">↩</button></div>
-          <p>Format save: teks ringkas yang bisa dibaca dan diedit manual.</p>
-          <textarea id="savePayloadInput" rows="8" placeholder="AI26:{...}"></textarea>
-          <div class="industry-toolbar">
-            <button data-action="export-save">Generate Save</button>
-            <button data-action="download-save">Download Save</button>
-            <button data-action="load-save">Load Save</button>
+          <div class="frame-content-scroll">
+            <p>Format save: teks ringkas yang bisa dibaca dan diedit manual.</p>
+            <textarea id="savePayloadInput" rows="8" placeholder="AI26:{...}"></textarea>
+            <div class="industry-toolbar">
+              <button data-action="export-save">Generate Save</button>
+              <button data-action="download-save">Download Save</button>
+              <button data-action="load-save">Load Save</button>
+            </div>
           </div>
         </article>
       </section>

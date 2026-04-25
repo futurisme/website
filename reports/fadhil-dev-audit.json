@@ -1,13 +1,13 @@
 {
   "summary": {
     "base_url": "https://fadhil.dev",
-    "generated_at": "2026-04-21T11:50:18Z",
-    "paths_checked": 14,
-    "http_200_count": 14,
+    "generated_at": "2026-04-25T07:57:37Z",
+    "paths_checked": 16,
+    "http_200_count": 15,
     "redirect_count": 0,
-    "error_count": 0,
-    "missing_meta_description_count": 1,
-    "missing_canonical_count": 2,
+    "error_count": 1,
+    "missing_meta_description_count": 2,
+    "missing_canonical_count": 3,
     "missing_h1_count": 1,
     "non_https_final_count": 0,
     "duplicate_groups": 65,
@@ -25,7 +25,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 467.1,
+      "time_ms": 409.3,
       "content_type": "text/html; charset=utf-8",
       "content_length": 4729,
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
@@ -53,7 +53,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 384.5,
+      "time_ms": 364.8,
       "content_type": "text/html; charset=utf-8",
       "content_length": 7757,
       "title": "AnimeIndustry",
@@ -71,6 +71,41 @@
       "deprecated_flags": []
     },
     {
+      "path": "/archives",
+      "url": "https://fadhil.dev/archives",
+      "status": 200,
+      "final_url": "https://fadhil.dev/archives",
+      "final_host": "fadhil.dev",
+      "final_scheme": "https",
+      "final_path": "/archives",
+      "is_https_final": true,
+      "redirected": false,
+      "redirect_target": "",
+      "time_ms": 373.7,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": 1409,
+      "title": "Fadhil Archives",
+      "seo_basics": {
+        "meta_description": false,
+        "canonical": false,
+        "canonical_href": "",
+        "has_h1": true,
+        "noindex": false
+      },
+      "processing_hints": {
+        "script_tags": 1,
+        "stylesheet_links": 1
+      },
+      "deprecated_flags": []
+    },
+    {
+      "path": "/archives/([^/.]+)",
+      "url": "https://fadhil.dev/archives/([^/.]+)",
+      "status": 404,
+      "error": "HTTP Error 404: Not Found",
+      "time_ms": 268.5
+    },
+    {
       "path": "/books",
       "url": "https://fadhil.dev/books",
       "status": 200,
@@ -81,14 +116,14 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 281.1,
+      "time_ms": 229.1,
       "content_type": "text/html; charset=utf-8",
       "content_length": 1331,
       "title": "Books",
       "seo_basics": {
         "meta_description": true,
         "canonical": true,
-        "canonical_href": "https://fadhil.dev/Books",
+        "canonical_href": "https://fadhil.dev/books",
         "has_h1": true,
         "noindex": false
       },
@@ -109,14 +144,14 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 345.8,
+      "time_ms": 164.9,
       "content_type": "text/html; charset=utf-8",
       "content_length": 1321,
       "title": "Books Editor",
       "seo_basics": {
         "meta_description": true,
         "canonical": true,
-        "canonical_href": "https://fadhil.dev/Books/Editor",
+        "canonical_href": "https://fadhil.dev/books/editor",
         "has_h1": true,
         "noindex": false
       },
@@ -137,7 +172,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 198.0,
+      "time_ms": 172.6,
       "content_type": "text/html; charset=utf-8",
       "content_length": 7757,
       "title": "AnimeIndustry",
@@ -165,7 +200,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 260.9,
+      "time_ms": 276.0,
       "content_type": "text/html; charset=utf-8",
       "content_length": 4903,
       "title": "DreamBusiness",
@@ -193,7 +228,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 291.7,
+      "time_ms": 198.2,
       "content_type": "text/html; charset=utf-8",
       "content_length": 37627,
       "title": "FadhiumRPG",
@@ -221,7 +256,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 149.9,
+      "time_ms": 184.6,
       "content_type": "text/html; charset=utf-8",
       "content_length": 2450,
       "title": "Home | Website Hub",
@@ -249,7 +284,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 150.1,
+      "time_ms": 179.1,
       "content_type": "text/html; charset=utf-8",
       "content_length": 2641,
       "title": "Mindmapmaker Menu",
@@ -277,7 +312,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 145.0,
+      "time_ms": 293.2,
       "content_type": "text/html; charset=utf-8",
       "content_length": 2832,
       "title": "Mindmapmaker Workspace",
@@ -305,7 +340,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 120.2,
+      "time_ms": 183.9,
       "content_type": "text/html; charset=utf-8",
       "content_length": 4729,
       "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
@@ -333,7 +368,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 104.7,
+      "time_ms": 136.2,
       "content_type": "text/html; charset=utf-8",
       "content_length": 37627,
       "title": "FadhiumRPG",
@@ -361,9 +396,9 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 283.2,
+      "time_ms": 161.3,
       "content_type": "text/html; charset=utf-8",
-      "content_length": 6529,
+      "content_length": 6531,
       "title": "ShareIdeas — Home",
       "seo_basics": {
         "meta_description": true,
@@ -389,7 +424,7 @@
       "is_https_final": true,
       "redirected": false,
       "redirect_target": "",
-      "time_ms": 159.9,
+      "time_ms": 161.8,
       "content_type": "text/html; charset=utf-8",
       "content_length": 2993,
       "title": "ShareIdeas",
@@ -416,16 +451,16 @@
         {
           "path": "assets/public/images/shareideas-2.webp",
           "size_bytes": 259938,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 3,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
-          "path": "assets/public/images/shareideas-2.webp",
+          "path": "assets/public/images/shareideas.webp",
           "size_bytes": 259938,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 3,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -456,7 +491,7 @@
           "path": "website/portfolio/testing/images/portfolio.webp",
           "size_bytes": 59632,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 8,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -479,7 +514,7 @@
           "path": "library/fadhilweblib/styles/theme.css",
           "size_bytes": 9689,
           "reference_count_exact_path": 4,
-          "reference_count_basename": 15,
+          "reference_count_basename": 19,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -487,7 +522,7 @@
           "path": "website/home/theme.css",
           "size_bytes": 9689,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 15,
+          "reference_count_basename": 19,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -495,7 +530,7 @@
           "path": "website/website/mindmapmaker/theme.css",
           "size_bytes": 9689,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 15,
+          "reference_count_basename": 19,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -556,7 +591,7 @@
           "path": "library/fadhilweblib/core/syntax/expression.ts",
           "size_bytes": 4990,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 5,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -564,7 +599,7 @@
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts",
           "size_bytes": 4990,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 5,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -694,7 +729,7 @@
           "path": "library/fadhilweblib/components/layout/section.tsx",
           "size_bytes": 3618,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -702,7 +737,7 @@
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx",
           "size_bytes": 3618,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -855,7 +890,7 @@
           "path": "library/fadhilweblib/presets/index.ts",
           "size_bytes": 2744,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 351,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -863,7 +898,7 @@
           "path": "website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts",
           "size_bytes": 2744,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 351,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
