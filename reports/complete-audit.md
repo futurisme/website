@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-25T23:36:09Z
+Generated: 2026-04-25T23:41:58Z
 
 ## Executive Summary
 
@@ -13,33 +13,52 @@ Generated: 2026-04-25T23:36:09Z
 - Missing H1: 1
 - Duplicate file groups (all): 65
 - Potential unused static files: 0
+- Missing security headers (CSP/HSTS/XCTO/Referrer): 45
+- Avg response time (ms): 81.2
+- P95 response time (ms): 115.2
+- Vercel route target issues: 0
+- Vercel build glob issues: 0
 
 ## Domain Route Audit
 
-| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | Deprecated |
-|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 99.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/animeindustry` | 200 | — | 95.5 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/archives` | 200 | — | 42.2 | ❌ | ❌ | ✅ | ✅ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | 78.0 | ❌ | ❌ | ❌ | ❌ | ✅ |
-| `/books` | 200 | — | 148.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/books/editor` | 200 | — | 96.2 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/animeindustry` | 200 | — | 98.2 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/dreambusiness` | 200 | — | 145.5 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/games/rpg` | 200 | — | 57.3 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/home` | 200 | — | 53.7 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/mindmapmaker` | 200 | — | 86.1 | ✅ | ❌ | ✅ | ✅ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 46.1 | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `/portfolio` | 200 | — | 82.0 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/rpg` | 200 | — | 81.9 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas` | 200 | — | 44.4 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `/shareideas/page/1` | 200 | — | 81.4 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | SecHdr | Deprecated |
+|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| `/` | 200 | — | 115.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 120.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 45.6 | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | 81.3 | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `/books` | 200 | — | 85.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 52.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 60.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 87.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 102.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 95.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 94.1 | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 85.4 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 43.9 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 95.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 44.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 88.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
 ### Route Errors
 
 | Path | Status | Error |
 |---|---:|---|
 | `/archives/([^/.]+)` | 404 | `HTTP Error 404: Not Found` |
+
+## Security Header Coverage (HTTP 200 pages)
+
+| Header | Missing Count |
+|---|---:|
+| `content-security-policy` | 15 |
+| `strict-transport-security` | 0 |
+| `x-content-type-options` | 15 |
+| `referrer-policy` | 15 |
+
+## Vercel Target Integrity
+
+- Route target issues: 0
+- Build glob issues: 0
 
 ## Duplicate File Analysis (Top 25)
 

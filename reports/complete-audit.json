@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-04-25T23:36:09Z",
+    "generated_at": "2026-04-25T23:41:58Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 65,
-    "elapsed_seconds": 6.46
+    "elapsed_seconds": 6.34
   },
   "domain": {
     "summary": {
@@ -14,14 +14,24 @@
       "missing_meta_description_count": 2,
       "missing_canonical_count": 3,
       "missing_h1_count": 1,
-      "non_https_final_count": 0
+      "non_https_final_count": 0,
+      "avg_response_time_ms": 81.2,
+      "p95_response_time_ms": 115.2,
+      "max_response_time_ms": 120.6,
+      "missing_security_headers_count": 45,
+      "missing_security_header_details": {
+        "content-security-policy": 15,
+        "strict-transport-security": 0,
+        "x-content-type-options": 15,
+        "referrer-policy": 15
+      }
     },
     "results": [
       {
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 99.9,
+        "time_ms": 115.2,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -29,6 +39,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 4729,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
         "seo_basics": {
           "meta_description": true,
@@ -47,7 +64,7 @@
         "path": "/animeindustry",
         "url": "https://fadhil.dev/animeindustry",
         "status": 200,
-        "time_ms": 95.5,
+        "time_ms": 120.6,
         "final_url": "https://fadhil.dev/animeindustry",
         "final_path": "/animeindustry",
         "is_https_final": true,
@@ -55,6 +72,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 9425,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "AnimeIndustry",
         "seo_basics": {
           "meta_description": true,
@@ -73,7 +97,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 42.2,
+        "time_ms": 45.6,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -81,6 +105,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 2630,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Fadhil Archives",
         "seo_basics": {
           "meta_description": false,
@@ -100,13 +131,13 @@
         "url": "https://fadhil.dev/archives/([^/.]+)",
         "status": 404,
         "error": "HTTP Error 404: Not Found",
-        "time_ms": 78.0
+        "time_ms": 81.3
       },
       {
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 148.9,
+        "time_ms": 85.1,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -114,6 +145,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 1331,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Books",
         "seo_basics": {
           "meta_description": true,
@@ -132,7 +170,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 96.2,
+        "time_ms": 52.2,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -140,6 +178,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 1321,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Books Editor",
         "seo_basics": {
           "meta_description": true,
@@ -158,7 +203,7 @@
         "path": "/games/animeindustry",
         "url": "https://fadhil.dev/games/animeindustry",
         "status": 200,
-        "time_ms": 98.2,
+        "time_ms": 60.3,
         "final_url": "https://fadhil.dev/games/animeindustry",
         "final_path": "/games/animeindustry",
         "is_https_final": true,
@@ -166,6 +211,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 9425,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "AnimeIndustry",
         "seo_basics": {
           "meta_description": true,
@@ -184,7 +236,7 @@
         "path": "/games/dreambusiness",
         "url": "https://fadhil.dev/games/dreambusiness",
         "status": 200,
-        "time_ms": 145.5,
+        "time_ms": 87.6,
         "final_url": "https://fadhil.dev/games/dreambusiness",
         "final_path": "/games/dreambusiness",
         "is_https_final": true,
@@ -192,6 +244,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 4903,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "DreamBusiness",
         "seo_basics": {
           "meta_description": true,
@@ -210,7 +269,7 @@
         "path": "/games/rpg",
         "url": "https://fadhil.dev/games/rpg",
         "status": 200,
-        "time_ms": 57.3,
+        "time_ms": 102.8,
         "final_url": "https://fadhil.dev/games/rpg",
         "final_path": "/games/rpg",
         "is_https_final": true,
@@ -218,6 +277,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 37627,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "FadhiumRPG",
         "seo_basics": {
           "meta_description": true,
@@ -236,7 +302,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 53.7,
+        "time_ms": 95.6,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -244,6 +310,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 2450,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Home | Website Hub",
         "seo_basics": {
           "meta_description": true,
@@ -262,7 +335,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 86.1,
+        "time_ms": 94.1,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -270,6 +343,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 2641,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Mindmapmaker Menu",
         "seo_basics": {
           "meta_description": true,
@@ -288,7 +368,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 46.1,
+        "time_ms": 85.4,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -296,6 +376,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 2832,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Mindmapmaker Workspace",
         "seo_basics": {
           "meta_description": false,
@@ -314,7 +401,7 @@
         "path": "/portfolio",
         "url": "https://fadhil.dev/portfolio",
         "status": 200,
-        "time_ms": 82.0,
+        "time_ms": 43.9,
         "final_url": "https://fadhil.dev/portfolio",
         "final_path": "/portfolio",
         "is_https_final": true,
@@ -322,6 +409,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 4729,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
         "seo_basics": {
           "meta_description": true,
@@ -340,7 +434,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 81.9,
+        "time_ms": 95.7,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -348,6 +442,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 37627,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "FadhiumRPG",
         "seo_basics": {
           "meta_description": true,
@@ -366,7 +467,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 44.4,
+        "time_ms": 44.7,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -374,6 +475,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 6531,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "ShareIdeas — Home",
         "seo_basics": {
           "meta_description": true,
@@ -392,7 +500,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 81.4,
+        "time_ms": 88.4,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -400,6 +508,13 @@
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
         "content_length": 2993,
+        "cache_control": "public, max-age=0, must-revalidate",
+        "security_headers": {
+          "content-security-policy": false,
+          "strict-transport-security": true,
+          "x-content-type-options": false,
+          "referrer-policy": false
+        },
         "title": "ShareIdeas",
         "seo_basics": {
           "meta_description": true,
@@ -1019,7 +1134,7 @@
   ],
   "static_unused_audit": {
     "summary": {
-      "tracked_files": 473,
+      "tracked_files": 470,
       "candidate_files": 69,
       "used_via_vercel_config": 69,
       "used_via_exact_references": 0,
@@ -1032,5 +1147,13 @@
       "A file is considered used when matched by vercel routes/builds or referenced by exact repository path.",
       "Dynamic runtime fetches may not be detected; validate before deletion."
     ]
+  },
+  "vercel_target_audit": {
+    "summary": {
+      "route_target_issues": 0,
+      "build_glob_issues": 0
+    },
+    "route_target_issues": [],
+    "build_glob_issues": []
   }
 }

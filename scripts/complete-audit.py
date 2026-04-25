@@ -27,6 +27,12 @@ DEFAULT_BASE_URL = 'https://fadhil.dev'
 DEFAULT_TIMEOUT = 20
 DEFAULT_MAX_BODY_BYTES = 450_000
 DEFAULT_TOP_DUPLICATE_GROUPS = 25
+SECURITY_HEADERS = (
+    'content-security-policy',
+    'strict-transport-security',
+    'x-content-type-options',
+    'referrer-policy',
+)
 
 ACTIVE_PREFIXES = ('website/', 'games/', 'assets/public/images/', 'library/')
 STATIC_AUDIT_PREFIXES = (
@@ -145,6 +151,8 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
         'redirect_target': final_url if redirected else '',
         'content_type': content_type,
         'content_length': content_length,
+        'cache_control': headers.get('cache-control', ''),
+        'security_headers': {name: bool(headers.get(name)) for name in SECURITY_HEADERS},
         'title': re.sub(r'\s+', ' ', title_match.group(1)).strip() if title_match else '',
         'seo_basics': {
             'meta_description': bool(re.search(r"<meta[^>]+name=['\"]description['\"][^>]+content=", body, re.I)),
@@ -166,6 +174,14 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
             if present
         ],
     }
+
+
+def percentile(values: list[float], p: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    idx = int((len(ordered) - 1) * p)
+    return ordered[idx]
 
 
 def safe_rg_count(root: Path, pattern: str, file_self: str, fixed: bool = False) -> int:
@@ -270,7 +286,7 @@ def collect_routed_files(files: list[str], vercel_data: dict[str, Any]) -> set[s
         if not isinstance(src, str):
             continue
         for rel in files:
-            if fnmatch.fnmatch(rel, src):
+            if vercel_glob_match(rel, src):
                 routed.add(rel)
 
     return routed
@@ -328,10 +344,68 @@ def find_potential_unused_static_files(root: Path, vercel_data: dict[str, Any]) 
     }
 
 
+def audit_vercel_targets(root: Path, vercel_data: dict[str, Any]) -> dict[str, Any]:
+    files = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
+    file_set = set(files)
+
+    route_issues: list[dict[str, str]] = []
+    build_issues: list[dict[str, str]] = []
+
+    for route in vercel_data.get('routes', []):
+        src = route.get('src')
+        dest = route.get('dest')
+        if not isinstance(src, str) or not isinstance(dest, str) or not dest.startswith('/'):
+            continue
+        dest_rel = dest.lstrip('/')
+
+        if '$' in dest_rel:
+            prefix = dest_rel.split('$', 1)[0].rstrip('/')
+            matched = any(rel.startswith(prefix + '/') for rel in files) if prefix else False
+            if not matched:
+                route_issues.append({'src': src, 'dest': dest, 'reason': 'dynamic-target-prefix-has-no-files'})
+            continue
+
+        if dest_rel not in file_set:
+            route_issues.append({'src': src, 'dest': dest, 'reason': 'target-file-not-found'})
+
+    for build in vercel_data.get('builds', []):
+        src = build.get('src')
+        if not isinstance(src, str):
+            continue
+        if not any(vercel_glob_match(rel, src) for rel in files):
+            build_issues.append({'src': src, 'reason': 'build-glob-has-no-matches'})
+
+    return {
+        'summary': {
+            'route_target_issues': len(route_issues),
+            'build_glob_issues': len(build_issues),
+        },
+        'route_target_issues': route_issues,
+        'build_glob_issues': build_issues,
+    }
+
+
+def vercel_glob_match(path: str, pattern: str) -> bool:
+    if fnmatch.fnmatch(path, pattern):
+        return True
+    # Vercel-style globs frequently use `**/*` while Python fnmatch can miss
+    # single-level files for some patterns depending on shell-style semantics.
+    if '/**/*' in pattern:
+        prefix = pattern.split('/**/*', 1)[0].rstrip('/')
+        if prefix and path.startswith(prefix + '/'):
+            return True
+    if '/**/' in pattern:
+        single_level_pattern = pattern.replace('/**/', '/')
+        if fnmatch.fnmatch(path, single_level_pattern):
+            return True
+    return False
+
+
 def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     summary = report['summary']
     domain = report['domain']
     static = report['static_unused_audit']
+    vercel_cfg = report['vercel_target_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -349,11 +423,16 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- Missing H1: {domain['summary']['missing_h1_count']}",
         f"- Duplicate file groups (all): {summary['duplicate_groups_total']}",
         f"- Potential unused static files: {static['summary']['potential_unused_files']}",
+        f"- Missing security headers (CSP/HSTS/XCTO/Referrer): {domain['summary']['missing_security_headers_count']}",
+        f"- Avg response time (ms): {domain['summary']['avg_response_time_ms']}",
+        f"- P95 response time (ms): {domain['summary']['p95_response_time_ms']}",
+        f"- Vercel route target issues: {vercel_cfg['summary']['route_target_issues']}",
+        f"- Vercel build glob issues: {vercel_cfg['summary']['build_glob_issues']}",
         '',
         '## Domain Route Audit',
         '',
-        '| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | Deprecated |',
-        '|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|',
+        '| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | SecHdr | Deprecated |',
+        '|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|',
     ]
 
     for row in domain['results']:
@@ -362,6 +441,7 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
             f"| `{row.get('path')}` | {row.get('status')} | {'↪️' if row.get('redirected') else '—'} | {row.get('time_ms')} | "
             f"{'✅' if seo.get('meta_description') else '❌'} | {'✅' if seo.get('canonical') else '❌'} | "
             f"{'✅' if seo.get('has_h1') else '❌'} | {'✅' if row.get('is_https_final') else '❌'} | "
+            f"{'✅' if all(row.get('security_headers', {}).values()) else '❌'} | "
             f"{'⚠️' if row.get('deprecated_flags') else '✅'} |"
         )
 
@@ -370,6 +450,32 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         lines.extend(['', '### Route Errors', '', '| Path | Status | Error |', '|---|---:|---|'])
         for row in error_rows:
             lines.append(f"| `{row.get('path')}` | {row.get('status')} | `{row.get('error', '')}` |")
+
+    lines.extend([
+        '',
+        '## Security Header Coverage (HTTP 200 pages)',
+        '',
+        '| Header | Missing Count |',
+        '|---|---:|',
+    ])
+    for header, missing_count in domain['summary']['missing_security_header_details'].items():
+        lines.append(f'| `{header}` | {missing_count} |')
+
+    lines.extend([
+        '',
+        '## Vercel Target Integrity',
+        '',
+        f"- Route target issues: {vercel_cfg['summary']['route_target_issues']}",
+        f"- Build glob issues: {vercel_cfg['summary']['build_glob_issues']}",
+    ])
+    if vercel_cfg['route_target_issues']:
+        lines.extend(['', '| Route src | Route dest | Reason |', '|---|---|---|'])
+        for issue in vercel_cfg['route_target_issues']:
+            lines.append(f"| `{issue['src']}` | `{issue['dest']}` | `{issue['reason']}` |")
+    if vercel_cfg['build_glob_issues']:
+        lines.extend(['', '| Build src | Reason |', '|---|---|'])
+        for issue in vercel_cfg['build_glob_issues']:
+            lines.append(f"| `{issue['src']}` | `{issue['reason']}` |")
 
     lines.extend([
         '',
@@ -427,7 +533,14 @@ def main() -> None:
 
     duplicate_analysis, duplicate_groups_total = find_duplicate_files(root, args.top_duplicate_groups)
     static_unused = find_potential_unused_static_files(root, vercel_data)
+    vercel_target_audit = audit_vercel_targets(root, vercel_data)
 
+    successful_rows = [row for row in domain_results if row.get('status') == 200]
+    response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
+    missing_security_header_details = {
+        header: sum(1 for row in successful_rows if not row.get('security_headers', {}).get(header))
+        for header in SECURITY_HEADERS
+    }
     domain_summary = {
         'paths_checked': len(domain_results),
         'http_200_count': sum(1 for row in domain_results if row.get('status') == 200),
@@ -437,6 +550,11 @@ def main() -> None:
         'missing_canonical_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('canonical')),
         'missing_h1_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('has_h1')),
         'non_https_final_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('is_https_final', False)),
+        'avg_response_time_ms': round(sum(response_times) / len(response_times), 1) if response_times else 0.0,
+        'p95_response_time_ms': round(percentile(response_times, 0.95), 1),
+        'max_response_time_ms': round(max(response_times), 1) if response_times else 0.0,
+        'missing_security_headers_count': sum(missing_security_header_details.values()),
+        'missing_security_header_details': missing_security_header_details,
     }
 
     report = {
@@ -449,6 +567,7 @@ def main() -> None:
         'domain': {'summary': domain_summary, 'results': domain_results},
         'duplicate_analysis': duplicate_analysis,
         'static_unused_audit': static_unused,
+        'vercel_target_audit': vercel_target_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'
