@@ -431,10 +431,11 @@ function byId(state, projectId) {
 
 function getRankedStudios(state) {
   if (state.cache.rankedStudiosDay === state.day) return state.cache.rankedStudios;
+  const intelligence = buildStudioIntelligenceContext(state);
   state.cache.rankedStudios = [...state.studios]
     .sort((a, b) => {
-      const ratingA = computeStudioRating(state, a).overall;
-      const ratingB = computeStudioRating(state, b).overall;
+      const ratingA = intelligence.ratingsByStudioId.get(a.id)?.overall ?? 0;
+      const ratingB = intelligence.ratingsByStudioId.get(b.id)?.overall ?? 0;
       return (ratingB + b.network * 0.12 + b.scoutPower * 0.08) - (ratingA + a.network * 0.12 + a.scoutPower * 0.08);
     })
     .map((entry) => entry.id);
@@ -602,6 +603,82 @@ function computeStudioRating(state, studio, context = null) {
   };
 }
 
+function buildStudioIntelligenceContext(state) {
+  const releasesByStudioName = state.releases.reduce((acc, release) => {
+    if (!acc.has(release.studio)) acc.set(release.studio, []);
+    acc.get(release.studio).push(release);
+    return acc;
+  }, new Map());
+  const projectsByStudioId = state.projects.reduce((acc, project) => {
+    if (!project.studioId || project.archived) return acc;
+    if (!acc.has(project.studioId)) acc.set(project.studioId, []);
+    acc.get(project.studioId).push(project);
+    return acc;
+  }, new Map());
+  const npcProjectsByStudioId = state.npcProjects.reduce((acc, project) => {
+    if (!project.studioId) return acc;
+    if (!acc.has(project.studioId)) acc.set(project.studioId, []);
+    acc.get(project.studioId).push(project);
+    return acc;
+  }, new Map());
+  const staffByStudioId = state.npcs.reduce((acc, npc) => {
+    if (npc.role !== 'animator' || !npc.studioId) return acc;
+    if (!acc.has(npc.studioId)) acc.set(npc.studioId, []);
+    acc.get(npc.studioId).push(npc);
+    return acc;
+  }, new Map());
+  const investorRowsByStudio = new Map();
+  state.studioInvestments.forEach((entry) => {
+    if (!investorRowsByStudio.has(entry.studioId)) investorRowsByStudio.set(entry.studioId, []);
+    const investor = state.investors.find((row) => row.id === entry.investorId);
+    const investorNpc = state.npcs.find((row) => row.id === entry.investorId);
+    investorRowsByStudio.get(entry.studioId).push({
+      investorId: entry.investorId,
+      name: investor?.name ?? investorNpc?.name ?? entry.investorId,
+      influence: investor?.influence ?? investorNpc?.reputation ?? 40,
+      score: Math.max(0.25, (entry.amount || 0) / 350_000),
+    });
+  });
+  state.projects.forEach((project) => {
+    if (!project.studioId || !project.committeeIds?.length) return;
+    if (!investorRowsByStudio.has(project.studioId)) investorRowsByStudio.set(project.studioId, []);
+    const studioRows = investorRowsByStudio.get(project.studioId);
+    project.committeeIds.forEach((investorId) => {
+      const investor = state.investors.find((row) => row.id === investorId);
+      const investorNpc = state.npcs.find((row) => row.id === investorId);
+      studioRows.push({
+        investorId,
+        name: investor?.name ?? investorNpc?.name ?? investorId,
+        influence: investor?.influence ?? investorNpc?.reputation ?? 40,
+        score: 1 + ((project.securedBudget || 0) / Math.max(1, project.budgetNeed || 1)),
+      });
+    });
+  });
+  const valuationByStudioId = new Map(state.studios.map((studio) => [
+    studio.id,
+    computeStudioValuation(studio, (releasesByStudioName.get(studio.name) || []).reduce((sum, rel) => sum + (Number(rel.score) || 0), 0)),
+  ]));
+
+  const ratingsByStudioId = new Map(state.studios.map((studio) => [studio.id, computeStudioRating(state, studio, {
+    releases: releasesByStudioName.get(studio.name) ?? [],
+    projects: projectsByStudioId.get(studio.id) ?? [],
+    npcProjects: npcProjectsByStudioId.get(studio.id) ?? [],
+    staffByStudio: staffByStudioId,
+    investorRowsByStudio,
+    valuationByStudioId,
+  })]));
+
+  return {
+    releasesByStudioName,
+    projectsByStudioId,
+    npcProjectsByStudioId,
+    staffByStudioId,
+    investorRowsByStudio,
+    valuationByStudioId,
+    ratingsByStudioId,
+  };
+}
+
 function computeInitialStudioFunds(studio) {
   return Math.round((studio.craft + studio.speed + studio.network) * 24_000 + 1_400_000);
 }
@@ -735,7 +812,7 @@ export function createAnimeIndustryRuntime() {
   function tickNpcEcosystem() {
     const rankedStudios = getRankedStudios(state);
     const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
-    const studioRatingsById = new Map(state.studios.map((studio) => [studio.id, computeStudioRating(state, studio)]));
+    const studioRatingsById = buildStudioIntelligenceContext(state).ratingsByStudioId;
     const projectById = new Map(state.npcProjects.map((project) => [project.id, project]));
     const audienceSignal = state.projects.reduce((acc, project) => {
       if (project.archived || !project.targetAudience) return acc;
@@ -933,7 +1010,7 @@ export function createAnimeIndustryRuntime() {
       acc.set(release.studio, (acc.get(release.studio) ?? 0) + release.score * attention);
       return acc;
     }, new Map());
-    const studioRatingsById = new Map(state.studios.map((studio) => [studio.id, computeStudioRating(state, studio)]));
+    const studioRatingsById = buildStudioIntelligenceContext(state).ratingsByStudioId;
 
     for (let i = 0; i < state.studios.length; i += 1) {
       const studio = state.studios[i];
@@ -1381,6 +1458,7 @@ export function createAnimeIndustryRuntime() {
 
   function buildRankings() {
     const TOP_CONTENT_LIMIT = 50;
+    const intelligence = buildStudioIntelligenceContext(state);
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
@@ -1442,7 +1520,7 @@ export function createAnimeIndustryRuntime() {
 
     const studio = state.studios
       .map((entry) => {
-        const rating = computeStudioRating(state, entry);
+        const rating = intelligence.ratingsByStudioId.get(entry.id) ?? computeStudioRating(state, entry);
         return {
           id: entry.id,
           name: entry.name,
@@ -1456,10 +1534,7 @@ export function createAnimeIndustryRuntime() {
       .sort((a, b) => b.score - a.score);
 
     const studioValueById = new Map(
-      state.studios.map((entry) => [
-        entry.id,
-        computeStudioValuation(entry, studioReleaseScore.get(entry.name) ?? 0),
-      ]),
+      state.studios.map((entry) => [entry.id, intelligence.valuationByStudioId.get(entry.id) ?? computeStudioValuation(entry, studioReleaseScore.get(entry.name) ?? 0)]),
     );
 
     const individual = [
@@ -1498,47 +1573,41 @@ export function createAnimeIndustryRuntime() {
       adminOk: true,
     };
 
+    const intelligence = buildStudioIntelligenceContext(state);
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
       acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
       return acc;
     }, new Map());
     const studioDetailsMap = {};
     state.studios.forEach((studio) => {
-      const valuation = computeStudioValuation(studio, studioReleaseScore.get(studio.name) ?? 0);
+      const valuation = intelligence.valuationByStudioId.get(studio.id) ?? computeStudioValuation(studio, studioReleaseScore.get(studio.name) ?? 0);
       const profile = classifyStudio(studio, valuation);
-      const rating = computeStudioRating(state, studio, { valuationByStudioId: new Map([[studio.id, valuation]]) });
+      const rating = intelligence.ratingsByStudioId.get(studio.id) ?? computeStudioRating(state, studio, { valuationByStudioId: new Map([[studio.id, valuation]]) });
       const founderName = studio.ownership === 'player' || (state.player.studioId === studio.id)
         ? state.player.name
         : state.npcs.find((entry) => entry.id === studio.ceoNpcId)?.name ?? 'Board Consortium';
       const ceoName = state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD');
-      const activeProjects = state.projects.filter((project) => project.studioId === studio.id && !project.archived);
-      const npcProjects = state.npcProjects.filter((entry) => entry.studioId === studio.id && !entry.launched);
-      const releaseAssets = state.releases.filter((entry) => entry.studio === studio.name);
+      const activeProjects = intelligence.projectsByStudioId.get(studio.id) ?? [];
+      const npcProjects = (intelligence.npcProjectsByStudioId.get(studio.id) ?? []).filter((entry) => !entry.launched);
+      const releaseAssets = intelligence.releasesByStudioName.get(studio.name) ?? [];
       const animeAssets = activeProjects.filter((project) => ['anime', 'movie'].includes(project.medium)).map((project) => project.title)
         .concat(releaseAssets.filter((entry) => !String(entry.title || '').toLowerCase().includes('movie')).map((entry) => `${entry.title} (Released)`));
       const mangaAssets = activeProjects.filter((project) => ['manga', 'novel'].includes(project.medium)).map((project) => project.title)
         .concat(npcProjects.map((entry) => entry.title));
       const movieAssets = activeProjects.filter((project) => project.medium === 'movie').map((project) => project.title)
         .concat(releaseAssets.filter((entry) => String(entry.title || '').toLowerCase().includes('movie')).map((entry) => `${entry.title} (Released)`));
-      const staff = state.npcs.filter((npc) => npc.role === 'animator' && npc.studioId === studio.id)
+      const staff = (intelligence.staffByStudioId.get(studio.id) ?? [])
         .map((npc) => ({ id: npc.id, name: npc.name, reputation: npc.reputation, mood: npc.mood }));
-      const investorScores = new Map();
-      state.studioInvestments.forEach((entry) => {
-        if (entry.studioId !== studio.id) return;
-        investorScores.set(entry.investorId, (investorScores.get(entry.investorId) ?? 0) + Math.max(0.25, entry.amount / 350_000));
-      });
-      state.projects.forEach((project) => {
-        if (project.studioId !== studio.id) return;
-        (project.committeeIds || []).forEach((investorId) => {
-          investorScores.set(investorId, (investorScores.get(investorId) ?? 0) + 1 + (project.securedBudget / Math.max(1, project.budgetNeed)));
-        });
-      });
-      const investors = [...investorScores.entries()]
-        .map(([investorId, score]) => {
-          const investor = state.investors.find((entry) => entry.id === investorId);
-          const investorNpc = state.npcs.find((entry) => entry.id === investorId);
-          return { id: investorId, name: investor?.name ?? investorNpc?.name ?? investorId, score: Number(score) || 0, influence: investor?.influence ?? investorNpc?.reputation ?? 0 };
-        })
+      const investorScoreMap = (intelligence.investorRowsByStudio.get(studio.id) ?? [])
+        .reduce((acc, entry) => {
+          const key = entry.investorId ?? entry.name ?? 'unknown-investor';
+          const current = acc.get(key) ?? { id: key, name: entry.name ?? key, score: 0, influence: 0 };
+          current.score += Number(entry.score) || 0;
+          current.influence = Math.max(current.influence, Number(entry.influence) || 0);
+          acc.set(key, current);
+          return acc;
+        }, new Map());
+      const investors = [...investorScoreMap.values()]
         .sort((a, b) => b.score - a.score)
         .slice(0, 6);
       const latestFinance = [...state.studioFinanceLedger].reverse().find((entry) => entry.studioId === studio.id) ?? null;
