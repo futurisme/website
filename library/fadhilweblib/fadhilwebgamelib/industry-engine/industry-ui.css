@@ -6,7 +6,8 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 .frame.frame-active { display: block; width: 100%; max-width: 100%; height: 100%; max-height: 100%; animation: fade .18s ease-out; overflow: hidden; }
 @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
 .industry-panel { border: 1px solid #9cb7ff55; background: linear-gradient(180deg, #0a1942, #081332); border-radius: 8px; padding: 6px; box-shadow: 0 12px 28px #00000045; min-height: 100%; display: flex; flex-direction: column; overflow: hidden; }
-.frame-content-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding-right: 2px; }
+.frame.frame-active .industry-panel { height: 100%; min-height: 0; }
+.frame-content-scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 2px; }
 #frameMain .industry-panel { min-height: 0; height: 100%; }
 #frameMain,
 #frameMain .industry-panel,
@@ -94,6 +95,12 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-expandable-body { display: grid; gap: 6px; padding-top: 4px; }
 .industry-feed, .industry-releases { margin: 6px 0 0; padding-left: 16px; max-height: none; overflow: visible; overflow-wrap: anywhere; word-break: break-word; }
 #industryStudios { max-height: none; overflow: visible; padding-bottom: 44px; }
+#frameFullStudios .frame-content-scroll,
+#frameFullRanking .frame-content-scroll,
+#frameFullFeed .frame-content-scroll {
+  display: block;
+  min-height: 0;
+}
 .industry-ranking-list {
   margin: 4px 0 0;
   padding-left: 0;
