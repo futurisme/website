@@ -569,7 +569,7 @@ export function createIndustryUiController({ root, handlers }) {
               <span class="industry-ranking-rank">#${rank}</span>
               <span class="industry-ranking-name">${esc(entry.name)}</span>
               <span class="industry-ranking-tag">${esc(getNpcRoleLabel(entry.role))}</span>
-              <strong class="industry-ranking-score">${formatCompactValuation(entry.score)} (Harta/Valuasi)</strong>
+              <strong class="industry-ranking-score">${formatCompactValuation(entry.score)}</strong>
             </div>
           </div>
         `,

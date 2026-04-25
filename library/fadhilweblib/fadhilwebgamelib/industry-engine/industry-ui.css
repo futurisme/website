@@ -145,7 +145,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 .industry-ranking-name {
   font-weight: 600;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 .industry-ranking-tag {
   opacity: 0.92;
@@ -164,23 +164,29 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   justify-self: end;
 }
 @media (max-width: 620px) {
-  .industry-ranking-line {
-    grid-template-columns: minmax(42px, auto) minmax(0, 1fr);
-  }
-  .industry-ranking-line .industry-ranking-tag,
-  .industry-ranking-line .industry-ranking-score {
-    grid-column: auto;
-    justify-self: start;
-  }
+  .industry-ranking-list { gap: 5px; }
+  .industry-ranking-list li { padding: 6px 7px; }
+  .industry-ranking-row { gap: 3px; }
+  .industry-ranking-line { grid-template-columns: 40px minmax(0, 1fr) max-content max-content; gap: 6px; }
   .industry-ranking-line-sub {
-    grid-template-columns: 1fr;
-    gap: 3px;
-    padding-left: 42px;
-    justify-content: start;
+    grid-template-columns: max-content max-content max-content;
+    gap: 6px;
+    padding-left: 40px;
+    justify-content: space-between;
   }
-  .industry-ranking-line-sub .industry-ranking-score {
-    justify-self: start;
-  }
+  .industry-ranking-rank { font-size: 13px; }
+  .industry-ranking-name { font-size: 13px; }
+  .industry-ranking-tag,
+  .industry-ranking-meta { font-size: 11px; padding: 1px 5px; }
+  .industry-ranking-score { font-size: 12px; }
+}
+@media (max-width: 390px) {
+  .industry-ranking-line { gap: 5px; }
+  .industry-ranking-line-sub { gap: 5px; }
+  .industry-ranking-name { font-size: 12px; }
+  .industry-ranking-tag,
+  .industry-ranking-meta { font-size: 10px; }
+  .industry-ranking-score { font-size: 11px; }
 }
 .industry-popup {
   position: fixed;
