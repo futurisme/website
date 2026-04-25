@@ -1,15 +1,38 @@
 import {
+  archiveStorageKey,
   createArchiveCardMarkup,
   goToArchive,
   listArchives,
+  readArchiveDocument,
   normalizeArchiveName,
   searchArchives,
   upsertArchiveMeta,
 } from '/library/fadhilweblib/fadhilwebarchivesframework/runtime.js';
+import {
+  createFadhilContainer,
+  extractFadhilPayload,
+  stringifyFadhil,
+} from '/extension/fadhil-format.js';
 
 const searchEl = document.getElementById('archive-search');
 const listEl = document.getElementById('archives-list');
 const createBtn = document.getElementById('create-archive-btn');
+const manualModal = document.getElementById('manual-modal');
+const manualContainerEl = document.getElementById('manual-container');
+const manualStatusEl = document.getElementById('manual-status');
+const manualGenerateBtn = document.getElementById('manual-generate');
+const manualCopyBtn = document.getElementById('manual-copy');
+const manualApplyBtn = document.getElementById('manual-apply');
+
+const SWIPE_RIGHT_MIN_X = 76;
+const SWIPE_MAX_Y = 40;
+const SWIPE_RESET_MS = 2600;
+const SWIPE_REQUIRED_COUNT = 4;
+
+let touchStartX = null;
+let touchStartY = null;
+let rightSwipeCount = 0;
+let lastSwipeAt = 0;
 
 function renderArchives() {
   const archives = listArchives();
@@ -25,6 +48,114 @@ function renderArchives() {
   listEl.innerHTML = filtered.map((entry) => createArchiveCardMarkup(entry)).join('');
 }
 
+function setManualStatus(message) {
+  if (manualStatusEl) {
+    manualStatusEl.textContent = message;
+  }
+}
+
+function buildManualSnapshot() {
+  const registry = listArchives();
+  const documents = registry.map((entry) => {
+    const key = archiveStorageKey(entry.slug);
+    const raw = localStorage.getItem(key);
+    return {
+      slug: entry.slug,
+      key,
+      raw,
+      parsed: readArchiveDocument(entry.slug),
+    };
+  });
+
+  const payload = {
+    magic: 'fadhil/archives-bundle',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    registry,
+    documents,
+  };
+
+  const container = createFadhilContainer({
+    kind: 'archives-manual-backup',
+    name: 'All archives snapshot',
+    meta: {
+      source: 'fadhil.dev/archives',
+      includes: 'registry+documents+raw',
+      extension: '.fadhil',
+    },
+    data: payload,
+  });
+
+  return stringifyFadhil(container);
+}
+
+function openManualModal() {
+  if (!manualModal) return;
+  if (!manualContainerEl?.value.trim()) {
+    manualContainerEl.value = buildManualSnapshot();
+  }
+  manualModal.showModal();
+  setManualStatus('Manual save/load siap. Data memakai container .fadhil.');
+}
+
+function registerRightSwipe(endX, endY) {
+  if (touchStartX == null || touchStartY == null) return;
+  const deltaX = endX - touchStartX;
+  const deltaY = Math.abs(endY - touchStartY);
+  touchStartX = null;
+  touchStartY = null;
+
+  if (deltaX < SWIPE_RIGHT_MIN_X || deltaY > SWIPE_MAX_Y) return;
+
+  const now = Date.now();
+  if (now - lastSwipeAt > SWIPE_RESET_MS) {
+    rightSwipeCount = 0;
+  }
+  rightSwipeCount += 1;
+  lastSwipeAt = now;
+
+  if (rightSwipeCount >= SWIPE_REQUIRED_COUNT) {
+    rightSwipeCount = 0;
+    openManualModal();
+  } else {
+    setManualStatus(`Swipe kanan terdeteksi (${rightSwipeCount}/${SWIPE_REQUIRED_COUNT}).`);
+  }
+}
+
+function parseManualSnapshot(raw) {
+  const payload = extractFadhilPayload(raw, 'archives-manual-backup');
+  if (!payload || payload.magic !== 'fadhil/archives-bundle') {
+    throw new Error('Snapshot tidak cocok untuk seluruh archives.');
+  }
+  if (!Array.isArray(payload.registry) || !Array.isArray(payload.documents)) {
+    throw new Error('Snapshot rusak: registry/documents tidak valid.');
+  }
+  return payload;
+}
+
+function applyManualSnapshot(raw) {
+  const payload = parseManualSnapshot(raw);
+  const documentsBySlug = new Map(payload.documents.map((doc) => [doc?.slug, doc]));
+
+  localStorage.setItem('fadhil-archives-registry-v1', JSON.stringify(payload.registry));
+
+  for (const entry of payload.registry) {
+    const slug = entry?.slug;
+    if (!slug) continue;
+    const key = archiveStorageKey(slug);
+    const doc = documentsBySlug.get(slug);
+
+    if (typeof doc?.raw === 'string') {
+      localStorage.setItem(key, doc.raw);
+      continue;
+    }
+
+    if (doc?.parsed && typeof doc.parsed === 'object') {
+      localStorage.setItem(key, JSON.stringify(doc.parsed));
+    }
+  }
+}
+
 searchEl?.addEventListener('input', renderArchives);
 
 createBtn?.addEventListener('click', () => {
@@ -35,5 +166,52 @@ createBtn?.addEventListener('click', () => {
   const { slug } = upsertArchiveMeta(name);
   goToArchive(slug);
 });
+
+manualGenerateBtn?.addEventListener('click', () => {
+  manualContainerEl.value = buildManualSnapshot();
+  setManualStatus('Snapshot baru berhasil dibuat (all archives + all contents).');
+});
+
+manualCopyBtn?.addEventListener('click', async () => {
+  try {
+    const text = manualContainerEl.value.trim() || buildManualSnapshot();
+    manualContainerEl.value = text;
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      setManualStatus('Snapshot .fadhil berhasil disalin ke clipboard.');
+    } else {
+      setManualStatus('Clipboard tidak tersedia. Snapshot tetap ada di textarea.');
+    }
+  } catch (error) {
+    setManualStatus(`Copy gagal: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+manualApplyBtn?.addEventListener('click', () => {
+  try {
+    const raw = String(manualContainerEl.value || '').trim();
+    if (!raw) {
+      throw new Error('Container snapshot masih kosong.');
+    }
+    applyManualSnapshot(raw);
+    renderArchives();
+    setManualStatus('Snapshot berhasil dimuat ulang. Semua archives dipulihkan.');
+  } catch (error) {
+    setManualStatus(`Load gagal: ${error instanceof Error ? error.message : String(error)}`);
+  }
+});
+
+document.addEventListener('touchstart', (event) => {
+  const touch = event.changedTouches?.[0];
+  if (!touch) return;
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', (event) => {
+  const touch = event.changedTouches?.[0];
+  if (!touch) return;
+  registerRightSwipe(touch.clientX, touch.clientY);
+}, { passive: true });
 
 renderArchives();

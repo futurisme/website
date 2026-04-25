@@ -216,6 +216,36 @@ button:hover {
 .chip { padding: 6px 8px; border: 1px solid #1f9e78; border-radius: 999px; font-size: 11px; color: #a7f3d0; background: #022c2233; }
 label { display:block; margin-bottom:6px; color:#bfdbfe; }
 .toolbar { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
+.gesture-hint {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.manual-modal {
+  width: min(900px, calc(100% - 24px));
+  border: 1px solid var(--line-strong);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #0f172a, #0b1222);
+  color: var(--text);
+  padding: 0;
+  box-shadow: 0 16px 36px #00000088;
+}
+
+.manual-modal::backdrop {
+  background: #020617cc;
+  backdrop-filter: blur(3px);
+}
+
+.manual-content {
+  margin: 0;
+  padding: 14px;
+}
+
+#manual-container {
+  min-height: 280px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+  font-size: 0.82rem;
+}
 
 @media (max-width: 900px) {
   .archives-page,

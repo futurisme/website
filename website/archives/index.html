@@ -25,6 +25,7 @@
         <div class="archives-scroll" role="region" aria-label="Archives list scroll container">
           <ul id="archives-list" class="list"></ul>
         </div>
+        <p class="hint gesture-hint">Usap 4x ke kanan untuk membuka manual save/load seluruh arsip (.fadhil).</p>
       </section>
 
       <section class="compact-action" aria-label="Create archive">
@@ -33,6 +34,24 @@
 
       <footer class="compact-footer">© 2026 Fadhil Akbar Cariearsa. Some Rights Reserved.</footer>
     </main>
+
+    <dialog id="manual-modal" class="manual-modal">
+      <form method="dialog" class="manual-content">
+        <div class="section-head">
+          <h2>Manual Save/Load (All Archives)</h2>
+          <button id="manual-close" type="submit">Close</button>
+        </div>
+        <p class="hint">Berisi snapshot <strong>List of archives</strong> + isi masing-masing arsip secara original, dengan format <strong>.fadhil</strong>.</p>
+        <div class="toolbar">
+          <button id="manual-generate" type="button">Generate Snapshot</button>
+          <button id="manual-copy" type="button">Copy Snapshot</button>
+          <button id="manual-apply" type="button">Load Snapshot</button>
+        </div>
+        <label for="manual-container">.fadhil container</label>
+        <textarea id="manual-container" rows="14" placeholder="Container save/load semua archives muncul di sini"></textarea>
+        <p id="manual-status" class="hint"></p>
+      </form>
+    </dialog>
 
     <script type="module" src="/archives/archives.js"></script>
   </body>
