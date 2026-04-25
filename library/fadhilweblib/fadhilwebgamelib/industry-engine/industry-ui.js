@@ -33,6 +33,56 @@ function formatCompactValuation(value) {
   return amount.toFixed(2);
 }
 
+const PROJECT_PROFILE_TAXONOMY = {
+  manga: {
+    genres: {
+      action: ['redemption', 'rivalry', 'survival'],
+      fantasy: ['world-building', 'destiny', 'found-family'],
+      romance: ['slow-burn', 'second-chance', 'forbidden-love'],
+      thriller: ['conspiracy', 'mind-games', 'moral-dilemma'],
+      slice_of_life: ['self-growth', 'community', 'work-life'],
+    },
+    audiences: ['kids', 'teens', 'young_adults', 'general'],
+  },
+  novel: {
+    genres: {
+      drama: ['family-conflict', 'class-struggle', 'identity'],
+      mystery: ['whodunit', 'cold-case', 'betrayal'],
+      romance: ['emotional-healing', 'first-love', 'distance-relationship'],
+      fantasy: ['magic-politics', 'hero-journey', 'ancient-legacy'],
+      sci_fi: ['post-human', 'space-colony', 'ai-ethics'],
+    },
+    audiences: ['teens', 'young_adults', 'adults'],
+  },
+  anime: {
+    genres: {
+      action: ['tournament', 'revenge', 'elite-training'],
+      comedy: ['workplace-chaos', 'parody', 'culture-clash'],
+      sports: ['underdog', 'team-bonding', 'comeback'],
+      fantasy: ['isekai-politics', 'mythic-war', 'legacy-clans'],
+      sci_fi: ['mecha-conflict', 'time-loop', 'cyber-crime'],
+    },
+    audiences: ['kids', 'teens', 'young_adults', 'general'],
+  },
+  movie: {
+    genres: {
+      drama: ['tragedy', 'biographical', 'social-issue'],
+      thriller: ['heist', 'psychological', 'cat-and-mouse'],
+      fantasy: ['epic-quest', 'mythic-fall', 'legend-reborn'],
+      sci_fi: ['first-contact', 'dystopia', 'terraforming'],
+      family: ['friendship', 'coming-of-age', 'hope'],
+    },
+    audiences: ['family', 'teens', 'young_adults', 'adults'],
+  },
+};
+
+function titleToken(token) {
+  return String(token || '')
+    .split('_')
+    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 export function createIndustryUiController({ root, handlers }) {
   const frames = {
     register: root.querySelector('#frameRegister'),
@@ -307,6 +357,21 @@ export function createIndustryUiController({ root, handlers }) {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     handleProjectCreationAction(target);
+  });
+  subProjectCreateBodyEl?.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.id === 'createProjectGenreInput' && selectedCreateMedium) {
+      const selectedGenre = target.value;
+      pendingCreateDraft.genre = selectedGenre;
+      const mediumConfig = PROJECT_PROFILE_TAXONOMY[selectedCreateMedium];
+      const themes = mediumConfig?.genres?.[selectedGenre] || [];
+      pendingCreateDraft.theme = themes[0] || '';
+      renderProjectCreateSubframe();
+      return;
+    }
+    if (target.id === 'createProjectThemeInput') pendingCreateDraft.theme = target.value;
+    if (target.id === 'createProjectAudienceInput') pendingCreateDraft.targetAudience = target.value;
   });
 
   committeeBodyEl.addEventListener('click', (event) => {
@@ -584,16 +649,37 @@ export function createIndustryUiController({ root, handlers }) {
       return;
     }
     const mediumLabel = selectedCreateMedium[0].toUpperCase() + selectedCreateMedium.slice(1);
+    const mediumConfig = PROJECT_PROFILE_TAXONOMY[selectedCreateMedium] || { genres: {}, audiences: [] };
+    const genreOptions = Object.keys(mediumConfig.genres);
+    const selectedGenre = pendingCreateDraft.genre && genreOptions.includes(pendingCreateDraft.genre)
+      ? pendingCreateDraft.genre
+      : (genreOptions[0] || '');
+    const themeOptions = mediumConfig.genres[selectedGenre] || [];
+    const selectedTheme = pendingCreateDraft.theme && themeOptions.includes(pendingCreateDraft.theme)
+      ? pendingCreateDraft.theme
+      : (themeOptions[0] || '');
+    const selectedAudience = pendingCreateDraft.targetAudience && mediumConfig.audiences.includes(pendingCreateDraft.targetAudience)
+      ? pendingCreateDraft.targetAudience
+      : (mediumConfig.audiences[0] || '');
+    pendingCreateDraft.genre = selectedGenre;
+    pendingCreateDraft.theme = selectedTheme;
+    pendingCreateDraft.targetAudience = selectedAudience;
     if (subProjectCreateTitleEl) subProjectCreateTitleEl.textContent = `${mediumLabel} Development Brief`;
     subProjectCreateBodyEl.innerHTML = `
       <label>Nama karya</label>
       <input id="createProjectTitleInput" type="text" maxlength="80" placeholder="Masukkan judul karya" value="${esc(pendingCreateDraft.title)}" />
       <label>Genre</label>
-      <input id="createProjectGenreInput" type="text" maxlength="64" placeholder="Contoh: Action Fantasy" value="${esc(pendingCreateDraft.genre)}" />
+      <select id="createProjectGenreInput">
+        ${genreOptions.map((genre) => `<option value="${esc(genre)}" ${genre === selectedGenre ? 'selected' : ''}>${esc(titleToken(genre))}</option>`).join('')}
+      </select>
       <label>Tema</label>
-      <input id="createProjectThemeInput" type="text" maxlength="72" placeholder="Contoh: Ambisi, persahabatan, moralitas" value="${esc(pendingCreateDraft.theme)}" />
+      <select id="createProjectThemeInput">
+        ${themeOptions.map((theme) => `<option value="${esc(theme)}" ${theme === selectedTheme ? 'selected' : ''}>${esc(titleToken(theme))}</option>`).join('')}
+      </select>
       <label>Target audience</label>
-      <input id="createProjectAudienceInput" type="text" maxlength="64" placeholder="Contoh: Teens & Young Adults" value="${esc(pendingCreateDraft.targetAudience)}" />
+      <select id="createProjectAudienceInput">
+        ${mediumConfig.audiences.map((audience) => `<option value="${esc(audience)}" ${audience === selectedAudience ? 'selected' : ''}>${esc(titleToken(audience))}</option>`).join('')}
+      </select>
       <div class="industry-toolbar">
         <button type="button" data-action="confirm-create-project">Confirm</button>
         <button type="button" data-action="cancel-create-project-inline">Cancel</button>

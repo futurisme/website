@@ -45,6 +45,72 @@ const INVESTOR_POOL = Object.freeze([
 ]);
 
 const NPC_ROLES = ['ceo-studio', 'mangaka', 'novelis', 'animator', 'investor'];
+const PROJECT_PROFILE_TAXONOMY = {
+  manga: {
+    genres: {
+      action: ['redemption', 'rivalry', 'survival'],
+      fantasy: ['world-building', 'destiny', 'found-family'],
+      romance: ['slow-burn', 'second-chance', 'forbidden-love'],
+      thriller: ['conspiracy', 'mind-games', 'moral-dilemma'],
+      slice_of_life: ['self-growth', 'community', 'work-life'],
+    },
+    audiences: ['kids', 'teens', 'young_adults', 'general'],
+  },
+  novel: {
+    genres: {
+      drama: ['family-conflict', 'class-struggle', 'identity'],
+      mystery: ['whodunit', 'cold-case', 'betrayal'],
+      romance: ['emotional-healing', 'first-love', 'distance-relationship'],
+      fantasy: ['magic-politics', 'hero-journey', 'ancient-legacy'],
+      sci_fi: ['post-human', 'space-colony', 'ai-ethics'],
+    },
+    audiences: ['teens', 'young_adults', 'adults'],
+  },
+  anime: {
+    genres: {
+      action: ['tournament', 'revenge', 'elite-training'],
+      comedy: ['workplace-chaos', 'parody', 'culture-clash'],
+      sports: ['underdog', 'team-bonding', 'comeback'],
+      fantasy: ['isekai-politics', 'mythic-war', 'legacy-clans'],
+      sci_fi: ['mecha-conflict', 'time-loop', 'cyber-crime'],
+    },
+    audiences: ['kids', 'teens', 'young_adults', 'general'],
+  },
+  movie: {
+    genres: {
+      drama: ['tragedy', 'biographical', 'social-issue'],
+      thriller: ['heist', 'psychological', 'cat-and-mouse'],
+      fantasy: ['epic-quest', 'mythic-fall', 'legend-reborn'],
+      sci_fi: ['first-contact', 'dystopia', 'terraforming'],
+      family: ['friendship', 'coming-of-age', 'hope'],
+    },
+    audiences: ['family', 'teens', 'young_adults', 'adults'],
+  },
+};
+function normalizeToken(value) {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, '_');
+}
+
+function resolveProjectProfile(mediumInput, genreInput, themeInput, audienceInput) {
+  const medium = normalizeToken(mediumInput);
+  const genre = normalizeToken(genreInput);
+  const theme = normalizeToken(themeInput);
+  const targetAudience = normalizeToken(audienceInput);
+  const mediumConfig = PROJECT_PROFILE_TAXONOMY[medium];
+  if (!mediumConfig) return null;
+  const allowedThemes = mediumConfig.genres[genre];
+  if (!allowedThemes || !allowedThemes.includes(theme)) return null;
+  if (!mediumConfig.audiences.includes(targetAudience)) return null;
+  return { medium, genre, theme, targetAudience };
+}
+
+function computeGenreAudienceAffinity(genre, targetAudience, npc) {
+  const key = `${genre}:${targetAudience}`;
+  let score = 0;
+  for (let i = 0; i < key.length; i += 1) score += key.charCodeAt(i) * (i + 3);
+  score += Math.round((npc?.ambition ?? 20) * 11 + (npc?.reputation ?? 15) * 7 + (npc?.id?.length ?? 4) * 13);
+  return (score % 100) / 100;
+}
 
 function addUniqueName(usedNames, candidate) {
   if (usedNames.has(candidate)) return false;
@@ -229,6 +295,13 @@ function generateUniqueMangaTitle(state, npc) {
 }
 
 function createNpcProject(state, npc, day) {
+  const mediumByRole = npc.role === 'novelis' ? 'novel' : npc.role === 'animator' ? 'anime' : 'manga';
+  const taxonomy = PROJECT_PROFILE_TAXONOMY[mediumByRole] || PROJECT_PROFILE_TAXONOMY.manga;
+  const genreKeys = Object.keys(taxonomy.genres);
+  const genre = genreKeys[(day + npc.id.length + Math.floor(npc.ambition)) % genreKeys.length];
+  const themes = taxonomy.genres[genre];
+  const theme = themes[(day + Math.floor(npc.reputation) + npc.id.length) % themes.length];
+  const targetAudience = taxonomy.audiences[(day + Math.floor(npc.ambition / 8)) % taxonomy.audiences.length];
   if (!npc.franchiseTitle) npc.franchiseTitle = generateUniqueMangaTitle(state, npc);
   npc.franchiseIndex = (npc.franchiseIndex ?? 0) + 1;
   const installment = npc.franchiseIndex === 1 ? 'Main Story' : npc.franchiseIndex === 2 ? 'Sequel Arc' : `Series ${npc.franchiseIndex}`;
@@ -243,6 +316,9 @@ function createNpcProject(state, npc, day) {
     studioId: null,
     productionProgress: 0,
     launched: false,
+    genre,
+    theme,
+    targetAudience,
   };
 }
 
@@ -536,10 +612,11 @@ export function createAnimeIndustryRuntime() {
       }
 
       if (project.stage === 'serialization') {
+        const affinity = computeGenreAudienceAffinity(project.genre, project.targetAudience, npc);
         const writingBoost = 1 + (npc.ambition > 62 ? 1 : 0) + (kernel.discipline > 0.7 ? 1 : 0);
         project.chapters += writingBoost;
-        project.quality = clamp(project.quality + 1.1 + (npc.ambition / 130) + kernel.discipline * 0.7, 1, 100);
-        project.popularity = clamp(project.popularity + 0.85 + (npc.reputation / 190) + kernel.riskBudget * 0.5, 1, 100);
+        project.quality = clamp(project.quality + 1.1 + (npc.ambition / 130) + kernel.discipline * 0.7 + affinity * 0.45, 1, 100);
+        project.popularity = clamp(project.popularity + 0.85 + (npc.reputation / 190) + kernel.riskBudget * 0.5 + affinity * 0.55, 1, 100);
         if (project.chapters >= 10) {
           project.stage = 'studio-interest';
           const ownStudio = npc.writesManga && npc.studioId ? studioById.get(npc.studioId) : null;
@@ -563,7 +640,8 @@ export function createAnimeIndustryRuntime() {
       if (project.stage === 'launch-ready') {
         project.launched = true;
         const studio = studioById.get(project.studioId);
-        const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2) + kernel.discipline * 3.2);
+        const affinity = computeGenreAudienceAffinity(project.genre, project.targetAudience, npc);
+        const releaseScore = Math.max(52, project.quality * 0.55 + project.popularity * 0.45 + ((studio?.craft ?? 60) * 0.2) + kernel.discipline * 3.2 + affinity * 3.4);
         state.releases.push({
           id: project.id,
           title: project.title,
@@ -651,12 +729,12 @@ export function createAnimeIndustryRuntime() {
   function createProjectFromDraft(draft) {
     return withAction('create-project-from-draft', () => {
       if (!state.registered) return false;
-      const mediumInput = String(draft?.medium || '').trim().toLowerCase();
-      const medium = ['manga', 'novel', 'anime', 'movie'].includes(mediumInput) ? mediumInput : null;
+      const profile = resolveProjectProfile(draft?.medium, draft?.genre, draft?.theme, draft?.targetAudience);
+      const medium = profile?.medium ?? null;
       const title = String(draft?.title || '').trim();
-      const genre = String(draft?.genre || '').trim();
-      const theme = String(draft?.theme || '').trim();
-      const targetAudience = String(draft?.targetAudience || '').trim();
+      const genre = profile?.genre ?? '';
+      const theme = profile?.theme ?? '';
+      const targetAudience = profile?.targetAudience ?? '';
       if (!medium || !title || !genre || !theme || !targetAudience) return false;
       if (state.usedNames.has(title)) return false;
 
