@@ -185,20 +185,21 @@
   }
 
   #about-testing :is(img, picture > img) {
-    inline-size: min(100%, clamp(38rem, 64cqi, 56rem));
+    inline-size: min(100%, clamp(34rem, 58cqi, 48rem));
     block-size: auto;
     margin-inline: auto;
   }
 
   #about-testing img[alt="Fadhil Akbar portfolio banner"] {
     aspect-ratio: 16 / 9;
-    object-fit: cover;
+    object-fit: contain;
     object-position: 50% 50%;
-    max-block-size: min(46vh, 31.5rem);
+    max-block-size: min(40vh, 24rem);
+    background: rgba(2, 6, 23, 0.86);
   }
 
   #portfolio-testing [data-project-card] {
-    inline-size: min(100%, clamp(36rem, 62cqi, 50rem));
+    inline-size: min(100%, clamp(30rem, 54cqi, 42rem));
     margin-inline: auto;
   }
 
@@ -206,14 +207,15 @@
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     block-size: auto;
-    max-block-size: min(34vh, 18rem) !important;
-    object-fit: cover;
-    object-position: 50% 42%;
+    max-block-size: min(30vh, 14.5rem) !important;
+    object-fit: contain;
+    object-position: 50% 50%;
+    background: rgba(2, 6, 23, 0.86);
   }
 }
 
 @container portfolio-zone (min-width: 72rem) {
   #portfolio-testing [data-project-card] img[data-src] {
-    max-block-size: 16.5rem !important;
+    max-block-size: 13.5rem !important;
   }
 }
