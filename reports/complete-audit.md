@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-26T01:30:32Z
+Generated: 2026-04-26T01:39:42Z
 
 ## Executive Summary
 
@@ -8,19 +8,19 @@ Generated: 2026-04-26T01:30:32Z
 - Paths checked: 16
 - HTTP 200: 15
 - Errors (non-200/redirect): 1
-- Missing meta description: 2
-- Missing canonical: 3
+- Missing meta description: 0
+- Missing canonical: 0
 - Missing H1: 1
 - Missing HTML lang: 0
-- Missing OG title: 13
-- Missing OG description: 13
-- Missing twitter:card: 15
+- Missing OG title: 10
+- Missing OG description: 10
+- Missing twitter:card: 12
 - Missing JSON-LD: 15
 - Duplicate file groups (all): 65
 - Potential unused static files: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 45
-- Avg response time (ms): 214.3
-- P95 response time (ms): 322.1
+- Avg response time (ms): 240.4
+- P95 response time (ms): 356.9
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -34,22 +34,22 @@ Generated: 2026-04-26T01:30:32Z
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 289.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/animeindustry` | 200 | — | 273.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 322.1 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | 229.0 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `/books` | 200 | — | 137.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 327.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/animeindustry` | 200 | — | 178.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/dreambusiness` | 200 | — | 233.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/rpg` | 200 | — | 191.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 163.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 145.1 | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 255.3 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/portfolio` | 200 | — | 171.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 176.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 214.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 118.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 345.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 364.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 301.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | 178.6 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `/books` | 200 | — | 356.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 338.4 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 188.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 337.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 250.5 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 169.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 204.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 216.7 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 127.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 94.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 218.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 153.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ### Route Errors
 
@@ -75,8 +75,8 @@ Generated: 2026-04-26T01:30:32Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 124.3 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 214.9 | `url-count=13` |
+| `/robots.txt` | 200 | 181.1 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 198.6 | `url-count=13` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -203,8 +203,8 @@ Generated: 2026-04-26T01:30:32Z
 ### Group 19 — files: 2, bytes: 5488
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/presets/index.ts` | 2 | 6 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts` | 2 | 6 | ✅ | ❌ |
+| `library/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
 
 ### Group 20 — files: 2, bytes: 5472
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
