@@ -26,6 +26,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "website/*.svg",
+      "use": "@vercel/static"
+    },
+    {
       "src": "website/*.webmanifest",
       "use": "@vercel/static"
     },
@@ -143,6 +147,14 @@
     {
       "src": "/fadhil-512x512.png",
       "dest": "/website/fadhil-512x512.png"
+    },
+    {
+      "src": "/fadhil.svg",
+      "dest": "/website/fadhil.svg"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/website/fadhil.svg"
     },
     {
       "src": "/favicon.png",

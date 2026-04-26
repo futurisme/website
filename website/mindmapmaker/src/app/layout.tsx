@@ -3,7 +3,7 @@ import './globals.css';
 import '@/lib/fadhilweblib/styles/theme.css';
 import { GlobalRuntime } from '@/components/global-runtime';
 
-const siteUrl = 'https://fadhilwebsite.vercel.app';
+const siteUrl = 'https://fadhil.dev';
 const siteName = 'Mindmapmaker Workspace';
 const defaultTitle = 'Mindmapmaker Workspace | Cybernetic Concept Mapping';
 const defaultDescription =
@@ -21,6 +21,14 @@ export const metadata: Metadata = {
     canonical: '/mindmapmaker',
   },
   applicationName: siteName,
+  icons: {
+    icon: [
+      { url: '/fadhil-512x512.png', type: 'image/png', sizes: '512x512' },
+      { url: '/fadhil.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    shortcut: [{ url: '/fadhil-512x512.png', type: 'image/png' }],
+    apple: [{ url: '/fadhil-512x512.png', sizes: '512x512' }],
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',

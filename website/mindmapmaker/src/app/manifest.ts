@@ -12,9 +12,16 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#0a0f1f',
     icons: [
       {
-        src: '/mindmapmaker/favicon.ico',
+        src: '/fadhil-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any maskable',
+      },
+      {
+        src: '/fadhil.svg',
         sizes: 'any',
-        type: 'image/x-icon',
+        type: 'image/svg+xml',
+        purpose: 'any',
       },
     ],
   };
