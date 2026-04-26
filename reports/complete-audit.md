@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-25T23:56:47Z
+Generated: 2026-04-26T00:03:45Z
 
 ## Executive Summary
 
@@ -14,35 +14,37 @@ Generated: 2026-04-25T23:56:47Z
 - Duplicate file groups (all): 65
 - Potential unused static files: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 45
-- Avg response time (ms): 139.8
-- P95 response time (ms): 205.4
+- Avg response time (ms): 74.7
+- P95 response time (ms): 101.2
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
-- robots.txt status: 404
-- sitemap.xml status: 404
-- Sitemap URL count: 0
-- Sitemap coverage gap (audited routes not in sitemap): 13
+- robots.txt status: 200
+- sitemap.xml status: 200
+- Sitemap URL count: 13
+- Sitemap coverage gap (audited routes not in sitemap): 0
+- Local robots/sitemap ready: yes
+- Local sitemap coverage gap: 0
 
 ## Domain Route Audit
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 247.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/animeindustry` | 200 | — | 205.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 115.7 | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | 200.7 | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `/books` | 200 | — | 142.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 100.9 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/games/animeindustry` | 200 | — | 200.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/games/dreambusiness` | 200 | — | 135.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/games/rpg` | 200 | — | 60.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 63.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 97.7 | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 163.6 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/portfolio` | 200 | — | 146.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 123.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 130.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 102.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 101.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 64.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 90.4 | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | 88.0 | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `/books` | 200 | — | 47.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 98.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 87.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 52.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 104.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 44.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 79.3 | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 91.0 | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 90.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 66.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 45.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 45.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
 ### Route Errors
 
@@ -68,24 +70,17 @@ Generated: 2026-04-25T23:56:47Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 404 | 47.0 | `user-agent-missing,sitemap-missing` |
-| `/sitemap.xml` | 404 | 134.4 | `url-count=0` |
+| `/robots.txt` | 200 | 82.0 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 46.8 | `url-count=13` |
 
-| Audited route missing in sitemap |
-|---|
-| `/` |
-| `/animeindustry` |
-| `/archives` |
-| `/books` |
-| `/books/editor` |
-| `/games/animeindustry` |
-| `/games/dreambusiness` |
-| `/games/rpg` |
-| `/home` |
-| `/mindmapmaker` |
-| `/portfolio` |
-| `/rpg` |
-| `/shareideas` |
+## Local Crawl Asset Audit (Repository)
+
+- robots.txt exists: yes
+- sitemap.xml exists: yes
+- robots user-agent wildcard: yes
+- robots sitemap directive: yes
+- local sitemap URL count: 14
+- local sitemap coverage gap: 0
 
 ## Duplicate File Analysis (Top 25)
 

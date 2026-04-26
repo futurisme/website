@@ -425,6 +425,7 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     static = report['static_unused_audit']
     vercel_cfg = report['vercel_target_audit']
     crawl = report['crawl_support_audit']
+    local_crawl = report['local_crawl_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -451,6 +452,8 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- sitemap.xml status: {crawl['sitemap']['status']}",
         f"- Sitemap URL count: {crawl['summary']['sitemap_url_count']}",
         f"- Sitemap coverage gap (audited routes not in sitemap): {crawl['summary']['audited_route_not_in_sitemap_count']}",
+        f"- Local robots/sitemap ready: {'yes' if (local_crawl['summary']['robots_exists'] and local_crawl['summary']['sitemap_exists']) else 'no'}",
+        f"- Local sitemap coverage gap: {local_crawl['summary']['audited_route_not_in_sitemap_count']}",
         '',
         '## Domain Route Audit',
         '',
@@ -516,6 +519,22 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
 
     lines.extend([
         '',
+        '## Local Crawl Asset Audit (Repository)',
+        '',
+        f"- robots.txt exists: {'yes' if local_crawl['summary']['robots_exists'] else 'no'}",
+        f"- sitemap.xml exists: {'yes' if local_crawl['summary']['sitemap_exists'] else 'no'}",
+        f"- robots user-agent wildcard: {'yes' if local_crawl['summary']['robots_has_user_agent_wildcard'] else 'no'}",
+        f"- robots sitemap directive: {'yes' if local_crawl['summary']['robots_has_sitemap_directive'] else 'no'}",
+        f"- local sitemap URL count: {local_crawl['summary']['sitemap_url_count']}",
+        f"- local sitemap coverage gap: {local_crawl['summary']['audited_route_not_in_sitemap_count']}",
+    ])
+    if local_crawl['audited_routes_missing_in_sitemap']:
+        lines.extend(['', '| Local sitemap missing route |', '|---|'])
+        for route in local_crawl['audited_routes_missing_in_sitemap']:
+            lines.append(f'| `{route}` |')
+
+    lines.extend([
+        '',
         f'## Duplicate File Analysis (Top {top_duplicates})',
         '',
     ])
@@ -566,8 +585,8 @@ def audit_crawl_support(base_url: str, timeout: int, audited_paths: list[str]) -
     robots_body = robots.get('body', '')
     sitemap_body = sitemap.get('body', '')
 
-    has_user_agent = bool(re.search(r'(?im)^User-agent\\s*:\\s*\\*', robots_body))
-    has_sitemap_line = bool(re.search(r'(?im)^Sitemap\\s*:\\s*https?://', robots_body))
+    has_user_agent = bool(re.search(r'(?im)^User-agent\s*:\s*\*', robots_body))
+    has_sitemap_line = bool(re.search(r'(?im)^Sitemap\s*:\s*https?://', robots_body))
     sitemap_urls = sorted(set(re.findall(r'<loc>(https?://[^<]+)</loc>', sitemap_body)))
     sitemap_paths = {normalize_path(urllib.parse.urlparse(url).path or '/') for url in sitemap_urls}
 
@@ -605,6 +624,37 @@ def audit_crawl_support(base_url: str, timeout: int, audited_paths: list[str]) -
     }
 
 
+def audit_local_crawl_assets(root: Path, audited_paths: list[str]) -> dict[str, Any]:
+    robots_path = root / 'website' / 'robots.txt'
+    sitemap_path = root / 'website' / 'sitemap.xml'
+
+    robots_text = robots_path.read_text(encoding='utf-8') if robots_path.exists() else ''
+    sitemap_text = sitemap_path.read_text(encoding='utf-8') if sitemap_path.exists() else ''
+
+    robots_has_user_agent = bool(re.search(r'(?im)^User-agent\s*:\s*\*', robots_text))
+    robots_has_sitemap = bool(re.search(r'(?im)^Sitemap\s*:\s*https?://', robots_text))
+    local_sitemap_urls = sorted(set(re.findall(r'<loc>(https?://[^<]+)</loc>', sitemap_text)))
+    local_sitemap_paths = {normalize_path(urllib.parse.urlparse(url).path or '/') for url in local_sitemap_urls}
+
+    expected_paths = {
+        path for path in audited_paths
+        if path not in {'/archives/([^/.]+)', '/mindmapmaker/editor/1', '/shareideas/page/1'}
+    }
+    missing_paths = sorted(path for path in expected_paths if path not in local_sitemap_paths)
+
+    return {
+        'summary': {
+            'robots_exists': robots_path.exists(),
+            'sitemap_exists': sitemap_path.exists(),
+            'robots_has_user_agent_wildcard': robots_has_user_agent,
+            'robots_has_sitemap_directive': robots_has_sitemap,
+            'sitemap_url_count': len(local_sitemap_urls),
+            'audited_route_not_in_sitemap_count': len(missing_paths),
+        },
+        'audited_routes_missing_in_sitemap': missing_paths,
+    }
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -618,6 +668,7 @@ def main() -> None:
     static_unused = find_potential_unused_static_files(root, vercel_data)
     vercel_target_audit = audit_vercel_targets(root, vercel_data)
     crawl_support_audit = audit_crawl_support(args.base_url, args.timeout, paths)
+    local_crawl_audit = audit_local_crawl_assets(root, paths)
 
     successful_rows = [row for row in domain_results if row.get('status') == 200]
     response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
@@ -653,6 +704,7 @@ def main() -> None:
         'static_unused_audit': static_unused,
         'vercel_target_audit': vercel_target_audit,
         'crawl_support_audit': crawl_support_audit,
+        'local_crawl_audit': local_crawl_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'
