@@ -402,6 +402,46 @@ function RovingFocusExample() {
   );
 }
 
+
+function ModernResponsiveSupportExample() {
+  return (
+    <section className="fwlb-fluid-shell fwlb-fluid-stack fwlb-cq-root rounded-[1.25rem] border border-cyan-400/20 bg-slate-950/70 p-4">
+      <header className="fwlb-fluid-stack">
+        <p className="text-xs uppercase tracking-[0.18em] text-cyan-300/80">2026 responsive stack</p>
+        <h2 className="fwlb-fluid-type-title fwlb-variable-font" data-weight="strong">Container Queries + clamp() + variable fonts</h2>
+        <p className="fwlb-fluid-type-body text-slate-300">fadhilweblib now ships fluid layout utilities, component-level container queries, and adaptive media controls for srcSet/picture workflows.</p>
+      </header>
+
+      <nav className="fwlb-rwd-nav rounded-2xl border border-cyan-500/20 bg-slate-900/70 p-3">
+        <button type="button" data-mobile-toggle className="rounded-xl border border-cyan-400/30 px-3 py-2 text-xs text-cyan-100">☰ Menu</button>
+        <div data-desktop-links className="fwlb-flex-cluster text-sm text-cyan-100/90">
+          <span>Docs</span>
+          <span>Patterns</span>
+          <span>Tokens</span>
+          <span>Playground</span>
+        </div>
+      </nav>
+
+      <div className="fwlb-cq-grid">
+        {["Fluid grid", "Container aware", "Ultra lightweight"].map((label) => (
+          <article key={label} className="rounded-2xl border border-cyan-400/15 bg-slate-900/65 p-4">
+            <h3 className="fwlb-variable-font text-base text-cyan-100">{label}</h3>
+            <p className="mt-2 text-sm text-slate-300">Uses modern relative sizing (% / rem / cqi), composable Flex/Grid, and no JS layout lock-in.</p>
+          </article>
+        ))}
+      </div>
+
+      <figure className="fwlb-adaptive-media-frame" data-density="hero">
+        <picture>
+          <source media="(min-width: 1000px)" srcSet="/social-preview-whatsapp.jpg" />
+          <source media="(min-width: 640px)" srcSet="/social-preview-whatsapp.jpg" />
+          <img className="fwlb-adaptive-media" src="/social-preview-whatsapp.jpg" alt="Adaptive preview media demo" loading="lazy" />
+        </picture>
+      </figure>
+    </section>
+  );
+}
+
 export function FadhilWebLibShowcase() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#030712] text-slate-100">
@@ -614,6 +654,8 @@ import { Button, IconButton, CollapsiblePanel, useDisclosure, useRovingFocus } f
             </Stack>
           </Panel>
         </section>
+
+        <ModernResponsiveSupportExample />
 
         <section className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
           <AdvancedSyntaxExample />
