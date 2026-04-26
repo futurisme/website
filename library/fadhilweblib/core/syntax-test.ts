@@ -120,6 +120,40 @@ test('compileSyntax supports advanced containment and typography properties', ()
   assert.equal(resolved.style.aspectRatio, '16 / 9');
 });
 
+test('resolveSyntax supports container-query media controls and adaptive image attrs', () => {
+  const resolved = resolveSyntax({
+    layout: {
+      containerType: 'inline-size',
+      containerName: 'card-shell',
+      objectFit: 'cover',
+      objectPosition: '50% 40%',
+      imageRendering: 'auto',
+    },
+    text: {
+      fontVariationSettings: '"opsz" 32, "wght" 620',
+      fontOpticalSizing: 'auto',
+    },
+    logic: {
+      srcSet: '/hero-640.webp 640w, /hero-1280.webp 1280w',
+      sizes: '(max-width: 50rem) 100vw, 50vw',
+      fetchPriority: 'high',
+      decoding: 'async',
+    },
+  });
+
+  assert.equal((resolved.style as Record<string, string>).containerType, 'inline-size');
+  assert.equal((resolved.style as Record<string, string>).containerName, 'card-shell');
+  assert.equal(resolved.style.objectFit, 'cover');
+  assert.equal(resolved.style.objectPosition, '50% 40%');
+  assert.equal((resolved.style as Record<string, string>).imageRendering, 'auto');
+  assert.equal((resolved.style as Record<string, string>).fontVariationSettings, '"opsz" 32, "wght" 620');
+  assert.equal((resolved.style as Record<string, string>).fontOpticalSizing, 'auto');
+  assert.equal(resolved.attrs.srcSet, '/hero-640.webp 640w, /hero-1280.webp 1280w');
+  assert.equal(resolved.attrs.sizes, '(max-width: 50rem) 100vw, 50vw');
+  assert.equal(resolved.attrs.fetchPriority, 'high');
+  assert.equal(resolved.attrs.decoding, 'async');
+});
+
 test('parseSyntaxInput supports grouped namespace syntax and escape hatches', () => {
   const parsed = parseSyntaxInput(
     'layout(display:grid, cols:1.4fr 1fr, gap:lg, templateAreas:"hero stats", sticky:12); spacing(px:20, py:14); surface(bg:surface(base), border:tone(brand, border), radius:24); text(fs:18, weight:700, clamp:2); fx(duration:180, ease:cubic-bezier(0.2,0.8,0.2,1), translateY:-1); logic(open:true, focusable:true); attrs(draggable:true, title:Workspace card); aria(label:Workspace card); data(track:hero); vars(card-shadow:shadow(panel)); css(scrollbar-gutter:stable both-edges, grid-template-columns:subgrid);',

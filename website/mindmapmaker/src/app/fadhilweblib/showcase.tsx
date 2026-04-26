@@ -438,6 +438,15 @@ function ModernResponsiveSupportExample() {
           <img className="fwlb-adaptive-media" src="/social-preview-whatsapp.jpg" alt="Adaptive preview media demo" loading="lazy" />
         </picture>
       </figure>
+      <CodeBlock
+        code={`<Panel
+  syntax="containerType:inline-size; containerName:media-card; cols:repeat(auto-fit,minmax(15rem,1fr)); gap:clamp(0.7rem,1.4vw,1.2rem);"
+>
+  <img
+    {...resolveSyntax('objectFit:cover; objectPosition:50% 40%; imageRendering:auto; srcSet:/hero-640.webp 640w, /hero-1280.webp 1280w; sizes:(max-width:50rem) 100vw, 50vw; fetchPriority:high; decoding:async;').attrs}
+  />
+</Panel>`}
+      />
     </section>
   );
 }

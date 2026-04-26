@@ -194,6 +194,18 @@ export interface FadhilWebFlatSyntaxObject {
   contain?: string;
   contentVisibility?: string;
   containIntrinsicSize?: string | number;
+  containerType?: string;
+  containerName?: string;
+  container?: string;
+  objectFit?: string;
+  objectPosition?: string;
+  imageRendering?: string;
+  fontVariationSettings?: string;
+  fontOpticalSizing?: string;
+  srcSet?: string;
+  sizes?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
+  decoding?: 'sync' | 'async' | 'auto';
   role?: string;
   tabIndex?: string | number;
   titleText?: string;
@@ -279,7 +291,13 @@ export type FadhilWebLayoutSyntaxKey =
   | 'left'
   | 'z'
   | 'sticky'
-  | 'pin';
+  | 'pin'
+  | 'containerType'
+  | 'containerName'
+  | 'container'
+  | 'objectFit'
+  | 'objectPosition'
+  | 'imageRendering';
 
 export type FadhilWebSpacingSyntaxKey =
   | 'gap'
@@ -341,7 +359,9 @@ export type FadhilWebTextSyntaxKey =
   | 'truncate'
   | 'clampLines'
   | 'accent'
-  | 'caret';
+  | 'caret'
+  | 'fontVariationSettings'
+  | 'fontOpticalSizing';
 
 export type FadhilWebFxSyntaxKey =
   | 'cursor'
@@ -382,6 +402,10 @@ export type FadhilWebLogicSyntaxKey =
   | 'role'
   | 'tabIndex'
   | 'titleText'
+  | 'srcSet'
+  | 'sizes'
+  | 'fetchPriority'
+  | 'decoding'
   | 'inert'
   | 'loading'
   | 'disabled'

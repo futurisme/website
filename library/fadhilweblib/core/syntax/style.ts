@@ -353,6 +353,8 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   if (syntax.fontSize !== undefined) style.fontSize = resolveLengthValue(syntax.fontSize);
   if (syntax.fontFamily) style.fontFamily = syntax.fontFamily;
   if (syntax.weight !== undefined) style.fontWeight = parseNumber(syntax.weight) ?? String(syntax.weight);
+  if (syntax.fontVariationSettings) style.fontVariationSettings = resolveSyntaxString(syntax.fontVariationSettings);
+  if (syntax.fontOpticalSizing) style.fontOpticalSizing = resolveSyntaxString(syntax.fontOpticalSizing) as React.CSSProperties['fontOpticalSizing'];
   if (syntax.lineHeight !== undefined) style.lineHeight = parseNumberishValue(syntax.lineHeight);
   if (syntax.tracking !== undefined) style.letterSpacing = resolveLengthValue(syntax.tracking);
   if (syntax.textAlign) style.textAlign = syntax.textAlign as React.CSSProperties['textAlign'];
@@ -385,6 +387,9 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   if (syntax.colSpan !== undefined) style.gridColumn = buildGridSpanValue(syntax.colSpan);
   if (syntax.rowSpan !== undefined) style.gridRow = buildGridSpanValue(syntax.rowSpan);
   if (syntax.aspect !== undefined) style.aspectRatio = parseNumberishValue(syntax.aspect);
+  if (syntax.objectFit) style.objectFit = resolveSyntaxString(syntax.objectFit) as React.CSSProperties['objectFit'];
+  if (syntax.objectPosition) style.objectPosition = resolveSyntaxString(syntax.objectPosition);
+  if (syntax.imageRendering) style.imageRendering = resolveSyntaxString(syntax.imageRendering) as React.CSSProperties['imageRendering'];
   if (syntax.overflow) style.overflow = syntax.overflow as React.CSSProperties['overflow'];
   if (syntax.overflowX) style.overflowX = syntax.overflowX as React.CSSProperties['overflowX'];
   if (syntax.overflowY) style.overflowY = syntax.overflowY as React.CSSProperties['overflowY'];
@@ -436,6 +441,9 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   if (syntax.containIntrinsicSize !== undefined) {
     style.containIntrinsicSize = resolveLengthValue(syntax.containIntrinsicSize) as React.CSSProperties['containIntrinsicSize'];
   }
+  if (syntax.containerType) style.containerType = resolveSyntaxString(syntax.containerType) as React.CSSProperties['containerType'];
+  if (syntax.containerName) style.containerName = resolveSyntaxString(syntax.containerName) as React.CSSProperties['containerName'];
+  if (syntax.container) style.container = resolveSyntaxString(syntax.container);
 
   const direction = parseSemantic(syntax.direction, ['row', 'column'] as const);
   if (direction) {
@@ -566,6 +574,10 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   }
 
   if (syntax.titleText) attrs.title = syntax.titleText;
+  if (syntax.srcSet) attrs.srcSet = resolveSyntaxString(syntax.srcSet);
+  if (syntax.sizes) attrs.sizes = resolveSyntaxString(syntax.sizes);
+  if (syntax.fetchPriority) attrs.fetchPriority = syntax.fetchPriority;
+  if (syntax.decoding) attrs.decoding = syntax.decoding;
 
   if (syntax.aria) {
     for (const [key, value] of Object.entries(syntax.aria) as Array<[`aria-${string}`, SyntaxScalar]>) {
