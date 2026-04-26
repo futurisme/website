@@ -160,6 +160,11 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
             'canonical_href': canonical_match.group(1).strip() if canonical_match else '',
             'has_h1': bool(re.search(r'<h1\b', body, re.I)),
             'noindex': bool(re.search(r'<meta[^>]+name=[\'\"]robots[\'\"][^>]+content=[\'\"][^\"\']*noindex', body, re.I)),
+            'html_lang': bool(re.search(r'<html[^>]+lang=[\'\"][^\'\"]+[\'\"]', body, re.I)),
+            'og_title': bool(re.search(r"<meta[^>]+property=['\"]og:title['\"][^>]+content=", body, re.I)),
+            'og_description': bool(re.search(r"<meta[^>]+property=['\"]og:description['\"][^>]+content=", body, re.I)),
+            'twitter_card': bool(re.search(r"<meta[^>]+name=['\"]twitter:card['\"][^>]+content=", body, re.I)),
+            'json_ld': bool(re.search(r"<script[^>]+type=['\"]application/ld\\+json['\"]", body, re.I)),
         },
         'processing_hints': {
             'script_tags': len(re.findall(r'<script\b', body, re.I)),
@@ -441,6 +446,11 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- Missing meta description: {domain['summary']['missing_meta_description_count']}",
         f"- Missing canonical: {domain['summary']['missing_canonical_count']}",
         f"- Missing H1: {domain['summary']['missing_h1_count']}",
+        f"- Missing HTML lang: {domain['summary']['missing_html_lang_count']}",
+        f"- Missing OG title: {domain['summary']['missing_og_title_count']}",
+        f"- Missing OG description: {domain['summary']['missing_og_description_count']}",
+        f"- Missing twitter:card: {domain['summary']['missing_twitter_card_count']}",
+        f"- Missing JSON-LD: {domain['summary']['missing_json_ld_count']}",
         f"- Duplicate file groups (all): {summary['duplicate_groups_total']}",
         f"- Potential unused static files: {static['summary']['potential_unused_files']}",
         f"- Missing security headers (CSP/HSTS/XCTO/Referrer): {domain['summary']['missing_security_headers_count']}",
@@ -457,8 +467,8 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         '',
         '## Domain Route Audit',
         '',
-        '| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | HTTPS | SecHdr | Deprecated |',
-        '|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|',
+        '| Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |',
+        '|---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|',
     ]
 
     for row in domain['results']:
@@ -466,7 +476,9 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         lines.append(
             f"| `{row.get('path')}` | {row.get('status')} | {'↪️' if row.get('redirected') else '—'} | {row.get('time_ms')} | "
             f"{'✅' if seo.get('meta_description') else '❌'} | {'✅' if seo.get('canonical') else '❌'} | "
-            f"{'✅' if seo.get('has_h1') else '❌'} | {'✅' if row.get('is_https_final') else '❌'} | "
+            f"{'✅' if seo.get('has_h1') else '❌'} | {'✅' if seo.get('og_title') else '❌'} | "
+            f"{'✅' if seo.get('twitter_card') else '❌'} | {'✅' if seo.get('json_ld') else '❌'} | "
+            f"{'✅' if row.get('is_https_final') else '❌'} | "
             f"{'✅' if all(row.get('security_headers', {}).values()) else '❌'} | "
             f"{'⚠️' if row.get('deprecated_flags') else '✅'} |"
         )
@@ -684,6 +696,11 @@ def main() -> None:
         'missing_meta_description_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('meta_description')),
         'missing_canonical_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('canonical')),
         'missing_h1_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('has_h1')),
+        'missing_html_lang_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('html_lang')),
+        'missing_og_title_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('og_title')),
+        'missing_og_description_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('og_description')),
+        'missing_twitter_card_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('twitter_card')),
+        'missing_json_ld_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('seo_basics', {}).get('json_ld')),
         'non_https_final_count': sum(1 for row in domain_results if row.get('status') == 200 and not row.get('is_https_final', False)),
         'avg_response_time_ms': round(sum(response_times) / len(response_times), 1) if response_times else 0.0,
         'p95_response_time_ms': round(percentile(response_times, 0.95), 1),
