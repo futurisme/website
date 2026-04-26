@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-26T01:39:42Z
+Generated: 2026-04-26T03:09:15Z
 
 ## Executive Summary
 
@@ -10,7 +10,7 @@ Generated: 2026-04-26T01:39:42Z
 - Errors (non-200/redirect): 1
 - Missing meta description: 0
 - Missing canonical: 0
-- Missing H1: 1
+- Missing H1: 3
 - Missing HTML lang: 0
 - Missing OG title: 10
 - Missing OG description: 10
@@ -19,10 +19,10 @@ Generated: 2026-04-26T01:39:42Z
 - Duplicate file groups (all): 65
 - Potential unused static files: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 45
-- Avg response time (ms): 240.4
-- P95 response time (ms): 356.9
-- Vercel route target issues: 0
-- Vercel build glob issues: 0
+- Avg response time (ms): 88.8
+- P95 response time (ms): 123.3
+- Vercel route target issues: 3
+- Vercel build glob issues: 2
 - robots.txt status: 200
 - sitemap.xml status: 200
 - Sitemap URL count: 13
@@ -34,22 +34,22 @@ Generated: 2026-04-26T01:39:42Z
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 345.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/animeindustry` | 200 | — | 364.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 301.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | 178.6 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `/books` | 200 | — | 356.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 338.4 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/animeindustry` | 200 | — | 188.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/dreambusiness` | 200 | — | 337.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/rpg` | 200 | — | 250.5 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 169.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 204.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 216.7 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/portfolio` | 200 | — | 127.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 94.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 218.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 153.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 97.3 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 120.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 69.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/archives/([^/.]+)` | 404 | — | 98.4 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
+| `/books` | 200 | — | 245.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 89.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 123.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 58.5 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 42.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 84.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 104.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 75.8 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 40.5 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 42.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 47.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 82.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ### Route Errors
 
@@ -68,15 +68,26 @@ Generated: 2026-04-26T01:39:42Z
 
 ## Vercel Target Integrity
 
-- Route target issues: 0
-- Build glob issues: 0
+- Route target issues: 3
+- Build glob issues: 2
+
+| Route src | Route dest | Reason |
+|---|---|---|
+| `/favicon.ico` | `/website/fadhil-512x512.png` | `target-file-not-found` |
+| `/fadhil-512x512.png` | `/website/fadhil-512x512.png` | `target-file-not-found` |
+| `/site.webmanifest` | `/website/site.webmanifest` | `target-file-not-found` |
+
+| Build src | Reason |
+|---|---|
+| `website/*.png` | `build-glob-has-no-matches` |
+| `website/*.webmanifest` | `build-glob-has-no-matches` |
 
 ## Crawl Support Audit (robots + sitemap)
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 181.1 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 198.6 | `url-count=13` |
+| `/robots.txt` | 200 | 38.5 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 74.0 | `url-count=13` |
 
 ## Local Crawl Asset Audit (Repository)
 

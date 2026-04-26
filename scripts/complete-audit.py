@@ -101,7 +101,7 @@ def collect_paths(vercel_path: Path) -> list[str]:
         candidate = normalize_path(src)
         if candidate.startswith('/api'):
             continue
-        if re.search(r'\.[a-zA-Z0-9]{2,8}$', candidate):
+        if re.search(r'\.[a-zA-Z0-9]{2,20}$', candidate):
             continue
         paths.add(candidate)
 

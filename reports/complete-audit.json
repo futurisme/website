@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-04-26T01:39:42Z",
+    "generated_at": "2026-04-26T03:09:15Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 65,
-    "elapsed_seconds": 11.39
+    "elapsed_seconds": 6.49
   },
   "domain": {
     "summary": {
@@ -13,16 +13,16 @@
       "error_count": 1,
       "missing_meta_description_count": 0,
       "missing_canonical_count": 0,
-      "missing_h1_count": 1,
+      "missing_h1_count": 3,
       "missing_html_lang_count": 0,
       "missing_og_title_count": 10,
       "missing_og_description_count": 10,
       "missing_twitter_card_count": 12,
       "missing_json_ld_count": 15,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 240.4,
-      "p95_response_time_ms": 356.9,
-      "max_response_time_ms": 364.7,
+      "avg_response_time_ms": 88.8,
+      "p95_response_time_ms": 123.3,
+      "max_response_time_ms": 245.1,
       "missing_security_headers_count": 45,
       "missing_security_header_details": {
         "content-security-policy": 15,
@@ -36,14 +36,14 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 345.1,
+        "time_ms": 97.3,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4729,
+        "content_length": 4325,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -56,7 +56,7 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/",
-          "has_h1": true,
+          "has_h1": false,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
@@ -74,7 +74,7 @@
         "path": "/animeindustry",
         "url": "https://fadhil.dev/animeindustry",
         "status": 200,
-        "time_ms": 364.7,
+        "time_ms": 120.2,
         "final_url": "https://fadhil.dev/animeindustry",
         "final_path": "/animeindustry",
         "is_https_final": true,
@@ -112,7 +112,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 301.3,
+        "time_ms": 69.5,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -151,13 +151,13 @@
         "url": "https://fadhil.dev/archives/([^/.]+)",
         "status": 404,
         "error": "HTTP Error 404: Not Found",
-        "time_ms": 178.6
+        "time_ms": 98.4
       },
       {
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 356.9,
+        "time_ms": 245.1,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -195,7 +195,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 338.4,
+        "time_ms": 89.8,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -233,7 +233,7 @@
         "path": "/games/animeindustry",
         "url": "https://fadhil.dev/games/animeindustry",
         "status": 200,
-        "time_ms": 188.7,
+        "time_ms": 123.3,
         "final_url": "https://fadhil.dev/games/animeindustry",
         "final_path": "/games/animeindustry",
         "is_https_final": true,
@@ -271,7 +271,7 @@
         "path": "/games/dreambusiness",
         "url": "https://fadhil.dev/games/dreambusiness",
         "status": 200,
-        "time_ms": 337.2,
+        "time_ms": 58.5,
         "final_url": "https://fadhil.dev/games/dreambusiness",
         "final_path": "/games/dreambusiness",
         "is_https_final": true,
@@ -309,7 +309,7 @@
         "path": "/games/rpg",
         "url": "https://fadhil.dev/games/rpg",
         "status": 200,
-        "time_ms": 250.5,
+        "time_ms": 42.1,
         "final_url": "https://fadhil.dev/games/rpg",
         "final_path": "/games/rpg",
         "is_https_final": true,
@@ -347,7 +347,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 169.2,
+        "time_ms": 84.0,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -385,7 +385,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 204.0,
+        "time_ms": 104.0,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -423,7 +423,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 216.7,
+        "time_ms": 75.8,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -461,14 +461,14 @@
         "path": "/portfolio",
         "url": "https://fadhil.dev/portfolio",
         "status": 200,
-        "time_ms": 127.6,
+        "time_ms": 40.5,
         "final_url": "https://fadhil.dev/portfolio",
         "final_path": "/portfolio",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4729,
+        "content_length": 4325,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -481,7 +481,7 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/",
-          "has_h1": true,
+          "has_h1": false,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
@@ -499,7 +499,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 94.9,
+        "time_ms": 42.0,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -537,7 +537,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 218.1,
+        "time_ms": 47.3,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -575,7 +575,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 153.9,
+        "time_ms": 82.3,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -1230,22 +1230,47 @@
   },
   "vercel_target_audit": {
     "summary": {
-      "route_target_issues": 0,
-      "build_glob_issues": 0
+      "route_target_issues": 3,
+      "build_glob_issues": 2
     },
-    "route_target_issues": [],
-    "build_glob_issues": []
+    "route_target_issues": [
+      {
+        "src": "/favicon.ico",
+        "dest": "/website/fadhil-512x512.png",
+        "reason": "target-file-not-found"
+      },
+      {
+        "src": "/fadhil-512x512.png",
+        "dest": "/website/fadhil-512x512.png",
+        "reason": "target-file-not-found"
+      },
+      {
+        "src": "/site.webmanifest",
+        "dest": "/website/site.webmanifest",
+        "reason": "target-file-not-found"
+      }
+    ],
+    "build_glob_issues": [
+      {
+        "src": "website/*.png",
+        "reason": "build-glob-has-no-matches"
+      },
+      {
+        "src": "website/*.webmanifest",
+        "reason": "build-glob-has-no-matches"
+      }
+    ]
   },
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 181.1,
+      "time_ms": 38.5,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 198.6,
+      "time_ms": 74.0,
       "url_count": 13
     },
     "sitemap_urls": [

@@ -22,6 +22,14 @@
       "use": "@vercel/static"
     },
     {
+      "src": "website/*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "website/*.webmanifest",
+      "use": "@vercel/static"
+    },
+    {
       "src": "website/portfolio/**/*.html",
       "use": "@vercel/static"
     },
@@ -127,6 +135,18 @@
     {
       "src": "/$",
       "dest": "/website/portfolio/index.html"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/website/fadhil-512x512.png"
+    },
+    {
+      "src": "/fadhil-512x512.png",
+      "dest": "/website/fadhil-512x512.png"
+    },
+    {
+      "src": "/site.webmanifest",
+      "dest": "/website/site.webmanifest"
     },
     {
       "src": "/robots.txt",

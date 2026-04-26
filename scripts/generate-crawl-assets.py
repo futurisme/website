@@ -40,7 +40,7 @@ def route_paths() -> list[str]:
             continue
         if is_dynamic_route(src) or src.startswith('/api'):
             continue
-        if re.search(r'\.[a-zA-Z0-9]{2,8}$', src):
+        if re.search(r'\.[a-zA-Z0-9]{2,20}$', src):
             continue
         paths.add(normalize_path(src))
 
