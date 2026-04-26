@@ -691,9 +691,19 @@ function buildCommunityInsights(state) {
     genreMomentum.set(genre, (genreMomentum.get(genre) || 0) + influence * ((qualitySignal / 100) * 1.4 + 0.4));
     genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
   });
+  state.npcProjects.forEach((project) => {
+    if (project.launched) return;
+    const medium = project.medium === 'novel' ? 'novel' : project.medium === 'movie' ? 'movie' : project.medium === 'anime' ? 'anime' : 'manga';
+    const qualitySignal = ((project.plotQuality ?? project.quality ?? 0) * 0.5) + ((project.visualQuality ?? project.quality ?? 0) * 0.5);
+    const influence = Math.max(0.05, ((project.popularity || 0) * 0.09 + qualitySignal * 0.08) * (1 - fatigue * 0.28) * boomAmplifier);
+    mediumAccumulator[medium] += influence;
+    ageAccumulator.teens += influence * 0.24;
+    ageAccumulator.young_adults += influence * 0.34;
+    ageAccumulator.general += influence * 0.22;
+  });
 
   state.releases.slice(-120).forEach((release) => {
-    const medium = release.medium === 'movie' ? 'movie' : release.medium === 'anime' ? 'anime' : 'manga';
+    const medium = release.medium === 'novel' ? 'novel' : release.medium === 'movie' ? 'movie' : release.medium === 'anime' ? 'anime' : 'manga';
     const freshness = clamp(1 - ((state.day - (release.day ?? state.day)) / 1200), 0.32, 1.25);
     const influence = Math.max(0.12, ((release.score || 0) ** 1.06) * 0.06 + ((release.imdb || 0) ** 1.3) * 0.32) * freshness * boomAmplifier;
     mediumAccumulator[medium] = (mediumAccumulator[medium] || 0.0001) + influence;
@@ -722,6 +732,11 @@ function buildCommunityInsights(state) {
   regionAccumulator.apac *= Math.max(0.25, 1 + Math.cos(day / 12.1) * 0.05);
   regionAccumulator.americas *= Math.max(0.25, 1 + Math.sin(day / 15.4) * 0.05);
   regionAccumulator.emea *= Math.max(0.25, 1 + Math.cos(day / 17.2) * 0.05);
+
+  const mediumDampingPower = 0.86;
+  Object.keys(mediumAccumulator).forEach((key) => {
+    mediumAccumulator[key] = Math.pow(Math.max(0.0001, mediumAccumulator[key]), mediumDampingPower);
+  });
 
   const normalize = (acc) => {
     const total = Object.values(acc).reduce((sum, value) => sum + value, 0) || 1;
