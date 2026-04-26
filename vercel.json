@@ -2,6 +2,14 @@
   "version": 2,
   "builds": [
     {
+      "src": "fadhil-512x512.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "fadhil.svg",
+      "use": "@vercel/static"
+    },
+    {
       "src": "website/mindmapmaker/mindmapmaker.js",
       "use": "@vercel/node"
     },
@@ -142,27 +150,27 @@
     },
     {
       "src": "/favicon.ico",
-      "dest": "/website/fadhil-512x512.png"
+      "dest": "/fadhil-512x512.png"
     },
     {
       "src": "/fadhil-512x512.png",
-      "dest": "/website/fadhil-512x512.png"
+      "dest": "/fadhil-512x512.png"
     },
     {
       "src": "/fadhil.svg",
-      "dest": "/website/fadhil.svg"
+      "dest": "/fadhil.svg"
     },
     {
       "src": "/favicon.svg",
-      "dest": "/website/fadhil.svg"
+      "dest": "/fadhil.svg"
     },
     {
       "src": "/favicon.png",
-      "dest": "/website/fadhil-512x512.png"
+      "dest": "/fadhil-512x512.png"
     },
     {
       "src": "/apple-touch-icon.png",
-      "dest": "/website/fadhil-512x512.png"
+      "dest": "/fadhil-512x512.png"
     },
     {
       "src": "/site.webmanifest",
