@@ -185,7 +185,7 @@
   }
 
   #about-testing :is(img, picture > img) {
-    inline-size: min(100%, clamp(34rem, 58cqi, 48rem));
+    inline-size: min(100%, clamp(42rem, 70cqi, 64rem));
     block-size: auto;
     margin-inline: auto;
   }
@@ -194,11 +194,11 @@
     aspect-ratio: 16 / 9;
     object-fit: cover;
     object-position: 50% 50%;
-    max-block-size: min(46vh, 31.5rem);
+    max-block-size: none;
   }
 
   #portfolio-testing [data-project-card] {
-    inline-size: min(100%, clamp(30rem, 54cqi, 42rem));
+    inline-size: min(100%, clamp(36rem, 66cqi, 56rem));
     margin-inline: auto;
   }
 
@@ -206,14 +206,14 @@
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     block-size: auto;
-    max-block-size: min(34vh, 18rem) !important;
+    max-block-size: none !important;
     object-fit: cover;
-    object-position: 50% 42%;
+    object-position: 50% 50%;
   }
 }
 
 @container portfolio-zone (min-width: 72rem) {
   #portfolio-testing [data-project-card] img[data-src] {
-    max-block-size: 16.5rem !important;
+    max-block-size: none !important;
   }
 }
