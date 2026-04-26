@@ -171,3 +171,49 @@
     max-width: 3.9rem;
   }
 }
+
+/* 2026 desktop image governance (16:9-aware, container-driven, mobile unchanged) */
+#about-testing,
+#portfolio-testing {
+  container-type: inline-size;
+  container-name: portfolio-zone;
+}
+
+@media (min-width: 1024px) {
+  #app [data-slot="theme-scope"] {
+    --fwlb-container-max: clamp(58rem, 74vw, 72rem);
+  }
+
+  #about-testing :is(img, picture > img) {
+    inline-size: min(100%, clamp(38rem, 64cqi, 56rem));
+    block-size: auto;
+    margin-inline: auto;
+  }
+
+  #about-testing img[alt="Fadhil Akbar portfolio banner"] {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: 50% 50%;
+    max-block-size: min(46vh, 31.5rem);
+  }
+
+  #portfolio-testing [data-project-card] {
+    inline-size: min(100%, clamp(36rem, 62cqi, 50rem));
+    margin-inline: auto;
+  }
+
+  #portfolio-testing [data-project-card] img[data-src] {
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    block-size: auto;
+    max-block-size: min(34vh, 18rem) !important;
+    object-fit: cover;
+    object-position: 50% 42%;
+  }
+}
+
+@container portfolio-zone (min-width: 72rem) {
+  #portfolio-testing [data-project-card] img[data-src] {
+    max-block-size: 16.5rem !important;
+  }
+}
