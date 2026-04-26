@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { DialogSide, RovingFocusOrientation } from './hooks';
 import type { Density, LayoutAlign, LayoutElement, LayoutGap, LayoutJustify, PresenceMode, Size, ThemeName, Tone } from './layout';
+import type { AdaptiveMediaSource, ContainerQueryType, ResponsiveMediaDensity, ResponsiveTrackMode } from './responsive';
 import type { FadhilWebRecipe, FadhilWebStateSyntax, FadhilWebSyntax, SlotSyntax } from './syntax';
 
 export interface ThemeScopeRecipeLogic {
@@ -10,6 +11,8 @@ export interface ThemeScopeRecipeLogic {
 export interface ThemeScopeProps extends React.HTMLAttributes<HTMLElement> {
   as?: LayoutElement;
   theme?: ThemeName;
+  debugBoundary?: boolean;
+  debugTitle?: React.ReactNode;
   children?: React.ReactNode;
   syntax?: FadhilWebSyntax;
   recipe?: FadhilWebRecipe<never, ThemeScopeRecipeLogic>;
@@ -38,12 +41,19 @@ export interface PanelProps extends SurfaceProps {}
 
 export interface ContainerRecipeLogic {
   centered?: boolean;
+  fluid?: boolean;
+  query?: boolean;
 }
 
 export interface ContainerProps extends React.HTMLAttributes<HTMLElement> {
   as?: LayoutElement;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full' | number | string;
   centered?: boolean;
+  fluid?: boolean;
+  gutter?: LayoutGap | string | number;
+  query?: boolean;
+  containerName?: string;
+  containerType?: ContainerQueryType;
   children?: React.ReactNode;
   syntax?: FadhilWebSyntax;
   recipe?: FadhilWebRecipe<never, ContainerRecipeLogic>;
@@ -74,18 +84,52 @@ export interface SectionProps extends Omit<React.HTMLAttributes<HTMLElement>, 't
 export interface GridRecipeLogic {
   align?: LayoutAlign;
   justify?: LayoutJustify;
+  dense?: boolean;
 }
 
 export interface GridProps extends React.HTMLAttributes<HTMLElement> {
   as?: LayoutElement;
   columns?: number | string;
   minItemWidth?: number | string;
+  maxItemWidth?: number | string;
+  trackMode?: ResponsiveTrackMode;
   gap?: LayoutGap;
+  rowGap?: LayoutGap;
+  columnGap?: LayoutGap;
   align?: LayoutAlign;
   justify?: LayoutJustify;
+  dense?: boolean;
   children?: React.ReactNode;
   syntax?: FadhilWebSyntax;
   recipe?: FadhilWebRecipe<never, GridRecipeLogic>;
+}
+
+export interface AdaptiveMediaRecipeLogic {
+  density?: ResponsiveMediaDensity;
+  query?: boolean;
+}
+
+export interface AdaptiveMediaProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+  as?: LayoutElement;
+  alt: string;
+  src: string;
+  sources?: readonly AdaptiveMediaSource[];
+  srcSet?: string;
+  sizes?: string;
+  width?: number;
+  height?: number;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'sync' | 'async' | 'auto';
+  fetchPriority?: 'high' | 'low' | 'auto';
+  fit?: string;
+  position?: string;
+  aspectRatio?: string | number;
+  density?: ResponsiveMediaDensity;
+  caption?: React.ReactNode;
+  query?: boolean;
+  syntax?: FadhilWebSyntax;
+  slotSyntax?: SlotSyntax<'picture' | 'media' | 'caption'>;
+  recipe?: FadhilWebRecipe<'picture' | 'media' | 'caption', AdaptiveMediaRecipeLogic>;
 }
 
 export interface ButtonRecipeLogic {
@@ -390,6 +434,7 @@ export interface ProgressBarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export interface MetricRecipeLogic {
   tone?: Tone;
+  density?: Density;
 }
 
 export interface MetricProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -398,6 +443,7 @@ export interface MetricProps extends React.HTMLAttributes<HTMLDivElement> {
   change?: React.ReactNode;
   description?: React.ReactNode;
   tone?: Tone;
+  density?: Density;
   syntax?: FadhilWebSyntax;
   slotSyntax?: SlotSyntax<'label' | 'value' | 'change' | 'description'>;
   recipe?: FadhilWebRecipe<'label' | 'value' | 'change' | 'description', MetricRecipeLogic>;

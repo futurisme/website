@@ -352,7 +352,10 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   if (syntax.maxBlockSize !== undefined) style.maxBlockSize = resolveLengthValue(syntax.maxBlockSize);
   if (syntax.fontSize !== undefined) style.fontSize = resolveLengthValue(syntax.fontSize);
   if (syntax.fontFamily) style.fontFamily = syntax.fontFamily;
+  if (syntax.fontStyle) style.fontStyle = resolveSyntaxString(syntax.fontStyle);
+  if (syntax.fontStretch !== undefined) style.fontStretch = parseNumberishValue(syntax.fontStretch) as React.CSSProperties['fontStretch'];
   if (syntax.weight !== undefined) style.fontWeight = parseNumber(syntax.weight) ?? String(syntax.weight);
+  if (syntax.fontFeatureSettings) style.fontFeatureSettings = resolveSyntaxString(syntax.fontFeatureSettings);
   if (syntax.fontVariationSettings) style.fontVariationSettings = resolveSyntaxString(syntax.fontVariationSettings);
   if (syntax.fontOpticalSizing) style.fontOpticalSizing = resolveSyntaxString(syntax.fontOpticalSizing) as React.CSSProperties['fontOpticalSizing'];
   if (syntax.lineHeight !== undefined) style.lineHeight = parseNumberishValue(syntax.lineHeight);
@@ -574,8 +577,18 @@ function resolveParsedSyntax(syntax: FadhilWebNormalizedSyntaxObject) {
   }
 
   if (syntax.titleText) attrs.title = syntax.titleText;
-  if (syntax.srcSet) attrs.srcSet = resolveSyntaxString(syntax.srcSet);
-  if (syntax.sizes) attrs.sizes = resolveSyntaxString(syntax.sizes);
+  if (syntax.srcSet) {
+    const resolvedSrcSet = resolveSyntaxString(syntax.srcSet);
+    if (resolvedSrcSet) {
+      attrs.srcSet = resolvedSrcSet;
+    }
+  }
+  if (syntax.sizes) {
+    const resolvedSizes = resolveSyntaxString(syntax.sizes);
+    if (resolvedSizes) {
+      attrs.sizes = resolvedSizes;
+    }
+  }
   if (syntax.fetchPriority) attrs.fetchPriority = syntax.fetchPriority;
   if (syntax.decoding) attrs.decoding = syntax.decoding;
 

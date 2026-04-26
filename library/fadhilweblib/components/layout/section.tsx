@@ -1,7 +1,7 @@
 import type { LayoutElement, SectionProps } from '../../core/types';
 import { cx } from '../../core/cx';
 import { composeSyntax, resolveSyntax } from '../../core/syntax';
-import { Surface } from './Surface';
+import { Surface } from './surface';
 import styles from './section-module.css';
 
 export function Section({

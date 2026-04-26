@@ -97,9 +97,12 @@ export interface FadhilWebFlatSyntaxObject {
   maxBlockSize?: string | number;
   fontSize?: string | number;
   fontFamily?: string;
+  fontStyle?: string;
+  fontStretch?: string | number;
   weight?: string | number;
   lineHeight?: string | number;
   tracking?: string | number;
+  fontFeatureSettings?: string;
   textAlign?: string;
   textTransform?: string;
   whiteSpace?: string;
@@ -349,9 +352,12 @@ export type FadhilWebSurfaceSyntaxKey =
 export type FadhilWebTextSyntaxKey =
   | 'fontSize'
   | 'fontFamily'
+  | 'fontStyle'
+  | 'fontStretch'
   | 'weight'
   | 'lineHeight'
   | 'tracking'
+  | 'fontFeatureSettings'
   | 'textAlign'
   | 'textTransform'
   | 'whiteSpace'

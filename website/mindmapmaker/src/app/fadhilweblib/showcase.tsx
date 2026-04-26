@@ -2,7 +2,25 @@
 
 import { useState } from 'react';
 import type { CollapsiblePanelRecipeLogic } from '@/lib/fadhilweblib';
-import { ActionGroup, HeaderShell, Inline, Panel, Stack, StatusChip, defineRecipe, defineStateSyntax, defineSyntax, mergeRecipes } from '@/lib/fadhilweblib';
+import {
+  ActionGroup,
+  AdaptiveMedia,
+  Container,
+  Grid,
+  HeaderShell,
+  Inline,
+  Panel,
+  Stack,
+  StatusChip,
+  createFluidClamp,
+  createResponsiveMediaQuery,
+  createResponsiveSizes,
+  createSrcSet,
+  defineRecipe,
+  defineStateSyntax,
+  defineSyntax,
+  mergeRecipes,
+} from '@/lib/fadhilweblib';
 import { Button, CollapsiblePanel, IconButton, useAsyncAction, useDisclosure, useRovingFocus, useSelectionState, useStepper } from '@/lib/fadhilweblib/client';
 
 const launchHeaderRecipe = defineRecipe({
@@ -122,6 +140,28 @@ const rovingTools = [
   'List focus',
   'Async flow',
 ] as const;
+
+const responsiveHeroSizes = createResponsiveSizes({
+  base: '100vw',
+  sm: '92vw',
+  md: 'min(90vw, 44rem)',
+  lg: 'min(74vw, 58rem)',
+  xl: '52rem',
+});
+
+const responsiveHeroSrcSet = createSrcSet([
+  { src: '/social-preview-whatsapp.jpg', width: 640 },
+  { src: '/social-preview-whatsapp.jpg', width: 960 },
+  { src: '/social-preview-whatsapp.jpg', width: 1200 },
+]);
+
+const responsiveTitleSize = createFluidClamp({
+  min: '1.5rem',
+  max: '3rem',
+  minViewport: '22rem',
+  maxViewport: '88rem',
+  viewportUnit: 'cqi',
+});
 
 function CodeBlock({ code }: { code: string }) {
   return (
@@ -405,49 +445,139 @@ function RovingFocusExample() {
 
 function ModernResponsiveSupportExample() {
   return (
-    <section className="fwlb-fluid-shell fwlb-fluid-stack fwlb-cq-root rounded-[1.25rem] border border-cyan-400/20 bg-slate-950/70 p-4">
-      <header className="fwlb-fluid-stack">
-        <p className="text-xs uppercase tracking-[0.18em] text-cyan-300/80">2026 responsive stack</p>
-        <h2 className="fwlb-fluid-type-title fwlb-variable-font" data-weight="strong">Container Queries + clamp() + variable fonts</h2>
-        <p className="fwlb-fluid-type-body text-slate-300">fadhilweblib now ships fluid layout utilities, component-level container queries, and adaptive media controls for srcSet/picture workflows.</p>
-      </header>
+    <Container
+      as="section"
+      fluid
+      query
+      maxWidth="xl"
+      className="rounded-[1.25rem] border border-cyan-400/20 bg-slate-950/70 py-4"
+      syntax={defineSyntax({
+        contain: 'layout paint style',
+        contentVisibility: 'auto',
+        containIntrinsicSize: 780,
+      })}
+    >
+      <Stack gap="lg" className="fwlb-fluid-stack">
+        <HeaderShell
+          eyebrow="2026 responsive stack"
+          title={(
+            <span
+              className="fwlb-variable-font fwlb-balance-text"
+              data-weight="strong"
+              style={{
+                fontSize: responsiveTitleSize,
+                fontVariationSettings: '"wght" 720, "opsz" 32, "wdth" 106',
+              }}
+            >
+              First-class fluid shells, container queries, and adaptive media
+            </span>
+          )}
+          subtitle="fadhilweblib now ships typed helpers for clamp-driven scales, responsive source sets, and breakpoint queries, plus container-aware layout primitives and picture-based adaptive media."
+          meta={(
+            <Inline wrap gap="sm">
+              <StatusChip tone="brand" label="layout" value="Grid + Flex + cqi" />
+              <StatusChip tone="info" label="images" value="picture + srcSet + sizes" />
+            </Inline>
+          )}
+          actions={(
+            <ActionGroup gap="sm">
+              <Button tone="brand" size="sm">Use adaptive media</Button>
+              <Button tone="neutral" size="sm">Open tokens</Button>
+            </ActionGroup>
+          )}
+        />
 
-      <nav className="fwlb-rwd-nav rounded-2xl border border-cyan-500/20 bg-slate-900/70 p-3">
-        <button type="button" data-mobile-toggle className="rounded-xl border border-cyan-400/30 px-3 py-2 text-xs text-cyan-100">☰ Menu</button>
-        <div data-desktop-links className="fwlb-flex-cluster text-sm text-cyan-100/90">
-          <span>Docs</span>
-          <span>Patterns</span>
-          <span>Tokens</span>
-          <span>Playground</span>
-        </div>
-      </nav>
+        <Panel density="compact" className="fwlb-rwd-nav" syntax="bg:alpha($neutral-100, 0.08); border:alpha($brand-500, 0.22);">
+          <Inline wrap gap="sm" align="center" justify="between">
+            <Button tone="neutral" size="sm" syntax="attrs(data-mobile-toggle:true);">Menu</Button>
+            <Inline data-desktop-links wrap gap="sm" className="text-sm text-cyan-100/90">
+              <span>Fluid shell</span>
+              <span>Track-mode grid</span>
+              <span>Variable font</span>
+              <span>Adaptive media</span>
+            </Inline>
+          </Inline>
+        </Panel>
 
-      <div className="fwlb-cq-grid">
-        {["Fluid grid", "Container aware", "Ultra lightweight"].map((label) => (
-          <article key={label} className="rounded-2xl border border-cyan-400/15 bg-slate-900/65 p-4">
-            <h3 className="fwlb-variable-font text-base text-cyan-100">{label}</h3>
-            <p className="mt-2 text-sm text-slate-300">Uses modern relative sizing (% / rem / cqi), composable Flex/Grid, and no JS layout lock-in.</p>
-          </article>
-        ))}
-      </div>
+        <Grid minItemWidth="fluid(card-min)" trackMode="fit" gap="lg" dense>
+          {[
+            ['Fluid sizing', 'Container uses clamp(), rem, and cqi-friendly gaps instead of locking layout to px values.'],
+            ['Breakpoint helpers', '`createResponsiveMediaQuery()` and `createResponsiveSizes()` centralize media conditions and image sizing contracts.'],
+            ['Adaptive images', '`AdaptiveMedia` wraps picture/source/img so art direction and responsive loading stay typed and lightweight.'],
+          ].map(([title, description]) => (
+            <Panel key={title} density="compact" syntax="bg:alpha($neutral-100, 0.06); border:alpha($brand-500, 0.16);">
+              <Stack gap="sm">
+                <HeaderShell compact title={title} subtitle={description} />
+              </Stack>
+            </Panel>
+          ))}
+        </Grid>
 
-      <figure className="fwlb-adaptive-media-frame" data-density="hero">
-        <picture>
-          <source media="(min-width: 1000px)" srcSet="/social-preview-whatsapp.jpg" />
-          <source media="(min-width: 640px)" srcSet="/social-preview-whatsapp.jpg" />
-          <img className="fwlb-adaptive-media" src="/social-preview-whatsapp.jpg" alt="Adaptive preview media demo" loading="lazy" />
-        </picture>
-      </figure>
-      <CodeBlock
-        code={`<Panel
-  syntax="containerType:inline-size; containerName:media-card; cols:repeat(auto-fit,minmax(15rem,1fr)); gap:clamp(0.7rem,1.4vw,1.2rem);"
->
-  <img
-    {...resolveSyntax('objectFit:cover; objectPosition:50% 40%; imageRendering:auto; srcSet:/hero-640.webp 640w, /hero-1280.webp 1280w; sizes:(max-width:50rem) 100vw, 50vw; fetchPriority:high; decoding:async;').attrs}
+        <AdaptiveMedia
+          src="/social-preview-whatsapp.jpg"
+          alt="Adaptive preview media demo"
+          width={1200}
+          height={630}
+          density="hero"
+          srcSet={responsiveHeroSrcSet}
+          sizes={responsiveHeroSizes}
+          sources={[
+            {
+              media: createResponsiveMediaQuery('lg'),
+              srcSet: responsiveHeroSrcSet,
+              sizes: responsiveHeroSizes,
+            },
+            {
+              media: createResponsiveMediaQuery('md'),
+              srcSet: responsiveHeroSrcSet,
+              sizes: responsiveHeroSizes,
+            },
+          ]}
+          caption="The media primitive accepts picture sources, typed loading hints, and slotSyntax so object-fit, object-position, and srcSet behavior stay composable."
+          slotSyntax={{
+            media: 'objectFit:cover; objectPosition:50% 18%; imageRendering:auto;',
+            caption: 'fg:rgba(203,213,225,0.82);',
+          }}
+        />
+
+        <CodeBlock
+          code={`import {
+  AdaptiveMedia,
+  Container,
+  Grid,
+  createFluidClamp,
+  createResponsiveMediaQuery,
+  createResponsiveSizes,
+  createSrcSet,
+} from '@/lib/fadhilweblib';
+
+const heroSizes = createResponsiveSizes({
+  base: '100vw',
+  md: 'min(90vw, 44rem)',
+  lg: 'min(74vw, 58rem)',
+});
+
+<Container fluid query maxWidth="xl">
+  <Grid minItemWidth="fluid(card-min)" trackMode="fit" dense />
+  <AdaptiveMedia
+    density="hero"
+    src="/hero-1200.webp"
+    srcSet={createSrcSet([
+      { src: '/hero-640.webp', width: 640 },
+      { src: '/hero-1200.webp', width: 1200 },
+    ])}
+    sizes={heroSizes}
+    sources={[{
+      media: createResponsiveMediaQuery('lg'),
+      srcSet: heroSrcSet,
+      sizes: heroSizes,
+    }]}
+    slotSyntax={{ media: 'objectFit:cover; objectPosition:50% 18%;' }}
   />
-</Panel>`}
-      />
-    </section>
+</Container>`}
+        />
+      </Stack>
+    </Container>
   );
 }
 
@@ -680,3 +810,4 @@ import { Button, IconButton, CollapsiblePanel, useDisclosure, useRovingFocus } f
     </main>
   );
 }
+

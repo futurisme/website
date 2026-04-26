@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { ThemeScope } from '../components/layout/ThemeScope';
+import { ThemeScope } from '../components/layout/theme-scope';
 import { FADHILWEBLIB_THEME_PRESETS } from '../presets';
 
 test('theme preset registry stays aligned with the public ThemeName contract', () => {

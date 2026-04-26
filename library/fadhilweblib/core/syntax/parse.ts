@@ -583,9 +583,15 @@ function parseObjectSyntax(input: FadhilWebSyntaxObject) {
     }
 
     const normalizedGroup = normalizeGroupName(rawKey);
-    if (normalizedGroup) {
+    const normalizedKey = normalizeKey(rawKey);
+
+    if (normalizedGroup && isPlainObject(rawValue)) {
       applyGroupObjectSyntax(result, rawKey, rawValue);
       continue;
+    }
+
+    if (normalizedGroup && !normalizedKey) {
+      throw createSyntaxError(`Syntax group "${rawKey}" expects an object map.`);
     }
 
     if (typeof rawValue === 'object') {

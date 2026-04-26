@@ -19,6 +19,11 @@ export function Container({
   as = 'div',
   maxWidth = 'lg',
   centered = true,
+  fluid = false,
+  gutter,
+  query = false,
+  containerName,
+  containerType = 'inline-size',
   syntax,
   recipe,
   className,
@@ -29,6 +34,8 @@ export function Container({
   const Component = as as LayoutElement;
   const rootSyntax = resolveSyntax(composeSyntax(recipe?.syntax, syntax));
   const finalCentered = rootSyntax.semantics.full ? false : centered;
+  const finalFluid = recipe?.logic?.fluid ?? fluid;
+  const finalQuery = recipe?.logic?.query ?? query;
 
   return (
     <Component
@@ -38,10 +45,14 @@ export function Container({
       className={cx(styles.root, className)}
       style={{
         '--fwlb-container-max': resolveContainerMaxWidth(maxWidth),
+        '--fwlb-container-gutter': resolveLengthValue(gutter ?? (finalFluid ? 'clamp(1rem, 2.8vw, 2.5rem)' : 0)),
+        containerName: finalQuery ? containerName ?? 'fwlb-container' : undefined,
+        containerType: finalQuery ? containerType : undefined,
         ...rootSyntax.style,
         ...style,
       } as React.CSSProperties}
       data-centered={finalCentered ? 'true' : 'false'}
+      data-fluid={finalFluid ? 'true' : 'false'}
       data-slot={(props as Record<string, unknown>)['data-slot'] ?? 'container'}
     >
       {children}

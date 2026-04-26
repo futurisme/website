@@ -240,6 +240,16 @@ test('resolveSyntax supports grouped object syntax and css overrides', () => {
   assert.equal(resolved.attrs.draggable, true);
 });
 
+test('parseSyntaxInput keeps scalar size keys valid even though size is also a namespace alias', () => {
+  const parsed = parseSyntaxInput({
+    size: 'lg',
+    fontSize: 18,
+  });
+
+  assert.equal(parsed.size, 'lg');
+  assert.equal(parsed.fontSize, 18);
+});
+
 test('resolveSyntax supports extended sizing keys and size namespace aliases', () => {
   const resolved = resolveSyntax(
     'size(width:320, height:180, minInline:16rem, maxInline:72ch, block:60vh, minBlock:18rem, maxBlock:90vh);',
@@ -252,6 +262,30 @@ test('resolveSyntax supports extended sizing keys and size namespace aliases', (
   assert.equal(resolved.style.blockSize, '60vh');
   assert.equal(resolved.style.minBlockSize, '18rem');
   assert.equal(resolved.style.maxBlockSize, '90vh');
+});
+
+test('resolveSyntax supports fluid token lengths and richer variable font controls', () => {
+  const resolved = resolveSyntax({
+    text: {
+      fontSize: 'fluid(step-2)',
+      fontStyle: 'italic',
+      fontStretch: '110%',
+      fontFeatureSettings: '"cv05" 1',
+      fontVariationSettings: '"wght" 640, "wdth" 108',
+      fontOpticalSizing: 'auto',
+    },
+    layout: {
+      maxW: 'container(xl)',
+    },
+  });
+
+  assert.equal(resolved.style.fontSize, 'var(--fwlb-fluid-step-2)');
+  assert.equal(resolved.style.fontStyle, 'italic');
+  assert.equal(resolved.style.fontStretch, '110%');
+  assert.equal((resolved.style as Record<string, string>).fontFeatureSettings, '"cv05" 1');
+  assert.equal((resolved.style as Record<string, string>).fontVariationSettings, '"wght" 640, "wdth" 108');
+  assert.equal((resolved.style as Record<string, string>).fontOpticalSizing, 'auto');
+  assert.equal(resolved.style.maxWidth, 'var(--fwlb-container-xl)');
 });
 
 test('resolveSyntax supports positioning, truncation, and visually-hidden behavior helpers', () => {

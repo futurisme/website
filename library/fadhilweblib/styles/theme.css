@@ -1,7 +1,20 @@
 :root {
   --fwlb-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fwlb-font-family-variable: 'InterVariable', 'Inter var', var(--fwlb-font-family);
   --fwlb-font-family-display: 'Georgia', 'Times New Roman', serif;
   --fwlb-font-family-mono: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+
+  --fwlb-breakpoint-xs: 30rem;
+  --fwlb-breakpoint-sm: 40rem;
+  --fwlb-breakpoint-md: 48rem;
+  --fwlb-breakpoint-lg: 64rem;
+  --fwlb-breakpoint-xl: 80rem;
+  --fwlb-breakpoint-xxl: 96rem;
+
+  --fwlb-container-sm: 40rem;
+  --fwlb-container-md: 56rem;
+  --fwlb-container-lg: 72rem;
+  --fwlb-container-xl: 88rem;
 
   --fwlb-space-1: 0.25rem;
   --fwlb-space-2: 0.5rem;
@@ -227,20 +240,24 @@
   --fwlb-fluid-step-1: clamp(1.12rem, 1.02rem + 0.7vw, 1.42rem);
   --fwlb-fluid-step-2: clamp(1.3rem, 1.12rem + 1.05vw, 1.86rem);
   --fwlb-fluid-step-3: clamp(1.55rem, 1.26rem + 1.64vw, 2.44rem);
+  --fwlb-fluid-step-4: clamp(1.8rem, 1.42rem + 2.2vw, 3.2rem);
   --fwlb-fluid-space: clamp(0.8rem, 0.4rem + 1.4vw, 1.6rem);
+  --fwlb-fluid-gutter: clamp(1rem, 0.8rem + 1.4vw, 2.5rem);
+  --fwlb-fluid-reading: min(70ch, 100%);
+  --fwlb-fluid-card-min: clamp(15rem, 28vw, 21rem);
   --fwlb-fluid-shell-max: min(92rem, 100vw - clamp(1rem, 2.8vw, 3.5rem));
 }
 
 .fwlb-fluid-shell {
   width: min(100%, var(--fwlb-fluid-shell-max));
   margin-inline: auto;
-  padding-inline: clamp(0.8rem, 2.2vw, 2.4rem);
+  padding-inline: var(--fwlb-fluid-gutter);
 }
 
 .fwlb-fluid-grid {
   display: grid;
   gap: var(--fwlb-fluid-space);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--fwlb-fluid-card-min)), 1fr));
 }
 
 .fwlb-fluid-stack {
@@ -268,6 +285,14 @@
   grid-template-columns: 1fr;
 }
 
+.fwlb-balance-text {
+  text-wrap: balance;
+}
+
+.fwlb-pretty-text {
+  text-wrap: pretty;
+}
+
 @container fwlb (min-width: 30rem) {
   .fwlb-cq-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -281,20 +306,23 @@
 }
 
 .fwlb-fluid-type-title {
-  font-size: var(--fwlb-fluid-step-3);
+  font-size: var(--fwlb-fluid-step-4);
   line-height: 1.1;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .fwlb-fluid-type-body {
   font-size: var(--fwlb-fluid-step-0);
   line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .fwlb-variable-font {
-  font-family: 'InterVariable', 'Inter var', var(--fwlb-font-family);
+  font-family: var(--fwlb-font-family-variable);
   font-optical-sizing: auto;
   font-variation-settings: 'opsz' 32, 'wght' 560;
+  font-synthesis-weight: none;
 }
 
 .fwlb-variable-font[data-weight='strong'] {
@@ -302,7 +330,10 @@
 }
 
 .fwlb-adaptive-media {
+  display: block;
   width: 100%;
+  max-width: 100%;
+  height: auto;
   aspect-ratio: var(--fwlb-media-ratio, 16 / 9);
   object-fit: var(--fwlb-media-fit, cover);
   object-position: var(--fwlb-media-position, 50% 50%);
@@ -313,6 +344,7 @@
   overflow: clip;
   border: 1px solid var(--fwlb-border-soft);
   background: var(--fwlb-surface-muted);
+  container-type: inline-size;
 }
 
 .fwlb-adaptive-media-frame[data-density='compact'] {
@@ -321,6 +353,28 @@
 
 .fwlb-adaptive-media-frame[data-density='hero'] {
   --fwlb-media-ratio: 21 / 9;
+}
+
+.fwlb-rwd-nav {
+  container: fwlb-nav / inline-size;
+}
+
+@container fwlb-nav (min-width: 36rem) {
+  .fwlb-rwd-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .fwlb-rwd-nav [data-mobile-toggle] {
+    display: none;
+  }
+}
+
+@container fwlb-nav (max-width: 35.999rem) {
+  .fwlb-rwd-nav [data-desktop-links] {
+    display: none;
+  }
 }
 
 @media (min-width: 48rem) {

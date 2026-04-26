@@ -83,13 +83,20 @@ function parseNumber(value: string | number | boolean | undefined) {
   return Number.isNaN(parsed) ? undefined : parsed;
 }
 
+const semanticSetCache = new WeakMap<readonly string[], ReadonlySet<string>>();
+
 function parseSemantic<T extends string>(value: string | number | boolean | undefined, allowed: readonly T[]) {
   if (typeof value !== 'string') {
     return undefined;
   }
 
   const normalized = value.trim().toLowerCase() as T;
-  return allowed.includes(normalized) ? normalized : undefined;
+  let allowedSet = semanticSetCache.get(allowed as readonly string[]);
+  if (!allowedSet) {
+    allowedSet = new Set(allowed as readonly string[]);
+    semanticSetCache.set(allowed as readonly string[], allowedSet);
+  }
+  return allowedSet.has(normalized) ? normalized : undefined;
 }
 
 function resolveNumberishValue(value: string | number | boolean | undefined) {
@@ -576,9 +583,15 @@ function parseObjectSyntax(input: FadhilWebSyntaxObject) {
     }
 
     const normalizedGroup = normalizeGroupName(rawKey);
-    if (normalizedGroup) {
+    const normalizedKey = normalizeKey(rawKey);
+
+    if (normalizedGroup && isPlainObject(rawValue)) {
       applyGroupObjectSyntax(result, rawKey, rawValue);
       continue;
+    }
+
+    if (normalizedGroup && !normalizedKey) {
+      throw createSyntaxError(`Syntax group "${rawKey}" expects an object map.`);
     }
 
     if (typeof rawValue === 'object') {

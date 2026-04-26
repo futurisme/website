@@ -36,6 +36,20 @@ function resolveLengthTokenExpression(value: string) {
       return args[0] ? `var(--fwlb-${normalizeTokenName(args[0])})` : undefined;
     case 'space':
       return args[0] ? `var(--fwlb-space-${normalizeTokenName(args[0])})` : undefined;
+    case 'fluid':
+      if (!args[0]) {
+        return undefined;
+      }
+
+      return args[0].trim().toLowerCase() === 'space'
+        ? 'var(--fwlb-fluid-space)'
+        : `var(--fwlb-fluid-${normalizeTokenName(args[0])})`;
+    case 'container':
+    case 'shell':
+      return args[0] ? `var(--fwlb-container-${normalizeTokenName(args[0])})` : undefined;
+    case 'breakpoint':
+    case 'bp':
+      return args[0] ? `var(--fwlb-breakpoint-${normalizeTokenName(args[0])})` : undefined;
     case 'radius':
       return args[0] ? `var(--fwlb-radius-${normalizeTokenName(args[0])})` : undefined;
     case 'tone':
