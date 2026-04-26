@@ -76,7 +76,8 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="/portfolio/testing/testing.css" />
+    <link rel="preload" as="style" href="/portfolio/testing/testing.css" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="/portfolio/testing/testing.css" /></noscript>
     <link rel="modulepreload" href="/portfolio/testing/testing.js" fetchpriority="high" />
     <link rel="preload" as="image" href="/assets/public/images/portfolio.webp" fetchpriority="high" />
     <style>

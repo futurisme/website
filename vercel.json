@@ -121,6 +121,14 @@
   ],
   "routes": [
     {
+      "src": "/(.*)",
+      "headers": {
+        "host": "www.fadhil.dev"
+      },
+      "status": 308,
+      "dest": "https://fadhil.dev/$1"
+    },
+    {
       "src": "/api/shareideas",
       "dest": "/website/shareideas/shareideas-api.js"
     },
@@ -347,6 +355,16 @@
     {
       "src": "/extension/(.*)",
       "dest": "/extension/$1"
+    },
+    {
+      "src": "/404",
+      "status": 404,
+      "dest": "/website/home/404.html"
+    },
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/website/home/404.html"
     }
   ]
 }

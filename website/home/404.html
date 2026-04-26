@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Page Not Found | fadhil.dev</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="The page you requested was not found. Continue browsing fadhil.dev from the main pages below." />
+    <link rel="icon" href="/fadhil-512x512.png" sizes="512x512" type="image/png" />
+    <link rel="alternate icon" href="/fadhil.svg" type="image/svg+xml" />
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: radial-gradient(circle at 20% 0%, #7a1042 0%, #0a1028 42%, #050814 100%);
+        color: #ecfeff;
+      }
+      main {
+        width: min(720px, 92vw);
+        background: rgba(5, 12, 34, 0.88);
+        border: 1px solid rgba(186, 230, 253, 0.38);
+        border-radius: 20px;
+        padding: 1.5rem;
+      }
+      h1 { margin: 0 0 .4rem; font-size: clamp(1.4rem, 1rem + 1.8vw, 2.2rem); }
+      p { margin: .35rem 0; line-height: 1.55; color: #c9edff; }
+      nav { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .6rem; }
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.35rem;
+        padding: 0 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(125, 211, 252, .45);
+        text-decoration: none;
+        color: #f8fbff;
+        background: rgba(14, 165, 233, 0.16);
+      }
+      a:hover { background: rgba(14, 165, 233, 0.28); }
+      code { color: #67e8f9; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>404 — Page not found</h1>
+      <p>Halaman yang Anda akses tidak tersedia atau sudah dipindahkan.</p>
+      <p>Silakan lanjutkan dari halaman utama berikut atau laporkan URL bermasalah.</p>
+      <nav aria-label="Helpful links">
+        <a href="/">Home</a>
+        <a href="/portfolio">Portfolio</a>
+        <a href="/mindmapmaker">Mindmapmaker</a>
+        <a href="/shareideas">ShareIdeas</a>
+      </nav>
+      <p style="margin-top: 1rem;">Bug report: <a href="https://github.com/futurisme/website/issues/new" rel="noopener noreferrer">open issue</a></p>
+      <p style="font-size: .9rem; opacity: .85;">Requested URL: <code id="path"></code></p>
+    </main>
+    <script>
+      document.getElementById('path').textContent = location.pathname;
+    </script>
+  </body>
+</html>
