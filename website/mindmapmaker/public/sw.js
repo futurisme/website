@@ -1,4 +1,4 @@
-const SW_VERSION = 'v2';
+const SW_VERSION = 'v3';
 const CACHE_PREFIX = 'chartworkspace';
 const STATIC_CACHE = `${CACHE_PREFIX}-static-${SW_VERSION}`;
 const MAP_METADATA_CACHE = `${CACHE_PREFIX}-map-metadata-${SW_VERSION}`;
@@ -7,10 +7,9 @@ const MANAGED_CACHES = [STATIC_CACHE, MAP_METADATA_CACHE];
 const ALLOWED_STATIC_PATHS = [
   '/_next/static/',
   '/fonts/',
-  '/favicon',
-  '/icons/',
-  '/icon',
-  '/apple-touch-icon',
+  '/fadhil-512x512.png',
+  '/fadhil.svg',
+  '/site.webmanifest',
   '/manifest',
 ];
 
