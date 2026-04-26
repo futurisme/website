@@ -24,7 +24,7 @@ def normalize_path(path: str) -> str:
 
 
 def is_dynamic_route(src: str) -> bool:
-    return bool(re.search(r'\((?:\.\*|\[0-9\]\+|\[\^\)\]\+)\)|\$\d+', src))
+    return bool(re.search(r'\((?:\.\*|\[0-9\]\+|\[\^\)\]\+)\)|\$\d+', src)) or any(ch in src for ch in '()[]+^')
 
 
 def route_paths() -> list[str]:
