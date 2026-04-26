@@ -145,6 +145,14 @@
       "dest": "/website/fadhil-512x512.png"
     },
     {
+      "src": "/favicon.png",
+      "dest": "/website/fadhil-512x512.png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "dest": "/website/fadhil-512x512.png"
+    },
+    {
       "src": "/site.webmanifest",
       "dest": "/website/site.webmanifest"
     },
