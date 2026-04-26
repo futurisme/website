@@ -22,10 +22,7 @@ export const metadata: Metadata = {
   },
   applicationName: siteName,
   icons: {
-    icon: [
-      { url: '/fadhil-512x512.png', type: 'image/png', sizes: '512x512' },
-      { url: '/fadhil.svg', type: 'image/svg+xml', sizes: 'any' },
-    ],
+    icon: [{ url: '/fadhil-512x512.png', type: 'image/png', sizes: '512x512' }],
     shortcut: [{ url: '/fadhil-512x512.png', type: 'image/png' }],
     apple: [{ url: '/fadhil-512x512.png', sizes: '512x512' }],
   },
