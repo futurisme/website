@@ -692,7 +692,7 @@ function buildCommunityInsights(state) {
     genreCounts.set(genre, (genreCounts.get(genre) || 0) + 1);
   });
 
-  state.releases.forEach((release) => {
+  state.releases.slice(-120).forEach((release) => {
     const medium = release.medium === 'movie' ? 'movie' : release.medium === 'anime' ? 'anime' : 'manga';
     const freshness = clamp(1 - ((state.day - (release.day ?? state.day)) / 1200), 0.32, 1.25);
     const influence = Math.max(0.12, ((release.score || 0) ** 1.06) * 0.06 + ((release.imdb || 0) ** 1.3) * 0.32) * freshness * boomAmplifier;
@@ -705,6 +705,23 @@ function buildCommunityInsights(state) {
     regionAccumulator.emea += influence * 0.29;
     regionAccumulator.online += influence * 0.54;
   });
+
+  const day = Number(state.day) || 0;
+  const animeWave = 1 + Math.sin(day / 9.5) * 0.08 + (trend - 1) * 0.12;
+  const movieWave = 1 + Math.cos(day / 13.2) * 0.07 + (trend - 1) * 0.08;
+  const mangaWave = 1 + Math.sin(day / 7.8) * 0.06 - fatigue * 0.04;
+  const novelWave = 1 + Math.cos(day / 11.4) * 0.05 + fatigue * 0.03;
+  mediumAccumulator.anime *= Math.max(0.25, animeWave);
+  mediumAccumulator.movie *= Math.max(0.25, movieWave);
+  mediumAccumulator.manga *= Math.max(0.25, mangaWave);
+  mediumAccumulator.novel *= Math.max(0.25, novelWave);
+  ageAccumulator.teens *= Math.max(0.25, 1 + Math.sin(day / 10.7) * 0.08 + (1 - fatigue) * 0.05);
+  ageAccumulator.young_adults *= Math.max(0.25, 1 + Math.cos(day / 8.9) * 0.07 + trend * 0.03);
+  ageAccumulator.adults *= Math.max(0.25, 1 + Math.sin(day / 14.5) * 0.06 + fatigue * 0.08);
+  regionAccumulator.online *= Math.max(0.25, 1 + Math.sin(day / 6.8) * 0.09 + trend * 0.04);
+  regionAccumulator.apac *= Math.max(0.25, 1 + Math.cos(day / 12.1) * 0.05);
+  regionAccumulator.americas *= Math.max(0.25, 1 + Math.sin(day / 15.4) * 0.05);
+  regionAccumulator.emea *= Math.max(0.25, 1 + Math.cos(day / 17.2) * 0.05);
 
   const normalize = (acc) => {
     const total = Object.values(acc).reduce((sum, value) => sum + value, 0) || 1;

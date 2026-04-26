@@ -995,7 +995,7 @@ export function createIndustryUiController({ root, handlers }) {
     };
 
     const renderLegend = (rows, palette) => rows.map((row, index) => `
-      <li><span class="industry-community-dot" style="background:${palette[index % palette.length]}"></span>${esc(row.key)}: ${(Math.max(0, Number(row.value) || 0) * 100).toFixed(1)}%</li>
+      <li><span class="industry-community-dot" style="background:${palette[index % palette.length]}"></span>${esc(row.key)}: ${(Math.max(0, Number(row.value) || 0) * 100).toFixed(2)}%</li>
     `).join('');
 
     const regionPalette = ['#7dd3fc', '#a78bfa', '#34d399', '#fbbf24', '#fb7185'];
