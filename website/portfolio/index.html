@@ -77,10 +77,11 @@
       }
     </script>
     <link rel="stylesheet" href="/portfolio/testing/testing.css" />
-    <link rel="modulepreload" href="/portfolio/testing/testing.js" fetchpriority="low" />
+    <link rel="modulepreload" href="/portfolio/testing/testing.js" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/public/images/portfolio.webp" fetchpriority="high" />
     <style>
       html, body, #app { margin: 0; min-height: 100%; }
-      body { background: #090f1f; }
+      body { background: linear-gradient(180deg, #4a0b1f 0%, #8A00C4 42%, #14A9FF 72%, #5b1027 100%); }
     </style>
     <script type="module" src="/portfolio/testing/boot.js"></script>
     <link rel="icon" href="/fadhil-512x512.png" sizes="512x512" type="image/png" />

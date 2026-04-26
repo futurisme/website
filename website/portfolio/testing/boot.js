@@ -5,12 +5,14 @@ const optimizeImage = (img) => {
     img.decoding = 'async';
   }
 
+  const isHero = img.alt === 'Fadhil Akbar portfolio banner' || img.closest('#about-testing') !== null;
+
   if (!img.hasAttribute('loading')) {
-    img.loading = 'lazy';
+    img.loading = isHero ? 'eager' : 'lazy';
   }
 
   if (!img.hasAttribute('fetchpriority')) {
-    img.fetchPriority = 'low';
+    img.fetchPriority = isHero ? 'high' : 'low';
   }
 };
 
@@ -45,16 +47,11 @@ const loadPortfolioApp = async () => {
 };
 
 const scheduleHydration = () => {
-  if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(loadPortfolioApp, { timeout: 1200 });
-    return;
-  }
-
-  window.setTimeout(loadPortfolioApp, 250);
+  loadPortfolioApp();
 };
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', scheduleHydration, { once: true });
+  scheduleHydration();
 } else {
   scheduleHydration();
 }

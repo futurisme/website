@@ -185,7 +185,7 @@
   }
 
   #about-testing :is(img, picture > img) {
-    inline-size: min(100%, clamp(42rem, 70cqi, 64rem));
+    inline-size: min(100%, clamp(48rem, 80cqi, 72rem));
     block-size: auto;
     margin-inline: auto;
   }
@@ -198,7 +198,7 @@
   }
 
   #portfolio-testing [data-project-card] {
-    inline-size: min(100%, clamp(36rem, 66cqi, 56rem));
+    inline-size: min(100%, clamp(42rem, 74cqi, 62rem));
     margin-inline: auto;
   }
 
