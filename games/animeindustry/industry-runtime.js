@@ -510,6 +510,8 @@ function createInitialState() {
       rankedStudiosDay: 0,
       intelligence: null,
       intelligenceDay: -1,
+      communities: null,
+      communitiesDay: -1,
     },
     debug: { lastAction: 'bootstrap' },
   };
@@ -525,6 +527,8 @@ function invalidateDerivedCaches(state) {
   state.cache.intelligence = null;
   state.cache.intelligenceDay = -1;
   state.cache.rankedStudiosDay = -1;
+  state.cache.communities = null;
+  state.cache.communitiesDay = -1;
 }
 
 function addEmail(state, type, subject, body) {
@@ -663,6 +667,7 @@ function computePopularityDemand(entry, state) {
 }
 
 function buildCommunityInsights(state) {
+  if (state?.cache?.communities && state.cache.communitiesDay === state.day) return state.cache.communities;
   const mediumAccumulator = { manga: 0.0001, novel: 0.0001, anime: 0.0001, movie: 0.0001 };
   const ageAccumulator = { kids: 0.0001, teens: 0.0001, young_adults: 0.0001, adults: 0.0001, general: 0.0001 };
   const regionAccumulator = { apac: 0.0001, americas: 0.0001, emea: 0.0001, online: 0.0001 };
@@ -751,12 +756,17 @@ function buildCommunityInsights(state) {
     })
     .sort((a, b) => b.momentum - a.momentum)
     .slice(0, 8);
-  return {
+  const result = {
     mediumShares: normalize(mediumAccumulator),
     ageShares: normalize(ageAccumulator),
     regionShares: normalize(regionAccumulator),
     trends,
   };
+  if (state?.cache) {
+    state.cache.communities = result;
+    state.cache.communitiesDay = state.day;
+  }
+  return result;
 }
 
 function computeCommunityImdbModifiers(state, { medium = 'manga', targetAudience = 'general', uniqueness = 35, ageDays = 0 }) {
@@ -1919,7 +1929,6 @@ export function createAnimeIndustryRuntime() {
   function buildRankings() {
     const TOP_CONTENT_LIMIT = 50;
     const intelligence = getStudioIntelligence(state);
-    const communities = buildCommunityInsights(state);
     const manga = [
       ...state.projects.filter((entry) => !entry.archived).map((entry) => ({
         title: entry.title,
@@ -2054,6 +2063,8 @@ export function createAnimeIndustryRuntime() {
 
     const intelligence = getStudioIntelligence(state);
     const communities = buildCommunityInsights(state);
+    const npcById = new Map(state.npcs.map((npc) => [npc.id, npc]));
+    const studioById = new Map(state.studios.map((studio) => [studio.id, studio]));
     const studioReleaseScore = state.releases.reduce((acc, rel) => {
       acc.set(rel.studio, (acc.get(rel.studio) ?? 0) + rel.score);
       return acc;
@@ -2065,8 +2076,8 @@ export function createAnimeIndustryRuntime() {
       const rating = intelligence.ratingsByStudioId.get(studio.id) ?? computeStudioRating(state, studio, { valuationByStudioId: new Map([[studio.id, valuation]]) });
       const founderName = studio.ownership === 'player' || (state.player.studioId === studio.id)
         ? state.player.name
-        : state.npcs.find((entry) => entry.id === studio.ceoNpcId)?.name ?? 'Board Consortium';
-      const ceoName = state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD');
+        : npcById.get(studio.ceoNpcId)?.name ?? 'Board Consortium';
+      const ceoName = npcById.get(studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD');
       const activeProjects = intelligence.projectsByStudioId.get(studio.id) ?? [];
       const npcProjects = (intelligence.npcProjectsByStudioId.get(studio.id) ?? []).filter((entry) => !entry.launched);
       const releaseAssets = intelligence.releasesByStudioName.get(studio.name) ?? [];
@@ -2121,7 +2132,7 @@ export function createAnimeIndustryRuntime() {
         initialProfession: state.player.initialProfession,
         currentProfession: state.player.career === 'studio-founder' ? 'CEO Studio' : state.player.career === 'animator' ? 'Animator' : state.player.initialProfession,
         writingMedium: state.player.writingMedium,
-        studioName: state.studios.find((entry) => entry.id === state.player.studioId)?.name ?? '-',
+        studioName: studioById.get(state.player.studioId)?.name ?? '-',
         adminScore: state.player.adminScore,
         fundingPool: state.player.fundingPool,
         studioPlanningOpen: state.player.studioPlanningOpen,
@@ -2171,11 +2182,11 @@ export function createAnimeIndustryRuntime() {
       },
       management: {
         isCeo: state.player.career === 'studio-founder',
-        studio: state.studios.find((entry) => entry.id === state.player.studioId) ?? null,
+        studio: studioById.get(state.player.studioId) ?? null,
       },
       studios: state.studios.map((studio) => ({
         ...studio,
-        ceoName: state.npcs.find((npc) => npc.id === studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
+        ceoName: npcById.get(studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
         valuation: studioDetailsMap[studio.id]?.valuation ?? 0,
         category: studioDetailsMap[studio.id]?.category ?? 'Independent',
         tier: studioDetailsMap[studio.id]?.tier ?? 'C',
@@ -2188,9 +2199,9 @@ export function createAnimeIndustryRuntime() {
       unreadEmails: state.emails.filter((entry) => !entry.read).slice(-40).reverse(),
       projects: state.projects.filter((project) => !project.archived).map((project) => ({
         ...project,
-        studioName: state.studios.find((entry) => entry.id === project.studioId)?.name ?? '-',
+        studioName: studioById.get(project.studioId)?.name ?? '-',
         interestedStudios: project.interestedStudioIds.map((id) => {
-          const studio = state.studios.find((entry) => entry.id === id);
+          const studio = studioById.get(id);
           return { id, name: studio?.name ?? id };
         }),
         canSerialize: ['ideation', 'manga_serialization'].includes(project.stage),
