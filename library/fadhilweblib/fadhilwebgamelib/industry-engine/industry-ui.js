@@ -181,6 +181,8 @@ export function createIndustryUiController({ root, handlers }) {
   let communitiesRenderKey = '';
   let lastUserScrollAt = 0;
   let scrollIdleTimer = null;
+  let deferredSnapshot = null;
+  let api = null;
 
   [
     ['#industryStats', statsEl],
@@ -201,6 +203,12 @@ export function createIndustryUiController({ root, handlers }) {
       lastUserScrollAt = performance.now();
       if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
       scrollIdleTimer = setTimeout(() => {
+        if (deferredSnapshot && api) {
+          const snapshotToRender = deferredSnapshot;
+          deferredSnapshot = null;
+          api.render(snapshotToRender, { bypassScrollGuard: true });
+          return;
+        }
         const activeRanking = frames.fullRanking?.classList.contains('frame-active');
         const activeCommunities = frames.fullCommunities?.classList.contains('frame-active');
         if (activeRanking && pendingRankingSnapshot) {
@@ -528,8 +536,8 @@ export function createIndustryUiController({ root, handlers }) {
     openFrame('subStudio');
   });
 
-  return {
-    render(snapshot) {
+  const controller = {
+    render(snapshot, options = {}) {
       currentSnapshot = snapshot;
       if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl || !communitiesEl) {
         reportUiContractIssue('#animeIndustryApp', 'Render skipped: critical UI nodes missing');
@@ -538,6 +546,13 @@ export function createIndustryUiController({ root, handlers }) {
 
       if (!snapshot.registered) {
         openFrame('register');
+        return;
+      }
+
+      const activeFrame = Object.values(frames).find((frame) => frame?.classList.contains('frame-active'));
+      const activeScrollNode = activeFrame?.querySelector?.('.frame-content-scroll');
+      if (!options.bypassScrollGuard && activeScrollNode && isUserActivelyScrolling()) {
+        deferredSnapshot = snapshot;
         return;
       }
 
@@ -683,6 +698,8 @@ export function createIndustryUiController({ root, handlers }) {
       openFrame('main');
     },
   };
+  api = controller;
+  return controller;
 
   function renderProjectsBoard(snapshot) {
     const projectStageWeight = {
