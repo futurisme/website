@@ -4,7 +4,7 @@ import '@/lib/fadhilweblib/styles/theme.css';
 import { GlobalRuntime } from '@/components/global-runtime';
 
 const siteUrl = 'https://fadhil.dev';
-const siteName = 'Mindmapmaker Workspace';
+const siteName = 'Fadhil Akbar Cariearsa';
 const defaultTitle = 'Mindmapmaker Workspace | Cybernetic Concept Mapping';
 const defaultDescription =
   'Build futuristic concept maps in Mindmapmaker Workspace with real-time collaboration, fast editing, and immersive cybernetic visuals.';
