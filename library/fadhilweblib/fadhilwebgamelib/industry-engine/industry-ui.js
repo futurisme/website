@@ -179,6 +179,8 @@ export function createIndustryUiController({ root, handlers }) {
   let rankingRenderKey = '';
   let pendingCommunitiesSnapshot = null;
   let communitiesRenderKey = '';
+  let lastUserScrollAt = 0;
+  let scrollIdleTimer = null;
 
   [
     ['#industryStats', statsEl],
@@ -194,6 +196,28 @@ export function createIndustryUiController({ root, handlers }) {
   });
 
   ensureActionSentinel('open-create-project');
+  root.querySelectorAll('.frame-content-scroll').forEach((scrollNode) => {
+    scrollNode.addEventListener('scroll', () => {
+      lastUserScrollAt = performance.now();
+      if (scrollIdleTimer) clearTimeout(scrollIdleTimer);
+      scrollIdleTimer = setTimeout(() => {
+        const activeRanking = frames.fullRanking?.classList.contains('frame-active');
+        const activeCommunities = frames.fullCommunities?.classList.contains('frame-active');
+        if (activeRanking && pendingRankingSnapshot) {
+          renderRankingBoard(pendingRankingSnapshot, { force: true });
+          pendingRankingSnapshot = null;
+        }
+        if (activeCommunities && pendingCommunitiesSnapshot) {
+          renderCommunitiesBoard(pendingCommunitiesSnapshot, { force: true });
+          pendingCommunitiesSnapshot = null;
+        }
+      }, 160);
+    }, { passive: true });
+  });
+
+  function isUserActivelyScrolling() {
+    return performance.now() - lastUserScrollAt < 180;
+  }
 
   function showPopup(message, tone = 'error') {
     let popup = root.querySelector('#industryInlinePopup');
@@ -563,13 +587,13 @@ export function createIndustryUiController({ root, handlers }) {
         `).join('')
         : '<p class="empty">No unread emails.</p>';
 
-      if (frames.fullRanking?.classList.contains('frame-active')) {
+      if (frames.fullRanking?.classList.contains('frame-active') && !isUserActivelyScrolling()) {
         renderRankingBoard(snapshot);
         pendingRankingSnapshot = null;
       } else {
         pendingRankingSnapshot = snapshot;
       }
-      if (frames.fullCommunities?.classList.contains('frame-active')) {
+      if (frames.fullCommunities?.classList.contains('frame-active') && !isUserActivelyScrolling()) {
         renderCommunitiesBoard(snapshot);
         pendingCommunitiesSnapshot = null;
       } else {
@@ -884,8 +908,6 @@ export function createIndustryUiController({ root, handlers }) {
 
   function renderRankingBoard(snapshot, options = {}) {
     const force = Boolean(options.force);
-    const scrollBox = rankingEl?.closest('.frame-content-scroll');
-    const previousScrollTop = scrollBox ? scrollBox.scrollTop : 0;
 
     const rankingTabs = [
       { id: 'studio', label: 'Studio' },
@@ -1001,18 +1023,11 @@ export function createIndustryUiController({ root, handlers }) {
       </article>
     `;
 
-    if (scrollBox) {
-      window.requestAnimationFrame(() => {
-        scrollBox.scrollTop = previousScrollTop;
-      });
-    }
   }
 
   function renderCommunitiesBoard(snapshot, options = {}) {
     if (!communitiesEl) return;
     const force = Boolean(options.force);
-    const scrollBox = communitiesEl.closest('.frame-content-scroll');
-    const previousScrollTop = scrollBox ? scrollBox.scrollTop : 0;
     const communities = snapshot.communities || {};
     const regions = Array.isArray(communities.regions) ? communities.regions : [];
     const ages = Array.isArray(communities.ages) ? communities.ages : [];
@@ -1082,10 +1097,5 @@ export function createIndustryUiController({ root, handlers }) {
           : '<p>No strong genre wave detected yet.</p>')}
       </article>
     `;
-    if (scrollBox) {
-      window.requestAnimationFrame(() => {
-        scrollBox.scrollTop = previousScrollTop;
-      });
-    }
   }
 }
