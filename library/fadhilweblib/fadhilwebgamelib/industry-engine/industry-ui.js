@@ -177,6 +177,8 @@ export function createIndustryUiController({ root, handlers }) {
   let studioReturnFrame = 'fullStudios';
   let pendingRankingSnapshot = null;
   let rankingRenderKey = '';
+  let pendingCommunitiesSnapshot = null;
+  let communitiesRenderKey = '';
 
   [
     ['#industryStats', statsEl],
@@ -220,6 +222,10 @@ export function createIndustryUiController({ root, handlers }) {
     if (key === 'fullRanking' && pendingRankingSnapshot) {
       renderRankingBoard(pendingRankingSnapshot, { force: true });
       pendingRankingSnapshot = null;
+    }
+    if (key === 'fullCommunities' && pendingCommunitiesSnapshot) {
+      renderCommunitiesBoard(pendingCommunitiesSnapshot, { force: true });
+      pendingCommunitiesSnapshot = null;
     }
   }
 
@@ -563,7 +569,12 @@ export function createIndustryUiController({ root, handlers }) {
       } else {
         pendingRankingSnapshot = snapshot;
       }
-      renderCommunitiesBoard(snapshot);
+      if (frames.fullCommunities?.classList.contains('frame-active')) {
+        renderCommunitiesBoard(snapshot);
+        pendingCommunitiesSnapshot = null;
+      } else {
+        pendingCommunitiesSnapshot = snapshot;
+      }
 
       managementEl.innerHTML = snapshot.management?.isCeo
         ? `
@@ -997,34 +1008,52 @@ export function createIndustryUiController({ root, handlers }) {
     }
   }
 
-  function renderCommunitiesBoard(snapshot) {
+  function renderCommunitiesBoard(snapshot, options = {}) {
     if (!communitiesEl) return;
+    const force = Boolean(options.force);
+    const scrollBox = communitiesEl.closest('.frame-content-scroll');
+    const previousScrollTop = scrollBox ? scrollBox.scrollTop : 0;
     const communities = snapshot.communities || {};
     const regions = Array.isArray(communities.regions) ? communities.regions : [];
     const ages = Array.isArray(communities.ages) ? communities.ages : [];
     const mediums = Array.isArray(communities.mediums) ? communities.mediums : [];
     const trends = Array.isArray(communities.trends) ? communities.trends : [];
 
-    const renderPie = (rows, palette) => {
-      const normalized = rows.length ? rows : [{ key: 'N/A', value: 1 }];
-      let start = 0;
-      const slices = normalized.map((row, index) => {
-        const share = Math.max(0, Number(row.value) || 0);
-        const end = start + share;
-        const largeArc = end - start > 0.5 ? 1 : 0;
-        const x1 = 50 + Math.cos(2 * Math.PI * start - Math.PI / 2) * 44;
-        const y1 = 50 + Math.sin(2 * Math.PI * start - Math.PI / 2) * 44;
-        const x2 = 50 + Math.cos(2 * Math.PI * end - Math.PI / 2) * 44;
-        const y2 = 50 + Math.sin(2 * Math.PI * end - Math.PI / 2) * 44;
-        start = end;
-        return `<path d="M 50 50 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 44 44 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${palette[index % palette.length]}"></path>`;
-      }).join('');
-      return `<svg viewBox="0 0 100 100" class="industry-community-pie" aria-hidden="true">${slices}<circle cx="50" cy="50" r="22" fill="#081332"></circle></svg>`;
+    const normalizeRows = (rows) => {
+      const source = rows.length ? rows : [{ key: 'N/A', value: 1 }];
+      const prepared = source.map((row) => ({
+        key: row.key,
+        value: Math.max(0, Number(row.value) || 0),
+      }));
+      const total = prepared.reduce((sum, row) => sum + row.value, 0) || 1;
+      return prepared.map((row) => ({ key: row.key, value: row.value / total }));
     };
 
-    const renderLegend = (rows, palette) => rows.map((row, index) => `
+    const renderPie = (rows, palette) => {
+      const normalized = normalizeRows(rows);
+      let cursor = 0;
+      const gradientStops = normalized.map((row, index) => {
+        const start = cursor * 100;
+        cursor += row.value;
+        const end = cursor * 100;
+        const color = palette[index % palette.length];
+        return `${color} ${start.toFixed(3)}% ${end.toFixed(3)}%`;
+      }).join(', ');
+      return `<div class="industry-community-pie" style="background:conic-gradient(${gradientStops})" aria-hidden="true"></div>`;
+    };
+
+    const renderLegend = (rows, palette) => normalizeRows(rows).map((row, index) => `
       <li><span class="industry-community-dot" style="background:${palette[index % palette.length]}"></span>${esc(row.key)}: ${(Math.max(0, Number(row.value) || 0) * 100).toFixed(2)}%</li>
     `).join('');
+
+    const nextRenderKey = [
+      regions.map((row) => `${row.key}:${Number(row.value) || 0}`).join('|'),
+      ages.map((row) => `${row.key}:${Number(row.value) || 0}`).join('|'),
+      mediums.map((row) => `${row.key}:${Number(row.value) || 0}`).join('|'),
+      trends.slice(0, 8).map((row) => `${row.genre}:${Number(row.momentum) || 0}:${Number(row.count) || 0}`).join('|'),
+    ].join('::');
+    if (!force && nextRenderKey === communitiesRenderKey) return;
+    communitiesRenderKey = nextRenderKey;
 
     const regionPalette = ['#7dd3fc', '#a78bfa', '#34d399', '#fbbf24', '#fb7185'];
     const agePalette = ['#60a5fa', '#22d3ee', '#4ade80', '#f97316', '#f472b6'];
@@ -1053,5 +1082,10 @@ export function createIndustryUiController({ root, handlers }) {
           : '<p>No strong genre wave detected yet.</p>')}
       </article>
     `;
+    if (scrollBox) {
+      window.requestAnimationFrame(() => {
+        scrollBox.scrollTop = previousScrollTop;
+      });
+    }
   }
 }

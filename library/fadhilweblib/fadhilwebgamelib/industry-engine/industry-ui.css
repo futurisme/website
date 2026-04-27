@@ -35,7 +35,14 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-studio-kv-row p { margin: 0; }
 .industry-studio-kv-row-2col { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; }
 .industry-community-chart { display: grid; place-items: center; padding: 4px 0; }
-.industry-community-pie { width: min(180px, 62vw); height: auto; }
+.industry-community-pie {
+  width: min(180px, 62vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  border: 1px solid #d9e6ff3b;
+  box-shadow: inset 0 0 0 18px #081332;
+  transform: translateZ(0);
+}
 .industry-community-legend { margin: 4px 0 0; padding-left: 0; list-style: none; display: grid; gap: 4px; }
 .industry-community-legend li { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .95; }
 .industry-community-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 auto; border: 1px solid #ffffff66; }
