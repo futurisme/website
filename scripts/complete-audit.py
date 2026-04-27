@@ -141,12 +141,10 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
         return {'path': path, 'url': url, 'status': 'ERR', 'error': str(exc), 'time_ms': duration_ms}
 
     duration_ms = round((time.perf_counter() - started) * 1000, 1)
-    title_match = re.search(r'<title[^>]*>(.*?)</title>', body, re.I | re.S)
-    canonical_match = re.search(r'<link[^>]+rel=[\'\"]canonical[\'\"][^>]*href=[\'\"]([^\'\"]+)', body, re.I)
-
     parsed_final = urllib.parse.urlparse(final_url)
     final_path = normalize_path(parsed_final.path or '/')
     redirected = final_path != normalize_path(path)
+    seo_fields = extract_seo_fields(body)
 
     return {
         'path': path,
@@ -162,19 +160,8 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
         'content_length': content_length,
         'cache_control': headers.get('cache-control', ''),
         'security_headers': {name: bool(headers.get(name)) for name in SECURITY_HEADERS},
-        'title': re.sub(r'\s+', ' ', title_match.group(1)).strip() if title_match else '',
-        'seo_basics': {
-            'meta_description': bool(re.search(r"<meta[^>]+name=['\"]description['\"][^>]+content=", body, re.I)),
-            'canonical': bool(canonical_match),
-            'canonical_href': canonical_match.group(1).strip() if canonical_match else '',
-            'has_h1': bool(re.search(r'<h1\b', body, re.I)),
-            'noindex': bool(re.search(r'<meta[^>]+name=[\'\"]robots[\'\"][^>]+content=[\'\"][^\"\']*noindex', body, re.I)),
-            'html_lang': bool(re.search(r'<html[^>]+lang=[\'\"][^\'\"]+[\'\"]', body, re.I)),
-            'og_title': bool(re.search(r"<meta[^>]+property=['\"]og:title['\"][^>]+content=", body, re.I)),
-            'og_description': bool(re.search(r"<meta[^>]+property=['\"]og:description['\"][^>]+content=", body, re.I)),
-            'twitter_card': bool(re.search(r"<meta[^>]+name=['\"]twitter:card['\"][^>]+content=", body, re.I)),
-            'json_ld': bool(re.search(r"<script[^>]+type=['\"]application/ld\\+json['\"]", body, re.I)),
-        },
+        'title': seo_fields['title'],
+        'seo_basics': seo_fields['seo_basics'],
         'processing_hints': {
             'script_tags': len(re.findall(r'<script\b', body, re.I)),
             'stylesheet_links': len(re.findall(r'<link[^>]+stylesheet', body, re.I)),
@@ -187,6 +174,26 @@ def fetch_path(base_url: str, path: str, timeout: int, max_body_bytes: int) -> d
             )
             if present
         ],
+    }
+
+
+def extract_seo_fields(body: str) -> dict[str, Any]:
+    title_match = re.search(r'<title[^>]*>(.*?)</title>', body, re.I | re.S)
+    canonical_match = re.search(r'<link[^>]+rel=[\'\"]canonical[\'\"][^>]*href=[\'\"]([^\'\"]+)', body, re.I)
+    return {
+        'title': re.sub(r'\s+', ' ', title_match.group(1)).strip() if title_match else '',
+        'seo_basics': {
+            'meta_description': bool(re.search(r"<meta[^>]+name=['\"]description['\"][^>]+content=", body, re.I)),
+            'canonical': bool(canonical_match),
+            'canonical_href': canonical_match.group(1).strip() if canonical_match else '',
+            'has_h1': bool(re.search(r'<h1\b', body, re.I)),
+            'noindex': bool(re.search(r'<meta[^>]+name=[\'\"]robots[\'\"][^>]+content=[\'\"][^\"\']*noindex', body, re.I)),
+            'html_lang': bool(re.search(r'<html[^>]+lang=[\'\"][^\'\"]+[\'\"]', body, re.I)),
+            'og_title': bool(re.search(r"<meta[^>]+property=['\"]og:title['\"][^>]+content=", body, re.I)),
+            'og_description': bool(re.search(r"<meta[^>]+property=['\"]og:description['\"][^>]+content=", body, re.I)),
+            'twitter_card': bool(re.search(r"<meta[^>]+(?:name|property)=['\"]twitter:card['\"][^>]+content=", body, re.I)),
+            'json_ld': bool(re.search(r"<script[^>]+type=['\"]application/ld\+json['\"]", body, re.I)),
+        },
     }
 
 
@@ -440,6 +447,7 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     crawl = report['crawl_support_audit']
     local_crawl = report['local_crawl_audit']
     local_html = report['local_html_audit']
+    local_route = report['local_route_target_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -477,6 +485,8 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- Local HTML missing robots meta: {local_html['summary']['missing_robots_count']}",
         f"- Local HTML missing OG title: {local_html['summary']['missing_og_title_count']}",
         f"- Local HTML missing twitter:card: {local_html['summary']['missing_twitter_card_count']}",
+        f"- Local route target missing OG title: {local_route['summary']['missing_og_title_count']}",
+        f"- Local route target missing twitter:card: {local_route['summary']['missing_twitter_card_count']}",
         '',
         '## Domain Route Audit',
         '',
@@ -557,6 +567,31 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         lines.extend(['', '| Local sitemap missing route |', '|---|'])
         for route in local_crawl['audited_routes_missing_in_sitemap']:
             lines.append(f'| `{route}` |')
+
+    lines.extend([
+        '',
+        '## Local Route Target SEO Audit (Vercel Mapping)',
+        '',
+        f"- Paths checked: {local_route['summary']['paths_checked']}",
+        f"- HTML targets found: {local_route['summary']['html_targets_found']}",
+        f"- Missing local target: {local_route['summary']['missing_target_count']}",
+        f"- Missing OG title: {local_route['summary']['missing_og_title_count']}",
+        f"- Missing OG description: {local_route['summary']['missing_og_description_count']}",
+        f"- Missing Twitter card: {local_route['summary']['missing_twitter_card_count']}",
+        f"- Missing JSON-LD: {local_route['summary']['missing_json_ld_count']}",
+        f"- Missing H1: {local_route['summary']['missing_h1_count']}",
+        '',
+        '| Path | Local target | Exists | HTML | OG | Tw | JSON-LD | H1 |',
+        '|---|---|:---:|:---:|:---:|:---:|:---:|:---:|',
+    ])
+    for row in local_route['results']:
+        seo = row.get('seo_basics', {})
+        lines.append(
+            f"| `{row['path']}` | `{row.get('local_target') or '-'}` | "
+            f"{'✅' if row.get('exists') else '❌'} | {'✅' if row.get('is_html') else '❌'} | "
+            f"{'✅' if seo.get('og_title') else '❌'} | {'✅' if seo.get('twitter_card') else '❌'} | "
+            f"{'✅' if seo.get('json_ld') else '❌'} | {'✅' if seo.get('has_h1') else '❌'} |"
+        )
 
     lines.extend([
         '',
@@ -755,6 +790,57 @@ def audit_local_html_metadata(root: Path) -> dict[str, Any]:
     }
 
 
+def resolve_local_route_target(path: str, vercel_data: dict[str, Any]) -> str | None:
+    for route in vercel_data.get('routes', []):
+        src = route.get('src')
+        dest = route.get('dest')
+        if not isinstance(src, str) or not isinstance(dest, str):
+            continue
+        try:
+            match = re.fullmatch(src, path)
+        except re.error:
+            continue
+        if not match:
+            continue
+        resolved = dest
+        for idx, value in enumerate(match.groups(), start=1):
+            resolved = resolved.replace(f'${idx}', value)
+        return resolved.lstrip('/')
+    return None
+
+
+def audit_local_route_targets(root: Path, vercel_data: dict[str, Any], audited_paths: list[str]) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    for path in audited_paths:
+        rel = resolve_local_route_target(path, vercel_data)
+        if not rel:
+            rows.append({'path': path, 'local_target': '', 'exists': False, 'is_html': False, 'seo_basics': {}})
+            continue
+        file_path = root / rel
+        exists = file_path.exists() and file_path.is_file()
+        is_html = exists and file_path.suffix.lower() == '.html'
+        seo = {}
+        if is_html:
+            body = file_path.read_text(encoding='utf-8', errors='ignore')
+            seo = extract_seo_fields(body)['seo_basics']
+        rows.append({'path': path, 'local_target': rel, 'exists': exists, 'is_html': is_html, 'seo_basics': seo})
+
+    html_rows = [row for row in rows if row.get('is_html')]
+    return {
+        'summary': {
+            'paths_checked': len(rows),
+            'html_targets_found': len(html_rows),
+            'missing_target_count': sum(1 for row in rows if not row.get('exists')),
+            'missing_og_title_count': sum(1 for row in html_rows if not row['seo_basics'].get('og_title')),
+            'missing_og_description_count': sum(1 for row in html_rows if not row['seo_basics'].get('og_description')),
+            'missing_twitter_card_count': sum(1 for row in html_rows if not row['seo_basics'].get('twitter_card')),
+            'missing_json_ld_count': sum(1 for row in html_rows if not row['seo_basics'].get('json_ld')),
+            'missing_h1_count': sum(1 for row in html_rows if not row['seo_basics'].get('has_h1')),
+        },
+        'results': rows,
+    }
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -779,6 +865,7 @@ def main() -> None:
     crawl_support_audit = audit_crawl_support(args.base_url, args.timeout, paths)
     local_crawl_audit = audit_local_crawl_assets(root, paths)
     local_html_audit = audit_local_html_metadata(root)
+    local_route_target_audit = audit_local_route_targets(root, vercel_data, paths)
 
     successful_rows = [row for row in domain_results if row.get('status') == 200]
     response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
@@ -821,6 +908,7 @@ def main() -> None:
         'crawl_support_audit': crawl_support_audit,
         'local_crawl_audit': local_crawl_audit,
         'local_html_audit': local_html_audit,
+        'local_route_target_audit': local_route_target_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'

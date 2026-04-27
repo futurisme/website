@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-04-27T11:18:21Z",
+    "generated_at": "2026-04-27T11:24:19Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 82,
-    "elapsed_seconds": 2.11
+    "elapsed_seconds": 1.47
   },
   "domain": {
     "summary": {
@@ -13,16 +13,16 @@
       "error_count": 0,
       "missing_meta_description_count": 0,
       "missing_canonical_count": 0,
-      "missing_h1_count": 3,
+      "missing_h1_count": 0,
       "missing_html_lang_count": 0,
-      "missing_og_title_count": 10,
-      "missing_og_description_count": 10,
-      "missing_twitter_card_count": 12,
-      "missing_json_ld_count": 15,
+      "missing_og_title_count": 0,
+      "missing_og_description_count": 0,
+      "missing_twitter_card_count": 0,
+      "missing_json_ld_count": 0,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 231.1,
-      "p95_response_time_ms": 308.0,
-      "max_response_time_ms": 322.2,
+      "avg_response_time_ms": 98.3,
+      "p95_response_time_ms": 140.9,
+      "max_response_time_ms": 146.8,
       "missing_security_headers_count": 45,
       "missing_security_header_details": {
         "content-security-policy": 15,
@@ -36,14 +36,14 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 290.1,
+        "time_ms": 146.8,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4973,
+        "content_length": 5189,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -56,13 +56,13 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/",
-          "has_h1": false,
+          "has_h1": true,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 3,
@@ -74,14 +74,14 @@
         "path": "/animeindustry",
         "url": "https://fadhil.dev/animeindustry",
         "status": 200,
-        "time_ms": 322.2,
+        "time_ms": 90.3,
         "final_url": "https://fadhil.dev/animeindustry",
         "final_path": "/animeindustry",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 10182,
+        "content_length": 11046,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -97,13 +97,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 2
         },
         "deprecated_flags": []
@@ -112,7 +112,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 271.1,
+        "time_ms": 110.5,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -138,7 +138,7 @@
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 2,
@@ -150,14 +150,14 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 256.6,
+        "time_ms": 140.9,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 1599,
+        "content_length": 2426,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -173,13 +173,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 1
         },
         "deprecated_flags": []
@@ -188,14 +188,14 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 258.5,
+        "time_ms": 120.1,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 1479,
+        "content_length": 2422,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -211,13 +211,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 1
         },
         "deprecated_flags": []
@@ -226,14 +226,14 @@
         "path": "/games/animeindustry",
         "url": "https://fadhil.dev/games/animeindustry",
         "status": 200,
-        "time_ms": 308.0,
+        "time_ms": 102.4,
         "final_url": "https://fadhil.dev/games/animeindustry",
         "final_path": "/games/animeindustry",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 10182,
+        "content_length": 11046,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -249,13 +249,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 2
         },
         "deprecated_flags": []
@@ -264,14 +264,14 @@
         "path": "/games/dreambusiness",
         "url": "https://fadhil.dev/games/dreambusiness",
         "status": 200,
-        "time_ms": 210.1,
+        "time_ms": 88.5,
         "final_url": "https://fadhil.dev/games/dreambusiness",
         "final_path": "/games/dreambusiness",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 5171,
+        "content_length": 6037,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -287,13 +287,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 1
         },
         "deprecated_flags": []
@@ -302,14 +302,14 @@
         "path": "/games/rpg",
         "url": "https://fadhil.dev/games/rpg",
         "status": 200,
-        "time_ms": 181.7,
+        "time_ms": 64.2,
         "final_url": "https://fadhil.dev/games/rpg",
         "final_path": "/games/rpg",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 37895,
+        "content_length": 38738,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -325,13 +325,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 3,
+          "script_tags": 4,
           "stylesheet_links": 0
         },
         "deprecated_flags": []
@@ -340,14 +340,14 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 210.6,
+        "time_ms": 88.8,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 2718,
+        "content_length": 3573,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -363,13 +363,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 0,
+          "script_tags": 1,
           "stylesheet_links": 2
         },
         "deprecated_flags": []
@@ -378,7 +378,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 227.3,
+        "time_ms": 103.0,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -404,7 +404,7 @@
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 2,
@@ -416,14 +416,14 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 295.6,
+        "time_ms": 92.9,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4251,
+        "content_length": 4467,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -436,13 +436,13 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/mindmapmaker/editor/1",
-          "has_h1": false,
+          "has_h1": true,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 2,
@@ -454,14 +454,14 @@
         "path": "/portfolio",
         "url": "https://fadhil.dev/portfolio",
         "status": 200,
-        "time_ms": 167.1,
+        "time_ms": 106.1,
         "final_url": "https://fadhil.dev/portfolio",
         "final_path": "/portfolio",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4973,
+        "content_length": 5189,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -474,13 +474,13 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/",
-          "has_h1": false,
+          "has_h1": true,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 3,
@@ -492,14 +492,14 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 105.1,
+        "time_ms": 91.5,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 37895,
+        "content_length": 38738,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -515,13 +515,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 3,
+          "script_tags": 4,
           "stylesheet_links": 0
         },
         "deprecated_flags": []
@@ -530,14 +530,14 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 208.2,
+        "time_ms": 86.2,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 6799,
+        "content_length": 7778,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -553,13 +553,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 1
         },
         "deprecated_flags": []
@@ -568,14 +568,14 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 153.8,
+        "time_ms": 43.0,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 3201,
+        "content_length": 4161,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -591,13 +591,13 @@
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 1
         },
         "deprecated_flags": []
@@ -1224,13 +1224,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 161.6,
+      "time_ms": 47.5,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 123.8,
+      "time_ms": 94.9,
       "url_count": 13
     },
     "sitemap_urls": [
@@ -1294,5 +1294,289 @@
       }
     },
     "top_files_with_most_gaps": []
+  },
+  "local_route_target_audit": {
+    "summary": {
+      "paths_checked": 15,
+      "html_targets_found": 15,
+      "missing_target_count": 0,
+      "missing_og_title_count": 0,
+      "missing_og_description_count": 0,
+      "missing_twitter_card_count": 0,
+      "missing_json_ld_count": 0,
+      "missing_h1_count": 0
+    },
+    "results": [
+      {
+        "path": "/",
+        "local_target": "website/portfolio/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/animeindustry",
+        "local_target": "games/animeindustry/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/games/animeindustry",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/archives",
+        "local_target": "website/archives/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/archives",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/books",
+        "local_target": "website/website/books/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/books",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/books/editor",
+        "local_target": "website/website/books/editor/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/books/editor",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/games/animeindustry",
+        "local_target": "games/animeindustry/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/games/animeindustry",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/games/dreambusiness",
+        "local_target": "games/dreambusiness/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/games/dreambusiness",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/games/rpg",
+        "local_target": "games/rpg/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/games/rpg",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/home",
+        "local_target": "website/home/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/home",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/mindmapmaker",
+        "local_target": "website/website/mindmapmaker/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/mindmapmaker",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/mindmapmaker/editor/1",
+        "local_target": "website/website/mindmapmaker/editor/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/mindmapmaker/editor/1",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/portfolio",
+        "local_target": "website/portfolio/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/rpg",
+        "local_target": "games/rpg/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/games/rpg",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/shareideas",
+        "local_target": "website/shareideas/index.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/shareideas",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      },
+      {
+        "path": "/shareideas/page/1",
+        "local_target": "website/shareideas/workspace.html",
+        "exists": true,
+        "is_html": true,
+        "seo_basics": {
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/shareideas/page/1",
+          "has_h1": true,
+          "noindex": false,
+          "html_lang": true,
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
+        }
+      }
+    ]
   }
 }
