@@ -1,13 +1,13 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-26T03:10:35Z
+Generated: 2026-04-27T11:11:00Z
 
 ## Executive Summary
 
 - Base URL: `https://fadhil.dev`
-- Paths checked: 16
+- Paths checked: 15
 - HTTP 200: 15
-- Errors (non-200/redirect): 1
+- Errors (non-200/redirect): 0
 - Missing meta description: 0
 - Missing canonical: 0
 - Missing H1: 3
@@ -16,11 +16,11 @@ Generated: 2026-04-26T03:10:35Z
 - Missing OG description: 10
 - Missing twitter:card: 12
 - Missing JSON-LD: 15
-- Duplicate file groups (all): 65
+- Duplicate file groups (all): 82
 - Potential unused static files: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 45
-- Avg response time (ms): 159.2
-- P95 response time (ms): 226.1
+- Avg response time (ms): 119.2
+- P95 response time (ms): 169.1
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -29,33 +29,30 @@ Generated: 2026-04-26T03:10:35Z
 - Sitemap coverage gap (audited routes not in sitemap): 0
 - Local robots/sitemap ready: yes
 - Local sitemap coverage gap: 0
+- Local HTML files audited: 14
+- Local HTML missing robots meta: 1
+- Local HTML missing OG title: 9
+- Local HTML missing twitter:card: 9
 
 ## Domain Route Audit
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 217.7 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/animeindustry` | 200 | — | 188.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 226.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/archives/([^/.]+)` | 404 | — | 137.8 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ |
-| `/books` | 200 | — | 237.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 177.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/animeindustry` | 200 | — | 85.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/dreambusiness` | 200 | — | 156.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/rpg` | 200 | — | 203.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 145.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 161.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 162.2 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/portfolio` | 200 | — | 86.4 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 92.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 172.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 100.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-
-### Route Errors
-
-| Path | Status | Error |
-|---|---:|---|
-| `/archives/([^/.]+)` | 404 | `HTTP Error 404: Not Found` |
+| `/` | 200 | — | 169.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 240.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 156.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | 164.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 167.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 120.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 92.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 52.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 48.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 56.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 92.3 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 79.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 136.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 112.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 99.4 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ## Security Header Coverage (HTTP 200 pages)
 
@@ -75,8 +72,8 @@ Generated: 2026-04-26T03:10:35Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 141.6 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 154.3 | `url-count=13` |
+| `/robots.txt` | 200 | 44.4 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 104.2 | `url-count=13` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -100,152 +97,151 @@ Generated: 2026-04-26T03:10:35Z
 |---|---:|---:|:---:|:---:|
 | `assets/public/images/mindmapmaker.webp` | 2 | 5 | ✅ | ❌ |
 | `website/portfolio/testing/images/mindmapmaker.webp` | 2 | 5 | ✅ | ❌ |
-| `website/portfolio/testing/images/portfolio.webp` | 2 | 8 | ✅ | ❌ |
+| `website/portfolio/testing/images/portfolio.webp` | 2 | 10 | ✅ | ❌ |
 | `website/portfolio/testing/images/share-ideas.webp` | 2 | 2 | ✅ | ❌ |
 
-### Group 3 — files: 3, bytes: 29067
+### Group 3 — files: 2, bytes: 56686
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/styles/theme.css` | 4 | 15 | ✅ | ❌ |
-| `website/home/theme.css` | 2 | 15 | ✅ | ❌ |
-| `website/website/mindmapmaker/theme.css` | 2 | 15 | ✅ | ❌ |
+| `library/fadhilweblib/core/syntax/style.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/style.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 4 — files: 2, bytes: 12364
+### Group 4 — files: 2, bytes: 38256
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/core/syntax/parse.ts` | 3 | 5 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/parse.ts` | 2 | 5 | ✅ | ❌ |
+
+### Group 5 — files: 2, bytes: 36082
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/core/types/components.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/types/components.ts` | 2 | 4 | ✅ | ❌ |
+
+### Group 6 — files: 2, bytes: 27518
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/core/syntax-test.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax-test.ts` | 2 | 4 | ✅ | ❌ |
+
+### Group 7 — files: 2, bytes: 27378
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/styles/theme.css` | 4 | 17 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/styles/theme.css` | 2 | 17 | ✅ | ❌ |
+
+### Group 8 — files: 2, bytes: 25980
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/core/syntax/constants.ts` | 3 | 5 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/constants.ts` | 2 | 5 | ✅ | ❌ |
+
+### Group 9 — files: 2, bytes: 22364
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/core/types/syntax.ts` | 2 | 9 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/types/syntax.ts` | 2 | 9 | ✅ | ❌ |
+
+### Group 10 — files: 2, bytes: 19378
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `website/home/theme.css` | 2 | 17 | ✅ | ❌ |
+| `website/website/mindmapmaker/theme.css` | 2 | 17 | ✅ | ❌ |
+
+### Group 11 — files: 2, bytes: 12364
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/types/hooks.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 5 — files: 2, bytes: 10924
+### Group 12 — files: 2, bytes: 10924
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/use-dialog.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 6 — files: 2, bytes: 9980
+### Group 13 — files: 2, bytes: 9980
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 7 — files: 2, bytes: 9740
+### Group 14 — files: 2, bytes: 9740
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/collapsible-panel.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 8 — files: 2, bytes: 9532
+### Group 15 — files: 2, bytes: 9532
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/state-syntax.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 9 — files: 2, bytes: 9166
+### Group 16 — files: 2, bytes: 9166
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/overlay/drawer.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 10 — files: 2, bytes: 8828
+### Group 17 — files: 2, bytes: 8828
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/overlay/dialog.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 11 — files: 2, bytes: 8142
+### Group 18 — files: 2, bytes: 8142
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/use-roving-focus.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 12 — files: 2, bytes: 7236
+### Group 19 — files: 2, bytes: 7236
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/layout/section.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 13 — files: 2, bytes: 6900
+### Group 20 — files: 2, bytes: 7070
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/button.tsx` | 2 | 8 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx` | 2 | 8 | ✅ | ❌ |
+| `library/fadhilweblib/components/media/adaptive-media.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/media/adaptive-media.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 14 — files: 2, bytes: 6406
+### Group 21 — files: 2, bytes: 7036
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `node_modules/.pnpm/lock.yaml` | 4 | 8 | ❌ | ❌ |
+| `pnpm-lock.yaml` | 4 | 4 | ❌ | ❌ |
+
+### Group 22 — files: 2, bytes: 6900
+| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
+|---|---:|---:|:---:|:---:|
+| `library/fadhilweblib/components/button.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx` | 2 | 4 | ✅ | ❌ |
+
+### Group 23 — files: 2, bytes: 6406
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/navigation/tabs.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/navigation/tabs.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 15 — files: 2, bytes: 6388
+### Group 24 — files: 2, bytes: 6388
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/components/forms/field.tsx` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/components/forms/field.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 16 — files: 2, bytes: 5970
+### Group 25 — files: 2, bytes: 5970
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
 | `library/fadhilweblib/core/use-tabs.ts` | 2 | 4 | ✅ | ❌ |
 | `website/mindmapmaker/src/lib/fadhilweblib/core/use-tabs.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 17 — files: 2, bytes: 5828
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/recipe.ts` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/recipe.ts` | 2 | 4 | ✅ | ❌ |
-
-### Group 18 — files: 2, bytes: 5662
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/use-disclosure.ts` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/use-disclosure.ts` | 2 | 4 | ✅ | ❌ |
-
-### Group 19 — files: 2, bytes: 5488
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts` | 2 | 4 | ✅ | ❌ |
-
-### Group 20 — files: 2, bytes: 5472
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/header-shell.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/header-shell.tsx` | 2 | 4 | ✅ | ❌ |
-
-### Group 21 — files: 2, bytes: 5434
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/forms/switch.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/forms/switch.tsx` | 2 | 4 | ✅ | ❌ |
-
-### Group 22 — files: 2, bytes: 5012
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/forms/checkbox.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/forms/checkbox.tsx` | 2 | 4 | ✅ | ❌ |
-
-### Group 23 — files: 2, bytes: 4966
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/navigation/segmented-control.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/navigation/segmented-control.tsx` | 2 | 4 | ✅ | ❌ |
-
-### Group 24 — files: 2, bytes: 4888
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/icon-button.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/icon-button.tsx` | 2 | 4 | ✅ | ❌ |
-
-### Group 25 — files: 2, bytes: 4368
-| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
-|---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/feedback/progress-bar.tsx` | 2 | 4 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/feedback/progress-bar.tsx` | 2 | 4 | ✅ | ❌ |
-
 ## Static Unused File Audit (High Confidence)
 
-- Candidate files scanned: 69
-- Used via vercel config: 69
+- Candidate files scanned: 70
+- Used via vercel config: 70
 - Used via exact references: 0
 - Potential unused files: 0
 
@@ -255,8 +251,50 @@ Generated: 2026-04-26T03:10:35Z
 | Potential unused file | Exact path refs |
 |---|---:|
 
+## Local HTML Metadata Coverage Audit
+
+- HTML files audited: 14
+- Missing `<title>`: 0
+- Missing meta description: 0
+- Missing canonical: 1
+- Missing robots: 1
+- Missing Open Graph title: 9
+- Missing Open Graph description: 9
+- Missing Twitter card: 9
+- Missing JSON-LD: 9
+- Missing HTML lang: 0
+- Missing H1: 2
+
+| Missing check | Count |
+|---|---:|
+| `title` | 0 |
+| `meta_description` | 0 |
+| `canonical` | 1 |
+| `robots` | 1 |
+| `og_title` | 9 |
+| `og_description` | 9 |
+| `twitter_card` | 9 |
+| `json_ld` | 9 |
+| `html_lang` | 0 |
+| `h1` | 2 |
+
+| File | Gap Count | Missing checks |
+|---|---:|---|
+| `website/home/404.html` | 5 | `canonical, og_title, og_description, twitter_card, json_ld` |
+| `website/website/books/editor/index.html` | 5 | `robots, og_title, og_description, twitter_card, json_ld` |
+| `games/animeindustry/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `games/dreambusiness/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `games/rpg/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `website/home/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `website/shareideas/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `website/shareideas/workspace.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `website/website/books/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
+| `website/portfolio/index.html` | 1 | `h1` |
+| `website/website/mindmapmaker/editor/index.html` | 1 | `h1` |
+
 ### Notes
 
 - Audit scope is intentionally limited to static delivery folders to minimize false positives.
 - A file is considered used when matched by vercel routes/builds or referenced by exact repository path.
 - Dynamic runtime fetches may not be detected; validate before deletion.
+- Local HTML metadata coverage audit is static repository inspection and should be paired with live deployment checks.

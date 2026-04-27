@@ -13,6 +13,7 @@ import argparse
 import fnmatch
 import hashlib
 import json
+import os
 import re
 import subprocess
 import time
@@ -20,6 +21,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -71,6 +73,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--timeout', type=int, default=DEFAULT_TIMEOUT, help='HTTP timeout in seconds.')
     parser.add_argument('--max-body-bytes', type=int, default=DEFAULT_MAX_BODY_BYTES, help='Max HTML bytes to read per path.')
     parser.add_argument('--top-duplicate-groups', type=int, default=DEFAULT_TOP_DUPLICATE_GROUPS, help='Max duplicate groups in report.')
+    parser.add_argument('--workers', type=int, default=max(4, min(24, (os.cpu_count() or 8) * 2)), help='Parallel workers for network/domain audit.')
     return parser.parse_args()
 
 
@@ -81,7 +84,11 @@ def normalize_path(path: str) -> str:
 
 
 def is_dynamic_route(src: str) -> bool:
-    return bool(re.search(r'\((?:\.\*|\[0-9\]\+|\[\^\)\]\+)\)|\$\d+', src))
+    if '$' in src and src not in {'/$', '/'}:
+        return True
+    if re.search(r'\((?:\.\*|\[0-9\]\+|\[\^\)\]\+)\)', src):
+        return True
+    return bool(re.search(r'[\(\)\[\]\+\*\?]', src))
 
 
 def collect_paths(vercel_path: Path) -> list[str]:
@@ -100,6 +107,8 @@ def collect_paths(vercel_path: Path) -> list[str]:
             continue
         candidate = normalize_path(src)
         if candidate.startswith('/api'):
+            continue
+        if candidate == '/404':
             continue
         if re.search(r'\.[a-zA-Z0-9]{2,20}$', candidate):
             continue
@@ -207,20 +216,11 @@ def fetch_text_endpoint(url: str, timeout: int) -> dict[str, Any]:
         return {'url': url, 'status': 'ERR', 'error': str(exc), 'body': '', 'headers': {}, 'time_ms': duration_ms}
 
 
-def safe_rg_count(root: Path, pattern: str, file_self: str, fixed: bool = False) -> int:
-    cmd = ['rg', '-n']
-    if fixed:
-        cmd.append('--fixed-strings')
-    cmd.extend([pattern, '--', '.'])
-    proc = subprocess.run(cmd, cwd=root, text=True, capture_output=True, check=False)
-    lines = proc.stdout.splitlines() if proc.stdout else []
-    return sum(1 for line in lines if not line.startswith(file_self + ':'))
-
-
 def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], int]:
     files = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
     hashed: dict[str, list[str]] = {}
     sizes: dict[str, int] = {}
+    text_corpus: list[tuple[str, str]] = []
 
     for rel in files:
         p = root / rel
@@ -230,6 +230,9 @@ def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], 
         digest = hashlib.sha256(raw).hexdigest()
         hashed.setdefault(digest, []).append(rel)
         sizes[rel] = len(raw)
+        text = safe_read_text(p)
+        if text is not None:
+            text_corpus.append((rel, text))
 
     duplicate_groups = [group for group in hashed.values() if len(group) > 1]
 
@@ -239,8 +242,13 @@ def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], 
         safe_candidates = []
         for rel in sorted(group):
             basename = Path(rel).name
-            basename_refs = safe_rg_count(root, basename, rel, fixed=True)
-            exact_refs = safe_rg_count(root, rel, rel, fixed=True)
+            basename_refs = 0
+            exact_refs = 0
+            for scan_rel, scan_text in text_corpus:
+                if scan_rel == rel:
+                    continue
+                basename_refs += scan_text.count(basename)
+                exact_refs += scan_text.count(rel)
             in_active_scope = rel.startswith(ACTIVE_PREFIXES)
             can_delete = (exact_refs == 0) and (not in_active_scope)
             if can_delete:
@@ -431,6 +439,7 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     vercel_cfg = report['vercel_target_audit']
     crawl = report['crawl_support_audit']
     local_crawl = report['local_crawl_audit']
+    local_html = report['local_html_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -464,6 +473,10 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- Sitemap coverage gap (audited routes not in sitemap): {crawl['summary']['audited_route_not_in_sitemap_count']}",
         f"- Local robots/sitemap ready: {'yes' if (local_crawl['summary']['robots_exists'] and local_crawl['summary']['sitemap_exists']) else 'no'}",
         f"- Local sitemap coverage gap: {local_crawl['summary']['audited_route_not_in_sitemap_count']}",
+        f"- Local HTML files audited: {local_html['summary']['html_files_audited']}",
+        f"- Local HTML missing robots meta: {local_html['summary']['missing_robots_count']}",
+        f"- Local HTML missing OG title: {local_html['summary']['missing_og_title_count']}",
+        f"- Local HTML missing twitter:card: {local_html['summary']['missing_twitter_card_count']}",
         '',
         '## Domain Route Audit',
         '',
@@ -583,9 +596,36 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     for item in static['potential_unused_files']:
         lines.append(f"| `{item['path']}` | {item['exact_reference_count']} |")
 
+    lines.extend([
+        '',
+        '## Local HTML Metadata Coverage Audit',
+        '',
+        f"- HTML files audited: {local_html['summary']['html_files_audited']}",
+        f"- Missing `<title>`: {local_html['summary']['missing_title_count']}",
+        f"- Missing meta description: {local_html['summary']['missing_description_count']}",
+        f"- Missing canonical: {local_html['summary']['missing_canonical_count']}",
+        f"- Missing robots: {local_html['summary']['missing_robots_count']}",
+        f"- Missing Open Graph title: {local_html['summary']['missing_og_title_count']}",
+        f"- Missing Open Graph description: {local_html['summary']['missing_og_description_count']}",
+        f"- Missing Twitter card: {local_html['summary']['missing_twitter_card_count']}",
+        f"- Missing JSON-LD: {local_html['summary']['missing_json_ld_count']}",
+        f"- Missing HTML lang: {local_html['summary']['missing_html_lang_count']}",
+        f"- Missing H1: {local_html['summary']['missing_h1_count']}",
+        '',
+        '| Missing check | Count |',
+        '|---|---:|',
+    ])
+    for key, count in local_html['summary']['missing_by_check'].items():
+        lines.append(f'| `{key}` | {count} |')
+    if local_html['top_files_with_most_gaps']:
+        lines.extend(['', '| File | Gap Count | Missing checks |', '|---|---:|---|'])
+        for item in local_html['top_files_with_most_gaps']:
+            lines.append(f"| `{item['path']}` | {item['gap_count']} | `{', '.join(item['missing_checks'])}` |")
+
     lines.extend(['', '### Notes', ''])
     for note in static['notes']:
         lines.append(f'- {note}')
+    lines.append('- Local HTML metadata coverage audit is static repository inspection and should be paired with live deployment checks.')
 
     return '\n'.join(lines) + '\n'
 
@@ -667,6 +707,54 @@ def audit_local_crawl_assets(root: Path, audited_paths: list[str]) -> dict[str, 
     }
 
 
+def audit_local_html_metadata(root: Path) -> dict[str, Any]:
+    files = subprocess.check_output(['git', 'ls-files', '*.html'], cwd=root, text=True).splitlines()
+    scoped_files = [f for f in files if f.startswith(('website/', 'games/'))]
+
+    checks = {
+        'title': re.compile(r'<title[^>]*>.+?</title>', re.I | re.S),
+        'meta_description': re.compile(r'<meta[^>]+name=["\']description["\'][^>]+content=', re.I),
+        'canonical': re.compile(r'<link[^>]+rel=["\']canonical["\'][^>]+href=', re.I),
+        'robots': re.compile(r'<meta[^>]+name=["\']robots["\'][^>]+content=', re.I),
+        'og_title': re.compile(r'<meta[^>]+property=["\']og:title["\'][^>]+content=', re.I),
+        'og_description': re.compile(r'<meta[^>]+property=["\']og:description["\'][^>]+content=', re.I),
+        'twitter_card': re.compile(r'<meta[^>]+(?:name|property)=["\']twitter:card["\'][^>]+content=', re.I),
+        'json_ld': re.compile(r'<script[^>]+type=["\']application/ld\+json["\']', re.I),
+        'html_lang': re.compile(r'<html[^>]+lang=["\'][^"\']+["\']', re.I),
+        'h1': re.compile(r'<h1\b', re.I),
+    }
+
+    missing_counts: dict[str, int] = {name: 0 for name in checks}
+    files_with_gaps: list[dict[str, Any]] = []
+
+    for rel in scoped_files:
+        text = (root / rel).read_text(encoding='utf-8', errors='ignore')
+        missing = [name for name, pattern in checks.items() if not pattern.search(text)]
+        for name in missing:
+            missing_counts[name] += 1
+        if missing:
+            files_with_gaps.append({'path': rel, 'gap_count': len(missing), 'missing_checks': missing})
+
+    files_with_gaps.sort(key=lambda item: (-item['gap_count'], item['path']))
+    return {
+        'summary': {
+            'html_files_audited': len(scoped_files),
+            'missing_title_count': missing_counts['title'],
+            'missing_description_count': missing_counts['meta_description'],
+            'missing_canonical_count': missing_counts['canonical'],
+            'missing_robots_count': missing_counts['robots'],
+            'missing_og_title_count': missing_counts['og_title'],
+            'missing_og_description_count': missing_counts['og_description'],
+            'missing_twitter_card_count': missing_counts['twitter_card'],
+            'missing_json_ld_count': missing_counts['json_ld'],
+            'missing_html_lang_count': missing_counts['html_lang'],
+            'missing_h1_count': missing_counts['h1'],
+            'missing_by_check': missing_counts,
+        },
+        'top_files_with_most_gaps': files_with_gaps[:30],
+    }
+
+
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -674,13 +762,23 @@ def main() -> None:
 
     started = time.time()
     paths = collect_paths(root / 'vercel.json')
-    domain_results = [fetch_path(args.base_url, path, args.timeout, args.max_body_bytes) for path in paths]
+    domain_results: list[dict[str, Any]] = []
+    path_order = {path: idx for idx, path in enumerate(paths)}
+    with ThreadPoolExecutor(max_workers=max(1, args.workers)) as executor:
+        future_map = {
+            executor.submit(fetch_path, args.base_url, path, args.timeout, args.max_body_bytes): path
+            for path in paths
+        }
+        for future in as_completed(future_map):
+            domain_results.append(future.result())
+    domain_results.sort(key=lambda row: path_order.get(row.get('path', '/'), 10**9))
 
     duplicate_analysis, duplicate_groups_total = find_duplicate_files(root, args.top_duplicate_groups)
     static_unused = find_potential_unused_static_files(root, vercel_data)
     vercel_target_audit = audit_vercel_targets(root, vercel_data)
     crawl_support_audit = audit_crawl_support(args.base_url, args.timeout, paths)
     local_crawl_audit = audit_local_crawl_assets(root, paths)
+    local_html_audit = audit_local_html_metadata(root)
 
     successful_rows = [row for row in domain_results if row.get('status') == 200]
     response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
@@ -722,6 +820,7 @@ def main() -> None:
         'vercel_target_audit': vercel_target_audit,
         'crawl_support_audit': crawl_support_audit,
         'local_crawl_audit': local_crawl_audit,
+        'local_html_audit': local_html_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'

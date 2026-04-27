@@ -1,16 +1,16 @@
 {
   "summary": {
-    "generated_at": "2026-04-26T03:10:35Z",
+    "generated_at": "2026-04-27T11:11:00Z",
     "base_url": "https://fadhil.dev",
-    "duplicate_groups_total": 65,
-    "elapsed_seconds": 8.31
+    "duplicate_groups_total": 82,
+    "elapsed_seconds": 1.56
   },
   "domain": {
     "summary": {
-      "paths_checked": 16,
+      "paths_checked": 15,
       "http_200_count": 15,
       "redirect_count": 0,
-      "error_count": 1,
+      "error_count": 0,
       "missing_meta_description_count": 0,
       "missing_canonical_count": 0,
       "missing_h1_count": 3,
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 12,
       "missing_json_ld_count": 15,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 159.2,
-      "p95_response_time_ms": 226.1,
-      "max_response_time_ms": 237.0,
+      "avg_response_time_ms": 119.2,
+      "p95_response_time_ms": 169.1,
+      "max_response_time_ms": 240.2,
       "missing_security_headers_count": 45,
       "missing_security_header_details": {
         "content-security-policy": 15,
@@ -36,14 +36,14 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 217.7,
+        "time_ms": 169.1,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4544,
+        "content_length": 4973,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -51,7 +51,7 @@
           "x-content-type-options": false,
           "referrer-policy": false
         },
-        "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
+        "title": "Fadhil Akbar Cariearsa — Hobbyist Full-Stack Developer Portfolio",
         "seo_basics": {
           "meta_description": true,
           "canonical": true,
@@ -66,7 +66,7 @@
         },
         "processing_hints": {
           "script_tags": 3,
-          "stylesheet_links": 1
+          "stylesheet_links": 2
         },
         "deprecated_flags": []
       },
@@ -74,14 +74,14 @@
         "path": "/animeindustry",
         "url": "https://fadhil.dev/animeindustry",
         "status": 200,
-        "time_ms": 188.8,
+        "time_ms": 240.2,
         "final_url": "https://fadhil.dev/animeindustry",
         "final_path": "/animeindustry",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 9644,
+        "content_length": 10182,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -112,14 +112,14 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 226.1,
+        "time_ms": 156.4,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4054,
+        "content_length": 4005,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -147,24 +147,17 @@
         "deprecated_flags": []
       },
       {
-        "path": "/archives/([^/.]+)",
-        "url": "https://fadhil.dev/archives/([^/.]+)",
-        "status": 404,
-        "error": "HTTP Error 404: Not Found",
-        "time_ms": 137.8
-      },
-      {
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 237.0,
+        "time_ms": 164.7,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 1550,
+        "content_length": 1599,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -195,14 +188,14 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 177.2,
+        "time_ms": 167.7,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 1540,
+        "content_length": 1479,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -233,14 +226,14 @@
         "path": "/games/animeindustry",
         "url": "https://fadhil.dev/games/animeindustry",
         "status": 200,
-        "time_ms": 85.2,
+        "time_ms": 120.7,
         "final_url": "https://fadhil.dev/games/animeindustry",
         "final_path": "/games/animeindustry",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 9644,
+        "content_length": 10182,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -271,14 +264,14 @@
         "path": "/games/dreambusiness",
         "url": "https://fadhil.dev/games/dreambusiness",
         "status": 200,
-        "time_ms": 156.0,
+        "time_ms": 92.6,
         "final_url": "https://fadhil.dev/games/dreambusiness",
         "final_path": "/games/dreambusiness",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 5122,
+        "content_length": 5171,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -309,14 +302,14 @@
         "path": "/games/rpg",
         "url": "https://fadhil.dev/games/rpg",
         "status": 200,
-        "time_ms": 203.1,
+        "time_ms": 52.9,
         "final_url": "https://fadhil.dev/games/rpg",
         "final_path": "/games/rpg",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 37846,
+        "content_length": 37895,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -347,14 +340,14 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 145.1,
+        "time_ms": 48.3,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 2669,
+        "content_length": 2718,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -385,14 +378,14 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 161.3,
+        "time_ms": 56.6,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 3909,
+        "content_length": 3860,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -423,14 +416,14 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 162.2,
+        "time_ms": 92.3,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4300,
+        "content_length": 4251,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -461,14 +454,14 @@
         "path": "/portfolio",
         "url": "https://fadhil.dev/portfolio",
         "status": 200,
-        "time_ms": 86.4,
+        "time_ms": 79.1,
         "final_url": "https://fadhil.dev/portfolio",
         "final_path": "/portfolio",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4544,
+        "content_length": 4973,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -476,7 +469,7 @@
           "x-content-type-options": false,
           "referrer-policy": false
         },
-        "title": "Fadhil Akbar — Hobbyist Full-Stack Developer Portfolio",
+        "title": "Fadhil Akbar Cariearsa — Hobbyist Full-Stack Developer Portfolio",
         "seo_basics": {
           "meta_description": true,
           "canonical": true,
@@ -491,7 +484,7 @@
         },
         "processing_hints": {
           "script_tags": 3,
-          "stylesheet_links": 1
+          "stylesheet_links": 2
         },
         "deprecated_flags": []
       },
@@ -499,14 +492,14 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 92.0,
+        "time_ms": 136.0,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 37846,
+        "content_length": 37895,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -537,14 +530,14 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 172.0,
+        "time_ms": 112.0,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 6750,
+        "content_length": 6799,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -575,14 +568,14 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 100.1,
+        "time_ms": 99.4,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 2993,
+        "content_length": 3201,
         "cache_control": "public, max-age=0, must-revalidate",
         "security_headers": {
           "content-security-policy": false,
@@ -660,7 +653,7 @@
           "path": "website/portfolio/testing/images/portfolio.webp",
           "size_bytes": 59632,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 8,
+          "reference_count_basename": 10,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -675,23 +668,176 @@
       ]
     },
     {
-      "group_size": 3,
-      "group_total_bytes": 29067,
+      "group_size": 2,
+      "group_total_bytes": 56686,
       "safe_delete_candidates": [],
       "items": [
         {
-          "path": "library/fadhilweblib/styles/theme.css",
-          "size_bytes": 9689,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 15,
+          "path": "library/fadhilweblib/core/syntax/style.ts",
+          "size_bytes": 28343,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/style.ts",
+          "size_bytes": 28343,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 38256,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/syntax/parse.ts",
+          "size_bytes": 19128,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/parse.ts",
+          "size_bytes": 19128,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 36082,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/types/components.ts",
+          "size_bytes": 18041,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/types/components.ts",
+          "size_bytes": 18041,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 27518,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/syntax-test.ts",
+          "size_bytes": 13759,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax-test.ts",
+          "size_bytes": 13759,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 27378,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/styles/theme.css",
+          "size_bytes": 13689,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 17,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/styles/theme.css",
+          "size_bytes": 13689,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 17,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 25980,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/syntax/constants.ts",
+          "size_bytes": 12990,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/constants.ts",
+          "size_bytes": 12990,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 5,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 22364,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/types/syntax.ts",
+          "size_bytes": 11182,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 9,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/types/syntax.ts",
+          "size_bytes": 11182,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 9,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 19378,
+      "safe_delete_candidates": [],
+      "items": [
+        {
           "path": "website/home/theme.css",
           "size_bytes": 9689,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 15,
+          "reference_count_basename": 17,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -699,7 +845,7 @@
           "path": "website/website/mindmapmaker/theme.css",
           "size_bytes": 9689,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 15,
+          "reference_count_basename": 17,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -914,6 +1060,52 @@
     },
     {
       "group_size": 2,
+      "group_total_bytes": 7070,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/media/adaptive-media.tsx",
+          "size_bytes": 3535,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/media/adaptive-media.tsx",
+          "size_bytes": 3535,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 7036,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "node_modules/.pnpm/lock.yaml",
+          "size_bytes": 3518,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 8,
+          "in_active_scope": false,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "size_bytes": 3518,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 4,
+          "in_active_scope": false,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
       "group_total_bytes": 6900,
       "safe_delete_candidates": [],
       "items": [
@@ -921,7 +1113,7 @@
           "path": "library/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 8,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -929,7 +1121,7 @@
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 8,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1003,220 +1195,13 @@
           "safe_delete_candidate": false
         }
       ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5828,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/core/recipe.ts",
-          "size_bytes": 2914,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/recipe.ts",
-          "size_bytes": 2914,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5662,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/core/use-disclosure.ts",
-          "size_bytes": 2831,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-disclosure.ts",
-          "size_bytes": 2831,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5488,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/presets/index.ts",
-          "size_bytes": 2744,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts",
-          "size_bytes": 2744,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5472,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/header-shell.tsx",
-          "size_bytes": 2736,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/header-shell.tsx",
-          "size_bytes": 2736,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5434,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/forms/switch.tsx",
-          "size_bytes": 2717,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/switch.tsx",
-          "size_bytes": 2717,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 5012,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/forms/checkbox.tsx",
-          "size_bytes": 2506,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/checkbox.tsx",
-          "size_bytes": 2506,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 4966,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/navigation/segmented-control.tsx",
-          "size_bytes": 2483,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/segmented-control.tsx",
-          "size_bytes": 2483,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 4888,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/icon-button.tsx",
-          "size_bytes": 2444,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/icon-button.tsx",
-          "size_bytes": 2444,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 4368,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "library/fadhilweblib/components/feedback/progress-bar.tsx",
-          "size_bytes": 2184,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/progress-bar.tsx",
-          "size_bytes": 2184,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
     }
   ],
   "static_unused_audit": {
     "summary": {
-      "tracked_files": 476,
-      "candidate_files": 69,
-      "used_via_vercel_config": 69,
+      "tracked_files": 661,
+      "candidate_files": 70,
+      "used_via_vercel_config": 70,
       "used_via_exact_references": 0,
       "potential_unused_files": 0
     },
@@ -1239,13 +1224,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 141.6,
+      "time_ms": 44.4,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 154.3,
+      "time_ms": 104.2,
       "url_count": 13
     },
     "sitemap_urls": [
@@ -1281,5 +1266,140 @@
       "audited_route_not_in_sitemap_count": 0
     },
     "audited_routes_missing_in_sitemap": []
+  },
+  "local_html_audit": {
+    "summary": {
+      "html_files_audited": 14,
+      "missing_title_count": 0,
+      "missing_description_count": 0,
+      "missing_canonical_count": 1,
+      "missing_robots_count": 1,
+      "missing_og_title_count": 9,
+      "missing_og_description_count": 9,
+      "missing_twitter_card_count": 9,
+      "missing_json_ld_count": 9,
+      "missing_html_lang_count": 0,
+      "missing_h1_count": 2,
+      "missing_by_check": {
+        "title": 0,
+        "meta_description": 0,
+        "canonical": 1,
+        "robots": 1,
+        "og_title": 9,
+        "og_description": 9,
+        "twitter_card": 9,
+        "json_ld": 9,
+        "html_lang": 0,
+        "h1": 2
+      }
+    },
+    "top_files_with_most_gaps": [
+      {
+        "path": "website/home/404.html",
+        "gap_count": 5,
+        "missing_checks": [
+          "canonical",
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/website/books/editor/index.html",
+        "gap_count": 5,
+        "missing_checks": [
+          "robots",
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "games/animeindustry/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "games/dreambusiness/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "games/rpg/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/home/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/shareideas/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/shareideas/workspace.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/website/books/index.html",
+        "gap_count": 4,
+        "missing_checks": [
+          "og_title",
+          "og_description",
+          "twitter_card",
+          "json_ld"
+        ]
+      },
+      {
+        "path": "website/portfolio/index.html",
+        "gap_count": 1,
+        "missing_checks": [
+          "h1"
+        ]
+      },
+      {
+        "path": "website/website/mindmapmaker/editor/index.html",
+        "gap_count": 1,
+        "missing_checks": [
+          "h1"
+        ]
+      }
+    ]
   }
 }
