@@ -3,11 +3,11 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 .industry-shell { width: 100%; max-width: 100%; height: 100svh; height: 100dvh; min-height: 100vh; margin: 0; padding: 4px; color: #fff; overflow: hidden; }
 .industry-shell * { color: #fff; box-sizing: border-box; }
 .frame { display: none; }
-.frame.frame-active { display: block; width: 100%; max-width: 100%; height: 100%; max-height: 100%; animation: fade .18s ease-out; overflow: hidden; }
+.frame.frame-active { display: block; width: 100%; max-width: 100%; height: 100%; max-height: 100%; animation: fade .14s ease-out; overflow: hidden; }
 @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
-.industry-panel { border: 1px solid #9cb7ff55; background: linear-gradient(180deg, #0a1942, #081332); border-radius: 8px; padding: 6px; box-shadow: 0 12px 28px #00000045; min-height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.industry-panel { border: 1px solid #9cb7ff55; background: linear-gradient(180deg, #0a1942, #081332); border-radius: 8px; padding: 6px; box-shadow: 0 4px 12px #0000002b; min-height: 100%; display: flex; flex-direction: column; overflow: hidden; contain: layout paint; }
 .frame.frame-active .industry-panel { height: 100%; min-height: 0; }
-.frame-content-scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 2px; }
+.frame-content-scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 2px; scrollbar-gutter: stable both-edges; touch-action: pan-y; }
 #frameMain .industry-panel { min-height: 0; height: 100%; }
 #frameMain,
 #frameMain .industry-panel,
@@ -26,7 +26,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-metric { border: 1px solid #ffffff44; border-radius: 8px; background: #0a1b42; padding: 6px; }
 .industry-metric small { opacity: .85; display: block; margin-bottom: 4px; }
 .industry-projects { display: grid; gap: 6px; margin-top: 4px; overflow: visible; padding-right: 0; }
-.industry-project { border: 1px solid #ffffff44; border-radius: 8px; padding: 6px; background: #081737; }
+.industry-project { border: 1px solid #ffffff36; border-radius: 8px; padding: 6px; background: #081737; contain: content; content-visibility: auto; contain-intrinsic-size: 120px; }
 .industry-project h3 { margin: 0 0 6px; }
 .industry-project p { margin: 0; opacity: .9; overflow-wrap: anywhere; word-break: break-word; }
 .industry-project-rich { display: grid; gap: 6px; }
@@ -109,6 +109,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 #frameFullFeed .frame-content-scroll {
   display: block;
   min-height: 0;
+  scroll-behavior: auto;
 }
 .industry-ranking-list {
   margin: 4px 0 0;
@@ -116,6 +117,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   display: grid;
   gap: 6px;
   list-style: none;
+  overflow-anchor: none;
 }
 .industry-ranking-list li {
   line-height: 1.22;

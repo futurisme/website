@@ -175,6 +175,8 @@ export function createIndustryUiController({ root, handlers }) {
   let selectedCreateMedium = null;
   let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
   let studioReturnFrame = 'fullStudios';
+  let pendingRankingSnapshot = null;
+  let rankingRenderKey = '';
 
   [
     ['#industryStats', statsEl],
@@ -215,6 +217,10 @@ export function createIndustryUiController({ root, handlers }) {
     if (!canOpenFrame(key)) return;
     Object.values(frames).forEach((frame) => frame?.classList.remove('frame-active'));
     frames[key]?.classList.add('frame-active');
+    if (key === 'fullRanking' && pendingRankingSnapshot) {
+      renderRankingBoard(pendingRankingSnapshot, { force: true });
+      pendingRankingSnapshot = null;
+    }
   }
 
   bindAction('register', () => {
@@ -551,7 +557,12 @@ export function createIndustryUiController({ root, handlers }) {
         `).join('')
         : '<p class="empty">No unread emails.</p>';
 
-      renderRankingBoard(snapshot);
+      if (frames.fullRanking?.classList.contains('frame-active')) {
+        renderRankingBoard(snapshot);
+        pendingRankingSnapshot = null;
+      } else {
+        pendingRankingSnapshot = snapshot;
+      }
       renderCommunitiesBoard(snapshot);
 
       managementEl.innerHTML = snapshot.management?.isCeo
@@ -860,7 +871,11 @@ export function createIndustryUiController({ root, handlers }) {
     `;
   }
 
-  function renderRankingBoard(snapshot) {
+  function renderRankingBoard(snapshot, options = {}) {
+    const force = Boolean(options.force);
+    const scrollBox = rankingEl?.closest('.frame-content-scroll');
+    const previousScrollTop = scrollBox ? scrollBox.scrollTop : 0;
+
     const rankingTabs = [
       { id: 'studio', label: 'Studio' },
       { id: 'anime', label: 'Anime' },
@@ -952,6 +967,13 @@ export function createIndustryUiController({ root, handlers }) {
     };
 
     const activeConfig = rankingConfigs[selectedRanking] ?? rankingConfigs.studio;
+    const activeList = activeConfig.list || [];
+    const nextRenderKey = `${selectedRanking}|${activeList.length}|${activeList
+      .slice(0, 8)
+      .map((entry) => `${entry.id ?? entry.name ?? entry.title}:${Number(entry.score) || 0}:${Number(entry.popularity) || 0}`)
+      .join('|')}`;
+    if (!force && nextRenderKey === rankingRenderKey) return;
+    rankingRenderKey = nextRenderKey;
 
     rankingEl.innerHTML = `
       <section class="industry-tab-switch" aria-label="Switch ranking">
@@ -967,6 +989,12 @@ export function createIndustryUiController({ root, handlers }) {
         </ol>
       </article>
     `;
+
+    if (scrollBox) {
+      window.requestAnimationFrame(() => {
+        scrollBox.scrollTop = previousScrollTop;
+      });
+    }
   }
 
   function renderCommunitiesBoard(snapshot) {

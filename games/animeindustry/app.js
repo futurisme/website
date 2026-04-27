@@ -14,6 +14,10 @@ if (!appRoot) {
   report('bootstrap-error', { message: 'animeIndustryApp root not found at boot' });
 } else {
   const runtime = createAnimeIndustryRuntime();
+  let renderRafId = 0;
+  let pendingSnapshot = null;
+  let persistTimer = null;
+
   const persistAutoSave = () => {
     try {
       const payload = runtime.exportCompactSave();
@@ -22,9 +26,27 @@ if (!appRoot) {
       // no-op: avoid breaking gameplay due to storage/browser constraints
     }
   };
-  const renderAndPersist = () => {
-    ui.render(runtime.snapshot());
-    persistAutoSave();
+
+  const queuePersist = () => {
+    if (persistTimer) return;
+    persistTimer = window.setTimeout(() => {
+      persistTimer = null;
+      persistAutoSave();
+    }, 420);
+  };
+
+  const flushRender = () => {
+    renderRafId = 0;
+    const snapshot = pendingSnapshot || runtime.snapshot();
+    pendingSnapshot = null;
+    ui.render(snapshot);
+    queuePersist();
+  };
+
+  const renderAndPersist = (snapshot = null) => {
+    pendingSnapshot = snapshot || runtime.snapshot();
+    if (renderRafId) return;
+    renderRafId = window.requestAnimationFrame(flushRender);
   };
 
   const ui = createIndustryUiController({
@@ -40,8 +62,7 @@ if (!appRoot) {
       onCreateProject: (draft) => { const ok = runtime.createProjectFromDraft(draft); renderAndPersist(); return ok; },
       onAutoToggle: () => {
         const active = runtime.toggleAuto((snapshot) => {
-          ui.render(snapshot);
-          persistAutoSave();
+          renderAndPersist(snapshot);
         });
         ui.setAutoState(active);
       },
