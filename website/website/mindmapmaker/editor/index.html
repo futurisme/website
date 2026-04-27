@@ -28,6 +28,7 @@
     <style>
       html, body { margin: 0; min-height: 100%; background: #020617; color: #e2f8ff; }
       body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     </style>
     <link rel="preload" href="/mindmapmaker/theme.css" as="style" />
     <link rel="preload" href="/mindmapmaker/editor/editor.css" as="style" />
@@ -37,6 +38,7 @@
     <link rel="alternate icon" href="/fadhil.svg" type="image/svg+xml" />
   </head>
   <body>
+    <h1 class="sr-only">Mindmapmaker Workspace</h1>
     <main class="editor-shell" data-fwlb-theme="game" data-slot="theme-scope">
       <section class="workspace panel">
         <div class="help" id="status">Pan canvas: drag empty area. Select node: tap/click. Drag node: drag selected node.</div>

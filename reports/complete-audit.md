@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-04-27T11:11:00Z
+Generated: 2026-04-27T11:18:21Z
 
 ## Executive Summary
 
@@ -19,8 +19,8 @@ Generated: 2026-04-27T11:11:00Z
 - Duplicate file groups (all): 82
 - Potential unused static files: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 45
-- Avg response time (ms): 119.2
-- P95 response time (ms): 169.1
+- Avg response time (ms): 231.1
+- P95 response time (ms): 308.0
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -30,29 +30,29 @@ Generated: 2026-04-27T11:11:00Z
 - Local robots/sitemap ready: yes
 - Local sitemap coverage gap: 0
 - Local HTML files audited: 14
-- Local HTML missing robots meta: 1
-- Local HTML missing OG title: 9
-- Local HTML missing twitter:card: 9
+- Local HTML missing robots meta: 0
+- Local HTML missing OG title: 0
+- Local HTML missing twitter:card: 0
 
 ## Domain Route Audit
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 169.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/animeindustry` | 200 | — | 240.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 156.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | 164.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 167.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/animeindustry` | 200 | — | 120.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/dreambusiness` | 200 | — | 92.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/games/rpg` | 200 | — | 52.9 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 48.3 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 56.6 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 92.3 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/portfolio` | 200 | — | 79.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 136.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 112.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 99.4 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 290.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/animeindustry` | 200 | — | 322.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 271.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | 256.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 258.5 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/animeindustry` | 200 | — | 308.0 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/dreambusiness` | 200 | — | 210.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/games/rpg` | 200 | — | 181.7 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 210.6 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 227.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 295.6 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/portfolio` | 200 | — | 167.1 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 105.1 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 208.2 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 153.8 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ## Security Header Coverage (HTTP 200 pages)
 
@@ -72,8 +72,8 @@ Generated: 2026-04-27T11:11:00Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 44.4 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 104.2 | `url-count=13` |
+| `/robots.txt` | 200 | 161.6 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 123.8 | `url-count=13` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -89,7 +89,7 @@ Generated: 2026-04-27T11:11:00Z
 ### Group 1 — files: 2, bytes: 519876
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `assets/public/images/shareideas-2.webp` | 4 | 4 | ✅ | ❌ |
+| `assets/public/images/shareideas-2.webp` | 5 | 5 | ✅ | ❌ |
 | `assets/public/images/shareideas.webp` | 2 | 2 | ✅ | ❌ |
 
 ### Group 2 — files: 4, bytes: 238528
@@ -211,8 +211,8 @@ Generated: 2026-04-27T11:11:00Z
 ### Group 21 — files: 2, bytes: 7036
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `node_modules/.pnpm/lock.yaml` | 4 | 8 | ❌ | ❌ |
-| `pnpm-lock.yaml` | 4 | 4 | ❌ | ❌ |
+| `node_modules/.pnpm/lock.yaml` | 2 | 4 | ❌ | ❌ |
+| `pnpm-lock.yaml` | 2 | 2 | ❌ | ❌ |
 
 ### Group 22 — files: 2, bytes: 6900
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -256,41 +256,27 @@ Generated: 2026-04-27T11:11:00Z
 - HTML files audited: 14
 - Missing `<title>`: 0
 - Missing meta description: 0
-- Missing canonical: 1
-- Missing robots: 1
-- Missing Open Graph title: 9
-- Missing Open Graph description: 9
-- Missing Twitter card: 9
-- Missing JSON-LD: 9
+- Missing canonical: 0
+- Missing robots: 0
+- Missing Open Graph title: 0
+- Missing Open Graph description: 0
+- Missing Twitter card: 0
+- Missing JSON-LD: 0
 - Missing HTML lang: 0
-- Missing H1: 2
+- Missing H1: 0
 
 | Missing check | Count |
 |---|---:|
 | `title` | 0 |
 | `meta_description` | 0 |
-| `canonical` | 1 |
-| `robots` | 1 |
-| `og_title` | 9 |
-| `og_description` | 9 |
-| `twitter_card` | 9 |
-| `json_ld` | 9 |
+| `canonical` | 0 |
+| `robots` | 0 |
+| `og_title` | 0 |
+| `og_description` | 0 |
+| `twitter_card` | 0 |
+| `json_ld` | 0 |
 | `html_lang` | 0 |
-| `h1` | 2 |
-
-| File | Gap Count | Missing checks |
-|---|---:|---|
-| `website/home/404.html` | 5 | `canonical, og_title, og_description, twitter_card, json_ld` |
-| `website/website/books/editor/index.html` | 5 | `robots, og_title, og_description, twitter_card, json_ld` |
-| `games/animeindustry/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `games/dreambusiness/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `games/rpg/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `website/home/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `website/shareideas/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `website/shareideas/workspace.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `website/website/books/index.html` | 4 | `og_title, og_description, twitter_card, json_ld` |
-| `website/portfolio/index.html` | 1 | `h1` |
-| `website/website/mindmapmaker/editor/index.html` | 1 | `h1` |
+| `h1` | 0 |
 
 ### Notes
 

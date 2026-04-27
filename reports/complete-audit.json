@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-04-27T11:11:00Z",
+    "generated_at": "2026-04-27T11:18:21Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 82,
-    "elapsed_seconds": 1.56
+    "elapsed_seconds": 2.11
   },
   "domain": {
     "summary": {
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 12,
       "missing_json_ld_count": 15,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 119.2,
-      "p95_response_time_ms": 169.1,
-      "max_response_time_ms": 240.2,
+      "avg_response_time_ms": 231.1,
+      "p95_response_time_ms": 308.0,
+      "max_response_time_ms": 322.2,
       "missing_security_headers_count": 45,
       "missing_security_header_details": {
         "content-security-policy": 15,
@@ -36,7 +36,7 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 169.1,
+        "time_ms": 290.1,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -74,7 +74,7 @@
         "path": "/animeindustry",
         "url": "https://fadhil.dev/animeindustry",
         "status": 200,
-        "time_ms": 240.2,
+        "time_ms": 322.2,
         "final_url": "https://fadhil.dev/animeindustry",
         "final_path": "/animeindustry",
         "is_https_final": true,
@@ -112,7 +112,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 156.4,
+        "time_ms": 271.1,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -150,7 +150,7 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 164.7,
+        "time_ms": 256.6,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -188,7 +188,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 167.7,
+        "time_ms": 258.5,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -226,7 +226,7 @@
         "path": "/games/animeindustry",
         "url": "https://fadhil.dev/games/animeindustry",
         "status": 200,
-        "time_ms": 120.7,
+        "time_ms": 308.0,
         "final_url": "https://fadhil.dev/games/animeindustry",
         "final_path": "/games/animeindustry",
         "is_https_final": true,
@@ -264,7 +264,7 @@
         "path": "/games/dreambusiness",
         "url": "https://fadhil.dev/games/dreambusiness",
         "status": 200,
-        "time_ms": 92.6,
+        "time_ms": 210.1,
         "final_url": "https://fadhil.dev/games/dreambusiness",
         "final_path": "/games/dreambusiness",
         "is_https_final": true,
@@ -302,7 +302,7 @@
         "path": "/games/rpg",
         "url": "https://fadhil.dev/games/rpg",
         "status": 200,
-        "time_ms": 52.9,
+        "time_ms": 181.7,
         "final_url": "https://fadhil.dev/games/rpg",
         "final_path": "/games/rpg",
         "is_https_final": true,
@@ -340,7 +340,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 48.3,
+        "time_ms": 210.6,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -378,7 +378,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 56.6,
+        "time_ms": 227.3,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -416,7 +416,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 92.3,
+        "time_ms": 295.6,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -454,7 +454,7 @@
         "path": "/portfolio",
         "url": "https://fadhil.dev/portfolio",
         "status": 200,
-        "time_ms": 79.1,
+        "time_ms": 167.1,
         "final_url": "https://fadhil.dev/portfolio",
         "final_path": "/portfolio",
         "is_https_final": true,
@@ -492,7 +492,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 136.0,
+        "time_ms": 105.1,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -530,7 +530,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 112.0,
+        "time_ms": 208.2,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -568,7 +568,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 99.4,
+        "time_ms": 153.8,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -613,8 +613,8 @@
         {
           "path": "assets/public/images/shareideas-2.webp",
           "size_bytes": 259938,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 4,
+          "reference_count_exact_path": 5,
+          "reference_count_basename": 5,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -1089,16 +1089,16 @@
         {
           "path": "node_modules/.pnpm/lock.yaml",
           "size_bytes": 3518,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 8,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "pnpm-lock.yaml",
           "size_bytes": 3518,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 4,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 2,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -1224,13 +1224,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 44.4,
+      "time_ms": 161.6,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 104.2,
+      "time_ms": 123.8,
       "url_count": 13
     },
     "sitemap_urls": [
@@ -1272,134 +1272,27 @@
       "html_files_audited": 14,
       "missing_title_count": 0,
       "missing_description_count": 0,
-      "missing_canonical_count": 1,
-      "missing_robots_count": 1,
-      "missing_og_title_count": 9,
-      "missing_og_description_count": 9,
-      "missing_twitter_card_count": 9,
-      "missing_json_ld_count": 9,
+      "missing_canonical_count": 0,
+      "missing_robots_count": 0,
+      "missing_og_title_count": 0,
+      "missing_og_description_count": 0,
+      "missing_twitter_card_count": 0,
+      "missing_json_ld_count": 0,
       "missing_html_lang_count": 0,
-      "missing_h1_count": 2,
+      "missing_h1_count": 0,
       "missing_by_check": {
         "title": 0,
         "meta_description": 0,
-        "canonical": 1,
-        "robots": 1,
-        "og_title": 9,
-        "og_description": 9,
-        "twitter_card": 9,
-        "json_ld": 9,
+        "canonical": 0,
+        "robots": 0,
+        "og_title": 0,
+        "og_description": 0,
+        "twitter_card": 0,
+        "json_ld": 0,
         "html_lang": 0,
-        "h1": 2
+        "h1": 0
       }
     },
-    "top_files_with_most_gaps": [
-      {
-        "path": "website/home/404.html",
-        "gap_count": 5,
-        "missing_checks": [
-          "canonical",
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/website/books/editor/index.html",
-        "gap_count": 5,
-        "missing_checks": [
-          "robots",
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "games/animeindustry/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "games/dreambusiness/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "games/rpg/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/home/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/shareideas/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/shareideas/workspace.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/website/books/index.html",
-        "gap_count": 4,
-        "missing_checks": [
-          "og_title",
-          "og_description",
-          "twitter_card",
-          "json_ld"
-        ]
-      },
-      {
-        "path": "website/portfolio/index.html",
-        "gap_count": 1,
-        "missing_checks": [
-          "h1"
-        ]
-      },
-      {
-        "path": "website/website/mindmapmaker/editor/index.html",
-        "gap_count": 1,
-        "missing_checks": [
-          "h1"
-        ]
-      }
-    ]
+    "top_files_with_most_gaps": []
   }
 }
