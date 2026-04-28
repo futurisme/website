@@ -1170,7 +1170,7 @@ export function createIndustryUiController({ root, handlers }) {
       if (entryType === 'manga') {
         li.removeAttribute('data-studio-id');
         setText(li, 'name', entry.title);
-        setText(li, 'tag1', `Vol ${Math.max(0, Math.floor(entry.volume ?? 0))}`);
+        setText(li, 'tag1', entry.series || `Vol ${Math.max(0, Math.floor(entry.volume ?? 0))}`);
         setText(li, 'tag2', entry.format || 'Manga/Novel');
         setText(li, 'score', `${(Number(entry.score) || 0).toFixed(1)} pts`);
         setText(li, 'meta1', `Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%`);
