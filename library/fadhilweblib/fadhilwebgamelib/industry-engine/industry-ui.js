@@ -175,13 +175,17 @@ export function createIndustryUiController({ root, handlers }) {
   let selectedCreateMedium = null;
   let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
   let studioReturnFrame = 'fullStudios';
-  let pendingRankingSnapshot = null;
   let rankingRenderKey = '';
-  let pendingCommunitiesSnapshot = null;
   let communitiesRenderKey = '';
   let lastUserScrollAt = 0;
   let scrollIdleTimer = null;
   let deferredSnapshot = null;
+  let rankingSmoothRaf = 0;
+  let rankingSmoothCurrent = 0;
+  let rankingSmoothTarget = 0;
+  let rankingDragActive = false;
+  let rankingDragStartY = 0;
+  let rankingDragStartTop = 0;
   let api = null;
 
   [
@@ -209,22 +213,146 @@ export function createIndustryUiController({ root, handlers }) {
           api.render(snapshotToRender, { bypassScrollGuard: true });
           return;
         }
-        const activeRanking = frames.fullRanking?.classList.contains('frame-active');
-        const activeCommunities = frames.fullCommunities?.classList.contains('frame-active');
-        if (activeRanking && pendingRankingSnapshot) {
-          renderRankingBoard(pendingRankingSnapshot, { force: true });
-          pendingRankingSnapshot = null;
-        }
-        if (activeCommunities && pendingCommunitiesSnapshot) {
-          renderCommunitiesBoard(pendingCommunitiesSnapshot, { force: true });
-          pendingCommunitiesSnapshot = null;
-        }
       }, 160);
     }, { passive: true });
   });
+  setupRankingDesktopInternalScroll();
 
   function isUserActivelyScrolling() {
     return performance.now() - lastUserScrollAt < 180;
+  }
+
+  function isDesktopInternalScrollMode() {
+    return window.matchMedia?.('(pointer:fine)')?.matches && (window.innerWidth || 0) >= 1024;
+  }
+
+  function getRankingScrollbarElements() {
+    const scrollHost = frames.fullRanking?.querySelector('.frame-content-scroll');
+    const track = scrollHost?.querySelector('.industry-ranking-scrollbar');
+    const thumb = track?.querySelector('.industry-ranking-scrollbar-thumb');
+    return { scrollHost, track, thumb };
+  }
+
+  function updateRankingScrollbar() {
+    const { track, thumb } = getRankingScrollbarElements();
+    if (!rankingEl || !track || !thumb) return;
+    const enabled = isDesktopInternalScrollMode();
+    track.setAttribute('data-enabled', enabled ? 'true' : 'false');
+    if (!enabled) return;
+
+    const maxScroll = Math.max(0, rankingEl.scrollHeight - rankingEl.clientHeight);
+    if (maxScroll <= 0) {
+      track.setAttribute('data-hidden', 'true');
+      thumb.style.height = '0px';
+      thumb.style.transform = 'translateY(0)';
+      return;
+    }
+    track.removeAttribute('data-hidden');
+    const thumbHeight = Math.max(36, Math.round((rankingEl.clientHeight / rankingEl.scrollHeight) * rankingEl.clientHeight));
+    const travel = Math.max(0, rankingEl.clientHeight - thumbHeight);
+    const ratio = maxScroll > 0 ? rankingEl.scrollTop / maxScroll : 0;
+    thumb.style.height = `${thumbHeight}px`;
+    thumb.style.transform = `translateY(${Math.round(ratio * travel)}px)`;
+  }
+
+  function clampRankingTarget(value) {
+    if (!rankingEl) return 0;
+    const maxScroll = Math.max(0, rankingEl.scrollHeight - rankingEl.clientHeight);
+    return Math.min(maxScroll, Math.max(0, value));
+  }
+
+  function flushRankingSmoothScroll() {
+    rankingSmoothRaf = 0;
+    if (!rankingEl) return;
+    const delta = rankingSmoothTarget - rankingSmoothCurrent;
+    const easing = Math.abs(delta) > 120 ? 0.42 : 0.32;
+    rankingSmoothCurrent += delta * easing;
+    if (Math.abs(rankingSmoothTarget - rankingSmoothCurrent) < 0.2) {
+      rankingSmoothCurrent = rankingSmoothTarget;
+    }
+    rankingEl.scrollTop = rankingSmoothCurrent;
+    updateRankingScrollbar();
+    if (Math.abs(rankingSmoothTarget - rankingSmoothCurrent) >= 0.2) {
+      rankingSmoothRaf = window.requestAnimationFrame(flushRankingSmoothScroll);
+    }
+  }
+
+  function queueRankingSmoothScroll(nextTarget) {
+    rankingSmoothTarget = clampRankingTarget(nextTarget);
+    if (!rankingSmoothRaf) rankingSmoothRaf = window.requestAnimationFrame(flushRankingSmoothScroll);
+  }
+
+  function setupRankingDesktopInternalScroll() {
+    const { scrollHost } = getRankingScrollbarElements();
+    if (!scrollHost || !rankingEl || scrollHost.querySelector('.industry-ranking-scrollbar')) return;
+
+    const track = document.createElement('div');
+    track.className = 'industry-ranking-scrollbar';
+    const thumb = document.createElement('div');
+    thumb.className = 'industry-ranking-scrollbar-thumb';
+    track.appendChild(thumb);
+    scrollHost.appendChild(track);
+
+    rankingEl.addEventListener('scroll', () => {
+      lastUserScrollAt = performance.now();
+      rankingSmoothCurrent = rankingEl.scrollTop;
+      rankingSmoothTarget = rankingEl.scrollTop;
+      updateRankingScrollbar();
+    }, { passive: true });
+
+    rankingEl.addEventListener('wheel', (event) => {
+      if (!isDesktopInternalScrollMode()) return;
+      event.preventDefault();
+      lastUserScrollAt = performance.now();
+      const deltaScale = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 16 : 1;
+      const delta = event.deltaY * deltaScale;
+      queueRankingSmoothScroll(rankingSmoothTarget + delta);
+    }, { passive: false });
+
+    thumb.addEventListener('pointerdown', (event) => {
+      if (!isDesktopInternalScrollMode()) return;
+      rankingDragActive = true;
+      rankingDragStartY = event.clientY;
+      rankingDragStartTop = rankingEl.scrollTop;
+      thumb.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    thumb.addEventListener('pointermove', (event) => {
+      if (!rankingDragActive || !isDesktopInternalScrollMode()) return;
+      const thumbHeight = thumb.getBoundingClientRect().height || 1;
+      const travel = Math.max(1, rankingEl.clientHeight - thumbHeight);
+      const maxScroll = Math.max(1, rankingEl.scrollHeight - rankingEl.clientHeight);
+      const deltaRatio = (event.clientY - rankingDragStartY) / travel;
+      const nextTop = rankingDragStartTop + deltaRatio * maxScroll;
+      rankingEl.scrollTop = clampRankingTarget(nextTop);
+      lastUserScrollAt = performance.now();
+      rankingSmoothCurrent = rankingEl.scrollTop;
+      rankingSmoothTarget = rankingEl.scrollTop;
+      updateRankingScrollbar();
+    });
+    thumb.addEventListener('pointerup', (event) => {
+      rankingDragActive = false;
+      thumb.releasePointerCapture(event.pointerId);
+    });
+    thumb.addEventListener('pointercancel', (event) => {
+      rankingDragActive = false;
+      thumb.releasePointerCapture(event.pointerId);
+    });
+
+    track.addEventListener('pointerdown', (event) => {
+      if (!isDesktopInternalScrollMode() || event.target === thumb) return;
+      const rect = track.getBoundingClientRect();
+      const ratio = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(1, rect.height)));
+      const maxScroll = Math.max(0, rankingEl.scrollHeight - rankingEl.clientHeight);
+      rankingEl.scrollTop = maxScroll * ratio;
+      lastUserScrollAt = performance.now();
+      rankingSmoothCurrent = rankingEl.scrollTop;
+      rankingSmoothTarget = rankingEl.scrollTop;
+      updateRankingScrollbar();
+    });
+
+    window.addEventListener('resize', updateRankingScrollbar, { passive: true });
+    updateRankingScrollbar();
   }
 
   function showPopup(message, tone = 'error') {
@@ -251,14 +379,6 @@ export function createIndustryUiController({ root, handlers }) {
     if (!canOpenFrame(key)) return;
     Object.values(frames).forEach((frame) => frame?.classList.remove('frame-active'));
     frames[key]?.classList.add('frame-active');
-    if (key === 'fullRanking' && pendingRankingSnapshot) {
-      renderRankingBoard(pendingRankingSnapshot, { force: true });
-      pendingRankingSnapshot = null;
-    }
-    if (key === 'fullCommunities' && pendingCommunitiesSnapshot) {
-      renderCommunitiesBoard(pendingCommunitiesSnapshot, { force: true });
-      pendingCommunitiesSnapshot = null;
-    }
   }
 
   bindAction('register', () => {
@@ -602,18 +722,8 @@ export function createIndustryUiController({ root, handlers }) {
         `).join('')
         : '<p class="empty">No unread emails.</p>';
 
-      if (frames.fullRanking?.classList.contains('frame-active') && !isUserActivelyScrolling()) {
-        renderRankingBoard(snapshot);
-        pendingRankingSnapshot = null;
-      } else {
-        pendingRankingSnapshot = snapshot;
-      }
-      if (frames.fullCommunities?.classList.contains('frame-active') && !isUserActivelyScrolling()) {
-        renderCommunitiesBoard(snapshot);
-        pendingCommunitiesSnapshot = null;
-      } else {
-        pendingCommunitiesSnapshot = snapshot;
-      }
+      renderRankingBoard(snapshot);
+      renderCommunitiesBoard(snapshot);
 
       managementEl.innerHTML = snapshot.management?.isCeo
         ? `
@@ -923,8 +1033,54 @@ export function createIndustryUiController({ root, handlers }) {
     `;
   }
 
+
+  function preserveScrollContainer(scrollNode, renderTask) {
+    const previousScrollTop = scrollNode?.scrollTop ?? 0;
+    const previousMaxTop = scrollNode
+      ? Math.max(0, scrollNode.scrollHeight - scrollNode.clientHeight)
+      : 0;
+    const previousBottomGap = scrollNode ? Math.max(0, previousMaxTop - previousScrollTop) : 0;
+    let rankingAnchorKey = null;
+    let rankingAnchorOffset = 0;
+    if (scrollNode === rankingEl) {
+      const containerTop = rankingEl.getBoundingClientRect().top;
+      const anchor = Array.from(rankingEl.querySelectorAll('.industry-ranking-list > li[data-rank-key]'))
+        .find((item) => item.getBoundingClientRect().bottom > containerTop + 6);
+      if (anchor) {
+        rankingAnchorKey = anchor.getAttribute('data-rank-key');
+        rankingAnchorOffset = anchor.getBoundingClientRect().top - containerTop;
+      }
+    }
+
+    renderTask();
+
+    if (!scrollNode) return;
+    let anchorRestored = false;
+    if (scrollNode === rankingEl && rankingAnchorKey) {
+      const anchor = Array.from(rankingEl.querySelectorAll('.industry-ranking-list > li[data-rank-key]'))
+        .find((item) => item.getAttribute('data-rank-key') === rankingAnchorKey);
+      if (anchor) {
+        const containerTop = rankingEl.getBoundingClientRect().top;
+        const delta = anchor.getBoundingClientRect().top - containerTop - rankingAnchorOffset;
+        rankingEl.scrollTop += delta;
+        anchorRestored = true;
+      }
+    }
+    if (anchorRestored) return;
+    const nextMaxTop = Math.max(0, scrollNode.scrollHeight - scrollNode.clientHeight);
+    const wasNearBottom = previousBottomGap <= 24;
+    const targetTop = wasNearBottom
+      ? Math.max(0, nextMaxTop - previousBottomGap)
+      : Math.min(previousScrollTop, nextMaxTop);
+    scrollNode.scrollTop = targetTop;
+  }
+
   function renderRankingBoard(snapshot, options = {}) {
     const force = Boolean(options.force);
+    const rankEntryKey = (entry, index) => {
+      const primary = entry?.id ?? entry?.name ?? entry?.title ?? `slot-${index + 1}`;
+      return String(primary);
+    };
 
     const rankingTabs = [
       { id: 'studio', label: 'Studio' },
@@ -942,103 +1098,164 @@ export function createIndustryUiController({ root, handlers }) {
         title: 'Ranking Manga/Novel',
         empty: 'No data yet.',
         list: snapshot.rankings.manga ?? [],
-        renderLine: (entry, rank) => `
-          <div class="industry-ranking-row industry-ranking-row-double">
-            <div class="industry-ranking-line">
-              <span class="industry-ranking-rank">#${rank}</span>
-              <span class="industry-ranking-name">${esc(entry.title)}</span>
-              <span class="industry-ranking-tag">Vol ${Math.max(0, Math.floor(entry.volume ?? 0))}</span>
-              <span class="industry-ranking-tag">${esc(entry.format || 'Manga/Novel')}</span>
-            </div>
-            <div class="industry-ranking-line industry-ranking-line-sub">
-              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
-              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
-              <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
-            </div>
-          </div>
-        `,
       },
       anime: {
         title: 'Ranking Anime',
         empty: 'No releases yet.',
         list: snapshot.rankings.anime ?? [],
-        renderLine: (entry, rank) => `
-          <div class="industry-ranking-row industry-ranking-row-double">
-            <div class="industry-ranking-line">
-              <span class="industry-ranking-rank">#${rank}</span>
-              <span class="industry-ranking-name">${esc(entry.title)}</span>
-              <span class="industry-ranking-tag">${esc(entry.series || 'Series 1')}</span>
-              <span class="industry-ranking-tag">${esc(entry.format || 'Anime')}</span>
-            </div>
-            <div class="industry-ranking-line industry-ranking-line-sub">
-              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
-              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
-              <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
-            </div>
-          </div>
-        `,
       },
       studio: {
         title: 'Ranking Studio',
         empty: 'No studio data yet.',
         list: snapshot.rankings.studio ?? [],
-        renderLine: (entry, rank) => `
-          <div class="industry-ranking-row industry-ranking-row-double" data-studio-id="${esc(entry.id)}">
-            <div class="industry-ranking-line">
-              <span class="industry-ranking-rank">#${rank}</span>
-              <span class="industry-ranking-name">${esc(entry.name)}</span>
-              <span class="industry-ranking-tag">Studio</span>
-              <span class="industry-ranking-tag">Rating ${(Number(entry.rating) || 0).toFixed(1)}</span>
-              <span class="industry-ranking-tag">Tier ${esc(entry.tier || '-')}</span>
-            </div>
-            <div class="industry-ranking-line industry-ranking-line-sub">
-              <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} val</strong>
-              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
-              <span class="industry-ranking-meta">Total Anime ${Math.max(0, Math.floor(entry.totalAnime ?? 0))}</span>
-            </div>
-          </div>
-        `,
       },
       individual: {
         title: 'Individual Wealth Ranking',
         empty: 'No individual data yet.',
         list: snapshot.rankings.individual ?? [],
-        renderLine: (entry, rank) => `
-          <div class="industry-ranking-row">
-            <div class="industry-ranking-line">
-              <span class="industry-ranking-rank">#${rank}</span>
-              <span class="industry-ranking-name">${esc(entry.name)}</span>
-              <span class="industry-ranking-tag">${esc(getNpcRoleLabel(entry.role))}</span>
-              <strong class="industry-ranking-score">${formatCompactValuation(entry.score)}</strong>
-            </div>
-          </div>
-        `,
       },
     };
 
     const activeConfig = rankingConfigs[selectedRanking] ?? rankingConfigs.studio;
     const activeList = activeConfig.list || [];
     const nextRenderKey = `${selectedRanking}|${activeList.length}|${activeList
-      .slice(0, 8)
+      .slice(0, 10)
       .map((entry) => `${entry.id ?? entry.name ?? entry.title}:${Number(entry.score) || 0}:${Number(entry.popularity) || 0}`)
       .join('|')}`;
     if (!force && nextRenderKey === rankingRenderKey) return;
     rankingRenderKey = nextRenderKey;
 
-    rankingEl.innerHTML = `
-      <section class="industry-tab-switch" aria-label="Switch ranking">
-        ${rankingTabs.map((tab) => `
-          <button type="button" data-ranking-switch="${tab.id}" ${selectedRanking === tab.id ? 'data-active="true"' : ''}>${tab.label}</button>
-        `).join('')}
-      </section>
-      <article class="industry-project">
-        <h3>${activeConfig.title}</h3>
-        <ol class="industry-ranking-list">${activeConfig.list.length
-          ? activeConfig.list.map((entry, index) => `<li>${activeConfig.renderLine(entry, index + 1)}</li>`).join('')
-          : `<li class="industry-ranking-empty">${activeConfig.empty}</li>`}
-        </ol>
-      </article>
-    `;
+    const setText = (rootNode, field, value) => {
+      const node = rootNode.querySelector(`[data-rank-field="${field}"]`);
+      const text = String(value);
+      if (node && node.textContent !== text) node.textContent = text;
+    };
+
+    const ensureCardShell = (entryType, key) => {
+      const li = document.createElement('li');
+      li.setAttribute('data-rank-key', key);
+      if (entryType === 'individual') {
+        li.innerHTML = `
+          <div class="industry-ranking-row">
+            <div class="industry-ranking-line">
+              <span class="industry-ranking-rank" data-rank-field="rank"></span>
+              <span class="industry-ranking-name" data-rank-field="name"></span>
+              <span class="industry-ranking-tag" data-rank-field="tag"></span>
+              <strong class="industry-ranking-score" data-rank-field="score"></strong>
+            </div>
+          </div>
+        `;
+        return li;
+      }
+      li.innerHTML = `
+        <div class="industry-ranking-row industry-ranking-row-double">
+          <div class="industry-ranking-line" data-rank-row="top">
+            <span class="industry-ranking-rank" data-rank-field="rank"></span>
+            <span class="industry-ranking-name" data-rank-field="name"></span>
+            <span class="industry-ranking-tag" data-rank-field="tag1"></span>
+            <span class="industry-ranking-tag" data-rank-field="tag2"></span>
+          </div>
+          <div class="industry-ranking-line industry-ranking-line-sub">
+            <strong class="industry-ranking-score" data-rank-field="score"></strong>
+            <span class="industry-ranking-meta" data-rank-field="meta1"></span>
+            <span class="industry-ranking-meta" data-rank-field="meta2"></span>
+          </div>
+        </div>
+      `;
+      return li;
+    };
+
+    const patchCard = (li, entryType, entry, rank) => {
+      setText(li, 'rank', `#${rank}`);
+      if (entryType === 'manga') {
+        li.removeAttribute('data-studio-id');
+        setText(li, 'name', entry.title);
+        setText(li, 'tag1', `Vol ${Math.max(0, Math.floor(entry.volume ?? 0))}`);
+        setText(li, 'tag2', entry.format || 'Manga/Novel');
+        setText(li, 'score', `${(Number(entry.score) || 0).toFixed(1)} pts`);
+        setText(li, 'meta1', `Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%`);
+        setText(li, 'meta2', `IMDb ${(Number(entry.imdb) || 0).toFixed(1)}`);
+        return;
+      }
+      if (entryType === 'anime') {
+        li.removeAttribute('data-studio-id');
+        setText(li, 'name', entry.title);
+        setText(li, 'tag1', entry.series || 'Series 1');
+        setText(li, 'tag2', entry.format || 'Anime');
+        setText(li, 'score', `${(Number(entry.score) || 0).toFixed(1)} pts`);
+        setText(li, 'meta1', `Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%`);
+        setText(li, 'meta2', `IMDb ${(Number(entry.imdb) || 0).toFixed(1)}`);
+        return;
+      }
+      if (entryType === 'studio') {
+        if (entry.id) li.setAttribute('data-studio-id', entry.id);
+        else li.removeAttribute('data-studio-id');
+        setText(li, 'name', entry.name);
+        setText(li, 'tag1', 'Studio');
+        setText(li, 'tag2', `Rating ${(Number(entry.rating) || 0).toFixed(1)}`);
+        setText(li, 'score', `${(Number(entry.score) || 0).toFixed(1)} val`);
+        setText(li, 'meta1', `Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%`);
+        setText(li, 'meta2', `Total Anime ${Math.max(0, Math.floor(entry.totalAnime ?? 0))}`);
+        return;
+      }
+      li.removeAttribute('data-studio-id');
+      setText(li, 'name', entry.name);
+      setText(li, 'tag', getNpcRoleLabel(entry.role));
+      setText(li, 'score', formatCompactValuation(entry.score));
+    };
+
+    preserveScrollContainer(rankingEl, () => {
+      if (rankingEl.getAttribute('data-ranking-layout') !== selectedRanking) {
+        rankingEl.setAttribute('data-ranking-layout', selectedRanking);
+        rankingEl.innerHTML = `
+          <section class="industry-tab-switch" aria-label="Switch ranking">
+            ${rankingTabs.map((tab) => `
+              <button type="button" data-ranking-switch="${tab.id}" ${selectedRanking === tab.id ? 'data-active="true"' : ''}>${tab.label}</button>
+            `).join('')}
+          </section>
+          <article class="industry-project">
+            <h3 data-rank-title></h3>
+            <ol class="industry-ranking-list"></ol>
+          </article>
+        `;
+      }
+
+      rankingEl.querySelectorAll('[data-ranking-switch]').forEach((button) => {
+        if (!(button instanceof HTMLElement)) return;
+        button.toggleAttribute('data-active', button.getAttribute('data-ranking-switch') === selectedRanking);
+      });
+      const titleNode = rankingEl.querySelector('[data-rank-title]');
+      if (titleNode) titleNode.textContent = activeConfig.title;
+
+      const listNode = rankingEl.querySelector('.industry-ranking-list');
+      if (!listNode) return;
+
+      if (!activeList.length) {
+        listNode.innerHTML = `<li class="industry-ranking-empty">${activeConfig.empty}</li>`;
+        return;
+      }
+
+      const existingByKey = new Map();
+      listNode.querySelectorAll(':scope > li[data-rank-key]').forEach((item) => {
+        const key = item.getAttribute('data-rank-key');
+        if (key) existingByKey.set(key, item);
+      });
+
+      const fragment = document.createDocumentFragment();
+      activeList.forEach((entry, index) => {
+        const key = rankEntryKey(entry, index);
+        const card = existingByKey.get(key) || ensureCardShell(selectedRanking, key);
+        if (card.getAttribute('data-rank-key') !== key) card.setAttribute('data-rank-key', key);
+        patchCard(card, selectedRanking, entry, index + 1);
+        fragment.appendChild(card);
+      });
+
+      listNode.replaceChildren(fragment);
+    });
+
+    rankingSmoothCurrent = rankingEl.scrollTop;
+    rankingSmoothTarget = rankingEl.scrollTop;
+    updateRankingScrollbar();
 
   }
 
@@ -1091,7 +1308,8 @@ export function createIndustryUiController({ root, handlers }) {
     const agePalette = ['#60a5fa', '#22d3ee', '#4ade80', '#f97316', '#f472b6'];
     const mediumPalette = ['#818cf8', '#2dd4bf', '#f59e0b', '#ef4444'];
 
-    communitiesEl.innerHTML = `
+    preserveScrollContainer(frames.fullCommunities?.querySelector?.('.frame-content-scroll'), () => {
+      communitiesEl.innerHTML = `
       <article class="industry-project">
         <h3>Global Fanbase Regions</h3>
         <div class="industry-community-chart">${renderPie(regions, regionPalette)}</div>
@@ -1114,5 +1332,6 @@ export function createIndustryUiController({ root, handlers }) {
           : '<p>No strong genre wave detected yet.</p>')}
       </article>
     `;
+    });
   }
 }
