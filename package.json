@@ -5,5 +5,10 @@
   "description": "Serverless API helpers for static website deployment",
   "dependencies": {
     "pg": "^8.16.0"
+  },
+  "scripts": {
+    "deploy:cloudflare": "wrangler deploy",
+    "deploy:vercel": "vercel --prod",
+    "build:cloudflare": "wrangler deploy --dry-run"
   }
 }

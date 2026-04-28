@@ -1,0 +1,14 @@
+name = "futurisme-website"
+main = "cloudflare/worker.mjs"
+compatibility_date = "2026-04-28"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "."
+binding = "ASSETS"
+not_found_handling = "404-page"
+
+[vars]
+# Optional: set this in Cloudflare to keep using existing Vercel serverless APIs.
+# Example: https://your-vercel-domain.vercel.app
+API_ORIGIN = ""
