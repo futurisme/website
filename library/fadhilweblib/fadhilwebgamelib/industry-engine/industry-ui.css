@@ -197,6 +197,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   gap: 6px;
   list-style: none;
   overflow-anchor: none;
+  align-content: start;
 }
 .industry-ranking-list li {
   line-height: 1.22;

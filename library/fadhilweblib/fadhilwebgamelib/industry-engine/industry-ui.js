@@ -1117,9 +1117,9 @@ export function createIndustryUiController({ root, handlers }) {
     };
 
     const activeConfig = rankingConfigs[selectedRanking] ?? rankingConfigs.studio;
-    const activeList = activeConfig.list || [];
+    const activeList = (activeConfig.list || []).slice(0, 20);
     const nextRenderKey = `${selectedRanking}|${activeList.length}|${activeList
-      .slice(0, 10)
+      .slice(0, 20)
       .map((entry) => `${entry.id ?? entry.name ?? entry.title}:${Number(entry.score) || 0}:${Number(entry.popularity) || 0}`)
       .join('|')}`;
     if (!force && nextRenderKey === rankingRenderKey) return;
