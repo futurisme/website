@@ -39,7 +39,7 @@ export default function OpenGraphImage() {
           }}
         >
           <div style={{ fontSize: 24, letterSpacing: 4, color: '#7dd3fc', marginBottom: 24 }}>RELEASE MODE</div>
-          <div style={{ fontSize: 88, fontWeight: 900, lineHeight: 1, color: '#c4fcff' }}>MindMapper</div>
+          <div style={{ fontSize: 88, fontWeight: 900, lineHeight: 1, color: '#c4fcff' }}>Mindmapmaker</div>
           <div style={{ fontSize: 82, fontWeight: 900, lineHeight: 1.05, color: '#f5b8ff', marginTop: 8 }}>Workspace</div>
           <div style={{ fontSize: 30, marginTop: 26, maxWidth: 980, color: '#e2e8f0' }}>
             Create your fate, innovate and elevate — futuristic collaborative concept mapping.

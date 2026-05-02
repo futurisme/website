@@ -8,6 +8,7 @@ const siteName = 'Mindmapmaker Workspace';
 const defaultTitle = 'Mindmapmaker Workspace | Cybernetic Concept Mapping';
 const defaultDescription =
   'Build futuristic concept maps in Mindmapmaker Workspace with real-time collaboration, fast editing, and immersive cybernetic visuals.';
+const canonicalPath = '/mindmapmaker';
 const socialImage = `${siteUrl}/mindmapmaker/social-preview-whatsapp.jpg`;
 
 export const metadata: Metadata = {
@@ -18,7 +19,20 @@ export const metadata: Metadata = {
   },
   description: defaultDescription,
   alternates: {
-    canonical: '/mindmapmaker',
+    canonical: canonicalPath,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
   applicationName: siteName,
   icons: {
@@ -29,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: `${siteUrl}/mindmapmaker`,
+    url: `${siteUrl}${canonicalPath}`,
     siteName,
     title: defaultTitle,
     description: defaultDescription,

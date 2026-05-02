@@ -4,5 +4,7 @@ Allow: /
 # Keep crawl budget focused on canonical public URLs.
 Disallow: /api/
 Disallow: /extension/
+Disallow: /website/
+Disallow: /node_modules/
 
 Sitemap: https://fadhil.dev/sitemap.xml

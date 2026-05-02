@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Mindmapmaker Workspace',
     short_name: 'Mindmapmaker',
-    description: 'Mindmapmaker visual workspace and simulation studio.',
+    description:
+      'Mindmapmaker Workspace for collaborative concept mapping, simulation, and cybernetic ideation.',
     start_url: '/mindmapmaker',
     scope: '/mindmapmaker',
     display: 'standalone',
