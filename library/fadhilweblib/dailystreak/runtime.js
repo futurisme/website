@@ -32,6 +32,7 @@ export const mountDailyStreakChecklist = ({ container, storageKey, items }) => {
       const nextState = readState(storageKey);
       nextState[item.id] = checkbox.checked;
       writeState(storageKey, nextState);
+      row.classList.toggle('is-checked', checkbox.checked);
     });
 
     const link = document.createElement('a');
@@ -41,6 +42,7 @@ export const mountDailyStreakChecklist = ({ container, storageKey, items }) => {
     link.rel = 'noreferrer noopener';
     link.textContent = item.label;
 
+    row.classList.toggle('is-checked', checkbox.checked);
     row.append(checkbox, link);
     container.append(row);
   });
