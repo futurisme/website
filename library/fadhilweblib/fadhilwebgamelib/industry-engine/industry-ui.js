@@ -138,6 +138,7 @@ export function createIndustryUiController({ root, handlers }) {
     fullManagement: root.querySelector('#frameFullManagement'),
     fullSettings: root.querySelector('#frameFullSettings'),
     fullFeed: root.querySelector('#frameFullFeed'),
+    fullCommunities: root.querySelector('#frameFullCommunities'),
     subProject: root.querySelector('#frameSubProject'),
     subProjectCreate: root.querySelector('#frameSubProjectCreate'),
     subStudio: root.querySelector('#frameSubStudio'),
@@ -151,6 +152,7 @@ export function createIndustryUiController({ root, handlers }) {
   const rankingEl = root.querySelector('#rankingBoard');
   const managementEl = root.querySelector('#managementBoard');
   const committeeBodyEl = root.querySelector('#committeeBody');
+  const communitiesEl = root.querySelector('#communitiesBoard');
   const feedEl = root.querySelector('#industryFeed');
   const releasesEl = root.querySelector('#industryReleases');
   const ceoStatusEl = root.querySelector('#ceoStatus');
@@ -231,6 +233,7 @@ export function createIndustryUiController({ root, handlers }) {
   bindAction('to-full-email', () => openFrame('fullEmail'));
   bindAction('to-full-found-studio', () => openFrame('fullFoundStudio'));
   bindAction('to-full-ranking', () => openFrame('fullRanking'));
+  bindAction('to-full-communities', () => openFrame('fullCommunities'));
   bindAction('to-full-management', () => openFrame('fullManagement'));
   bindAction('to-full-feed', () => openFrame('fullFeed'));
   document.querySelector('[data-action="to-full-settings"]')?.addEventListener('click', () => openFrame('fullSettings'));
@@ -251,7 +254,7 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="improve-admin"]')?.addEventListener('click', handlers.onImproveAdmin);
   root.querySelector('[data-action="open-studio-planning"]')?.addEventListener('click', () => {
     const ok = handlers.onOpenStudioPlanning();
-    if (!ok) showPopup('Gagal membuka perencanaan studio.', 'error');
+    if (!ok) showPopup('Failed to open studio planning.', 'error');
   });
   root.querySelector('[data-action="found-studio"]')?.addEventListener('click', () => {
     const ok = handlers.onFoundStudio(studioNameInput.value);
@@ -259,7 +262,7 @@ export function createIndustryUiController({ root, handlers }) {
       showPopup('Studio berhasil didirikan.', 'success');
       openFrame('main');
     } else {
-      showPopup('Gagal mendirikan studio.', 'error');
+      showPopup('Failed to found studio.', 'error');
     }
   });
   bindAction('committee-discuss', () => {
@@ -280,10 +283,10 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelector('[data-action="management-cofund"]')?.addEventListener('click', () => {
     const ok = handlers.onManagementCoFund();
     if (ok) {
-      showPopup('Co-funding studio baru berhasil.', 'success');
+      showPopup('New studio co-funding succeeded.', 'success');
       openFrame('main');
     } else {
-      showPopup('Gagal: co-funding belum memenuhi syarat.', 'error');
+      showPopup('Failed: co-funding requirements are not met yet.', 'error');
     }
   });
   root.querySelector('[data-action="export-save"]')?.addEventListener('click', () => {
@@ -352,7 +355,7 @@ export function createIndustryUiController({ root, handlers }) {
     }
     if (action === 'confirm-create-project') {
       if (!selectedCreateMedium) {
-        showPopup('Pilih jenis project terlebih dahulu.', 'error');
+        showPopup('Please select a project type first.', 'error');
         return true;
       }
       const projectTitle = root.querySelector('#createProjectTitleInput')?.value?.trim() || '';
@@ -492,7 +495,7 @@ export function createIndustryUiController({ root, handlers }) {
   return {
     render(snapshot) {
       currentSnapshot = snapshot;
-      if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl) {
+      if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl || !communitiesEl) {
         reportUiContractIssue('#animeIndustryApp', 'Render skipped: critical UI nodes missing');
         return;
       }
@@ -511,7 +514,7 @@ export function createIndustryUiController({ root, handlers }) {
       `;
 
       profileEl.innerHTML = `
-        <article class="industry-metric"><small>Nama</small><strong>${esc(snapshot.player.name)}</strong></article>
+        <article class="industry-metric"><small>Name</small><strong>${esc(snapshot.player.name)}</strong></article>
         <article class="industry-metric"><small>Profesi saat ini</small><strong>${esc(snapshot.player.currentProfession)}</strong></article>
         <article class="industry-metric"><small>Reputasi</small><strong>${snapshot.reputation}</strong></article>
         <article class="industry-metric"><small>Studio Aktif</small><strong>${esc(snapshot.player.studioName)}</strong></article>
@@ -534,7 +537,7 @@ export function createIndustryUiController({ root, handlers }) {
           <h3>NPC Adaptation Pipeline</h3>
           <p>${snapshot.npcProjects?.length
             ? snapshot.npcProjects.map((entry) => `${esc(entry.title)} [${esc(entry.stage)}]`).join(' · ')
-            : 'Belum ada project NPC aktif.'}</p>
+            : 'No active NPC projects yet.'}</p>
         </article>
       `;
 
@@ -543,12 +546,13 @@ export function createIndustryUiController({ root, handlers }) {
           <article class="industry-project">
             <h3>${esc(email.subject)}</h3>
             <p>${esc(email.body)}</p>
-            <button data-action="read-email" data-email-id="${esc(email.id)}">Tandai Read</button>
+            <button data-action="read-email" data-email-id="${esc(email.id)}">Mark as Read</button>
           </article>
         `).join('')
-        : '<p class="empty">Tidak ada email unread.</p>';
+        : '<p class="empty">No unread emails.</p>';
 
       renderRankingBoard(snapshot);
+      renderCommunitiesBoard(snapshot);
 
       managementEl.innerHTML = snapshot.management?.isCeo
         ? `
@@ -556,10 +560,10 @@ export function createIndustryUiController({ root, handlers }) {
             <h3>Kontrol Studio CEO</h3>
             <p>Studio: ${esc(snapshot.management.studio?.name ?? '-')}</p>
             <p>Craft/Speed/Network: ${snapshot.management.studio?.craft ?? 0}/${snapshot.management.studio?.speed ?? 0}/${snapshot.management.studio?.network ?? 0}</p>
-            <p>Gunakan proposal merger (sangat jarang lolos) atau co-funding studio baru.</p>
+            <p>Use merger proposals (rarely accepted) or co-fund a new studio.</p>
           </article>
         `
-        : '<p>Management hanya tersedia untuk pemain yang sudah menjadi CEO studio.</p>';
+        : '<p>Management is only available once the player becomes a studio CEO.</p>';
 
       const committeeProject = snapshot.projects.find((entry) => entry.id === selectedProjectId);
       if (committeeProject) {
@@ -575,15 +579,15 @@ export function createIndustryUiController({ root, handlers }) {
             <p>Alokasi (Visual/Alur/Suara/Marketing/Admin): ${(Number(alloc.visual || 0) * 100).toFixed(1)}% / ${(Number(alloc.plot || 0) * 100).toFixed(1)}% / ${(Number(alloc.audio || 0) * 100).toFixed(1)}% / ${(Number(alloc.marketing || 0) * 100).toFixed(1)}% / ${(Number(alloc.administration || 0) * 100).toFixed(1)}%</p>
             <p>Pemakaian Alokasi: V ${Math.round(Number(allocSpent.visual || 0)).toLocaleString()} · A ${Math.round(Number(allocSpent.plot || 0)).toLocaleString()} · S ${Math.round(Number(allocSpent.audio || 0)).toLocaleString()} · M ${Math.round(Number(allocSpent.marketing || 0)).toLocaleString()} · Ad ${Math.round(Number(allocSpent.administration || 0)).toLocaleString()}</p>
             <p>Draft Bagi Hasil (Creator/Studio/Investor): ${committeeProject.contractDraft.creatorShare}% / ${committeeProject.contractDraft.studioShare}% / ${committeeProject.contractDraft.investorShare}%</p>
-            <p>Komite approval: ${committeeProject.committeeApproved ? '✅ Ready' : '⏳ Diskusi berjalan'}</p>
+            <p>Committee approval: ${committeeProject.committeeApproved ? '✅ Ready' : '⏳ Discussion in progress'}</p>
             <div class="actions">
-              ${(committeeProject.interestedStudios || []).map((studio) => `<button data-action="select-studio" data-studio-id="${esc(studio.id)}">Pilih ${esc(studio.name)}</button>`).join('')}
+              ${(committeeProject.interestedStudios || []).map((studio) => `<button data-action="select-studio" data-studio-id="${esc(studio.id)}">Select ${esc(studio.name)}</button>`).join('')}
             </div>
             <ul class="industry-feed">${(committeeProject.committeeNegotiationLog || []).map((line) => `<li>${esc(line)}</li>`).join('')}</ul>
           </article>
         `;
       } else {
-        committeeBodyEl.innerHTML = '<p>Pilih project dari frame Projects lalu masuk ke Production Committee.</p>';
+        committeeBodyEl.innerHTML = '<p>Select a project from the Projects frame, then open Production Committee.</p>';
       }
 
       ceoStatusEl.innerHTML = `
@@ -599,7 +603,7 @@ export function createIndustryUiController({ root, handlers }) {
       feedEl.innerHTML = snapshot.feed.map((entry) => `<li>${esc(entry)}</li>`).join('');
       releasesEl.innerHTML = snapshot.releases.length
         ? snapshot.releases.map((item) => `<li>${esc(item.title)} · score ${item.score.toFixed(1)} · ${item.revenue.toLocaleString()}</li>`).join('')
-        : '<li>Belum ada release.</li>';
+        : '<li>No releases yet.</li>';
 
       if (selectedProjectId) {
         const project = snapshot.projects.find((entry) => entry.id === selectedProjectId);
@@ -685,12 +689,12 @@ export function createIndustryUiController({ root, handlers }) {
       const scriptReadiness = Math.min(100, Math.round(project.scriptQuality * 0.68 + project.chapters * 2.1));
       const visualReadiness = Math.min(100, Math.round(project.popularity * 0.44 + (project.productionProgress ?? 0) * 0.56));
       const handoffReady = project.stage === 'committee_setup' || project.canProduction || ['production', 'postproduction', 'release'].includes(project.stage);
-      const studioLabel = project.studioName && project.studioName !== '-' ? project.studioName : 'Belum ada studio';
+      const studioLabel = project.studioName && project.studioName !== '-' ? project.studioName : 'No studio yet';
       const writeLabel = project.medium === 'movie' ? 'Develop Film' : 'Develop';
       return `
         <article class="industry-project industry-project-rich" data-project-id="${esc(project.id)}">
           <h3>${esc(project.title)}</h3>
-          <p>${esc(project.medium === 'movie' ? 'Movie Track' : 'Anime Track')} · ${handoffReady ? `handoff ke studio: ${esc(studioLabel)}` : 'masih personal (scripts/naskah/gambaran)'}</p>
+          <p>${esc(project.medium === 'movie' ? 'Movie Track' : 'Anime Track')} · ${handoffReady ? `handoff to studio: ${esc(studioLabel)}` : 'still personal (scripts/drafts/visual concepts)'}</p>
           <p>Genre: ${esc(project.genre || '-')} · Theme: ${esc(project.theme || '-')} · Audience: ${esc(project.targetAudience || '-')}</p>
           <div class="industry-progress">
             <small>Script/Naskah Readiness ${scriptReadiness}%</small>
@@ -710,7 +714,7 @@ export function createIndustryUiController({ root, handlers }) {
       `;
     }).join('');
 
-    const empty = '<p class="empty">Belum ada project di kategori ini.</p>';
+    const empty = '<p class="empty">No projects in this category yet.</p>';
     projectsEl.innerHTML = `
       <section class="industry-ownership-switch">
         <button type="button" data-ownership-switch="personal" ${selectedOwnership === 'personal' ? 'data-active="true"' : ''}>Personal</button>
@@ -738,7 +742,7 @@ export function createIndustryUiController({ root, handlers }) {
     if (!selectedCreateMedium) {
       if (subProjectCreateTitleEl) subProjectCreateTitleEl.textContent = 'Create New Project';
       subProjectCreateBodyEl.innerHTML = `
-        <p>Pilih jenis project yang ingin dibuat:</p>
+        <p>Select the project type you want to create:</p>
         <div class="industry-toolbar">
           <button type="button" data-action="select-create-medium" data-medium="manga">Manga</button>
           <button type="button" data-action="select-create-medium" data-medium="novel">Novel</button>
@@ -766,13 +770,13 @@ export function createIndustryUiController({ root, handlers }) {
     pendingCreateDraft.targetAudience = selectedAudience;
     if (subProjectCreateTitleEl) subProjectCreateTitleEl.textContent = `${mediumLabel} Development Brief`;
     subProjectCreateBodyEl.innerHTML = `
-      <label>Nama karya</label>
-      <input id="createProjectTitleInput" type="text" maxlength="80" placeholder="Masukkan judul karya" value="${esc(pendingCreateDraft.title)}" />
+      <label>Title</label>
+      <input id="createProjectTitleInput" type="text" maxlength="80" placeholder="Enter project title" value="${esc(pendingCreateDraft.title)}" />
       <label>Genre</label>
       <select id="createProjectGenreInput">
         ${genreOptions.map((genre) => `<option value="${esc(genre)}" ${genre === selectedGenre ? 'selected' : ''}>${esc(titleToken(genre))}</option>`).join('')}
       </select>
-      <label>Tema</label>
+      <label>Theme</label>
       <select id="createProjectThemeInput">
         ${themeOptions.map((theme) => `<option value="${esc(theme)}" ${theme === selectedTheme ? 'selected' : ''}>${esc(titleToken(theme))}</option>`).join('')}
       </select>
@@ -792,39 +796,66 @@ export function createIndustryUiController({ root, handlers }) {
     const detail = snapshot.studioDetails?.[studioId];
     if (!detail) {
       subStudioTitleEl.textContent = 'Studio Detail';
-      subStudioBodyEl.innerHTML = '<p>Data studio tidak ditemukan.</p>';
+      subStudioBodyEl.innerHTML = '<p>Studio data was not found.</p>';
       return;
     }
     subStudioTitleEl.textContent = detail.name;
+    const animeAssets = (detail.assets?.anime || []).length
+      ? `<ul class="industry-feed">${detail.assets.anime.map((name) => `<li>${esc(name)}</li>`).join('')}</ul>`
+      : '<p>-</p>';
+    const mangaAssets = (detail.assets?.manga || []).length
+      ? `<ul class="industry-feed">${detail.assets.manga.map((name) => `<li>${esc(name)}</li>`).join('')}</ul>`
+      : '<p>-</p>';
+    const movieAssets = (detail.assets?.movie || []).length
+      ? `<ul class="industry-feed">${detail.assets.movie.map((name) => `<li>${esc(name)}</li>`).join('')}</ul>`
+      : '<p>-</p>';
     subStudioBodyEl.innerHTML = `
       <article class="industry-project">
-        <h3>${esc(detail.name)}</h3>
-        <p>Pendiri: ${esc(detail.founderName)} · CEO: ${esc(detail.ceoName)}</p>
-        <p>Kategori: ${esc(detail.category)} · Kelas/Tingkat: ${esc(detail.tier)} · Rating Studio ${Number(detail.rating?.overall || 0).toFixed(2)}</p>
-        <p>Komponen Rating — Rilis ${Number(detail.rating?.components?.releaseQuality || 0).toFixed(1)} · Produksi ${Number(detail.rating?.components?.productionQuality || 0).toFixed(1)} · Kompetensi ${Number(detail.rating?.components?.competence || 0).toFixed(1)} · Reliabilitas ${Number(detail.rating?.components?.reliability || 0).toFixed(1)} · TierScore ${Number(detail.rating?.components?.studioTier || 0).toFixed(1)}</p>
-        <p>Efek Rating — Investor ×${Number(detail.rating?.multipliers?.investorAttractiveness || 1).toFixed(2)} · Momentum Proyek ×${Number(detail.rating?.multipliers?.projectMomentum || 1).toFixed(2)} · Efisiensi Marketing ×${Number(detail.rating?.multipliers?.marketingEfficiency || 1).toFixed(2)}</p>
-        <p>Valuasi: ${Number(detail.valuation || 0).toLocaleString()} · Dana Studio: ${Number(detail.funds || 0).toLocaleString()}</p>
-        ${detail.finance
-          ? `<p>Keuangan Terakhir — Income: ${Number(detail.finance.income || 0).toLocaleString()} · Expense: ${Number(detail.finance.expense || 0).toLocaleString()} · Net: ${Number(detail.finance.net || 0).toLocaleString()}</p>`
-          : '<p>Keuangan Terakhir: belum tersedia.</p>'}
+        <h3>Studio Summary</h3>
+        <div class="industry-studio-kv">
+          <div class="industry-studio-kv-row"><p><strong>Studio Name:</strong> ${esc(detail.name)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Studio Rating:</strong> ${Number(detail.rating?.overall || 0).toFixed(2)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Class/Tier:</strong> ${esc(detail.tier)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Category:</strong> ${esc(detail.category)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Valuation:</strong> ${Number(detail.valuation || 0).toLocaleString()}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Founder:</strong> ${esc(detail.founderName)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>CEO:</strong> ${esc(detail.ceoName)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Studio Funds:</strong> ${Number(detail.funds || 0).toLocaleString()}</p></div>
+          ${detail.finance
+            ? `<div class="industry-studio-kv-row"><p><strong>Latest Income:</strong> ${Number(detail.finance.income || 0).toLocaleString()}</p></div>
+               <div class="industry-studio-kv-row"><p><strong>Latest Expense:</strong> ${Number(detail.finance.expense || 0).toLocaleString()}</p></div>
+               <div class="industry-studio-kv-row"><p><strong>Latest Net:</strong> ${Number(detail.finance.net || 0).toLocaleString()}</p></div>`
+            : '<div class="industry-studio-kv-row"><p><strong>Latest Income:</strong> Not available yet.</p></div><div class="industry-studio-kv-row"><p><strong>Latest Expense:</strong> Not available yet.</p></div><div class="industry-studio-kv-row"><p><strong>Latest Net:</strong> Not available yet.</p></div>'}
+          <div class="industry-studio-kv-row"><p><strong>Release Score:</strong> ${Number(detail.rating?.components?.releaseQuality || 0).toFixed(1)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Production Score:</strong> ${Number(detail.rating?.components?.productionQuality || 0).toFixed(1)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Competence:</strong> ${Number(detail.rating?.components?.competence || 0).toFixed(1)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Reliability:</strong> ${Number(detail.rating?.components?.reliability || 0).toFixed(1)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Tier Score:</strong> ${Number(detail.rating?.components?.studioTier || 0).toFixed(1)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Investor Multiplier:</strong> ×${Number(detail.rating?.multipliers?.investorAttractiveness || 1).toFixed(2)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Project Momentum:</strong> ×${Number(detail.rating?.multipliers?.projectMomentum || 1).toFixed(2)}</p></div>
+          <div class="industry-studio-kv-row"><p><strong>Marketing Efficiency:</strong> ×${Number(detail.rating?.multipliers?.marketingEfficiency || 1).toFixed(2)}</p></div>
+        </div>
       </article>
       <article class="industry-project">
-        <h3>Aset Studio</h3>
-        <p><strong>Anime</strong>: ${(detail.assets?.anime || []).length ? detail.assets.anime.map((name) => esc(name)).join(' · ') : '-'}</p>
-        <p><strong>Manga/Novel</strong>: ${(detail.assets?.manga || []).length ? detail.assets.manga.map((name) => esc(name)).join(' · ') : '-'}</p>
-        <p><strong>Movies</strong>: ${(detail.assets?.movie || []).length ? detail.assets.movie.map((name) => esc(name)).join(' · ') : '-'}</p>
+        <h3>Studio Assets</h3>
+        <p><strong>Anime</strong></p>
+        ${animeAssets}
+        <p><strong>Manga/Novel</strong></p>
+        ${mangaAssets}
+        <p><strong>Movies</strong></p>
+        ${movieAssets}
       </article>
       <article class="industry-project">
         <h3>Staff Studio (Animator)</h3>
         ${(detail.staff || []).length
           ? `<ul class="industry-feed">${detail.staff.map((staff) => `<li>${esc(staff.name)} · Rep ${Number(staff.reputation || 0).toFixed(1)} · Mood ${(Number(staff.mood || 0) * 100).toFixed(0)}%</li>`).join('')}</ul>`
-          : '<p>Tidak ada staff animator tercatat.</p>'}
+          : '<p>No animator staff recorded.</p>'}
       </article>
       <article class="industry-project">
         <h3>Investor Ranking (Studio)</h3>
         ${(detail.investors || []).length
           ? `<ol class="industry-ranking-list">${detail.investors.map((inv, index) => `<li>#${index + 1} · ${esc(inv.name)} · Score ${(Number(inv.score) || 0).toFixed(2)} · Influence ${Math.round(Number(inv.influence) || 0)}</li>`).join('')}</ol>`
-          : '<p>Belum ada investor aktif pada studio ini.</p>'}
+          : '<p>No active investors for this studio yet.</p>'}
       </article>
     `;
   }
@@ -834,7 +865,7 @@ export function createIndustryUiController({ root, handlers }) {
       { id: 'studio', label: 'Studio' },
       { id: 'anime', label: 'Anime' },
       { id: 'manga', label: 'Manga/Novel' },
-      { id: 'individual', label: 'Kekayaan Individu' },
+      { id: 'individual', label: 'Individual Wealth' },
     ];
 
     if (!rankingTabs.some((entry) => entry.id === selectedRanking)) {
@@ -844,7 +875,7 @@ export function createIndustryUiController({ root, handlers }) {
     const rankingConfigs = {
       manga: {
         title: 'Ranking Manga/Novel',
-        empty: 'Belum ada data.',
+        empty: 'No data yet.',
         list: snapshot.rankings.manga ?? [],
         renderLine: (entry, rank) => `
           <div class="industry-ranking-row industry-ranking-row-double">
@@ -856,7 +887,7 @@ export function createIndustryUiController({ root, handlers }) {
             </div>
             <div class="industry-ranking-line industry-ranking-line-sub">
               <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
-              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
               <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
             </div>
           </div>
@@ -864,7 +895,7 @@ export function createIndustryUiController({ root, handlers }) {
       },
       anime: {
         title: 'Ranking Anime',
-        empty: 'Belum ada rilis.',
+        empty: 'No releases yet.',
         list: snapshot.rankings.anime ?? [],
         renderLine: (entry, rank) => `
           <div class="industry-ranking-row industry-ranking-row-double">
@@ -876,7 +907,7 @@ export function createIndustryUiController({ root, handlers }) {
             </div>
             <div class="industry-ranking-line industry-ranking-line-sub">
               <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} pts</strong>
-              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
               <span class="industry-ranking-meta">IMDb ${(Number(entry.imdb) || 0).toFixed(1)}</span>
             </div>
           </div>
@@ -884,7 +915,7 @@ export function createIndustryUiController({ root, handlers }) {
       },
       studio: {
         title: 'Ranking Studio',
-        empty: 'Belum ada data studio.',
+        empty: 'No studio data yet.',
         list: snapshot.rankings.studio ?? [],
         renderLine: (entry, rank) => `
           <div class="industry-ranking-row industry-ranking-row-double" data-studio-id="${esc(entry.id)}">
@@ -897,15 +928,15 @@ export function createIndustryUiController({ root, handlers }) {
             </div>
             <div class="industry-ranking-line industry-ranking-line-sub">
               <strong class="industry-ranking-score">${(Number(entry.score) || 0).toFixed(1)} val</strong>
-              <span class="industry-ranking-meta">Popularitas ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
+              <span class="industry-ranking-meta">Popularity ${(Number(entry.popularity) || 0).toFixed(1)}%</span>
               <span class="industry-ranking-meta">Total Anime ${Math.max(0, Math.floor(entry.totalAnime ?? 0))}</span>
             </div>
           </div>
         `,
       },
       individual: {
-        title: 'Ranking Kekayaan Individu',
-        empty: 'Belum ada data individu.',
+        title: 'Individual Wealth Ranking',
+        empty: 'No individual data yet.',
         list: snapshot.rankings.individual ?? [],
         renderLine: (entry, rank) => `
           <div class="industry-ranking-row">
@@ -934,6 +965,64 @@ export function createIndustryUiController({ root, handlers }) {
           ? activeConfig.list.map((entry, index) => `<li>${activeConfig.renderLine(entry, index + 1)}</li>`).join('')
           : `<li class="industry-ranking-empty">${activeConfig.empty}</li>`}
         </ol>
+      </article>
+    `;
+  }
+
+  function renderCommunitiesBoard(snapshot) {
+    if (!communitiesEl) return;
+    const communities = snapshot.communities || {};
+    const regions = Array.isArray(communities.regions) ? communities.regions : [];
+    const ages = Array.isArray(communities.ages) ? communities.ages : [];
+    const mediums = Array.isArray(communities.mediums) ? communities.mediums : [];
+    const trends = Array.isArray(communities.trends) ? communities.trends : [];
+
+    const renderPie = (rows, palette) => {
+      const normalized = rows.length ? rows : [{ key: 'N/A', value: 1 }];
+      let start = 0;
+      const slices = normalized.map((row, index) => {
+        const share = Math.max(0, Number(row.value) || 0);
+        const end = start + share;
+        const largeArc = end - start > 0.5 ? 1 : 0;
+        const x1 = 50 + Math.cos(2 * Math.PI * start - Math.PI / 2) * 44;
+        const y1 = 50 + Math.sin(2 * Math.PI * start - Math.PI / 2) * 44;
+        const x2 = 50 + Math.cos(2 * Math.PI * end - Math.PI / 2) * 44;
+        const y2 = 50 + Math.sin(2 * Math.PI * end - Math.PI / 2) * 44;
+        start = end;
+        return `<path d="M 50 50 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 44 44 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${palette[index % palette.length]}"></path>`;
+      }).join('');
+      return `<svg viewBox="0 0 100 100" class="industry-community-pie" aria-hidden="true">${slices}<circle cx="50" cy="50" r="22" fill="#081332"></circle></svg>`;
+    };
+
+    const renderLegend = (rows, palette) => rows.map((row, index) => `
+      <li><span class="industry-community-dot" style="background:${palette[index % palette.length]}"></span>${esc(row.key)}: ${(Math.max(0, Number(row.value) || 0) * 100).toFixed(2)}%</li>
+    `).join('');
+
+    const regionPalette = ['#7dd3fc', '#a78bfa', '#34d399', '#fbbf24', '#fb7185'];
+    const agePalette = ['#60a5fa', '#22d3ee', '#4ade80', '#f97316', '#f472b6'];
+    const mediumPalette = ['#818cf8', '#2dd4bf', '#f59e0b', '#ef4444'];
+
+    communitiesEl.innerHTML = `
+      <article class="industry-project">
+        <h3>Global Fanbase Regions</h3>
+        <div class="industry-community-chart">${renderPie(regions, regionPalette)}</div>
+        <ul class="industry-community-legend">${renderLegend(regions, regionPalette)}</ul>
+      </article>
+      <article class="industry-project">
+        <h3>Audience Age Structure</h3>
+        <div class="industry-community-chart">${renderPie(ages, agePalette)}</div>
+        <ul class="industry-community-legend">${renderLegend(ages, agePalette)}</ul>
+      </article>
+      <article class="industry-project">
+        <h3>Platform Medium Trends</h3>
+        <div class="industry-community-chart">${renderPie(mediums, mediumPalette)}</div>
+        <ul class="industry-community-legend">${renderLegend(mediums, mediumPalette)}</ul>
+      </article>
+      <article class="industry-project">
+        <h3>Genre Momentum & Pioneer Wave</h3>
+        ${(trends.length
+          ? `<ol class="industry-ranking-list">${trends.map((entry, index) => `<li>#${index + 1} · ${esc(entry.genre)} · Momentum ${(Number(entry.momentum) || 0).toFixed(2)} · Active Titles ${Math.max(1, Math.round(Number(entry.count) || 0))}</li>`).join('')}</ol>`
+          : '<p>No strong genre wave detected yet.</p>')}
       </article>
     `;
   }

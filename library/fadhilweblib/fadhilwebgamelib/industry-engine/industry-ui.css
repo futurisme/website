@@ -30,6 +30,15 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-project h3 { margin: 0 0 6px; }
 .industry-project p { margin: 0; opacity: .9; overflow-wrap: anywhere; word-break: break-word; }
 .industry-project-rich { display: grid; gap: 6px; }
+.industry-studio-kv { display: grid; gap: 6px; }
+.industry-studio-kv-row { display: grid; gap: 4px; }
+.industry-studio-kv-row p { margin: 0; }
+.industry-studio-kv-row-2col { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; }
+.industry-community-chart { display: grid; place-items: center; padding: 4px 0; }
+.industry-community-pie { width: min(180px, 62vw); height: auto; }
+.industry-community-legend { margin: 4px 0 0; padding-left: 0; list-style: none; display: grid; gap: 4px; }
+.industry-community-legend li { display: flex; align-items: center; gap: 8px; font-size: 12px; opacity: .95; }
+.industry-community-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 auto; border: 1px solid #ffffff66; }
 .industry-progress { display: grid; gap: 4px; margin-top: 2px; }
 .industry-progress small { opacity: .88; font-size: 12px; }
 .industry-progress progress {
