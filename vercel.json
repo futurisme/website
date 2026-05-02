@@ -72,6 +72,10 @@
     {
       "src": "extension/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "website/daily-streak/**",
+      "use": "@vercel/static"
     }
   ],
   "headers": [
@@ -347,6 +351,18 @@
     {
       "src": "/extension/(.*)",
       "dest": "/extension/$1"
+    },
+    {
+      "src": "/daily-streak",
+      "dest": "/website/daily-streak/index.html"
+    },
+    {
+      "src": "/daily-streak/",
+      "dest": "/website/daily-streak/index.html"
+    },
+    {
+      "src": "/daily-streak/(.*)",
+      "dest": "/website/daily-streak/$1"
     }
   ]
 }
