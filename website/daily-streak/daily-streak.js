@@ -11,6 +11,17 @@ const DAILY_STREAK_ITEMS = [
   { id: 'khanacademy', label: 'Khan Academy', href: 'https://id.khanacademy.org/profile/fadhilakbar' }
 ];
 
+const applyHints = (container) => {
+  const rows = container.querySelectorAll('.streak-item');
+  rows.forEach((row) => {
+    if (row.querySelector('.streak-item__hint')) return;
+    const hint = document.createElement('span');
+    hint.className = 'streak-item__hint';
+    hint.textContent = 'Buka';
+    row.append(hint);
+  });
+};
+
 const renderFallbackChecklist = ({ container, storageKey, items }) => {
   const safeParse = (raw) => {
     try {
@@ -24,6 +35,7 @@ const renderFallbackChecklist = ({ container, storageKey, items }) => {
   const writeState = (value) => localStorage.setItem(storageKey, JSON.stringify(value));
   const current = readState();
 
+  const fragment = document.createDocumentFragment();
   items.forEach((item) => {
     const row = document.createElement('article');
     row.className = 'streak-item';
@@ -50,29 +62,27 @@ const renderFallbackChecklist = ({ container, storageKey, items }) => {
 
     row.classList.toggle('is-checked', checkbox.checked);
     row.append(checkbox, link);
-    container.append(row);
+    fragment.append(row);
   });
+
+  container.append(fragment);
+  applyHints(container);
 };
 
 const mountChecklist = async () => {
   const container = document.getElementById('daily-streak-list');
   if (!container) return;
 
-  const config = {
-    container,
-    storageKey: 'fadhil-daily-streak-v1',
-    items: DAILY_STREAK_ITEMS
-  };
+  const config = { container, storageKey: 'fadhil-daily-streak-v1', items: DAILY_STREAK_ITEMS };
 
   try {
     const runtime = await import('/library/fadhilweblib/dailystreak/runtime.js');
     if (runtime && typeof runtime.mountDailyStreakChecklist === 'function') {
       runtime.mountDailyStreakChecklist(config);
+      applyHints(container);
       return;
     }
-  } catch {
-    // fallback for environments where module path is unavailable
-  }
+  } catch {}
 
   renderFallbackChecklist(config);
 };
