@@ -1,10 +1,20 @@
 User-agent: *
 Allow: /
 
-# Keep crawl budget focused on canonical public URLs.
+# Keep crawl budget focused on canonical public URLs and non-indexable internals.
 Disallow: /api/
 Disallow: /extension/
-Disallow: /website/
-Disallow: /node_modules/
+Disallow: /_next/
+Disallow: /*?*preview=
+Disallow: /*?*utm_
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
 
 Sitemap: https://fadhil.dev/sitemap.xml
