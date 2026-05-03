@@ -288,3 +288,53 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
     max-height: clamp(310px, 52dvh, 560px);
   }
 }
+
+
+.media-list .sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+.embed-spotlight {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px;
+  background: #071426;
+}
+
+.embed-spotlight h3 {
+  margin: 0 0 6px;
+  font-size: .95rem;
+}
+
+.embed-banner-link {
+  display: block;
+  margin: 8px 0;
+}
+
+.embed-banner {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line-strong);
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  background: #030712;
+}
+
+.embed-frame-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: #000;
+  aspect-ratio: 16 / 9;
+}
+
+.embed-frame-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

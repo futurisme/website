@@ -25,6 +25,40 @@ const manualGenerateBtn = document.getElementById('manual-generate');
 const manualCopyBtn = document.getElementById('manual-copy');
 const manualApplyBtn = document.getElementById('manual-apply');
 
+
+const mediaListEl = document.getElementById('media-archives-list');
+
+const STATIC_MEDIA_ARCHIVES = [
+  {
+    title: 'Catatan riset teks mingguan',
+    type: 'text',
+    description: 'Ringkasan insight, opini, dan draft pemikiran yang diarsipkan sebagai teks statis.',
+    source: 'Inline source /archives/archives.js',
+  },
+  {
+    title: 'Galeri media visual',
+    type: 'media',
+    description: 'Kumpulan media banner, thumbnail, dan cuplikan visual untuk dokumentasi arsip.',
+    source: 'Inline source /archives/archives.js',
+  },
+  {
+    title: 'Embed statis playlist YouTube',
+    type: 'embed',
+    description: 'Embed playlist YouTube dengan update konten realtime dari URL sumber asli.',
+    source: 'https://www.youtube.com/playlist?list=PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf',
+  },
+];
+
+function renderStaticMediaArchives() {
+  if (!mediaListEl) return;
+  mediaListEl.innerHTML = STATIC_MEDIA_ARCHIVES.map((item) => `
+    <li>
+      <div class="archive-title-row"><strong>${item.title}</strong><span class="archive-updated">${item.type}</span></div>
+      <p class="sub">${item.description}</p>
+      <span class="archive-slug">source: ${item.source}</span>
+    </li>
+  `).join('');
+}
 const SWIPE_RIGHT_MIN_X = 76;
 const SWIPE_MAX_Y = 40;
 const SWIPE_RESET_MS = 2600;
@@ -218,6 +252,7 @@ manualApplyBtn?.addEventListener('click', () => {
     }
     applyManualSnapshot(raw);
     renderArchives();
+renderStaticMediaArchives();
     setManualStatus('Snapshot berhasil dimuat ulang. Semua archives dipulihkan.');
   } catch (error) {
     setManualStatus(`Load gagal: ${error instanceof Error ? error.message : String(error)}`);
