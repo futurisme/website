@@ -74,6 +74,29 @@ body {
   letter-spacing: .018em;
 }
 
+
+.compact-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.contact-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 1.65rem;
+  padding: 0 8px;
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #ff1a1a;
+  border-radius: 0;
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .compact-header p {
   margin: 4px 0 0;
   color: var(--muted);
@@ -444,7 +467,8 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 
 
 .brand-fadhil { color: #990000; }
-.brand-archives { color: #111111; }
+.brand-arch { color: #111111; }
+.brand-ives { color: #0b57d0; }
 
 
 @media (max-width: 768px) {
@@ -459,6 +483,11 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
     margin-inline: 0;
     width: 100%;
     border-radius: 0;
+  }
+
+  .contact-pill {
+    font-size: 0.66rem;
+    padding: 0 6px;
   }
 }
 
