@@ -310,12 +310,13 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 }
 
 .embed-spotlight {
-  margin-top: 12px;
-  border: 1px solid var(--line);
+  margin-top: 8px;
+  border: 1px solid #ff1a1a;
   border-radius: 14px;
-  padding: 8px;
-  background: #071426;
+  padding: 10px;
+  background: #ffffff;
 }
+
 
 .embed-spotlight h3 {
   margin: 0 0 6px;
@@ -442,4 +443,10 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
     width: 100%;
     border-radius: 0;
   }
+}
+
+
+.archives-page > .compact-block[aria-label="Archive media and embed"] {
+  background: #1e2a78;
+  border-color: #ffffff;
 }
