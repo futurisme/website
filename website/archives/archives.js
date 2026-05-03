@@ -29,6 +29,8 @@ const manualApplyBtn = document.getElementById('manual-apply');
 const playlistBannerEl = document.getElementById('playlist-banner');
 const playlistBannerPrevEl = document.getElementById('playlist-banner-prev');
 const playlistBannerNextEl = document.getElementById('playlist-banner-next');
+const playlistBannerBackLeftEl = document.getElementById('playlist-banner-back-left');
+const playlistBannerBackRightEl = document.getElementById('playlist-banner-back-right');
 const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
 const PRIMARY_PLAYLIST_BANNER = 'https://i.ytimg.com/pl_c/PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf/studio_square_thumbnail.jpg?sqp=CJTi288G-oaymwEICKoDEPABSFqi85f_AwYI1vjbzwY=&rs=AOn4CLCj5f7rzUP0Pwu1L4B8u7XUra5ABQ';
 
@@ -93,7 +95,14 @@ async function hydratePlaylistBanner() {
 function setPlaylistBanner(index) {
   if (!playlistBannerEl || !playlistBannerGallery.length) return;
   playlistBannerIndex = (index + playlistBannerGallery.length) % playlistBannerGallery.length;
-  playlistBannerEl.src = playlistBannerGallery[playlistBannerIndex];
+
+  const mainSrc = playlistBannerGallery[playlistBannerIndex];
+  const leftSrc = playlistBannerGallery[(playlistBannerIndex - 1 + playlistBannerGallery.length) % playlistBannerGallery.length];
+  const rightSrc = playlistBannerGallery[(playlistBannerIndex + 1) % playlistBannerGallery.length];
+
+  playlistBannerEl.src = mainSrc;
+  if (playlistBannerBackLeftEl) playlistBannerBackLeftEl.src = leftSrc;
+  if (playlistBannerBackRightEl) playlistBannerBackRightEl.src = rightSrc;
 }
 
 function setupBannerNavigation() {

@@ -41,15 +41,19 @@
                     <div class="embed-banner-row">
             <button type="button" id="playlist-banner-prev" class="banner-nav" aria-label="Banner sebelumnya">←</button>
             <a class="embed-banner-link" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/playlist?list=PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf">
-              <img
-                class="embed-banner"
-                id="playlist-banner"
-                src="https://i.ytimg.com/pl_c/PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf/studio_square_thumbnail.jpg?sqp=CJTi288G-oaymwEICKoDEPABSFqi85f_AwYI1vjbzwY=&rs=AOn4CLCj5f7rzUP0Pwu1L4B8u7XUra5ABQ"
-                alt="Banner playlist YouTube"
-                loading="eager"
-                decoding="async"
-                fetchpriority="high"
-              />
+              <div class="banner-stack" aria-hidden="true">
+                <img class="embed-banner-layer layer-left" id="playlist-banner-back-left" alt="" loading="lazy" decoding="async" />
+                <img class="embed-banner-layer layer-right" id="playlist-banner-back-right" alt="" loading="lazy" decoding="async" />
+                <img
+                  class="embed-banner layer-main"
+                  id="playlist-banner"
+                  src="https://i.ytimg.com/pl_c/PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf/studio_square_thumbnail.jpg?sqp=CJTi288G-oaymwEICKoDEPABSFqi85f_AwYI1vjbzwY=&rs=AOn4CLCj5f7rzUP0Pwu1L4B8u7XUra5ABQ"
+                  alt="Banner playlist YouTube"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              </div>
             </a>
             <button type="button" id="playlist-banner-next" class="banner-nav" aria-label="Banner berikutnya">→</button>
           </div>
