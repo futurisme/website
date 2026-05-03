@@ -426,6 +426,23 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 }
 
 
+.playlist-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35ch;
+}
+
+.playlist-personal,
+.playlist-sep { color: #000000; }
+
+.playlist-word { color: #0b57d0; }
+
+.playlist-curation { color: #0b4f2a; }
+
+.playlist-by { color: #990000; }
+
+
+
 .brand-fadhil { color: #990000; }
 .brand-archives { color: #111111; }
 
