@@ -32,7 +32,7 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   height: 100dvh;
-  padding: var(--space);
+  padding: 0 var(--space) var(--space);
   display: grid;
   grid-template-rows: auto auto 1fr auto auto;
   gap: var(--space);
@@ -53,17 +53,21 @@ body {
 .compact-header {
   position: sticky;
   top: 0;
-  z-index: 40;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: linear-gradient(180deg, #2b1212f0, #1a0d0df0);
-  backdrop-filter: blur(10px);
+  z-index: 80;
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+  padding: 8px max(var(--space), env(safe-area-inset-right)) 8px max(var(--space), env(safe-area-inset-left));
+  border-radius: 0;
+  border: 2px solid #ff1a1a;
+  border-left: 0;
+  border-right: 0;
+  background: #ffffff;
+  backdrop-filter: none;
 }
 
 .compact-header h1 {
   margin: 0;
-  color: #990000;
+  color: inherit;
   font-size: clamp(1.08rem, 1vw + 0.75rem, 1.42rem);
   font-weight: 700;
   letter-spacing: .02em;
@@ -418,3 +422,7 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
     --nav-gap: clamp(6px, 2.2vw, 12px);
   }
 }
+
+
+.brand-fadhil { color: #990000; }
+.brand-archives { color: #111111; }
