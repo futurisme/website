@@ -59,6 +59,58 @@ function renderStaticMediaArchives() {
     </li>
   `).join('');
 }
+
+const playlistBannerEl = document.getElementById('playlist-banner');
+const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
+
+function candidateThumbs(videoId) {
+  if (!videoId) return [];
+  return [
+    `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`,
+    `https://i.ytimg.com/vi/${videoId}/sddefault.jpg`,
+    `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+    `https://i.ytimg.com/vi_webp/${videoId}/maxresdefault.webp`,
+    `https://i.ytimg.com/vi_webp/${videoId}/hqdefault.webp`,
+  ];
+}
+
+function applyBannerWithFallback(imgEl, sources) {
+  if (!imgEl || !sources.length) return;
+  let idx = 0;
+  const setNext = () => {
+    if (idx >= sources.length) return;
+    imgEl.src = sources[idx++];
+  };
+  imgEl.onerror = setNext;
+  setNext();
+}
+
+async function hydratePlaylistBanner() {
+  if (!playlistBannerEl) return;
+
+  const fallbackImage = '/assets/public/images/portfolio.webp';
+  applyBannerWithFallback(playlistBannerEl, [fallbackImage]);
+
+  try {
+    const response = await fetch(`https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`, {
+      cache: 'no-store',
+      mode: 'cors',
+    });
+    if (!response.ok) throw new Error(`Feed status ${response.status}`);
+
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlText, 'application/xml');
+    const firstVideoId = doc.querySelector('entry > video\:videoId, entry > yt\:videoId')?.textContent?.trim();
+
+    if (!firstVideoId) throw new Error('Playlist feed tidak punya videoId.');
+
+    applyBannerWithFallback(playlistBannerEl, candidateThumbs(firstVideoId));
+  } catch (error) {
+    console.warn('Playlist banner fallback used:', error);
+  }
+}
+
 const SWIPE_RIGHT_MIN_X = 76;
 const SWIPE_MAX_Y = 40;
 const SWIPE_RESET_MS = 2600;
@@ -253,6 +305,7 @@ manualApplyBtn?.addEventListener('click', () => {
     applyManualSnapshot(raw);
     renderArchives();
 renderStaticMediaArchives();
+hydratePlaylistBanner();
     setManualStatus('Snapshot berhasil dimuat ulang. Semua archives dipulihkan.');
   } catch (error) {
     setManualStatus(`Load gagal: ${error instanceof Error ? error.message : String(error)}`);
