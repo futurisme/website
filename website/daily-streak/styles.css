@@ -20,43 +20,48 @@ body {
   color: var(--text);
   display: grid;
   place-items: center;
-  padding: 10px;
+  padding-inline: max(12px, env(safe-area-inset-left), env(safe-area-inset-right));
+  padding-block: max(12px, env(safe-area-inset-top), env(safe-area-inset-bottom));
   line-height: 1.35;
+  overflow-x: clip;
 }
 
 .daily-streak {
-  width: min(680px, 100%);
+  inline-size: min(100%, 980px);
   background: linear-gradient(180deg, rgb(10 15 30 / 94%), rgb(6 10 20 / 94%));
   border: 1px solid var(--surface-border);
   border-radius: 14px;
-  padding: clamp(12px, 1.8vw, 18px);
+  padding: clamp(16px, 2.4vw, 28px);
   box-shadow: 0 8px 24px rgb(0 0 0 / 25%);
 }
 
 .daily-streak__header h1 {
   margin: 0;
-  font-size: clamp(1.3rem, 3.5vw, 1.85rem);
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
   letter-spacing: 0.2px;
 }
 
 .daily-streak__header p {
-  margin: 6px 0 10px;
+  margin: 8px 0 16px;
   color: var(--muted);
-  font-size: clamp(0.94rem, 2.3vw, 1rem);
+  font-size: clamp(1rem, 1.8vw, 1.1rem);
 }
 
 .daily-streak__list {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19.5rem), 1fr));
+  gap: clamp(10px, 1.6vw, 14px);
+  align-items: stretch;
 }
 
 .streak-item {
+  min-inline-size: 0;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: 10px;
+  gap: clamp(8px, 1.2vw, 12px);
+  padding: clamp(10px, 1.4vw, 14px);
+  border-radius: 11px;
   background: linear-gradient(180deg, var(--surface), var(--surface-2));
   border: 1px solid var(--surface-border);
 }
@@ -67,10 +72,11 @@ body {
 }
 
 .streak-item__label {
+  min-inline-size: 0;
   color: var(--text);
   font-weight: 650;
   text-decoration: none;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .streak-item__label::after {
@@ -97,12 +103,22 @@ body {
 
 .streak-item__hint {
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: clamp(0.8rem, 1.25vw, 0.9rem);
   white-space: nowrap;
 }
 
 .daily-streak__footer {
-  margin-top: 10px;
+  margin-top: 12px;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: clamp(0.82rem, 1.2vw, 0.92rem);
+}
+
+@media (max-width: 540px) {
+  .daily-streak {
+    border-radius: 12px;
+  }
+
+  .daily-streak__list {
+    grid-template-columns: 1fr;
+  }
 }
