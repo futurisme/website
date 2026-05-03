@@ -1,16 +1,16 @@
 :root {
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  --bg: #020617;
-  --panel: #0b1222e0;
-  --line: #223149;
-  --line-strong: #33507a;
-  --text: #e2e8f0;
-  --muted: #94a3b8;
-  --accent: #38bdf8;
-  --accent-2: #22d3ee;
+  --bg: #1a0c0c;
+  --panel: #1f1111ee;
+  --line: #5b2a2a;
+  --line-strong: #8d3a3a;
+  --text: #f9ece5;
+  --muted: #d2b8ad;
+  --accent: #c99745;
+  --accent-2: #d44f4f;
   --card-min-h: 96px;
-  --space: clamp(8px, 1vw, 10px);
+  --space: clamp(6px, 0.7vw, 8px);
   --shell-w: min(880px, 100%);
 }
 
@@ -20,15 +20,15 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(1000px 520px at -8% -15%, #0ea5e933, transparent 62%),
-    radial-gradient(900px 520px at 110% 0%, #22d3ee2b, transparent 68%),
-    var(--bg);
+    radial-gradient(1100px 560px at -8% -18%, #99000033, transparent 62%),
+    radial-gradient(900px 540px at 112% 0%, #c9974529, transparent 68%),
+    linear-gradient(180deg, #140808 0%, #1d0e0e 44%, #180909 100%);
   min-height: 100dvh;
 }
 
 .archives-page,
 .app {
-  width: var(--shell-w);
+  width: min(100%, 1200px);
   margin: 0 auto;
   min-height: 100dvh;
   height: 100dvh;
@@ -51,11 +51,19 @@ body {
 }
 
 .compact-header {
-  padding: 10px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2b1212f0, #1a0d0df0);
+  backdrop-filter: blur(10px);
 }
 
 .compact-header h1 {
   margin: 0;
+  color: #990000;
   font-size: clamp(1.08rem, 1vw + 0.75rem, 1.42rem);
   font-weight: 700;
   letter-spacing: .02em;
@@ -71,7 +79,7 @@ body {
 .card,
 .compact-action,
 .compact-footer {
-  padding: 10px;
+  padding: 8px;
 }
 
 .compact-block h2 {
@@ -85,7 +93,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .section-head .pill {
@@ -270,7 +278,7 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   .hero { flex-direction: column; }
   .archives-page,
   .app {
-    padding: 10px;
+    padding: 8px;
     gap: 10px;
   }
 
@@ -280,7 +288,7 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   .compact-action,
   .compact-footer {
     border-radius: 14px;
-    padding: 10px;
+    padding: 8px;
   }
 
   .archives-scroll {
@@ -300,7 +308,7 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   margin-top: 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 10px;
+  padding: 8px;
   background: #071426;
 }
 
