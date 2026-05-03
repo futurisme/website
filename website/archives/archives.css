@@ -309,9 +309,30 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   font-size: .95rem;
 }
 
+
+
+.embed-banner-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.banner-nav {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 .embed-banner-link {
   display: block;
-  margin: 8px 0;
+  inline-size: min(78%, 540px);
+  justify-self: center;
 }
 
 .embed-banner {

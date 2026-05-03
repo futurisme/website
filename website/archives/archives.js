@@ -61,7 +61,13 @@ function renderStaticMediaArchives() {
 }
 
 const playlistBannerEl = document.getElementById('playlist-banner');
+const playlistBannerPrevEl = document.getElementById('playlist-banner-prev');
+const playlistBannerNextEl = document.getElementById('playlist-banner-next');
 const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
+const PRIMARY_PLAYLIST_BANNER = 'https://i.ytimg.com/pl_c/PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf/studio_square_thumbnail.jpg?sqp=CJTi288G-oaymwEICKoDEPABSFqi85f_AwYI1vjbzwY=&rs=AOn4CLCj5f7rzUP0Pwu1L4B8u7XUra5ABQ';
+
+let playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER];
+let playlistBannerIndex = 0;
 
 function candidateThumbs(videoId) {
   if (!videoId) return [];
@@ -89,7 +95,8 @@ async function hydratePlaylistBanner() {
   if (!playlistBannerEl) return;
 
   const fallbackImage = '/assets/public/images/portfolio.webp';
-  applyBannerWithFallback(playlistBannerEl, [fallbackImage]);
+  playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER, fallbackImage];
+  setPlaylistBanner(0);
 
   try {
     const response = await fetch(`https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`, {
@@ -105,10 +112,27 @@ async function hydratePlaylistBanner() {
 
     if (!firstVideoId) throw new Error('Playlist feed tidak punya videoId.');
 
-    applyBannerWithFallback(playlistBannerEl, candidateThumbs(firstVideoId));
+    const dynamicThumbs = candidateThumbs(firstVideoId);
+    playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER, ...dynamicThumbs, fallbackImage]
+      .filter((value, idx, arr) => Boolean(value) && arr.indexOf(value) === idx);
+    setPlaylistBanner(0);
   } catch (error) {
     console.warn('Playlist banner fallback used:', error);
+    setPlaylistBanner(0);
   }
+}
+
+
+
+function setPlaylistBanner(index) {
+  if (!playlistBannerEl || !playlistBannerGallery.length) return;
+  playlistBannerIndex = (index + playlistBannerGallery.length) % playlistBannerGallery.length;
+  playlistBannerEl.src = playlistBannerGallery[playlistBannerIndex];
+}
+
+function setupBannerNavigation() {
+  playlistBannerPrevEl?.addEventListener('click', () => setPlaylistBanner(playlistBannerIndex - 1));
+  playlistBannerNextEl?.addEventListener('click', () => setPlaylistBanner(playlistBannerIndex + 1));
 }
 
 const SWIPE_RIGHT_MIN_X = 76;
@@ -304,8 +328,8 @@ manualApplyBtn?.addEventListener('click', () => {
     }
     applyManualSnapshot(raw);
     renderArchives();
-renderStaticMediaArchives();
-hydratePlaylistBanner();
+    renderStaticMediaArchives();
+    hydratePlaylistBanner();
     setManualStatus('Snapshot berhasil dimuat ulang. Semua archives dipulihkan.');
   } catch (error) {
     setManualStatus(`Load gagal: ${error instanceof Error ? error.message : String(error)}`);
@@ -331,3 +355,6 @@ document.addEventListener('touchcancel', () => {
 }, { passive: true });
 
 renderArchives();
+renderStaticMediaArchives();
+setupBannerNavigation();
+hydratePlaylistBanner();
