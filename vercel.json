@@ -76,6 +76,10 @@
     {
       "src": "website/daily-streak/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "library/fadhilweblib/dailystreak/styles.css",
+      "use": "@vercel/static"
     }
   ],
   "headers": [
