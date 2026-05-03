@@ -57,7 +57,6 @@ export const mountDailyStreakChecklist = ({
   const grid = document.createElement('div');
   grid.className = 'daily-streak__grid';
   grid.style.setProperty('--daily-streak-columns', String(Math.max(1, columns)));
-  grid.style.setProperty('--daily-streak-mobile-breakpoint', `${Math.max(320, mobileBreakpoint)}px`);
 
   items.forEach((item) => {
     grid.append(createRow({ item, current: state, storageKey }));
