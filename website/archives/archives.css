@@ -369,12 +369,12 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 }
 
 .layer-left {
-  transform: translate(-18px, 8px) rotate(-4deg) scale(.965);
+  transform: translate(-45px, 20px) rotate(-4deg) scale(.965);
   z-index: 1;
 }
 
 .layer-right {
-  transform: translate(18px, 8px) rotate(4deg) scale(.965);
+  transform: translate(45px, 20px) rotate(4deg) scale(.965);
   z-index: 2;
 }
 
