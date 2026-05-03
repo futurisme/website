@@ -1,6 +1,11 @@
 const safeParse = (raw) => {
-  try { return raw ? JSON.parse(raw) : {}; } catch { return {}; }
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
 };
+
 const readState = (storageKey) => safeParse(localStorage.getItem(storageKey));
 const writeState = (storageKey, value) => localStorage.setItem(storageKey, JSON.stringify(value));
 
@@ -25,13 +30,6 @@ const createRow = ({ item, current, storageKey }) => {
   hint.className = 'streak-item__hint';
   hint.textContent = 'Buka';
 
-  const hitArea = document.createElement('a');
-  hitArea.className = 'streak-item__hit';
-  hitArea.href = item.href;
-  hitArea.target = '_blank';
-  hitArea.rel = 'noreferrer noopener';
-  hitArea.setAttribute('aria-label', `Buka ${item.label}`);
-
   checkbox.addEventListener('change', () => {
     const next = readState(storageKey);
     next[item.id] = checkbox.checked;
@@ -40,27 +38,31 @@ const createRow = ({ item, current, storageKey }) => {
   });
 
   row.classList.toggle('is-checked', checkbox.checked);
-  row.append(checkbox, label, hint, hitArea);
+  row.append(checkbox, label, hint);
   return row;
 };
 
-export const mountDailyStreakChecklist = ({ container, storageKey, items }) => {
+export const mountDailyStreakChecklist = ({
+  container,
+  storageKey,
+  items,
+  columns = 2
+}) => {
   if (!container) throw new Error('Daily streak container is required.');
+  if (!Array.isArray(items)) throw new Error('Daily streak items must be an array.');
+
   const state = readState(storageKey);
+  const fragment = document.createDocumentFragment();
 
-  const list = document.createElement('div');
-  list.className = 'daily-streak__list';
-  const left = document.createElement('div');
-  left.className = 'daily-streak__column';
-  const divider = document.createElement('div');
-  divider.className = 'daily-streak__divider';
-  const right = document.createElement('div');
-  right.className = 'daily-streak__column';
+  const grid = document.createElement('div');
+  grid.className = 'daily-streak__grid';
+  grid.style.setProperty('--daily-streak-columns', String(Math.max(1, columns)));
+  grid.style.setProperty('--daily-streak-mobile-breakpoint', `${Math.max(320, mobileBreakpoint)}px`);
 
-  const mid = Math.ceil(items.length / 2);
-  items.slice(0, mid).forEach((item) => left.append(createRow({ item, current: state, storageKey })));
-  items.slice(mid).forEach((item) => right.append(createRow({ item, current: state, storageKey })));
+  items.forEach((item) => {
+    grid.append(createRow({ item, current: state, storageKey }));
+  });
 
-  list.append(left, divider, right);
-  container.replaceChildren(list);
+  fragment.append(grid);
+  container.replaceChildren(fragment);
 };
