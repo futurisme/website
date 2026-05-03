@@ -55,8 +55,18 @@ export function enableSpeculativeNavigation(options: SpeculativeNavigationOption
     return link instanceof HTMLAnchorElement ? link.href : null;
   };
 
+  const resolveCardFromEvent = (event: Event): Element | null => {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return null;
+    }
+
+    return target.closest(cardSelector);
+  };
+
   const onPointerEnter = (event: Event): void => {
-    const card = (event.target as Element | null)?.closest(cardSelector);
+    const card = resolveCardFromEvent(event);
 
     if (!card) {
       return;
@@ -86,7 +96,7 @@ export function enableSpeculativeNavigation(options: SpeculativeNavigationOption
   };
 
   const onPointerLeave = (event: Event): void => {
-    const card = (event.target as Element | null)?.closest(cardSelector);
+    const card = resolveCardFromEvent(event);
 
     if (card) {
       clearTimer(card);
