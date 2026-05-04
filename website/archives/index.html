@@ -73,13 +73,31 @@
               loading="lazy"
             ></iframe>
           </div>
-          <div class="image-archives-wrap">
-            <h4 class="image-archives-title">Image Archives</h4>
-            <div class="image-archives-grid" aria-label="Image archives gallery">
-              <img src="/assets/public/images/portfolio.webp" alt="Portfolio archive image" loading="lazy" decoding="async" />
-              <img src="/assets/public/images/shareideas-2.webp" alt="ShareIdeas archive image" loading="lazy" decoding="async" />
-              <img src="/assets/public/images/bookshelf.webp" alt="BookShelf archive image" loading="lazy" decoding="async" />
-            </div>
+          <div class="archives-panels-wrap">
+            <details class="archives-panel" open>
+              <summary>Image Archives</summary>
+              <div class="archives-panel-fill">
+                <div class="image-archives-grid" aria-label="Image archives gallery">
+                  <img src="/assets/public/images/portfolio.webp" alt="Portfolio archive image" loading="lazy" decoding="async" />
+                  <img src="/assets/public/images/shareideas-2.webp" alt="ShareIdeas archive image" loading="lazy" decoding="async" />
+                  <img src="/assets/public/images/bookshelf.webp" alt="BookShelf archive image" loading="lazy" decoding="async" />
+                </div>
+              </div>
+            </details>
+
+            <details class="archives-panel" open>
+              <summary>Asset Archives</summary>
+              <div class="archives-panel-fill">
+                <div class="asset-archives-embed-wrap">
+                  <iframe
+                    title="Asset Archives Drive Folder"
+                    src="https://drive.google.com/embeddedfolderview?id=1htmZRQY-JN647ffZ74-t2GCJpPN35w7o#list"
+                    loading="lazy"
+                  ></iframe>
+                </div>
+                <a class="asset-archives-link" href="https://drive.google.com/drive/folders/1htmZRQY-JN647ffZ74-t2GCJpPN35w7o?hl=ID" target="_blank" rel="noopener noreferrer">Open Asset Archives</a>
+              </div>
+            </details>
           </div>
         </article>
       </section>
