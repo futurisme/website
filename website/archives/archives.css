@@ -408,8 +408,8 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 .embed-banner-layer {
   position: absolute;
   inset: 0;
-  filter: saturate(.84) brightness(.78);
-  opacity: .9;
+  filter: none;
+  opacity: 1;
   transition: transform .2s ease;
 }
 
@@ -649,13 +649,13 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 .layer-far-left {
   transform: translate(-92px, 26px) rotate(-10deg) scale(.90);
   z-index: 0;
-  opacity: .86;
+  opacity: 1;
 }
 
 .layer-far-right {
   transform: translate(92px, 26px) rotate(10deg) scale(.90);
   z-index: 0;
-  opacity: .86;
+  opacity: 1;
 }
 
 .webgame-list {
@@ -697,4 +697,21 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 
 body {
   overflow-x: hidden;
+}
+
+
+.image-archives-carousel .layer-left {
+  transform: translate(-45px, 10px) rotate(-4deg) scale(.965);
+}
+
+.image-archives-carousel .layer-right {
+  transform: translate(45px, 10px) rotate(4deg) scale(.965);
+}
+
+.image-archives-carousel .layer-far-left {
+  transform: translate(-92px, 16px) rotate(-10deg) scale(.90);
+}
+
+.image-archives-carousel .layer-far-right {
+  transform: translate(92px, 16px) rotate(10deg) scale(.90);
 }
