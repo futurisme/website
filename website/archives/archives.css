@@ -634,3 +634,52 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
 .embed-banner-row img {
   pointer-events: auto;
 }
+
+
+.layer-far-left {
+  transform: translate(-72px, 28px) rotate(-7deg) scale(.93);
+  z-index: 0;
+  opacity: .72;
+}
+
+.layer-far-right {
+  transform: translate(72px, 28px) rotate(7deg) scale(.93);
+  z-index: 0;
+  opacity: .72;
+}
+
+.webgame-list {
+  display: grid;
+  gap: 6px;
+}
+
+.webgame-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.webgame-item img {
+  width: 100%;
+  max-width: 180px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #0b57d0;
+  background: #111827;
+  flex: 1 1 auto;
+}
+
+.webgame-play-btn {
+  flex: 0 0 auto;
+  min-width: 54px;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid #0b57d0;
+  color: #dbeafe;
+  text-decoration: none;
+  font-weight: 700;
+  line-height: 1;
+}

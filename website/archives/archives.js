@@ -34,6 +34,8 @@ const playlistBannerBackRightEl = document.getElementById('playlist-banner-back-
 const imageArchivesMainEl = document.getElementById('image-archives-main');
 const imageArchivesBackLeftEl = document.getElementById('image-archives-back-left');
 const imageArchivesBackRightEl = document.getElementById('image-archives-back-right');
+const imageArchivesBackFarLeftEl = document.getElementById('image-archives-back-far-left');
+const imageArchivesBackFarRightEl = document.getElementById('image-archives-back-far-right');
 const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
 const PRIMARY_PLAYLIST_BANNER = '/assets/public/images/youtube-playlist-banner.avif';
 
@@ -168,10 +170,14 @@ function setImageArchivesSlide(index) {
   const mainSrc = IMAGE_ARCHIVES_GALLERY[imageArchivesIndex];
   const leftSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex - 1 + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length];
   const rightSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex + 1) % IMAGE_ARCHIVES_GALLERY.length];
+  const farLeftSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex - 2 + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length];
+  const farRightSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex + 2) % IMAGE_ARCHIVES_GALLERY.length];
 
   imageArchivesMainEl.src = mainSrc;
   if (imageArchivesBackLeftEl) imageArchivesBackLeftEl.src = leftSrc;
   if (imageArchivesBackRightEl) imageArchivesBackRightEl.src = rightSrc;
+  if (imageArchivesBackFarLeftEl) imageArchivesBackFarLeftEl.src = farLeftSrc;
+  if (imageArchivesBackFarRightEl) imageArchivesBackFarRightEl.src = farRightSrc;
 }
 
 function setupImageArchivesCarousel() {
@@ -179,7 +185,36 @@ function setupImageArchivesCarousel() {
   setImageArchivesSlide(0);
   window.setInterval(() => {
     setImageArchivesSlide(imageArchivesIndex + 1);
-  }, 2000);
+  }, 1000);
+}
+
+
+function setupProceduralImageLoad() {
+  const proceduralImages = Array.from(document.querySelectorAll('img[data-procedural-src]'));
+  if (!proceduralImages.length) return;
+
+  const hydrate = (img) => {
+    if (!img || img.dataset.loaded === 'true') return;
+    const src = img.dataset.proceduralSrc;
+    if (!src) return;
+    img.src = src;
+    img.dataset.loaded = 'true';
+  };
+
+  if (!('IntersectionObserver' in window)) {
+    proceduralImages.forEach(hydrate);
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      hydrate(entry.target);
+      observer.unobserve(entry.target);
+    }
+  }, { rootMargin: '80px 0px' });
+
+  proceduralImages.forEach((img) => observer.observe(img));
 }
 
 function renderArchives() {
@@ -395,3 +430,4 @@ setupBannerNavigation();
 hydratePlaylistBanner();
 setupInteractionGuards();
 setupImageArchivesCarousel();
+setupProceduralImageLoad();
