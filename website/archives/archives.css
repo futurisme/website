@@ -686,3 +686,8 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   font-weight: 700;
   line-height: 1;
 }
+
+
+body {
+  overflow-x: hidden;
+}
