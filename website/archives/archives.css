@@ -594,3 +594,32 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   background: #10205f;
   border: 2px solid #ffffff;
 }
+
+
+/* Interaction guard: block selection/drag on archives page except playlist media/video */
+.archives-page {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.archives-page img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* allow playlist banner controls and video/embed interactions */
+.embed-banner-row,
+.embed-banner-row *,
+.embed-frame-wrap,
+.embed-frame-wrap iframe,
+.embed-frame-wrap * {
+  -webkit-user-select: auto;
+  user-select: auto;
+  -webkit-touch-callout: default;
+}
+
+.embed-banner-row img {
+  pointer-events: auto;
+}

@@ -120,6 +120,36 @@ let touchStartY = null;
 let rightSwipeCount = 0;
 let lastSwipeAt = 0;
 
+
+function isAllowedInteractionTarget(target) {
+  return Boolean(
+    target?.closest?.('.embed-banner-row') ||
+    target?.closest?.('.embed-frame-wrap') ||
+    target?.closest?.('input, textarea, [contenteditable="true"]')
+  );
+}
+
+function setupInteractionGuards() {
+  const blockedEvents = ['copy', 'cut', 'contextmenu', 'selectstart', 'dragstart'];
+  for (const type of blockedEvents) {
+    document.addEventListener(type, (event) => {
+      if (isAllowedInteractionTarget(event.target)) return;
+      event.preventDefault();
+    }, { passive: false });
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (isAllowedInteractionTarget(event.target)) return;
+    const key = event.key?.toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && ['a', 'c', 'x', 's', 'u', 'p'].includes(key)) {
+      event.preventDefault();
+    }
+    if (key === 'f12') {
+      event.preventDefault();
+    }
+  });
+}
+
 function renderArchives() {
   const archives = listArchives();
   const keyword = String(searchEl?.value || '').trim().toLowerCase();
@@ -331,3 +361,4 @@ document.addEventListener('touchcancel', () => {
 renderArchives();
 setupBannerNavigation();
 hydratePlaylistBanner();
+setupInteractionGuards();
