@@ -159,7 +159,9 @@ function setupInteractionGuards() {
 const IMAGE_ARCHIVES_GALLERY = [
   '/assets/public/images/portfolio.webp',
   '/assets/public/images/shareideas-2.webp',
-  '/assets/public/images/bookshelf.webp'
+  '/assets/public/images/bookshelf.webp',
+  '/assets/public/images/youtube-playlist-banner.avif',
+  '/assets/public/images/mindmapmaker.webp'
 ];
 let imageArchivesIndex = 0;
 
@@ -180,12 +182,33 @@ function setImageArchivesSlide(index) {
   if (imageArchivesBackFarRightEl) imageArchivesBackFarRightEl.src = farRightSrc;
 }
 
+let imageArchivesTimer = null;
+
+function startImageArchivesCarousel() {
+  if (imageArchivesTimer || !imageArchivesMainEl) return;
+  imageArchivesTimer = window.setInterval(() => {
+    setImageArchivesSlide(imageArchivesIndex + 1);
+  }, 1000);
+}
+
+function stopImageArchivesCarousel() {
+  if (!imageArchivesTimer) return;
+  window.clearInterval(imageArchivesTimer);
+  imageArchivesTimer = null;
+}
+
 function setupImageArchivesCarousel() {
   if (!imageArchivesMainEl) return;
   setImageArchivesSlide(0);
-  window.setInterval(() => {
-    setImageArchivesSlide(imageArchivesIndex + 1);
-  }, 1000);
+  startImageArchivesCarousel();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopImageArchivesCarousel();
+      return;
+    }
+    startImageArchivesCarousel();
+  }, { passive: true });
 }
 
 
