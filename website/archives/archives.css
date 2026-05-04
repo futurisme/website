@@ -492,6 +492,17 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   padding: 8px;
 }
 
+
+.image-archives-carousel {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.image-archives-carousel .banner-stack {
+  aspect-ratio: 16 / 9;
+}
+
 .image-archives-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

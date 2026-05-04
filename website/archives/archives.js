@@ -31,6 +31,9 @@ const playlistBannerPrevEl = document.getElementById('playlist-banner-prev');
 const playlistBannerNextEl = document.getElementById('playlist-banner-next');
 const playlistBannerBackLeftEl = document.getElementById('playlist-banner-back-left');
 const playlistBannerBackRightEl = document.getElementById('playlist-banner-back-right');
+const imageArchivesMainEl = document.getElementById('image-archives-main');
+const imageArchivesBackLeftEl = document.getElementById('image-archives-back-left');
+const imageArchivesBackRightEl = document.getElementById('image-archives-back-right');
 const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
 const PRIMARY_PLAYLIST_BANNER = '/assets/public/images/youtube-playlist-banner.avif';
 
@@ -148,6 +151,35 @@ function setupInteractionGuards() {
       event.preventDefault();
     }
   });
+}
+
+
+const IMAGE_ARCHIVES_GALLERY = [
+  '/assets/public/images/portfolio.webp',
+  '/assets/public/images/shareideas-2.webp',
+  '/assets/public/images/bookshelf.webp'
+];
+let imageArchivesIndex = 0;
+
+function setImageArchivesSlide(index) {
+  if (!imageArchivesMainEl || !IMAGE_ARCHIVES_GALLERY.length) return;
+  imageArchivesIndex = (index + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length;
+
+  const mainSrc = IMAGE_ARCHIVES_GALLERY[imageArchivesIndex];
+  const leftSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex - 1 + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length];
+  const rightSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex + 1) % IMAGE_ARCHIVES_GALLERY.length];
+
+  imageArchivesMainEl.src = mainSrc;
+  if (imageArchivesBackLeftEl) imageArchivesBackLeftEl.src = leftSrc;
+  if (imageArchivesBackRightEl) imageArchivesBackRightEl.src = rightSrc;
+}
+
+function setupImageArchivesCarousel() {
+  if (!imageArchivesMainEl) return;
+  setImageArchivesSlide(0);
+  window.setInterval(() => {
+    setImageArchivesSlide(imageArchivesIndex + 1);
+  }, 2000);
 }
 
 function renderArchives() {
@@ -362,3 +394,4 @@ renderArchives();
 setupBannerNavigation();
 hydratePlaylistBanner();
 setupInteractionGuards();
+setupImageArchivesCarousel();

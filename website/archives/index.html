@@ -77,10 +77,19 @@
             <details class="archives-panel" open>
               <summary>Image Archives</summary>
               <div class="archives-panel-fill">
-                <div class="image-archives-grid" aria-label="Image archives gallery">
-                  <img src="/assets/public/images/portfolio.webp" alt="Portfolio archive image" loading="lazy" decoding="async" />
-                  <img src="/assets/public/images/shareideas-2.webp" alt="ShareIdeas archive image" loading="lazy" decoding="async" />
-                  <img src="/assets/public/images/bookshelf.webp" alt="BookShelf archive image" loading="lazy" decoding="async" />
+                <div class="image-archives-carousel" aria-label="Image archives carousel">
+                  <div class="banner-stack" aria-hidden="true">
+                    <img class="embed-banner-layer layer-left" id="image-archives-back-left" alt="" loading="lazy" decoding="async" />
+                    <img class="embed-banner-layer layer-right" id="image-archives-back-right" alt="" loading="lazy" decoding="async" />
+                    <img
+                      class="embed-banner layer-main"
+                      id="image-archives-main"
+                      src="/assets/public/images/portfolio.webp"
+                      alt="Image archives preview"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
                 </div>
               </div>
             </details>
