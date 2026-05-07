@@ -52,13 +52,27 @@
             <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
           </div>
           <div class="mainframe-canvas frame-content-scroll">
-            <div id="industryStats" class="industry-stats"></div>
-            <div class="industry-toolbar">
+            <aside class="mainframe-side mainframe-side-left" aria-label="Left Sidebar">
+              <h3>Workspace</h3>
               <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
               <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Found Studio</button>
-              <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
-              <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
-            </div>
+              <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
+            </aside>
+            <section class="mainframe-center" aria-label="Main Canvas">
+              <div id="industryStats" class="industry-stats"></div>
+              <div class="industry-toolbar">
+                <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
+                <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
+                <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
+                <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
+              </div>
+            </section>
+            <aside class="mainframe-side mainframe-side-right" aria-label="Right Sidebar">
+              <h3>Quick Routes</h3>
+              <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
+              <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
+              <button data-action="toggle-auto">Auto Run</button>
+            </aside>
           </div>
           <div class="industry-bottombar" role="toolbar" aria-label="Mainframe Bottombar">
             <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
