@@ -60,7 +60,7 @@ def build_sitemap_xml(paths: list[str]) -> str:
             return '1.0'
         if path in {'/home', '/portfolio'}:
             return '0.9'
-        if path.startswith('/games/') or path in {'/animeindustry', '/rpg'}:
+        if path.startswith('/games/') or path in {'/hype', '/rpg'}:
             return '0.7'
         return '0.8'
 

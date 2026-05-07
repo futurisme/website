@@ -1,6 +1,6 @@
 (function (global) {
-  var DEBUG_SESSION_KEY = '__animeindustry_debug_once__';
-  var DEBUG_DOM_ID = 'animeindustry-debug-once';
+  var DEBUG_SESSION_KEY = '__hype_debug_once__';
+  var DEBUG_DOM_ID = 'hype-debug-once';
   var HISTORY_LIMIT = 320;
   var WATCHDOG_INTERVAL_MS = 2600;
   var REPORT_DEDUP_WINDOW_MS = 1800;
@@ -24,13 +24,13 @@
   }
 
   function getHistory() {
-    if (!global.__animeIndustryDebugHistory) global.__animeIndustryDebugHistory = [];
-    return global.__animeIndustryDebugHistory;
+    if (!global.__hypeDebugHistory) global.__hypeDebugHistory = [];
+    return global.__hypeDebugHistory;
   }
 
   function getDedupMap() {
-    if (!global.__animeIndustryDebugDedupMap) global.__animeIndustryDebugDedupMap = new Map();
-    return global.__animeIndustryDebugDedupMap;
+    if (!global.__hypeDebugDedupMap) global.__hypeDebugDedupMap = new Map();
+    return global.__hypeDebugDedupMap;
   }
 
   function computeSignature(kind, detail) {
@@ -205,7 +205,7 @@
     ].join(';') + ';';
 
     var heading = doc.createElement('strong');
-    heading.textContent = 'AnimeIndustry Smart Debug Console';
+    heading.textContent = 'Hype Smart Debug Console';
     heading.style.cssText = 'display:block;margin-bottom:6px;color:#fecaca;';
     panel.appendChild(heading);
 
@@ -324,7 +324,7 @@
     var causes = inferCauses(kind, detail || {});
     var predictions = inferPredictions(kind, detail || {});
     var payload = {
-      system: 'animeindustry',
+      system: 'hype',
       version: '2026.04.25-smart-debugger',
       kind: kind,
       severity: severity,
@@ -444,5 +444,5 @@
   }
 
   install();
-  global.fadhilAnimeDebugger = { report: report };
+  global.fadhilHypeDebugger = { report: report };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -3,7 +3,7 @@ import {
   evaluateGameMathProgram,
   formatDateFromDays,
   formatMoneyCompact,
-} from '/games/animeindustry/anime-engine-bundle.js';
+} from '/games/hype/anime-engine-bundle.js';
 import {
   MANGA_TITLE_DATASET,
   STUDIO_NAME_PART_A,
@@ -12,7 +12,7 @@ import {
   STUDIO_ONE_WORD_DATASET,
   UNIQUE_NPC_FIRST_NAMES,
   UNIQUE_NPC_LAST_NAMES,
-} from '/games/animeindustry/name-datasets.js';
+} from '/games/hype/name-datasets.js';
 
 const MAX_ACTIVE_STUDIOS = 13;
 const INITIAL_ACTIVE_STUDIOS = 10;
@@ -1075,7 +1075,7 @@ function pickStudioForAnimator(state, npc, preferredStudioId = null) {
   return candidates[0]?.id ?? null;
 }
 
-export function createAnimeIndustryRuntime() {
+export function createHypeRuntime() {
   let state = createInitialState();
   let timer = null;
 

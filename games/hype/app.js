@@ -1,11 +1,11 @@
-import '/games/animeindustry/animeindustry-debugger.js';
-import { createAnimeIndustryRuntime } from '/games/animeindustry/industry-runtime.js';
+import '/games/hype/hype-debugger.js';
+import { createHypeRuntime } from '/games/hype/industry-runtime.js';
 import { createIndustryUiController } from '/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.js';
 
-const AUTO_SAVE_KEY = 'animeindustry-autosave-v1';
+const AUTO_SAVE_KEY = 'hype-autosave-v1';
 
 function report(kind, detail) {
-  window.fadhilAnimeDebugger?.report?.(kind, detail);
+  window.fadhilHypeDebugger?.report?.(kind, detail);
 }
 
 const appRoot = document.getElementById('animeIndustryApp');
@@ -13,7 +13,7 @@ const appRoot = document.getElementById('animeIndustryApp');
 if (!appRoot) {
   report('bootstrap-error', { message: 'animeIndustryApp root not found at boot' });
 } else {
-  const runtime = createAnimeIndustryRuntime();
+  const runtime = createHypeRuntime();
   const persistAutoSave = () => {
     try {
       const payload = runtime.exportCompactSave();
