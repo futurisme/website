@@ -170,12 +170,12 @@
   }
 
   function hasTriggered() {
-    try { return global.sessionStorage.getItem(DEBUG_SESSION_KEY) === '1' || !!global.__animeIndustryDebugTriggered; }
-    catch (_err) { return !!global.__animeIndustryDebugTriggered; }
+    try { return global.sessionStorage.getItem(DEBUG_SESSION_KEY) === '1' || !!global.__hypeDebugTriggered; }
+    catch (_err) { return !!global.__hypeDebugTriggered; }
   }
 
   function markTriggered() {
-    global.__animeIndustryDebugTriggered = true;
+    global.__hypeDebugTriggered = true;
     try { global.sessionStorage.setItem(DEBUG_SESSION_KEY, '1'); } catch (_err) {}
   }
 
@@ -348,9 +348,9 @@
     var doc = global.document;
     if (!doc) return;
 
-    var app = doc.getElementById('animeIndustryApp');
+    var app = doc.getElementById('hypeApp');
     if (!app) {
-      report('bootstrap-error', { message: 'animeIndustryApp missing on watchdog', selector: '#animeIndustryApp' });
+      report('bootstrap-error', { message: 'hypeApp missing on watchdog', selector: '#hypeApp' });
       return;
     }
 
@@ -375,8 +375,8 @@
   }
 
   function installConsoleHooks() {
-    if (global.__animeIndustryConsoleHooksInstalled) return;
-    global.__animeIndustryConsoleHooksInstalled = true;
+    if (global.__hypeConsoleHooksInstalled) return;
+    global.__hypeConsoleHooksInstalled = true;
 
     var originalError = global.console && global.console.error ? global.console.error.bind(global.console) : null;
     var originalWarn = global.console && global.console.warn ? global.console.warn.bind(global.console) : null;
@@ -403,8 +403,8 @@
   }
 
   function install() {
-    if (global.__animeIndustryDebuggerInstalled) return;
-    global.__animeIndustryDebuggerInstalled = true;
+    if (global.__hypeDebuggerInstalled) return;
+    global.__hypeDebuggerInstalled = true;
 
     installConsoleHooks();
 

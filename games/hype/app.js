@@ -8,10 +8,10 @@ function report(kind, detail) {
   window.fadhilHypeDebugger?.report?.(kind, detail);
 }
 
-const appRoot = document.getElementById('animeIndustryApp');
+const appRoot = document.getElementById('hypeApp');
 
 if (!appRoot) {
-  report('bootstrap-error', { message: 'animeIndustryApp root not found at boot' });
+  report('bootstrap-error', { message: 'hypeApp root not found at boot' });
 } else {
   const runtime = createHypeRuntime();
   const persistAutoSave = () => {

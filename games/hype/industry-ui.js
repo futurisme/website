@@ -304,7 +304,7 @@ export function createIndustryUiController({ root, handlers }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `animeindustry-save-day-${currentSnapshot?.day ?? 0}.txt`;
+    link.download = `hype-save-day-${currentSnapshot?.day ?? 0}.txt`;
     link.click();
     URL.revokeObjectURL(url);
     showPopup('Save berhasil diunduh.', 'success');
@@ -496,7 +496,7 @@ export function createIndustryUiController({ root, handlers }) {
     render(snapshot) {
       currentSnapshot = snapshot;
       if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl || !communitiesEl) {
-        reportUiContractIssue('#animeIndustryApp', 'Render skipped: critical UI nodes missing');
+        reportUiContractIssue('#hypeApp', 'Render skipped: critical UI nodes missing');
         return;
       }
 
