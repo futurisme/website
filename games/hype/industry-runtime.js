@@ -3,7 +3,7 @@ import {
   evaluateGameMathProgram,
   formatDateFromDays,
   formatMoneyCompact,
-} from '/games/hype/anime-engine-bundle.js';
+} from '/games/hype/hype-engine-bundle.js';
 import {
   MANGA_TITLE_DATASET,
   STUDIO_NAME_PART_A,
