@@ -13,6 +13,19 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 #frameMain .industry-panel,
 #frameMain .industry-stats,
 #frameMain .industry-toolbar { overflow: hidden; }
+
+#frameMain .industry-panel { padding: 0; gap: 0; }
+#frameMain .topline { padding: 8px 10px; margin: 0; border-bottom: 1px solid #b7c9ff55; background: linear-gradient(180deg,#122b68,#102657); }
+#frameMain .mainframe-canvas { flex: 1 1 auto; min-height: 0; padding: 8px 10px; overflow: auto; }
+#frameMain .industry-topbar,
+#frameMain .industry-bottombar { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 6px; padding: 8px 10px; background: #0b1e49; border-top: 1px solid #b7c9ff44; border-bottom: 1px solid #b7c9ff44; }
+#frameMain .industry-bottombar { grid-template-columns: repeat(3,minmax(0,1fr)); border-top: 1px solid #b7c9ff55; border-bottom: 0; margin-top: auto; }
+#frameMain .industry-toolbar { grid-template-columns: repeat(4,minmax(0,1fr)); }
+@media (min-width: 1200px) {
+  #frameMain .industry-topbar button,
+  #frameMain .industry-bottombar button,
+  #frameMain .industry-toolbar button { min-height: 34px; }
+}
 .topline { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; }
 .topline h1, .topline h2 { margin: 0; }
 .industry-toolbar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; margin-top: 6px; }

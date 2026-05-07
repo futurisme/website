@@ -44,19 +44,25 @@
             <h1>Mainframe</h1>
             <small id="topDate"></small>
           </div>
-          <div id="industryStats" class="industry-stats"></div>
-          <div class="industry-toolbar">
+          <div class="industry-topbar" role="toolbar" aria-label="Mainframe Topbar">
             <button data-action="tick-1">+1 Day</button>
             <button data-action="tick-7">+7 Day</button>
             <button data-action="toggle-auto">Auto</button>
             <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
-            <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
-            <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Found Studio</button>
-            <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
-            <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
+            <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
+          </div>
+          <div class="mainframe-canvas frame-content-scroll">
+            <div id="industryStats" class="industry-stats"></div>
+            <div class="industry-toolbar">
+              <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
+              <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Found Studio</button>
+              <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
+              <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
+            </div>
+          </div>
+          <div class="industry-bottombar" role="toolbar" aria-label="Mainframe Bottombar">
             <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
             <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
-            <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
             <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
           </div>
         </article>
