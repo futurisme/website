@@ -3,6 +3,11 @@ export const STUDIO_NAME_PART_B = Object.freeze(['Frame', 'Works', 'Pictures', '
 export const STUDIO_NAME_PART_C = Object.freeze(['Collective', 'Guild', 'Division', 'Systems', 'Prime', 'Dynamics', 'Factory']);
 export const STUDIO_ONE_WORD_DATASET = Object.freeze(['SHUKARI', 'MAPPEX', 'JPNIME', 'Kaminameta', 'VINIX', 'ANIZEN', 'TOKARU']);
 
+
+export const AGENCY_NAME_DATASET = Object.freeze(['Astra Talent', 'Mirai Cast', 'Kumo Agency', 'Sora Perform', 'Hoshi Actors', 'Nova Stage']);
+export const PRODUCTION_HOUSE_NAME_DATASET = Object.freeze(['Aurora House', 'Kage Pictures', 'Nami Cinema', 'Rei Motion', 'Tora Visual', 'Mizu Films']);
+export const ACTOR_NAME_DATASET = Object.freeze(['Aoi Kirana', 'Ren Asuka', 'Mio Takara', 'Riku Hayami', 'Yuna Kagari', 'Kai Morino']);
+
 export const MANGA_TITLE_DATASET = Object.freeze([
   // Waktu, musim, dan langit (romaji Jepang, 2 kata)
   'Sennen Yoru', 'Akatsuki Yume', 'Byakuya Kage', 'Tsuki Hikari', 'Hoshi Kizuna', 'Kokoro Ame',
@@ -101,6 +106,9 @@ assertUnique('STUDIO_ONE_WORD_DATASET', STUDIO_ONE_WORD_DATASET);
 assertUnique('MANGA_TITLE_DATASET', MANGA_TITLE_DATASET);
 assertUnique('NPC_FIRST_NAMES', NPC_FIRST_NAMES);
 assertUnique('NPC_LAST_NAMES', NPC_LAST_NAMES);
+assertUnique('AGENCY_NAME_DATASET', AGENCY_NAME_DATASET);
+assertUnique('PRODUCTION_HOUSE_NAME_DATASET', PRODUCTION_HOUSE_NAME_DATASET);
+assertUnique('ACTOR_NAME_DATASET', ACTOR_NAME_DATASET);
 assertUnique('UNIQUE_NPC_FIRST_NAMES', UNIQUE_NPC_FIRST_NAMES);
 assertUnique('UNIQUE_NPC_LAST_NAMES', UNIQUE_NPC_LAST_NAMES);
 assertTwoWordTitles(MANGA_TITLE_DATASET);

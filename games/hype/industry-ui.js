@@ -518,6 +518,9 @@ export function createIndustryUiController({ root, handlers }) {
         <article class="industry-metric"><small>Profesi saat ini</small><strong>${esc(snapshot.player.currentProfession)}</strong></article>
         <article class="industry-metric"><small>Reputasi</small><strong>${snapshot.reputation}</strong></article>
         <article class="industry-metric"><small>Studio Aktif</small><strong>${esc(snapshot.player.studioName)}</strong></article>
+        <article class="industry-metric"><small>Agency</small><strong>${snapshot.companies?.agencies ?? 0}</strong></article>
+        <article class="industry-metric"><small>Production House</small><strong>${snapshot.companies?.productionHouses ?? 0}</strong></article>
+        <article class="industry-metric"><small>Actor</small><strong>${(snapshot.actors||[]).length}</strong></article>
       `;
 
       renderProjectsBoard(snapshot);
@@ -580,6 +583,7 @@ export function createIndustryUiController({ root, handlers }) {
             <p>Pemakaian Alokasi: V ${Math.round(Number(allocSpent.visual || 0)).toLocaleString()} · A ${Math.round(Number(allocSpent.plot || 0)).toLocaleString()} · S ${Math.round(Number(allocSpent.audio || 0)).toLocaleString()} · M ${Math.round(Number(allocSpent.marketing || 0)).toLocaleString()} · Ad ${Math.round(Number(allocSpent.administration || 0)).toLocaleString()}</p>
             <p>Draft Bagi Hasil (Creator/Studio/Investor): ${committeeProject.contractDraft.creatorShare}% / ${committeeProject.contractDraft.studioShare}% / ${committeeProject.contractDraft.investorShare}%</p>
             <p>Committee approval: ${committeeProject.committeeApproved ? '✅ Ready' : '⏳ Discussion in progress'}</p>
+            <p>Partner Companies: ${snapshot.companies?.studios ?? 0} Studio · ${snapshot.companies?.agencies ?? 0} Agency · ${snapshot.companies?.productionHouses ?? 0} Production House</p>
             <div class="actions">
               ${(committeeProject.interestedStudios || []).map((studio) => `<button data-action="select-studio" data-studio-id="${esc(studio.id)}">Select ${esc(studio.name)}</button>`).join('')}
             </div>

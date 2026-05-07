@@ -12,6 +12,9 @@ import {
   STUDIO_ONE_WORD_DATASET,
   UNIQUE_NPC_FIRST_NAMES,
   UNIQUE_NPC_LAST_NAMES,
+  AGENCY_NAME_DATASET,
+  PRODUCTION_HOUSE_NAME_DATASET,
+  ACTOR_NAME_DATASET,
 } from '/games/hype/name-datasets.js';
 
 const MAX_ACTIVE_STUDIOS = 13;
@@ -48,7 +51,7 @@ const INVESTOR_POOL = Object.freeze([
   { id: 'inv-merch', name: 'Merch Partner', influence: 62, risk: 59 },
 ]);
 
-const NPC_ROLES = ['ceo-studio', 'mangaka', 'novelis', 'animator', 'investor'];
+const NPC_ROLES = ['ceo-studio', 'mangaka', 'novelis', 'animator', 'investor', 'actor'];
 const PROJECT_PROFILE_TAXONOMY = {
   manga: {
     genres: {
@@ -177,6 +180,7 @@ function pickNpcRole(index) {
   if (index < 50) return 'ceo-studio';
   if (index < 56) return 'mangaka';
   if (index < 62) return 'investor';
+  if (index < 67) return 'actor';
   return 'novelis';
 }
 
@@ -478,6 +482,9 @@ function createInitialState() {
     funds: computeInitialStudioFunds(studio),
   }));
   const npcs = createNpcAgents(studios, usedNames);
+  const agencies = AGENCY_NAME_DATASET.map((name, idx) => ({ id: `ag-${idx+1}`, name, tier: ['A','B','C'][idx%3], actorIds: [] }));
+  const productionHouses = PRODUCTION_HOUSE_NAME_DATASET.map((name, idx) => ({ id: `ph-${idx+1}`, name, specialty: idx % 2 === 0 ? 'movie' : 'hybrid', partnerStudioIds: studios.slice(0,2).map(s=>s.id) }));
+  npcs.filter((n)=>n.role==='actor').forEach((actor, idx)=>{ actor.name = ACTOR_NAME_DATASET[idx % ACTOR_NAME_DATASET.length] || actor.name; actor.companyType='agency'; actor.companyId=agencies[idx % agencies.length].id; agencies[idx % agencies.length].actorIds.push(actor.id); });
   return {
     registered: false,
     day: 0,
@@ -498,6 +505,8 @@ function createInitialState() {
     studioInvestments: [],
     studioFinanceLedger: [],
     studios,
+    agencies,
+    productionHouses,
     investors: INVESTOR_POOL,
     npcs,
     npcProjects: [],
@@ -1811,6 +1820,8 @@ export function createHypeRuntime() {
         },
         s: state.studios.map((entry) => ({ id: entry.id, n: entry.name, c: entry.craft, sp: entry.speed, nw: entry.network, o: entry.ownership, sc: entry.scoutPower, ceo: entry.ceoNpcId, eqp: entry.equity?.player ?? 0, eqi: entry.equity?.investor ?? 0, fd: entry.funds ?? 0 })),
         pj: state.projects.map((entry) => ({ id: entry.id, t: entry.title, m: entry.medium, st: entry.stage, p: entry.popularity, q: entry.scriptQuality, vq: entry.visualQuality, pq: entry.plotQuality, cp: entry.competitiveness, im: clamp(entry.imdbScore, IMDB_MIN, IMDB_MAX), rc: entry.ratingsCount, ch: entry.chapters, sid: entry.studioId, ints: entry.interestedStudioIds, cm: entry.committeeIds, cd: entry.contractDraft, ca: entry.committeeApproved, bn: entry.budgetNeed, sb: entry.securedBudget, pp: entry.productionProgress, dr: entry.delayRisk, ar: !!entry.archived, g: entry.genre, th: entry.theme, ta: entry.targetAudience, pe: entry.plannedEpisodes, cf: entry.committeeFinance })),
+        ag: (state.agencies||[]).map((e)=>({id:e.id,n:e.name,t:e.tier,a:e.actorIds||[]})),
+        ph: (state.productionHouses||[]).map((e)=>({id:e.id,n:e.name,s:e.specialty,p:e.partnerStudioIds||[]})),
         iv: state.studioInvestments.slice(-500).map((entry) => ({ id: entry.id, iid: entry.investorId, sid: entry.studioId, am: entry.amount, d: entry.day })),
         fl: state.studioFinanceLedger.slice(-600).map((entry) => ({ d: entry.day, sid: entry.studioId, i: entry.income, e: entry.expense, n: entry.net, f: entry.funds })),
         rl: state.releases.slice(-30).map((entry) => ({ id: entry.id, t: entry.title, s: entry.score, im: clamp(entry.imdb, IMDB_MIN, IMDB_MAX), rt: entry.ratings, rv: entry.revenue, st: entry.studio, d: entry.day })),
@@ -1858,6 +1869,8 @@ export function createHypeRuntime() {
         committeeFinance: entry.cf ?? { committeeBudget: Number(entry.bn) || 10_000_000, spent: 0, debtToCommittee: 0, topUpRounds: 0, allocations: { visual: 0.37, plot: 0.23, audio: 0.15, marketing: 0.14, administration: 0.11 }, allocationSpent: { visual: 0, plot: 0, audio: 0, marketing: 0, administration: 0 }, committeeContributions: {}, reviewHistory: [] },
         delayRisk: Number(entry.dr) || 0.1, archived: !!entry.ar, genre: entry.g ?? '', theme: entry.th ?? '', targetAudience: entry.ta ?? '',
       })) : [];
+      fresh.agencies = Array.isArray(data.ag) ? data.ag.map((e)=>({id:e.id,name:e.n,tier:e.t,actorIds:Array.isArray(e.a)?e.a:[]})) : fresh.agencies;
+      fresh.productionHouses = Array.isArray(data.ph) ? data.ph.map((e)=>({id:e.id,name:e.n,specialty:e.s,partnerStudioIds:Array.isArray(e.p)?e.p:[]})) : fresh.productionHouses;
       fresh.studioInvestments = Array.isArray(data.iv) ? data.iv.map((entry) => ({
         id: entry.id ?? `inv-${entry.iid ?? 'x'}-${entry.sid ?? 'x'}-${Number(entry.d) || 0}`,
         investorId: entry.iid ?? '',
@@ -2184,6 +2197,14 @@ export function createHypeRuntime() {
         isCeo: state.player.career === 'studio-founder',
         studio: studioById.get(state.player.studioId) ?? null,
       },
+      companies: {
+        studios: state.studios.length,
+        agencies: (state.agencies||[]).length,
+        productionHouses: (state.productionHouses||[]).length,
+      },
+      agencies: (state.agencies||[]).map((a)=>({...a,actors:a.actorIds?.length||0})),
+      productionHouses: (state.productionHouses||[]),
+      actors: state.npcs.filter((n)=>n.role==='actor').map((n)=>({id:n.id,name:n.name,agencyId:n.companyId||null})),
       studios: state.studios.map((studio) => ({
         ...studio,
         ceoName: npcById.get(studio.ceoNpcId)?.name ?? (studio.ownership === 'player' ? state.player.name : 'TBD'),
