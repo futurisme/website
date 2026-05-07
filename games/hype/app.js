@@ -1,6 +1,6 @@
 import '/games/hype/hype-debugger.js';
 import { createHypeRuntime } from '/games/hype/industry-runtime.js';
-import { createIndustryUiController } from '/library/fadhilweblib/fadhilwebgamelib/industry-engine/industry-ui.js';
+import { createIndustryUiController } from '/games/hype/industry-ui.js';
 
 const AUTO_SAVE_KEY = 'hype-autosave-v1';
 
