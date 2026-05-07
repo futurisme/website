@@ -54,7 +54,7 @@
             <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Found Studio</button>
             <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
             <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
-            <button data-action="to-full-studios" data-frame-target="fullStudios">Studios</button>
+            <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
             <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
             <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
             <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
@@ -130,8 +130,13 @@
 
       <section id="frameFullStudios" class="frame">
         <article class="industry-panel">
-          <div class="topline"><h2>Studios Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="topline"><h2>Industries Fullframe</h2><button data-action="back-main">↩</button></div>
           <div class="frame-content-scroll">
+            <div class="industry-toolbar">
+              <button data-action="industries-view" data-view="studios">Studios</button>
+              <button data-action="industries-view" data-view="agencies">Agency</button>
+              <button data-action="industries-view" data-view="production">Production House</button>
+            </div>
             <div id="industryStudios" class="industry-projects"></div>
           </div>
         </article>

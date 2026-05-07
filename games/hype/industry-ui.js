@@ -147,7 +147,7 @@ export function createIndustryUiController({ root, handlers }) {
   const statsEl = root.querySelector('#industryStats');
   const profileEl = root.querySelector('#industryProfile');
   const projectsEl = root.querySelector('#industryProjects');
-  const studiosEl = root.querySelector('#industryStudios');
+  const industriesEl = root.querySelector('#industryStudios');
   const inboxEl = root.querySelector('#industryInbox');
   const rankingEl = root.querySelector('#rankingBoard');
   const managementEl = root.querySelector('#managementBoard');
@@ -171,6 +171,7 @@ export function createIndustryUiController({ root, handlers }) {
   let currentSnapshot = null;
   let selectedOwnership = 'personal';
   let selectedRanking = 'studio';
+  let selectedIndustryView = 'studios';
   let popupTimer = null;
   let selectedCreateMedium = null;
   let pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
@@ -180,7 +181,7 @@ export function createIndustryUiController({ root, handlers }) {
     ['#industryStats', statsEl],
     ['#industryProfile', profileEl],
     ['#industryProjects', projectsEl],
-    ['#industryStudios', studiosEl],
+    ['#industryStudios', industriesEl],
     ['#industryInbox', inboxEl],
     ['#rankingBoard', rankingEl],
     ['#committeeBody', committeeBodyEl],
@@ -240,6 +241,10 @@ export function createIndustryUiController({ root, handlers }) {
   root.querySelectorAll('[data-action="back-main"]').forEach((button) => button.addEventListener('click', () => openFrame('main')));
   root.querySelectorAll('[data-action="back-projects"]').forEach((button) => button.addEventListener('click', () => openFrame('fullProjects')));
   root.querySelector('[data-action="back-studio-source"]')?.addEventListener('click', () => openFrame(studioReturnFrame));
+  root.querySelectorAll('[data-action="industries-view"]').forEach((btn)=>btn.addEventListener('click', ()=>{
+    selectedIndustryView = btn.getAttribute('data-view') || 'studios';
+    if (currentSnapshot) renderIndustriesBoard(currentSnapshot);
+  }));
   root.querySelector('[data-action="cancel-create-project"]')?.addEventListener('click', () => {
     selectedCreateMedium = null;
     pendingCreateDraft = { title: '', genre: '', theme: '', targetAudience: '' };
@@ -457,7 +462,8 @@ export function createIndustryUiController({ root, handlers }) {
     if (!emailId) return;
     handlers.onReadEmail(emailId);
   });
-  studiosEl?.addEventListener('click', (event) => {
+  industriesEl?.addEventListener('click', (event) => {
+    if (selectedIndustryView !== 'studios') return;
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     const card = target.closest('[data-studio-id]');
@@ -495,7 +501,7 @@ export function createIndustryUiController({ root, handlers }) {
   return {
     render(snapshot) {
       currentSnapshot = snapshot;
-      if (!topDateEl || !statsEl || !profileEl || !projectsEl || !studiosEl || !inboxEl || !rankingEl || !feedEl || !releasesEl || !communitiesEl) {
+      if (!topDateEl || !statsEl || !profileEl || !projectsEl || !industriesEl || !inboxEl || !rankingEl || !feedEl || !releasesEl || !communitiesEl) {
         reportUiContractIssue('#hypeApp', 'Render skipped: critical UI nodes missing');
         return;
       }
@@ -526,23 +532,7 @@ export function createIndustryUiController({ root, handlers }) {
       renderProjectsBoard(snapshot);
       renderProjectCreateSubframe();
 
-      studiosEl.innerHTML = snapshot.studios.map((studio) => `
-        <article class="industry-project" data-studio-id="${esc(studio.id)}">
-          <h3>${esc(studio.name)}</h3>
-          <p>CEO: ${esc(studio.ceoName)} · Tier ${esc(studio.tier)} · Rating ${Number(studio.rating || 0).toFixed(1)} · ${esc(studio.category)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
-        </article>
-      `).join('') + `
-        <article class="industry-project">
-          <h3>NPC Roster</h3>
-          <p>${snapshot.npcs.map((npc) => `${esc(npc.name)} (${esc(getNpcRoleLabel(npc.role))})`).join(' · ')}</p>
-        </article>
-        <article class="industry-project">
-          <h3>NPC Adaptation Pipeline</h3>
-          <p>${snapshot.npcProjects?.length
-            ? snapshot.npcProjects.map((entry) => `${esc(entry.title)} [${esc(entry.stage)}]`).join(' · ')
-            : 'No active NPC projects yet.'}</p>
-        </article>
-      `;
+      renderIndustriesBoard(snapshot);
 
       inboxEl.innerHTML = snapshot.unreadEmails?.length
         ? snapshot.unreadEmails.map((email) => `
@@ -641,6 +631,34 @@ export function createIndustryUiController({ root, handlers }) {
       openFrame('main');
     },
   };
+
+
+  function renderIndustriesBoard(snapshot) {
+    if (selectedIndustryView === 'agencies') {
+      industriesEl.innerHTML = (snapshot.agencies || []).map((agency) => `
+        <article class="industry-project">
+          <h3>${esc(agency.name)}</h3>
+          <p>Tier ${esc(agency.tier)} · Actors ${Number(agency.actors || 0)}</p>
+        </article>
+      `).join('') || '<p class="empty">No agency data yet.</p>';
+      return;
+    }
+    if (selectedIndustryView === 'production') {
+      industriesEl.innerHTML = (snapshot.productionHouses || []).map((house) => `
+        <article class="industry-project">
+          <h3>${esc(house.name)}</h3>
+          <p>Specialty: ${esc(house.specialty || 'hybrid')} · Partner Studios: ${(house.partnerStudioIds || []).length}</p>
+        </article>
+      `).join('') || '<p class="empty">No production house data yet.</p>';
+      return;
+    }
+    industriesEl.innerHTML = snapshot.studios.map((studio) => `
+      <article class="industry-project" data-studio-id="${esc(studio.id)}">
+        <h3>${esc(studio.name)}</h3>
+        <p>CEO: ${esc(studio.ceoName)} · Tier ${esc(studio.tier)} · Rating ${Number(studio.rating || 0).toFixed(1)} · ${esc(studio.category)} · Craft ${studio.craft.toFixed(0)} · Speed ${studio.speed.toFixed(0)} · Network ${studio.network.toFixed(0)} · Equity P/I: ${(studio.equity?.player ?? 0)}%/${(studio.equity?.investor ?? 0)}%</p>
+      </article>
+    `).join('');
+  }
 
   function renderProjectsBoard(snapshot) {
     const projectStageWeight = {
