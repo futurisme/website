@@ -130,11 +130,13 @@ const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(sel
 const state = loadState();
 let dragStart = null;
 let selectedOption = null;
+let lastFocus = null;
 
 const elements = {
   app: $('#academiaApp'),
   level: $('#levelLabel'),
-  streak: $('#streakLabel'),
+  topXp: $('#topXpValue'),
+  topAccuracy: $('#topAccuracyValue'),
   xp: $('#xpValue'),
   accuracy: $('#accuracyValue'),
   cardValue: $('#cardValue'),
@@ -150,7 +152,15 @@ const elements = {
   reflection: $('#reflectionPanel'),
   reflectionInput: $('#reflectionInput'),
   feedback: $('#feedback'),
-  pathway: $('#pathway')
+  pathway: $('#pathway'),
+  moduleNav: $('#moduleNav'),
+  profilePanel: $('#profilePanel'),
+  profileButton: $('[data-action="profile"]'),
+  profileTitle: $('#profileTitle'),
+  profileXp: $('#profileXp'),
+  profileAccuracy: $('#profileAccuracy'),
+  profileCards: $('#profileCards'),
+  profileStage: $('#profileStage')
 };
 
 function loadState() {
@@ -198,25 +208,51 @@ function markDone(points = 20) {
 function renderStats() {
   const progress = Math.round((state.done.length / cards.length) * 100);
   const accuracy = state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
-  elements.level.textContent = levelName(state.xp);
-  elements.streak.textContent = `${state.xp} XP · ${state.done.length} kartu selesai`;
+  const level = levelName(state.xp);
+  elements.level.textContent = level;
+  elements.topXp.textContent = state.xp;
+  elements.topAccuracy.textContent = `${accuracy}%`;
   elements.xp.textContent = state.xp;
   elements.accuracy.textContent = `${accuracy}%`;
   elements.cardValue.textContent = `${state.done.length}/${cards.length}`;
+  elements.profileTitle.textContent = level;
+  elements.profileXp.textContent = state.xp;
+  elements.profileAccuracy.textContent = `${accuracy}%`;
+  elements.profileCards.textContent = `${state.done.length}/${cards.length}`;
+  elements.profileStage.textContent = currentCard().module.title;
   elements.progress.textContent = `${progress}%`;
   elements.ring.style.setProperty('--progress', `${progress}%`);
 }
 
+function moduleDoneCount(module) {
+  return module.cards.filter((_, cardIndex) => state.done.includes(cards.findIndex((card) => card.module.id === module.id && card.cardIndex === cardIndex))).length;
+}
+
+function jumpToModule(moduleIndex) {
+  const nextIndex = cards.findIndex((card) => card.moduleIndex === moduleIndex);
+  if (nextIndex < 0) return;
+  elements.card.dataset.exit = moduleIndex > currentCard().moduleIndex ? 'right' : 'left';
+  window.setTimeout(() => {
+    state.index = nextIndex;
+    renderCard();
+  }, 120);
+}
+
 function renderPathway() {
+  const activeId = currentCard().module.id;
   elements.pathway.innerHTML = modules.map((module, index) => {
     const total = module.cards.length;
-    const done = module.cards.filter((_, cardIndex) => state.done.includes(cards.findIndex((card) => card.module.id === module.id && card.cardIndex === cardIndex))).length;
-    return `<article class="path-node" data-active="${currentCard().module.id === module.id}">
+    const done = moduleDoneCount(module);
+    return `<article class="path-node" data-active="${activeId === module.id}">
       <p class="eyebrow">Stage ${index + 1}</p>
       <h3>${esc(module.title)}</h3>
       <p>${esc(module.summary)}</p>
       <p>${done}/${total} selesai</p>
     </article>`;
+  }).join('');
+  elements.moduleNav.innerHTML = modules.map((module, index) => {
+    const done = moduleDoneCount(module);
+    return `<button type="button" data-module-index="${index}" data-active="${activeId === module.id}"><span>${esc(module.title)}</span><small>${done}/${module.cards.length}</small></button>`;
   }).join('');
 }
 
@@ -301,6 +337,19 @@ function resetProgress() {
   elements.feedback.textContent = 'Progres direset. Mulai lagi dari Focus Lab.';
 }
 
+function openProfile() {
+  lastFocus = document.activeElement;
+  elements.profilePanel.hidden = false;
+  elements.profileButton.setAttribute('aria-expanded', 'true');
+  elements.profilePanel.querySelector('[data-action="close-profile"]')?.focus();
+}
+
+function closeProfile() {
+  elements.profilePanel.hidden = true;
+  elements.profileButton.setAttribute('aria-expanded', 'false');
+  lastFocus?.focus?.();
+}
+
 function onPointerMove(event) {
   if (!dragStart) return;
   const dx = event.clientX - dragStart.x;
@@ -320,13 +369,18 @@ function onPointerEnd(event) {
   }
 }
 
-elements.app.addEventListener('click', (event) => {
+document.addEventListener('click', (event) => {
   const action = event.target.closest('[data-action]')?.dataset.action;
   if (action === 'start') elements.card.focus({ preventScroll: false });
   if (action === 'reset') resetProgress();
+  if (action === 'profile') openProfile();
+  if (action === 'close-profile') closeProfile();
   if (action === 'prev') move(-1);
   if (action === 'next') move(1);
   if (action === 'check') checkCard();
+
+  const moduleButton = event.target.closest('[data-module-index]');
+  if (moduleButton) jumpToModule(Number(moduleButton.dataset.moduleIndex));
 
   const option = event.target.closest('[data-option]');
   if (option) {
@@ -349,6 +403,10 @@ elements.card.addEventListener('pointerdown', (event) => {
 elements.card.addEventListener('pointermove', onPointerMove);
 elements.card.addEventListener('pointerup', onPointerEnd);
 elements.card.addEventListener('pointercancel', onPointerEnd);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !elements.profilePanel.hidden) closeProfile();
+});
+
 elements.card.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowRight') move(1);
   if (event.key === 'ArrowLeft') move(-1);
