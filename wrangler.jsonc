@@ -4,10 +4,24 @@
   "main": "src/index.js",
   "compatibility_date": "2026-05-09",
   "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
   "assets": {
     "directory": ".",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/", "/portfolio*", "/home*", "/shareideas*", "/archives*", "/mindmapmaker*", "/books*"],
+    "run_worker_first": [
+      "/api/*",
+      "/",
+      "/portfolio*",
+      "/home*",
+      "/shareideas*",
+      "/archives*",
+      "/mindmapmaker*",
+      "/books*",
+      "/hype*",
+      "/rpg*",
+      "/games/*",
+      "/daily-streak*"
+    ],
     "not_found_handling": "404-page"
   }
 }
