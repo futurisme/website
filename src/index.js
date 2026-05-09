@@ -57,6 +57,27 @@ const STATIC_PREFIXES = [
 function mapPath(path) {
   const clean = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
   if (ROOT_ROUTES.has(clean)) return { type: 'asset', value: ROOT_ROUTES.get(clean) };
+  const legacyRootMap = {
+    '/website/portfolio': '/',
+    '/website/portfolio/': '/',
+    '/website/home': '/home',
+    '/website/home/': '/home',
+    '/website/shareideas': '/shareideas',
+    '/website/shareideas/': '/shareideas',
+    '/website/archives': '/archives',
+    '/website/archives/': '/archives',
+    '/website/mindmapmaker': '/mindmapmaker',
+    '/website/mindmapmaker/': '/mindmapmaker',
+    '/website/daily-streak': '/daily-streak',
+    '/website/daily-streak/': '/daily-streak',
+    '/games/hype': '/hype',
+    '/games/hype/': '/hype',
+    '/games/dreambusiness': '/dreambusiness',
+    '/games/dreambusiness/': '/dreambusiness',
+    '/games/rpg': '/rpg',
+    '/games/rpg/': '/rpg'
+  };
+  if (legacyRootMap[path]) return { type: 'redirect', value: legacyRootMap[path] };
   for (const [from, to] of STATIC_PREFIXES) if (clean.startsWith(from)) return { type: 'asset', value: to + clean.slice(from.length) };
   const rootAssets = {
     '/robots.txt': '/website/robots.txt', '/sitemap.xml': '/website/sitemap.xml', '/site.webmanifest': '/website/site.webmanifest', '/fadhil.svg': '/website/fadhil.svg',
