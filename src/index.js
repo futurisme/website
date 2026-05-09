@@ -35,7 +35,7 @@ const ROOT_ROUTES = new Map([
   ['/home', '/website/home/index.html'],
   ['/shareideas', '/website/shareideas/index.html'],
   ['/archives', '/website/archives/index.html'],
-  ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
+  ['/mindmapmaker', '/website/mindmapmaker/index.html'],
   ['/daily-streak', '/website/daily-streak/index.html'],
   ['/hype', '/games/hype/index.html'],
   ['/dreambusiness', '/games/dreambusiness/index.html'],
@@ -46,7 +46,7 @@ const STATIC_PREFIXES = [
   ['/home/', '/website/home/'],
   ['/shareideas/', '/website/shareideas/'],
   ['/archives/', '/website/archives/'],
-  ['/mindmapmaker/', '/website/website/mindmapmaker/'],
+  ['/mindmapmaker/', '/website/mindmapmaker/'],
   ['/daily-streak/', '/website/daily-streak/'],
   ['/hype/', '/games/hype/'],
   ['/dreambusiness/', '/games/dreambusiness/'],
@@ -57,18 +57,6 @@ const STATIC_PREFIXES = [
 function mapPath(path) {
   const clean = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
   if (ROOT_ROUTES.has(clean)) return { type: 'asset', value: ROOT_ROUTES.get(clean) };
-  const legacyRootMap = {
-    '/website/portfolio': '/',
-    '/website/home': '/home',
-    '/website/shareideas': '/shareideas',
-    '/website/archives': '/archives',
-    '/website/mindmapmaker': '/mindmapmaker',
-    '/website/daily-streak': '/daily-streak'
-  };
-  if (legacyRootMap[clean]) return { type: 'redirect', value: legacyRootMap[clean] };
-  if (/^\/shareideas\/page\/\d+$/.test(clean)) return { type: 'asset', value: '/website/shareideas/workspace.html' };
-  if (/^\/archives\/[^/.]+$/.test(clean)) return { type: 'asset', value: '/website/archives/workspace.html' };
-  if (/^\/mindmapmaker\/editor\/\d+$/.test(clean) || /^\/editor\/\d+$/.test(clean)) return { type: 'asset', value: '/website/website/mindmapmaker/editor/index.html' };
   for (const [from, to] of STATIC_PREFIXES) if (clean.startsWith(from)) return { type: 'asset', value: to + clean.slice(from.length) };
   const rootAssets = {
     '/robots.txt': '/website/robots.txt', '/sitemap.xml': '/website/sitemap.xml', '/site.webmanifest': '/website/site.webmanifest', '/fadhil.svg': '/website/fadhil.svg',
