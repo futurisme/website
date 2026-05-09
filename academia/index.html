@@ -27,14 +27,20 @@
         <span class="brand-mark" aria-hidden="true">A</span>
         <span><strong>Academia</strong><small>Quest 13–16</small></span>
       </a>
-      <div class="top-metrics" aria-label="Progress ringkas">
-        <span><strong id="topXpValue">0</strong> XP</span>
-        <span><strong id="topAccuracyValue">0%</strong> Quiz</span>
+      <div class="top-center" aria-label="Progress ringkas">
+        <div class="top-metrics">
+          <span><strong id="topXpValue">0</strong> XP</span>
+          <span><strong id="topAccuracyValue">0%</strong> Quiz</span>
+        </div>
+        <div class="mini-progress" aria-label="Progress total"><span id="topProgressFill"></span></div>
       </div>
-      <button class="profile-button" type="button" data-action="profile" aria-controls="profilePanel" aria-expanded="false">
-        <span class="avatar" aria-hidden="true">RS</span>
-        <span>Profile</span>
-      </button>
+      <div class="top-actions">
+        <button class="stats-button" type="button" data-action="stats" aria-controls="statsPanel" aria-expanded="false">Stats</button>
+        <button class="profile-button" type="button" data-action="profile" aria-controls="profilePanel" aria-expanded="false">
+          <span class="avatar" aria-hidden="true">RS</span>
+          <span>Profile</span>
+        </button>
+      </div>
     </header>
 
     <main class="app-shell" id="academiaApp">
@@ -100,6 +106,11 @@
           <li><a href="https://www.unesco.org/en/digital-education" rel="noopener noreferrer" target="_blank">UNESCO Digital Education</a></li>
         </ul>
       </section>
+
+      <footer class="site-footer compact-panel">
+        <p><strong>Academia</strong> dibuat sebagai microlearning ringan untuk latihan fokus, riset, literasi AI, dan wellbeing.</p>
+        <small>© 2026 Fadhil.dev · Static-first, no-library, Cloudflare-compatible learning UI.</small>
+      </footer>
     </main>
 
     <aside class="profile-sheet" id="profilePanel" aria-labelledby="profileTitle" hidden>
@@ -120,6 +131,27 @@
           <div><dt>Stage aktif</dt><dd id="profileStage">Focus Lab</dd></div>
         </dl>
         <p class="profile-note">Tip: pakai ← / → untuk pindah kartu, Enter untuk cek, atau swipe langsung di layar sentuh.</p>
+      </section>
+    </aside>
+
+    <aside class="stats-sheet" id="statsPanel" aria-labelledby="statsTitle" hidden>
+      <div class="profile-backdrop" data-action="close-stats" aria-hidden="true"></div>
+      <section class="profile-card stats-card" role="dialog" aria-modal="true">
+        <div class="profile-head">
+          <span class="profile-avatar" aria-hidden="true">Σ</span>
+          <div>
+            <p class="eyebrow">Statistik</p>
+            <h2 id="statsTitle">Learning Analytics</h2>
+          </div>
+          <button type="button" class="icon-button" data-action="close-stats" aria-label="Tutup statistik">×</button>
+        </div>
+        <dl class="profile-grid">
+          <div><dt>Progress</dt><dd id="statsProgress">0%</dd></div>
+          <div><dt>XP</dt><dd id="statsXp">0</dd></div>
+          <div><dt>Akurasi</dt><dd id="statsAccuracy">0%</dd></div>
+          <div><dt>Selesai</dt><dd id="statsDone">0/0</dd></div>
+        </dl>
+        <div class="stats-bars" id="statsBars" aria-label="Progress per kategori"></div>
       </section>
     </aside>
 

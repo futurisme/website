@@ -131,12 +131,14 @@ const state = loadState();
 let dragStart = null;
 let selectedOption = null;
 let lastFocus = null;
+let activeSheet = null;
 
 const elements = {
   app: $('#academiaApp'),
   level: $('#levelLabel'),
   topXp: $('#topXpValue'),
   topAccuracy: $('#topAccuracyValue'),
+  topProgressFill: $('#topProgressFill'),
   xp: $('#xpValue'),
   accuracy: $('#accuracyValue'),
   cardValue: $('#cardValue'),
@@ -156,11 +158,18 @@ const elements = {
   moduleNav: $('#moduleNav'),
   profilePanel: $('#profilePanel'),
   profileButton: $('[data-action="profile"]'),
+  statsPanel: $('#statsPanel'),
+  statsButton: $('[data-action="stats"]'),
   profileTitle: $('#profileTitle'),
   profileXp: $('#profileXp'),
   profileAccuracy: $('#profileAccuracy'),
   profileCards: $('#profileCards'),
-  profileStage: $('#profileStage')
+  profileStage: $('#profileStage'),
+  statsProgress: $('#statsProgress'),
+  statsXp: $('#statsXp'),
+  statsAccuracy: $('#statsAccuracy'),
+  statsDone: $('#statsDone'),
+  statsBars: $('#statsBars')
 };
 
 function loadState() {
@@ -220,8 +229,13 @@ function renderStats() {
   elements.profileAccuracy.textContent = `${accuracy}%`;
   elements.profileCards.textContent = `${state.done.length}/${cards.length}`;
   elements.profileStage.textContent = currentCard().module.title;
+  elements.statsProgress.textContent = `${progress}%`;
+  elements.statsXp.textContent = state.xp;
+  elements.statsAccuracy.textContent = `${accuracy}%`;
+  elements.statsDone.textContent = `${state.done.length}/${cards.length}`;
   elements.progress.textContent = `${progress}%`;
   elements.ring.style.setProperty('--progress', `${progress}%`);
+  elements.topProgressFill.style.transform = `scaleX(${progress / 100})`;
 }
 
 function moduleDoneCount(module) {
@@ -250,10 +264,12 @@ function renderPathway() {
       <p>${done}/${total} selesai</p>
     </article>`;
   }).join('');
-  elements.moduleNav.innerHTML = modules.map((module, index) => {
+  const moduleStats = modules.map((module, index) => {
     const done = moduleDoneCount(module);
-    return `<button type="button" data-module-index="${index}" data-active="${activeId === module.id}"><span>${esc(module.title)}</span><small>${done}/${module.cards.length}</small></button>`;
-  }).join('');
+    return { module, index, done, total: module.cards.length, pct: Math.round((done / module.cards.length) * 100) };
+  });
+  elements.moduleNav.innerHTML = moduleStats.map(({ module, index, done, total }) => `<button type="button" data-module-index="${index}" data-active="${activeId === module.id}"><span>${esc(module.title)}</span><small>${done}/${total}</small></button>`).join('');
+  elements.statsBars.innerHTML = moduleStats.map(({ module, done, total, pct }) => `<div class="stat-bar"><span>${esc(module.title)}</span><strong>${done}/${total}</strong><i><b style="transform:scaleX(${pct / 100})"></b></i></div>`).join('');
 }
 
 function renderCard() {
@@ -337,16 +353,23 @@ function resetProgress() {
   elements.feedback.textContent = 'Progres direset. Mulai lagi dari Focus Lab.';
 }
 
-function openProfile() {
+function openSheet(kind) {
   lastFocus = document.activeElement;
-  elements.profilePanel.hidden = false;
-  elements.profileButton.setAttribute('aria-expanded', 'true');
-  elements.profilePanel.querySelector('[data-action="close-profile"]')?.focus();
+  activeSheet = kind;
+  const panel = kind === 'profile' ? elements.profilePanel : elements.statsPanel;
+  const button = kind === 'profile' ? elements.profileButton : elements.statsButton;
+  panel.hidden = false;
+  button.setAttribute('aria-expanded', 'true');
+  panel.querySelector('[data-action^="close-"]')?.focus();
 }
 
-function closeProfile() {
-  elements.profilePanel.hidden = true;
-  elements.profileButton.setAttribute('aria-expanded', 'false');
+function closeSheet(kind = activeSheet) {
+  if (!kind) return;
+  const panel = kind === 'profile' ? elements.profilePanel : elements.statsPanel;
+  const button = kind === 'profile' ? elements.profileButton : elements.statsButton;
+  panel.hidden = true;
+  button.setAttribute('aria-expanded', 'false');
+  activeSheet = null;
   lastFocus?.focus?.();
 }
 
@@ -373,8 +396,10 @@ document.addEventListener('click', (event) => {
   const action = event.target.closest('[data-action]')?.dataset.action;
   if (action === 'start') elements.card.focus({ preventScroll: false });
   if (action === 'reset') resetProgress();
-  if (action === 'profile') openProfile();
-  if (action === 'close-profile') closeProfile();
+  if (action === 'profile') openSheet('profile');
+  if (action === 'stats') openSheet('stats');
+  if (action === 'close-profile') closeSheet('profile');
+  if (action === 'close-stats') closeSheet('stats');
   if (action === 'prev') move(-1);
   if (action === 'next') move(1);
   if (action === 'check') checkCard();
@@ -404,7 +429,7 @@ elements.card.addEventListener('pointermove', onPointerMove);
 elements.card.addEventListener('pointerup', onPointerEnd);
 elements.card.addEventListener('pointercancel', onPointerEnd);
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && !elements.profilePanel.hidden) closeProfile();
+  if (event.key === 'Escape') closeSheet();
 });
 
 elements.card.addEventListener('keydown', (event) => {
