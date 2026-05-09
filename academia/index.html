@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08111f" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="Academia by Fadhil.dev: microlearning interaktif untuk remaja 13-16 dengan kartu swipe, quiz, pertanyaan reflektif, dan referensi pembelajaran digital." />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+    <link rel="canonical" href="https://fadhil.dev/academia" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fadhil.dev" />
+    <meta property="og:title" content="Academia | Digital Learning Quest" />
+    <meta property="og:description" content="Microlearning seru untuk remaja 13-16: swipe cards, quiz cepat, dan misi belajar berbasis literasi digital." />
+    <meta property="og:url" content="https://fadhil.dev/academia" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Academia | Digital Learning Quest" />
+    <meta name="twitter:description" content="Microlearning seru untuk remaja 13-16: swipe cards, quiz cepat, dan misi belajar berbasis literasi digital." />
+    <title>Academia | Digital Learning Quest</title>
+    <link rel="stylesheet" href="/academia/styles.css" />
+    <link rel="icon" href="/fadhil-512x512.png" sizes="512x512" type="image/png" />
+    <link rel="alternate icon" href="/fadhil.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="app-shell" id="academiaApp">
+      <section class="hero" aria-labelledby="appTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">Academia · usia 13–16</p>
+          <h1 id="appTitle">Digital Learning Quest</h1>
+          <p class="hero-text">Belajar dengan kartu geser, quiz mikro, dan pertanyaan reflektif. Setiap sesi dibuat pendek, jelas, dan bisa diselesaikan di ponsel maupun desktop.</p>
+          <div class="hero-actions" aria-label="Aksi utama">
+            <button class="primary-action" type="button" data-action="start">Mulai Quest</button>
+            <button class="ghost-action" type="button" data-action="reset">Reset Progres</button>
+          </div>
+        </div>
+        <aside class="mission-card" aria-label="Ringkasan progres">
+          <span class="orb" aria-hidden="true"></span>
+          <p>Level</p>
+          <strong id="levelLabel">Rookie Scholar</strong>
+          <small id="streakLabel">0 XP · 0 kartu selesai</small>
+        </aside>
+      </section>
+
+      <section class="dashboard" aria-label="Dashboard Academia">
+        <article class="stat"><span id="xpValue">0</span><small>XP</small></article>
+        <article class="stat"><span id="accuracyValue">0%</span><small>Akurasi Quiz</small></article>
+        <article class="stat"><span id="cardValue">0/0</span><small>Kartu</small></article>
+      </section>
+
+      <section class="learn-stage" aria-label="Arena kartu pembelajaran">
+        <div class="deck-topline">
+          <div>
+            <p class="eyebrow" id="moduleLabel">Module</p>
+            <h2 id="cardTitle">Loading…</h2>
+          </div>
+          <div class="progress-ring" aria-label="Progres modul"><span id="progressValue">0%</span></div>
+        </div>
+
+        <div class="deck" id="deck" aria-live="polite">
+          <article class="learn-card" id="learnCard" tabindex="0" aria-describedby="cardBody">
+            <div class="card-meta">
+              <span id="cardType">Lesson</span>
+              <span id="cardTime">2 min</span>
+            </div>
+            <p id="cardBody"></p>
+            <div class="quiz" id="quizPanel" hidden></div>
+            <div class="reflection" id="reflectionPanel" hidden>
+              <label for="reflectionInput">Jawaban singkatmu</label>
+              <textarea id="reflectionInput" rows="4" maxlength="260" placeholder="Tulis 1-2 kalimat…"></textarea>
+            </div>
+            <div class="swipe-hint" aria-hidden="true"><span>← ulangi</span><span>geser / tombol</span><span>lanjut →</span></div>
+          </article>
+        </div>
+
+        <div class="deck-controls" aria-label="Kontrol kartu">
+          <button type="button" data-action="prev" aria-label="Kartu sebelumnya">← Kiri</button>
+          <button type="button" data-action="check">Cek</button>
+          <button type="button" data-action="next" aria-label="Kartu berikutnya">Kanan →</button>
+        </div>
+        <p class="feedback" id="feedback" role="status"></p>
+      </section>
+
+      <section class="pathway" aria-label="Peta modul belajar" id="pathway"></section>
+
+      <section class="sources" aria-labelledby="sourceTitle">
+        <h2 id="sourceTitle">Basis desain pembelajaran</h2>
+        <ul>
+          <li><a href="https://www.cdc.gov/parents/teens/index.html" rel="noopener noreferrer" target="_blank">CDC — perkembangan remaja</a></li>
+          <li><a href="https://www.oecd.org/en/topics/digital-education.html" rel="noopener noreferrer" target="_blank">OECD — digital education</a></li>
+          <li><a href="https://www.unesco.org/en/digital-education" rel="noopener noreferrer" target="_blank">UNESCO — digital learning and education transformation</a></li>
+        </ul>
+      </section>
+    </main>
+    <script type="module" src="/academia/app.js"></script>
+  </body>
+</html>

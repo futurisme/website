@@ -38,6 +38,7 @@ const ROUTES = new Map([
   ['/home', '/website/home/index.html'],
   ['/shareideas', '/website/shareideas/index.html'],
   ['/archives', '/website/archives/index.html'],
+  ['/academia', '/academia/index.html'],
   ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
   ['/books', '/website/website/books/index.html'],
   ['/daily-streak', '/website/daily-streak/index.html'],
@@ -50,6 +51,7 @@ const STATIC_PREFIXES = [
   ['/home/', '/website/home/'],
   ['/shareideas/', '/website/shareideas/'],
   ['/archives/', '/website/archives/'],
+  ['/academia/', '/academia/'],
   ['/mindmapmaker/', '/website/website/mindmapmaker/'],
   ['/books/', '/website/website/books/'],
   ['/daily-streak/', '/website/daily-streak/'],
@@ -87,7 +89,7 @@ function canonicalPath(pathname) {
   let path = normalizePath(pathname);
   const original = path;
 
-  path = path.replace(/^\/website(?:\/website)?\/(portfolio|home|shareideas|archives|mindmapmaker|books|daily-streak)(?=\/|$)/, (_, section) => `/${section}`) || '/';
+  path = path.replace(/^\/website(?:\/website)?\/(portfolio|home|shareideas|archives|academia|mindmapmaker|books|daily-streak)(?=\/|$)/, (_, section) => `/${section}`) || '/';
   path = path.replace(/^\/games\/(hype|dreambusiness|rpg)(?=\/|$)/, '/$1');
   path = normalizePath(path);
 
