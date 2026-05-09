@@ -40,9 +40,9 @@ const ROOT_ROUTES = new Map([
   ['/archives', '/website/archives/index.html'],
   ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
   ['/daily-streak', '/website/daily-streak/index.html'],
-  ['/hype', '/games/hype/index.html'],
-  ['/dreambusiness', '/games/dreambusiness/index.html'],
-  ['/rpg', '/games/rpg/index.html']
+  ['/hype', '/hype/index.html'],
+  ['/dreambusiness', '/dreambusiness/index.html'],
+  ['/rpg', '/rpg/index.html']
 ]);
 
 const STATIC_PREFIXES = [
@@ -51,9 +51,9 @@ const STATIC_PREFIXES = [
   ['/archives/', '/website/archives/'],
   ['/mindmapmaker/', '/website/website/mindmapmaker/'],
   ['/daily-streak/', '/website/daily-streak/'],
-  ['/hype/', '/games/hype/'],
-  ['/dreambusiness/', '/games/dreambusiness/'],
-  ['/rpg/', '/games/rpg/'],
+  ['/hype/', '/hype/'],
+  ['/dreambusiness/', '/dreambusiness/'],
+  ['/rpg/', '/rpg/'],
   ['/assets/public/images/', '/assets/public/images/']
 ];
 

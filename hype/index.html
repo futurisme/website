@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fadhil Akbar Cariearsa | Generalist & Student of the Craft</title>
+    <link rel="canonical" href="https://fadhil.dev/hype" />
+    <meta property="og:site_name" content="Fadhil Akbar Cariearsa" />
+    <meta property="og:title" content="Fadhil Akbar Cariearsa | Generalist & Student of the Craft" />
+    <meta name="twitter:title" content="Fadhil Akbar Cariearsa | Generalist & Student of the Craft" />
+    <meta name="description" content="Fadhil Akbar Cariearsa: A trilingual hobbyist generalist in development, writing, cybersecurity, editing, and analysis. A student of the craft." />
+    <meta property="og:description" content="Fadhil Akbar Cariearsa: A trilingual hobbyist generalist in development, writing, cybersecurity, editing, and analysis. A student of the craft." />
+    <meta name="twitter:description" content="Fadhil Akbar Cariearsa: A trilingual hobbyist generalist in development, writing, cybersecurity, editing, and analysis. A student of the craft." />
+    <link rel="stylesheet" href="/hype/industry-ui.css" />
+    <link rel="icon" href="/fadhil-512x512.png" sizes="512x512" type="image/png" />
+    <link rel="alternate icon" href="/fadhil.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main id="hypeApp" class="industry-shell">
+      <section id="frameRegister" class="frame frame-active">
+        <article class="industry-panel">
+          <div class="frame-content-scroll">
+            <h1>Hype</h1>
+            <p>Register first to start the simulation.</p>
+            <label>Name</label>
+            <input id="registerName" type="text" placeholder="Enter your name" />
+            <label>Starting profession</label>
+            <select id="registerProfession">
+              <option>Mangaka</option>
+              <option>Novelis</option>
+              <option>Animator</option>
+            </select>
+            <label>Quick Save Load (AI26)</label>
+            <textarea id="registerSaveInput" rows="4" placeholder="Paste AI26 save text here to load immediately"></textarea>
+            <button data-action="load-save-register">Load Save from Register</button>
+            <button data-action="register">Start Simulation</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameMain" class="frame">
+        <article class="industry-panel">
+          <div class="topline">
+            <h1>Mainframe</h1>
+            <small id="topDate"></small>
+          </div>
+          <div class="industry-topbar" role="toolbar" aria-label="Mainframe Topbar">
+            <button data-action="tick-1">+1 Day</button>
+            <button data-action="tick-7">+7 Day</button>
+            <button data-action="toggle-auto">Auto</button>
+            <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
+            <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
+          </div>
+          <div class="mainframe-canvas frame-content-scroll">
+            <aside class="mainframe-side mainframe-side-left" aria-label="Left Sidebar">
+              <h3>Workspace</h3>
+              <button data-action="to-full-projects" data-frame-target="fullProjects">Projects</button>
+              <button data-action="to-full-found-studio" data-frame-target="fullFoundStudio">Found Studio</button>
+              <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
+            </aside>
+            <section class="mainframe-center" aria-label="Main Canvas">
+              <div id="industryStats" class="industry-stats"></div>
+              <div class="industry-toolbar">
+                <button data-action="to-full-ranking" data-frame-target="fullRanking">Ranking</button>
+                <button data-action="to-full-communities" data-frame-target="fullCommunities">Platforms</button>
+                <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
+                <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
+              </div>
+            </section>
+            <aside class="mainframe-side mainframe-side-right" aria-label="Right Sidebar">
+              <h3>Quick Routes</h3>
+              <button data-action="to-full-profile" data-frame-target="fullProfile">Profile</button>
+              <button data-action="to-full-email" data-frame-target="fullEmail">Email</button>
+              <button data-action="toggle-auto">Auto Run</button>
+            </aside>
+          </div>
+          <div class="industry-bottombar" role="toolbar" aria-label="Mainframe Bottombar">
+            <button data-action="to-full-studios" data-frame-target="fullStudios">Industries</button>
+            <button data-action="to-full-management" data-frame-target="fullManagement">Management</button>
+            <button data-action="to-full-feed" data-frame-target="fullFeed">Feed</button>
+          </div>
+        </article>
+      </section>
+
+
+      <section id="frameFullProfile" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Profile Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="industryProfile" class="industry-stats"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullProjects" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Projects Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <button type="button" data-action="open-create-project" hidden aria-hidden="true" tabindex="-1">contract-sentinel</button>
+            <div id="industryProjects" class="industry-projects"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullFoundStudio" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Studio Foundation</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="ceoStatus"></div>
+            <div class="industry-toolbar">
+              <button data-action="open-studio-planning">Open Studio Planning</button>
+              <button data-action="seek-funding">Seek Funding</button>
+            </div>
+            <label>New Studio Name</label>
+            <input id="studioNameInput" type="text" placeholder="Example: Aurora Frame Studio" />
+            <button data-action="found-studio">Found Studio</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullRanking" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Ranking Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="rankingBoard" class="industry-projects"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullFeed" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Feed Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <ul id="industryFeed" class="industry-feed"></ul>
+            <h3>Releases</h3>
+            <ul id="industryReleases" class="industry-releases"></ul>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullCommunities" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Communities</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="communitiesBoard" class="industry-projects"></div>
+          </div>
+        </article>
+      </section>
+
+
+      <section id="frameFullStudios" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Industries Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div class="industry-toolbar">
+              <button data-action="industries-view" data-view="studios">Studios</button>
+              <button data-action="industries-view" data-view="agencies">Agency</button>
+              <button data-action="industries-view" data-view="production">Production House</button>
+            </div>
+            <div id="industryStudios" class="industry-projects"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullEmail" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Email Inbox (Unread)</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="industryInbox" class="industry-projects"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullCommittee" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Production Committee</h2><button data-action="back-projects">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="committeeBody"></div>
+            <div class="industry-toolbar">
+              <button data-action="committee-discuss">Discuss with AI NPCs</button>
+              <button data-action="committee-confirm">Form Committee</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullManagement" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Management Fullframe</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="managementBoard"></div>
+            <div class="industry-toolbar">
+              <button data-action="management-merger">Propose Studio Merger</button>
+              <button data-action="management-cofund">Co-Fund New Studio</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameSubProject" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2 id="subProjectTitle">Project</h2><button data-action="back-projects">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="subProjectBody"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameSubProjectCreate" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2 id="subProjectCreateTitle">Create New Project</h2><button data-action="cancel-create-project">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="subProjectCreateBody"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameSubStudio" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2 id="subStudioTitle">Studio Detail</h2><button data-action="back-studio-source">↩</button></div>
+          <div class="frame-content-scroll">
+            <div id="subStudioBody"></div>
+          </div>
+        </article>
+      </section>
+
+      <section id="frameFullSettings" class="frame">
+        <article class="industry-panel">
+          <div class="topline"><h2>Settings Save/Load</h2><button data-action="back-main">↩</button></div>
+          <div class="frame-content-scroll">
+            <p>Save format: compact text that can be read and edited manually.</p>
+            <textarea id="savePayloadInput" rows="8" placeholder="AI26:{...}"></textarea>
+            <div class="industry-toolbar">
+              <button data-action="export-save">Generate Save</button>
+              <button data-action="download-save">Download Save</button>
+              <button data-action="load-save">Load Save</button>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+    <button id="settingsDockButton" data-action="to-full-settings" class="settings-dock-btn">Settings</button>
+
+    <script type="module" src="/hype/app.js"></script>
+  </body>
+</html>
