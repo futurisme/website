@@ -57,7 +57,15 @@ const STATIC_PREFIXES = [
 function mapPath(path) {
   const clean = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
   if (ROOT_ROUTES.has(clean)) return { type: 'asset', value: ROOT_ROUTES.get(clean) };
-  if (clean.startsWith('/website/')) return { type: 'deny' };
+  const legacyRootMap = {
+    '/website/portfolio': '/',
+    '/website/home': '/home',
+    '/website/shareideas': '/shareideas',
+    '/website/archives': '/archives',
+    '/website/mindmapmaker': '/mindmapmaker',
+    '/website/daily-streak': '/daily-streak'
+  };
+  if (legacyRootMap[clean]) return { type: 'redirect', value: legacyRootMap[clean] };
   if (/^\/shareideas\/page\/\d+$/.test(clean)) return { type: 'asset', value: '/website/shareideas/workspace.html' };
   if (/^\/archives\/[^/.]+$/.test(clean)) return { type: 'asset', value: '/website/archives/workspace.html' };
   if (/^\/mindmapmaker\/editor\/\d+$/.test(clean) || /^\/editor\/\d+$/.test(clean)) return { type: 'asset', value: '/website/website/mindmapmaker/editor/index.html' };
@@ -88,6 +96,7 @@ export default {
     if (u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req, env);
     if (u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req, env);
     const r = mapPath(u.pathname);
+    if (r.type === 'redirect') return Response.redirect(`${u.origin}${r.value}${u.search}`, 308);
     if (r.type === 'deny') return new Response('Not Found', { status: 404, headers: { 'cache-control': 'no-store' } });
     const url = new URL(req.url); url.pathname = r.value;
     const res = await env.ASSETS.fetch(new Request(url.toString(), req));
