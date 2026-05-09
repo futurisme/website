@@ -26,9 +26,7 @@ async function handleMindmap(req,env){ const p=getPool(env); if(!p) return json(
 }
 
 function mapPath(path){
-  if (path.startsWith('/website/')) return mapPath(path.slice('/website'.length) || '/');
-
-  const exact = new Map([
+    const exact = new Map([
     ['/', '/website/portfolio/index.html'], ['/portfolio', '/website/portfolio/index.html'], ['/portfolio/', '/website/portfolio/index.html'],
     ['/home', '/website/home/index.html'], ['/home/', '/website/home/index.html'], ['/shareideas', '/website/shareideas/index.html'], ['/shareideas/', '/website/shareideas/index.html'],
     ['/archives', '/website/archives/index.html'], ['/archives/', '/website/archives/index.html'], ['/mindmapmaker', '/website/website/mindmapmaker/index.html'], ['/mindmapmaker/', '/website/website/mindmapmaker/index.html'],
@@ -54,4 +52,31 @@ function mapPath(path){
   return path;
 }
 
-export default { async fetch(req, env){ const u=new URL(req.url); if(u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req,env); if(u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req,env); const mapped=mapPath(u.pathname); if(mapped!==u.pathname){ u.pathname=mapped; return env.ASSETS.fetch(new Request(u.toString(), req)); } return env.ASSETS.fetch(req);} };
+function withPerfHeaders(response, pathname){
+  const headers = new Headers(response.headers);
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  const isHtml = pathname.endsWith('.html') || !pathname.includes('.');
+  const isStaticAsset = /\.(css|js|mjs|png|jpg|jpeg|webp|avif|svg|woff2?|ico|txt|xml)$/i.test(pathname);
+  if (isHtml) {
+    headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
+  } else if (isStaticAsset) {
+    headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+export default { async fetch(req, env){
+  const u=new URL(req.url);
+  if (u.pathname.startsWith('/website/')) {
+    const cleaned = u.pathname.replace(/^\/website/, '') || '/';
+    return Response.redirect(`${u.origin}${cleaned}${u.search}`, 308);
+  }
+  if(u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req,env);
+  if(u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req,env);
+  const mapped=mapPath(u.pathname);
+  const assetUrl = new URL(req.url);
+  assetUrl.pathname = mapped;
+  const assetRes = await env.ASSETS.fetch(new Request(assetUrl.toString(), req));
+  return withPerfHeaders(assetRes, mapped);
+} };
