@@ -33,12 +33,13 @@ async function handleMindmap(req, env) { /* unchanged */
   return json({ ok: false, error: 'Method not allowed.' }, 405);
 }
 
-const ROOT_ROUTES = new Map([
+const ROUTES = new Map([
   ['/', '/website/portfolio/index.html'],
   ['/home', '/website/home/index.html'],
   ['/shareideas', '/website/shareideas/index.html'],
   ['/archives', '/website/archives/index.html'],
   ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
+  ['/books', '/website/website/books/index.html'],
   ['/daily-streak', '/website/daily-streak/index.html'],
   ['/hype', '/hype/index.html'],
   ['/dreambusiness', '/dreambusiness/index.html'],
@@ -50,37 +51,71 @@ const STATIC_PREFIXES = [
   ['/shareideas/', '/website/shareideas/'],
   ['/archives/', '/website/archives/'],
   ['/mindmapmaker/', '/website/website/mindmapmaker/'],
+  ['/books/', '/website/website/books/'],
   ['/daily-streak/', '/website/daily-streak/'],
   ['/hype/', '/hype/'],
   ['/dreambusiness/', '/dreambusiness/'],
   ['/rpg/', '/rpg/'],
-  ['/assets/public/images/', '/assets/public/images/']
+  ['/assets/public/images/', '/assets/public/images/'],
+  ['/portfolio/', '/website/portfolio/']
 ];
 
-function mapPath(path) {
-  const clean = path.endsWith('/') && path !== '/' ? path.slice(0, -1) : path;
-  if (ROOT_ROUTES.has(clean)) return { type: 'asset', value: ROOT_ROUTES.get(clean) };
-  const legacyWebsiteMatch = clean.match(/^\/website\/(portfolio|home|shareideas|archives|mindmapmaker|daily-streak)(\/.*)?$/);
-  if (legacyWebsiteMatch) {
-    const section = legacyWebsiteMatch[1];
-    const suffix = legacyWebsiteMatch[2] ?? '';
-    const base = section === 'portfolio' ? '' : `/${section}`;
-    return { type: 'redirect', value: `${base}${suffix}` || '/' };
-  }
-  const legacyGamesMatch = clean.match(/^\/games\/(hype|dreambusiness|rpg)(\/.*)?$/);
-  if (legacyGamesMatch) {
-    const section = legacyGamesMatch[1];
-    const suffix = legacyGamesMatch[2] ?? '';
-    return { type: 'redirect', value: `/${section}${suffix}` };
-  }
-  for (const [from, to] of STATIC_PREFIXES) if (clean.startsWith(from)) return { type: 'asset', value: to + clean.slice(from.length) };
-  const rootAssets = {
-    '/robots.txt': '/website/robots.txt', '/sitemap.xml': '/website/sitemap.xml', '/site.webmanifest': '/website/site.webmanifest', '/fadhil.svg': '/website/fadhil.svg',
-    '/fadhil-512x512.png': '/website/fadhil-512x512.png', '/favicon.ico': '/website/fadhil-512x512.png', '/favicon.png': '/website/fadhil-512x512.png', '/favicon.svg': '/website/fadhil.svg',
-    '/apple-touch-icon.png': '/website/fadhil-512x512.png', '/portfolio.webp': '/assets/public/images/portfolio.webp'
-  };
-  if (rootAssets[clean]) return { type: 'asset', value: rootAssets[clean] };
-  return { type: 'deny' };
+const ROOT_ASSETS = Object.freeze({
+  '/robots.txt': '/website/robots.txt',
+  '/sitemap.xml': '/website/sitemap.xml',
+  '/site.webmanifest': '/website/site.webmanifest',
+  '/fadhil.svg': '/website/fadhil.svg',
+  '/fadhil-512x512.png': '/website/fadhil-512x512.png',
+  '/favicon.ico': '/website/fadhil-512x512.png',
+  '/favicon.png': '/website/fadhil-512x512.png',
+  '/favicon.svg': '/website/fadhil.svg',
+  '/apple-touch-icon.png': '/website/fadhil-512x512.png',
+  '/portfolio.webp': '/assets/public/images/portfolio.webp'
+});
+
+function normalizePath(pathname) {
+  let path = pathname.replace(/\/+/g, '/');
+  if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+  return path || '/';
+}
+
+function appendSearch(target, search) {
+  return `${target}${search || ''}`;
+}
+
+function canonicalPath(pathname) {
+  let path = normalizePath(pathname);
+  const original = path;
+
+  path = path.replace(/^\/website(?:\/website)?\/(portfolio|home|shareideas|archives|mindmapmaker|books|daily-streak)(?=\/|$)/, (_, section) => `/${section}`) || '/';
+  path = path.replace(/^\/games\/(hype|dreambusiness|rpg)(?=\/|$)/, '/$1');
+  path = normalizePath(path);
+
+  if (path.endsWith('/index.html')) path = path.slice(0, -'/index.html'.length) || '/';
+  else if (path.endsWith('/index')) path = path.slice(0, -'/index'.length) || '/';
+  else if (path.endsWith('.html')) path = path.slice(0, -'.html'.length) || '/';
+
+  path = normalizePath(path);
+  if (path === '/portfolio') path = '/';
+  return path === original ? null : path;
+}
+
+function mappedAsset(pathname) {
+  if (pathname === '/portfolio') return '/website/portfolio/index.html';
+  if (ROUTES.has(pathname)) return ROUTES.get(pathname);
+  if (/^\/shareideas\/page\/[^/]+$/.test(pathname)) return '/website/shareideas/workspace.html';
+  if (/^\/archives\/[^/.]+$/.test(pathname)) return '/website/archives/workspace.html';
+  if (/^\/mindmapmaker\/editor(?:\/[^/]+)?$/.test(pathname)) return '/website/website/mindmapmaker/editor/index.html';
+  if (/^\/books\/editor(?:\/[^/]+)?$/.test(pathname)) return '/website/website/books/editor/index.html';
+  for (const [from, to] of STATIC_PREFIXES) if (pathname.startsWith(from)) return to + pathname.slice(from.length);
+  return ROOT_ASSETS[pathname] || null;
+}
+
+function mapPath(pathname) {
+  const canonical = canonicalPath(pathname);
+  if (canonical) return { type: 'redirect', value: canonical };
+  const asset = mappedAsset(normalizePath(pathname));
+  return asset ? { type: 'asset', value: asset } : { type: 'deny' };
 }
 
 function withPerfHeaders(response, pathname) {
@@ -101,7 +136,7 @@ export default {
       if (u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req, env);
       if (u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req, env);
       const r = mapPath(u.pathname);
-      if (r.type === 'redirect') return Response.redirect(`${u.origin}${r.value}${u.search}`, 308);
+      if (r.type === 'redirect') return Response.redirect(`${u.origin}${appendSearch(r.value, u.search)}`, 308);
       if (r.type === 'deny') return new Response('Not Found', { status: 404, headers: { 'cache-control': 'no-store' } });
       if (typeof env?.ASSETS?.fetch !== 'function') {
         return new Response('Asset binding ASSETS is missing. Re-add the ASSETS binding in Cloudflare Workers & Pages.', {
@@ -109,7 +144,8 @@ export default {
           headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
         });
       }
-      const url = new URL(req.url); url.pathname = r.value;
+      const url = new URL(req.url);
+      url.pathname = r.value;
       const res = await env.ASSETS.fetch(new Request(url.toString(), req));
       return withPerfHeaders(res, r.value);
     } catch (error) {

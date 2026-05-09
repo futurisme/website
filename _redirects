@@ -1,28 +1,4 @@
-/home/index.html /home 308
-/shareideas/index.html /shareideas 308
-/archives/index.html /archives 308
-/daily-streak/index.html /daily-streak 308
-/mindmapmaker/index.html /mindmapmaker 308
-/hype/index.html /hype 308
-/dreambusiness/index.html /dreambusiness 308
-/rpg/index.html /rpg 308
-/website/portfolio / 308
-/website/portfolio/* /:splat 308
-/website/home /home 308
-/website/home/* /home/:splat 308
-/website/shareideas /shareideas 308
-/website/shareideas/* /shareideas/:splat 308
-/website/archives /archives 308
-/website/archives/* /archives/:splat 308
-/website/mindmapmaker /mindmapmaker 308
-/website/mindmapmaker/* /mindmapmaker/:splat 308
-/website/website/mindmapmaker /mindmapmaker 308
-/website/website/mindmapmaker/* /mindmapmaker/:splat 308
-/website/daily-streak /daily-streak 308
-/website/daily-streak/* /daily-streak/:splat 308
-/games/hype /hype 308
-/games/hype/* /hype/:splat 308
-/games/dreambusiness /dreambusiness 308
-/games/dreambusiness/* /dreambusiness/:splat 308
-/games/rpg /rpg 308
-/games/rpg/* /rpg/:splat 308
+# Canonical URL handling is intentionally centralized in src/index.js.
+# Cloudflare Workers Static Assets redirects run before asset responses and can
+# conflict with extensionless directory routes. Keep this file rule-free so the
+# Worker can serve exact index.html assets with assets.html_handling = "none".
