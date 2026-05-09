@@ -11,15 +11,12 @@
     "run_worker_first": [
       "/api/*",
       "/",
-      "/portfolio*",
       "/home*",
       "/shareideas*",
       "/archives*",
       "/mindmapmaker*",
-      "/books*",
       "/hype*",
       "/rpg*",
-      "/games/*",
       "/daily-streak*"
     ],
     "not_found_handling": "404-page"
