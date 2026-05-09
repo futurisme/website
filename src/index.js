@@ -26,13 +26,56 @@ async function handleMindmap(req,env){ const p=getPool(env); if(!p) return json(
 }
 
 function mapPath(path){
-  if(path==='/') return '/website/portfolio/index.html';
-  if(path==='/portfolio'||path==='/portfolio/') return '/website/portfolio/index.html';
-  if(path==='/home'||path==='/home/') return '/website/home/index.html';
-  if(path==='/shareideas'||path==='/shareideas/') return '/website/shareideas/index.html';
-  if(path==='/archives'||path==='/archives/') return '/website/archives/index.html';
-  if(path==='/mindmapmaker'||path==='/mindmapmaker/') return '/website/website/mindmapmaker/index.html';
-  if(path==='/books'||path==='/books/') return '/website/website/books/index.html';
+  if (path.startsWith('/website/')) {
+    const stripped = path.slice('/website'.length) || '/';
+    return mapPath(stripped);
+  }
+
+  const exact = new Map([
+    ['/', '/website/portfolio/index.html'],
+    ['/portfolio', '/website/portfolio/index.html'],
+    ['/portfolio/', '/website/portfolio/index.html'],
+    ['/home', '/website/home/index.html'],
+    ['/home/', '/website/home/index.html'],
+    ['/shareideas', '/website/shareideas/index.html'],
+    ['/shareideas/', '/website/shareideas/index.html'],
+    ['/archives', '/website/archives/index.html'],
+    ['/archives/', '/website/archives/index.html'],
+    ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
+    ['/mindmapmaker/', '/website/website/mindmapmaker/index.html'],
+    ['/books', '/website/website/books/index.html'],
+    ['/books/', '/website/website/books/index.html'],
+    ['/robots.txt', '/website/robots.txt'],
+    ['/sitemap.xml', '/website/sitemap.xml'],
+    ['/site.webmanifest', '/website/site.webmanifest'],
+    ['/fadhil.svg', '/website/fadhil.svg'],
+    ['/fadhil-512x512.png', '/website/fadhil-512x512.png'],
+    ['/favicon.ico', '/website/fadhil-512x512.png'],
+    ['/favicon.png', '/website/fadhil-512x512.png'],
+    ['/favicon.svg', '/website/fadhil.svg'],
+    ['/apple-touch-icon.png', '/website/fadhil-512x512.png'],
+    ['/portfolio.webp', '/assets/public/images/portfolio.webp'],
+  ]);
+  if (exact.has(path)) return exact.get(path);
+
+  const prefixes = [
+    ['/portfolio/testing/', '/website/portfolio/testing/'],
+    ['/home/', '/website/home/'],
+    ['/shareideas/', '/website/shareideas/'],
+    ['/archives/', '/website/archives/'],
+    ['/mindmapmaker/', '/website/website/mindmapmaker/'],
+    ['/books/', '/website/website/books/'],
+    ['/library/', '/library/'],
+    ['/games/', '/games/'],
+    ['/extension/', '/extension/'],
+    ['/assets/public/images/', '/assets/public/images/'],
+    ['/daily-streak/', '/website/daily-streak/'],
+  ];
+
+  for (const [from, to] of prefixes) {
+    if (path.startsWith(from)) return to + path.slice(from.length);
+  }
+
   return path;
 }
 
