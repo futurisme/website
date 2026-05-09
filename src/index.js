@@ -26,56 +26,31 @@ async function handleMindmap(req,env){ const p=getPool(env); if(!p) return json(
 }
 
 function mapPath(path){
-  if (path.startsWith('/website/')) {
-    const stripped = path.slice('/website'.length) || '/';
-    return mapPath(stripped);
-  }
+  if (path.startsWith('/website/')) return mapPath(path.slice('/website'.length) || '/');
 
   const exact = new Map([
-    ['/', '/website/portfolio/index.html'],
-    ['/portfolio', '/website/portfolio/index.html'],
-    ['/portfolio/', '/website/portfolio/index.html'],
-    ['/home', '/website/home/index.html'],
-    ['/home/', '/website/home/index.html'],
-    ['/shareideas', '/website/shareideas/index.html'],
-    ['/shareideas/', '/website/shareideas/index.html'],
-    ['/archives', '/website/archives/index.html'],
-    ['/archives/', '/website/archives/index.html'],
-    ['/mindmapmaker', '/website/website/mindmapmaker/index.html'],
-    ['/mindmapmaker/', '/website/website/mindmapmaker/index.html'],
-    ['/books', '/website/website/books/index.html'],
-    ['/books/', '/website/website/books/index.html'],
-    ['/robots.txt', '/website/robots.txt'],
-    ['/sitemap.xml', '/website/sitemap.xml'],
-    ['/site.webmanifest', '/website/site.webmanifest'],
-    ['/fadhil.svg', '/website/fadhil.svg'],
-    ['/fadhil-512x512.png', '/website/fadhil-512x512.png'],
-    ['/favicon.ico', '/website/fadhil-512x512.png'],
-    ['/favicon.png', '/website/fadhil-512x512.png'],
-    ['/favicon.svg', '/website/fadhil.svg'],
-    ['/apple-touch-icon.png', '/website/fadhil-512x512.png'],
-    ['/portfolio.webp', '/assets/public/images/portfolio.webp'],
+    ['/', '/website/portfolio/index.html'], ['/portfolio', '/website/portfolio/index.html'], ['/portfolio/', '/website/portfolio/index.html'],
+    ['/home', '/website/home/index.html'], ['/home/', '/website/home/index.html'], ['/shareideas', '/website/shareideas/index.html'], ['/shareideas/', '/website/shareideas/index.html'],
+    ['/archives', '/website/archives/index.html'], ['/archives/', '/website/archives/index.html'], ['/mindmapmaker', '/website/website/mindmapmaker/index.html'], ['/mindmapmaker/', '/website/website/mindmapmaker/index.html'],
+    ['/books', '/website/website/books/index.html'], ['/books/', '/website/website/books/index.html'], ['/games/hype', '/games/hype/index.html'], ['/games/hype/', '/games/hype/index.html'],
+    ['/hype', '/games/hype/index.html'], ['/hype/', '/games/hype/index.html'], ['/games/rpg', '/games/rpg/index.html'], ['/games/rpg/', '/games/rpg/index.html'],
+    ['/rpg', '/games/rpg/index.html'], ['/rpg/', '/games/rpg/index.html'], ['/games/dreambusiness', '/games/dreambusiness/index.html'], ['/games/dreambusiness/', '/games/dreambusiness/index.html'],
+    ['/books/editor', '/website/website/books/editor/index.html'], ['/books/editor/', '/website/website/books/editor/index.html'], ['/daily-streak', '/website/daily-streak/index.html'], ['/daily-streak/', '/website/daily-streak/index.html'],
+    ['/robots.txt', '/website/robots.txt'], ['/sitemap.xml', '/website/sitemap.xml'], ['/site.webmanifest', '/website/site.webmanifest'], ['/fadhil.svg', '/website/fadhil.svg'], ['/fadhil-512x512.png', '/website/fadhil-512x512.png'],
+    ['/favicon.ico', '/website/fadhil-512x512.png'], ['/favicon.png', '/website/fadhil-512x512.png'], ['/favicon.svg', '/website/fadhil.svg'], ['/apple-touch-icon.png', '/website/fadhil-512x512.png'], ['/portfolio.webp', '/assets/public/images/portfolio.webp'],
   ]);
   if (exact.has(path)) return exact.get(path);
 
+  if (/^\/mindmapmaker\/editor\/\d+$/.test(path) || /^\/editor\/\d+$/.test(path)) return '/website/website/mindmapmaker/editor/index.html';
+  if (/^\/shareideas\/page\/\d+$/.test(path)) return '/website/shareideas/workspace.html';
+  if (/^\/archives\/[^/.]+$/.test(path)) return '/website/archives/workspace.html';
+
   const prefixes = [
-    ['/portfolio/testing/', '/website/portfolio/testing/'],
-    ['/home/', '/website/home/'],
-    ['/shareideas/', '/website/shareideas/'],
-    ['/archives/', '/website/archives/'],
-    ['/mindmapmaker/', '/website/website/mindmapmaker/'],
-    ['/books/', '/website/website/books/'],
-    ['/library/', '/library/'],
-    ['/games/', '/games/'],
-    ['/extension/', '/extension/'],
-    ['/assets/public/images/', '/assets/public/images/'],
-    ['/daily-streak/', '/website/daily-streak/'],
+    ['/portfolio/testing/', '/website/portfolio/testing/'], ['/home/', '/website/home/'], ['/shareideas/', '/website/shareideas/'], ['/archives/', '/website/archives/'],
+    ['/mindmapmaker/', '/website/website/mindmapmaker/'], ['/books/', '/website/website/books/'], ['/library/', '/library/'], ['/games/', '/games/'], ['/extension/', '/extension/'],
+    ['/assets/public/images/', '/assets/public/images/'], ['/daily-streak/', '/website/daily-streak/'], ['/hype/', '/games/hype/'], ['/rpg/', '/games/rpg/'],
   ];
-
-  for (const [from, to] of prefixes) {
-    if (path.startsWith(from)) return to + path.slice(from.length);
-  }
-
+  for (const [from, to] of prefixes) if (path.startsWith(from)) return to + path.slice(from.length);
   return path;
 }
 
