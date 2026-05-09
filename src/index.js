@@ -86,8 +86,15 @@ export default {
     const r = mapPath(u.pathname);
     if (r.type === 'redirect') return Response.redirect(`${u.origin}${r.value}${u.search}`, 308);
     if (r.type === 'deny') return new Response('Not Found', { status: 404, headers: { 'cache-control': 'no-store' } });
+    const assetFetcher = env?.ASSETS?.fetch;
+    if (typeof assetFetcher !== 'function') {
+      return new Response('Asset binding ASSETS is missing. Re-add the ASSETS binding in Cloudflare Workers & Pages.', {
+        status: 503,
+        headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
+      });
+    }
     const url = new URL(req.url); url.pathname = r.value;
-    const res = await env.ASSETS.fetch(new Request(url.toString(), req));
+    const res = await assetFetcher(new Request(url.toString(), req));
     return withPerfHeaders(res, r.value);
   }
 };
