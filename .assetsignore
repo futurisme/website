@@ -1,4 +1,9 @@
-node_modules/
+# Keep Cloudflare Workers Static Assets lean and deterministic.
 .git/
+.github/
+.wrangler/
+node_modules/
 reports/
 scripts/
+*.log
+.DS_Store

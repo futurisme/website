@@ -1,3 +1,4 @@
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 html, body { width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
 body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48%); color: #fff; overflow: hidden; }
 .industry-shell { width: 100%; max-width: 100%; height: 100svh; height: 100dvh; min-height: 100vh; margin: 0; padding: 0; color: #fff; overflow: hidden; }
@@ -7,7 +8,7 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 @keyframes fade { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: translateY(0);} }
 .industry-panel { border: 1px solid #9cb7ff55; background: linear-gradient(180deg, #0a1942, #081332); border-radius: 0; padding: 6px; box-shadow: none; min-height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 .frame.frame-active .industry-panel { height: 100%; min-height: 0; }
-.frame-content-scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 2px; }
+.frame-content-scroll { flex: 1 1 auto; min-height: 0; max-height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-right: 2px; content-visibility: auto; contain-intrinsic-size: auto 720px; }
 #frameMain .industry-panel { min-height: 0; height: 100%; }
 #frameMain,
 #frameMain .industry-panel,
@@ -31,9 +32,11 @@ body { margin: 0; background: radial-gradient(circle at top, #10214b, #020817 48
 .industry-toolbar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 5px; margin-top: 6px; }
 button, input, select { width: 100%; min-width: 0; border-radius: 7px; border: 1px solid #a5b7f366; background: #102453; color: #fff; min-height: 28px; padding: 4px 7px; line-height: 1.15; }
 textarea { width: 100%; border-radius: 7px; border: 1px solid #a5b7f366; background: #102453; color: #fff; min-height: 140px; padding: 6px 8px; resize: vertical; }
-button { transition: border-color .15s ease, background .15s ease; }
+button { cursor: pointer; touch-action: manipulation; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
 button, input, select, textarea { max-width: 100%; }
 button:hover:not(:disabled) { border-color: #d4e0ff; background: #16316f; }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid #9ed0ff; outline-offset: 2px; }
 button:disabled { opacity: .45; cursor: not-allowed; }
 .industry-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin-top: 6px; }
 .industry-metric { border: 1px solid #ffffff44; border-radius: 8px; background: #0a1b42; padding: 6px; }
@@ -253,9 +256,30 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 }
 
 #frameMain .mainframe-canvas { display: grid; grid-template-columns: minmax(140px, 0.18fr) minmax(0, 1fr) minmax(140px, 0.18fr); gap: 8px; }
-#frameMain .mainframe-center { min-width: 0; display: grid; gap: 8px; }
+#frameMain .mainframe-center { min-width: 0; display: grid; grid-template-rows: auto max-content; align-content: start; gap: 8px; }
 #frameMain .mainframe-side { display: grid; align-content: start; gap: 6px; padding: 8px; border: 1px solid #b7c9ff44; border-radius: 10px; background: #0a1b44; }
 #frameMain .mainframe-side h3 { margin: 0 0 2px; font-size: 12px; opacity: .88; letter-spacing: .02em; }
 #frameMain .frame-content-scroll { padding-right: 0; }
 #frameMain .industry-stats { margin-top: 0; }
+#frameMain .mainframe-route-grid {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 136px));
+  justify-content: start;
+  align-content: start;
+  align-items: start;
+  gap: 6px;
+  margin-top: 0;
+  max-width: 562px;
+  overflow: visible;
+}
+#frameMain .mainframe-route-grid button {
+  min-height: 32px;
+  padding: 5px 10px;
+  width: 100%;
+}
+@media (max-width: 620px) { #frameMain .mainframe-route-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .frame.frame-active { animation: none; }
+  button, .industry-popup { transition: none; }
+  button:active:not(:disabled) { transform: none; }
+}
 @media (max-width: 1180px) { #frameMain .mainframe-canvas { grid-template-columns: 1fr; } #frameMain .mainframe-side { grid-template-columns: repeat(3, minmax(0,1fr)); align-items: center; } #frameMain .mainframe-side h3 { grid-column: 1/-1; } }
