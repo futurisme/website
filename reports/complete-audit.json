@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-05-11T10:01:21Z",
+    "generated_at": "2026-05-11T10:19:54Z",
     "base_url": "https://fadhil.dev",
-    "duplicate_groups_total": 82,
-    "elapsed_seconds": 12.69
+    "duplicate_groups_total": 81,
+    "elapsed_seconds": 11.32
   },
   "domain": {
     "summary": {
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 10,
       "missing_json_ld_count": 13,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 279.3,
-      "p95_response_time_ms": 382.1,
-      "max_response_time_ms": 552.3,
+      "avg_response_time_ms": 218.2,
+      "p95_response_time_ms": 323.6,
+      "max_response_time_ms": 423.2,
       "missing_security_headers_count": 26,
       "missing_security_header_details": {
         "content-security-policy": 13,
@@ -36,7 +36,7 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 349.6,
+        "time_ms": 323.6,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -74,7 +74,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 296.8,
+        "time_ms": 423.2,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -112,7 +112,7 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 260.1,
+        "time_ms": 303.6,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -150,7 +150,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 217.1,
+        "time_ms": 222.8,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -188,7 +188,7 @@
         "path": "/daily-streak",
         "url": "https://fadhil.dev/daily-streak",
         "status": 200,
-        "time_ms": 164.1,
+        "time_ms": 200.9,
         "final_url": "https://fadhil.dev/daily-streak",
         "final_path": "/daily-streak",
         "is_https_final": true,
@@ -226,7 +226,7 @@
         "path": "/dreambusiness",
         "url": "https://fadhil.dev/dreambusiness",
         "status": 200,
-        "time_ms": 376.7,
+        "time_ms": 104.7,
         "final_url": "https://fadhil.dev/dreambusiness",
         "final_path": "/dreambusiness",
         "is_https_final": true,
@@ -264,7 +264,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 552.3,
+        "time_ms": 137.3,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -302,7 +302,7 @@
         "path": "/hype",
         "url": "https://fadhil.dev/hype",
         "status": 200,
-        "time_ms": 382.1,
+        "time_ms": 174.0,
         "final_url": "https://fadhil.dev/hype",
         "final_path": "/hype",
         "is_https_final": true,
@@ -340,7 +340,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 186.7,
+        "time_ms": 213.3,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -378,7 +378,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 195.7,
+        "time_ms": 168.7,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -416,7 +416,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 153.8,
+        "time_ms": 228.6,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -454,7 +454,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 226.5,
+        "time_ms": 177.6,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -492,7 +492,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 269.6,
+        "time_ms": 158.8,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -537,39 +537,16 @@
         {
           "path": "assets/public/images/shareideas-2.webp",
           "size_bytes": 259938,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 4,
+          "reference_count_exact_path": 5,
+          "reference_count_basename": 5,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "assets/public/images/shareideas.webp",
           "size_bytes": 259938,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 1,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 468916,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "dreambusiness/dream-engine-bundle.js",
-          "size_bytes": 234458,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 3,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "games/dreambusiness/dream-engine-bundle.js",
-          "size_bytes": 234458,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 3,
+          "reference_count_basename": 2,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -583,32 +560,32 @@
         {
           "path": "assets/public/images/mindmapmaker.webp",
           "size_bytes": 59632,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 5,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 7,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/portfolio/testing/images/mindmapmaker.webp",
           "size_bytes": 59632,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 5,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 7,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/portfolio/testing/images/portfolio.webp",
           "size_bytes": 59632,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 14,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 15,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/portfolio/testing/images/share-ideas.webp",
           "size_bytes": 59632,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 1,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 2,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -622,16 +599,16 @@
         {
           "path": "games/hype/industry-ui.js",
           "size_bytes": 53793,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/industry-ui.js",
           "size_bytes": 53793,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -645,16 +622,16 @@
         {
           "path": "games/rpg/fadhilwebrpglib.js",
           "size_bytes": 51309,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 354,
+          "reference_count_basename": 364,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "rpg/fadhilwebrpglib.js",
           "size_bytes": 51309,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 358,
+          "reference_count_basename": 364,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -668,16 +645,16 @@
         {
           "path": "fadhil.svg",
           "size_bytes": 30465,
-          "reference_count_exact_path": 21,
-          "reference_count_basename": 21,
+          "reference_count_exact_path": 25,
+          "reference_count_basename": 25,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "website/fadhil.svg",
           "size_bytes": 30465,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 21,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 25,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -691,16 +668,16 @@
         {
           "path": "fadhil-512x512.png",
           "size_bytes": 22691,
-          "reference_count_exact_path": 26,
-          "reference_count_basename": 26,
+          "reference_count_exact_path": 30,
+          "reference_count_basename": 30,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "website/fadhil-512x512.png",
           "size_bytes": 22691,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 26,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 30,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -714,16 +691,16 @@
         {
           "path": "games/hype/hype-debugger.js",
           "size_bytes": 16995,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 129,
+          "reference_count_basename": 132,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/hype-debugger.js",
           "size_bytes": 16995,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 132,
+          "reference_count_basename": 132,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -737,24 +714,24 @@
         {
           "path": "library/fadhilweblib/styles/theme.css",
           "size_bytes": 9689,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 13,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/home/theme.css",
           "size_bytes": 9689,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 13,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/website/mindmapmaker/theme.css",
           "size_bytes": 9689,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 13,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -768,16 +745,16 @@
         {
           "path": "games/hype/industry-ui.css",
           "size_bytes": 12365,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/industry-ui.css",
           "size_bytes": 12365,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -786,23 +763,21 @@
     {
       "group_size": 2,
       "group_total_bytes": 18270,
-      "safe_delete_candidates": [
-        "dreambusiness/dream-business-game.tsx"
-      ],
+      "safe_delete_candidates": [],
       "items": [
         {
           "path": "dreambusiness/dream-business-game.tsx",
           "size_bytes": 9135,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
-          "safe_delete_candidate": true
+          "safe_delete_candidate": false
         },
         {
           "path": "games/dreambusiness/dream-business-game.tsx",
           "size_bytes": 9135,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -816,16 +791,16 @@
         {
           "path": "games/hype/name-datasets.js",
           "size_bytes": 8643,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/name-datasets.js",
           "size_bytes": 8643,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -834,25 +809,23 @@
     {
       "group_size": 2,
       "group_total_bytes": 14856,
-      "safe_delete_candidates": [
-        "rpg/fadhilwebrpglib-test.js"
-      ],
+      "safe_delete_candidates": [],
       "items": [
         {
           "path": "games/rpg/fadhilwebrpglib-test.js",
           "size_bytes": 7428,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "rpg/fadhilwebrpglib-test.js",
           "size_bytes": 7428,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
-          "safe_delete_candidate": true
+          "safe_delete_candidate": false
         }
       ]
     },
@@ -864,24 +837,24 @@
         {
           "path": "library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 6,
+          "reference_count_exact_path": 5,
+          "reference_count_basename": 14,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/archives/runtime.js",
           "size_bytes": 4416,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 6,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 14,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 6,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 14,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -895,16 +868,16 @@
         {
           "path": "library/fadhilweblib/core/types/hooks.ts",
           "size_bytes": 6182,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts",
           "size_bytes": 6182,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -918,16 +891,16 @@
         {
           "path": "games/hype/hype-engine-bundle.js",
           "size_bytes": 6117,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 3,
+          "reference_count_basename": 6,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/hype-engine-bundle.js",
           "size_bytes": 6117,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 6,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -941,16 +914,16 @@
         {
           "path": "library/fadhilweblib/core/use-dialog.ts",
           "size_bytes": 5462,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts",
           "size_bytes": 5462,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -964,16 +937,16 @@
         {
           "path": "library/fadhilweblib/core/syntax/expression.ts",
           "size_bytes": 4990,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts",
           "size_bytes": 4990,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -987,16 +960,16 @@
         {
           "path": "library/fadhilweblib/components/collapsible-panel.tsx",
           "size_bytes": 4870,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx",
           "size_bytes": 4870,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1010,16 +983,16 @@
         {
           "path": "library/fadhilweblib/core/state-syntax.ts",
           "size_bytes": 4766,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts",
           "size_bytes": 4766,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1033,16 +1006,16 @@
         {
           "path": "library/fadhilweblib/components/overlay/drawer.tsx",
           "size_bytes": 4583,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx",
           "size_bytes": 4583,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1056,16 +1029,16 @@
         {
           "path": "index.html",
           "size_bytes": 4502,
-          "reference_count_exact_path": 19,
-          "reference_count_basename": 19,
+          "reference_count_exact_path": 89,
+          "reference_count_basename": 89,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "website/portfolio/index.html",
           "size_bytes": 4502,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 19,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 89,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1079,16 +1052,16 @@
         {
           "path": "library/fadhilweblib/components/overlay/dialog.tsx",
           "size_bytes": 4414,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx",
           "size_bytes": 4414,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1102,24 +1075,24 @@
         {
           "path": "extension/fadhil-format.js",
           "size_bytes": 2783,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 5,
+          "reference_count_basename": 10,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "website/archives/fadhil-format.js",
           "size_bytes": 2783,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 10,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/extension/fadhil-format.js",
           "size_bytes": 2783,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 10,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1133,16 +1106,39 @@
         {
           "path": "library/fadhilweblib/core/use-roving-focus.ts",
           "size_bytes": 4071,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts",
           "size_bytes": 4071,
-          "reference_count_exact_path": 1,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 7236,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/layout/section.tsx",
+          "size_bytes": 3618,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx",
+          "size_bytes": 3618,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1151,140 +1147,18 @@
   ],
   "static_unused_audit": {
     "summary": {
-      "tracked_files": 516,
+      "tracked_files": 517,
       "candidate_files": 72,
       "used_via_vercel_config": 0,
-      "used_via_exact_references": 47,
-      "potential_unused_files": 25
+      "used_via_exact_references": 71,
+      "potential_unused_files": 1
     },
     "potential_unused_by_extension": {
-      ".css": 10,
-      ".html": 3,
-      ".js": 12
+      ".js": 1
     },
     "potential_unused_files": [
       {
-        "path": "games/dreambusiness/dreambusiness-module.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "games/dreambusiness/styles.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/archives/archives.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/home/home.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/portfolio/testing/testing.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/shareideas/shareideas.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/website/books/editor/styles.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/website/books/styles.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/website/mindmapmaker/editor/editor.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "website/website/mindmapmaker/menu.css",
-        "exact_reference_count": 0,
-        "extension": ".css"
-      },
-      {
-        "path": "games/dreambusiness/index.html",
-        "exact_reference_count": 0,
-        "extension": ".html"
-      },
-      {
-        "path": "games/hype/index.html",
-        "exact_reference_count": 0,
-        "extension": ".html"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "exact_reference_count": 0,
-        "extension": ".html"
-      },
-      {
-        "path": "website/archives/archives.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/archives/fadhil-format.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/archives/runtime.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/archives/workspace.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/portfolio/testing/boot.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/portfolio/testing/testing.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/shareideas/shareideas-api.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/shareideas/shareideas.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/website/books/editor/editor.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/website/books/lib/fadhilebooklib-browser.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/website/mindmapmaker/editor/editor.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      },
-      {
-        "path": "website/website/mindmapmaker/lib/fadhilmindmaplib-browser.js",
+        "path": "games/dreambusiness/app.js",
         "exact_reference_count": 0,
         "extension": ".js"
       }
@@ -1306,13 +1180,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 143.0,
+      "time_ms": 137.1,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 167.3,
+      "time_ms": 225.5,
       "url_count": 12
     },
     "sitemap_urls": [
@@ -1350,11 +1224,11 @@
   },
   "loc_audit": {
     "summary": {
-      "tracked_files_scanned": 479,
-      "total_lines": 109283,
-      "blank_lines": 8630,
-      "comment_lines": 1899,
-      "code_lines": 98754
+      "tracked_files_scanned": 478,
+      "total_lines": 106809,
+      "blank_lines": 8625,
+      "comment_lines": 1892,
+      "code_lines": 96292
     },
     "by_extension": {
       ".css": {
@@ -1372,18 +1246,18 @@
         "code": 3066
       },
       ".js": {
-        "files": 47,
-        "total": 30749,
-        "blank": 1834,
-        "comment": 89,
-        "code": 28826
+        "files": 46,
+        "total": 25675,
+        "blank": 1829,
+        "comment": 82,
+        "code": 23764
       },
       ".json": {
         "files": 10,
-        "total": 9221,
+        "total": 11821,
         "blank": 0,
         "comment": 0,
-        "code": 9221
+        "code": 11821
       },
       ".jsonc": {
         "files": 1,
@@ -1473,10 +1347,10 @@
   },
   "deprecated_code_audit": {
     "summary": {
-      "total_hits": 747,
-      "files_with_hits": 9,
+      "total_hits": 681,
+      "files_with_hits": 8,
       "hits_by_pattern": {
-        "var-declaration": 747
+        "var-declaration": 681
       }
     },
     "hits": [
@@ -1872,402 +1746,6 @@
       },
       {
         "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 3008,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_BASELINES = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 2,
-        "pattern": "var-declaration",
-        "snippet": "var SEMICONDUCTOR_PRIMARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 34,
-        "pattern": "var-declaration",
-        "snippet": "var SEMICONDUCTOR_SECONDARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 56,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_PRIMARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 78,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_SECONDARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 100,
-        "pattern": "var-declaration",
-        "snippet": "var SOFTWARE_PRIMARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 122,
-        "pattern": "var-declaration",
-        "snippet": "var SOFTWARE_SECONDARY = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 144,
-        "pattern": "var-declaration",
-        "snippet": "var TERTIARY = [\"Group\", \"Works\", \"Labs\", \"Collective\", \"Hub\", \"Division\", \"Center\", \"Network\"];"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 170,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_CACHE_SIZE = 250;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 171,
-        "pattern": "var-declaration",
-        "snippet": "var parsedStringSyntaxCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 172,
-        "pattern": "var-declaration",
-        "snippet": "var parsedObjectSyntaxCache = /* @__PURE__ */ new WeakMap();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 173,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_PARSED_SYNTAX = Object.freeze({});"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 174,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_STYLE = Object.freeze({});"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 175,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_SEMANTICS = Object.freeze({});"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 176,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_LOGIC = Object.freeze({});"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 177,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_ATTRS = Object.freeze({});"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 178,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_RESOLVED_SYNTAX = Object.freeze({"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 184,
-        "pattern": "var-declaration",
-        "snippet": "var KEY_ALIASES = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 407,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_ALIASES = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 434,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_KEYS = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 615,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_KEY_SETS = Object.freeze({"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 648,
-        "pattern": "var-declaration",
-        "snippet": "var FadhilWebSyntaxError = class extends Error {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1061,
-        "pattern": "var-declaration",
-        "snippet": "var DEFAULT_RELEASE_PROFILE = Object.freeze({"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1080,
-        "pattern": "var-declaration",
-        "snippet": "var RELEASE_PROFILE_SYNTAX = `vars("
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1136,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_RELEASE_SYNTAX_PROFILE = buildReleaseSyntaxProfile();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1137,
-        "pattern": "var-declaration",
-        "snippet": "var ALLOWED_FUNCTIONS = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1143,
-        "pattern": "var-declaration",
-        "snippet": "var OP_PRIORITY = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1149,
-        "pattern": "var-declaration",
-        "snippet": "var expressionCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1150,
-        "pattern": "var-declaration",
-        "snippet": "var programCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1332,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_MATH_EXPRESSIONS = Object.freeze({"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1339,
-        "pattern": "var-declaration",
-        "snippet": "var TICK_MS = 200;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1340,
-        "pattern": "var-declaration",
-        "snippet": "var START_DATE_UTC = Date.UTC(2e3, 0, 1);"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1341,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_ACTION_EVERY_TICKS = 10;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1342,
-        "pattern": "var-declaration",
-        "snippet": "var PLAYER_STARTING_CASH = 140;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1343,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_NPC_COUNT = 75;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1344,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_ACTIVE_NPCS = 75;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1345,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_START_DAY = 180;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1346,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_INTERVAL_DAYS = 60;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1347,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_BATCH = 3;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1348,
-        "pattern": "var-declaration",
-        "snippet": "var GOVERNANCE_REFRESH_TICK_INTERVAL = 5;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1349,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_MIN_TENURE_DAYS = 30;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1350,
-        "pattern": "var-declaration",
-        "snippet": "var BOARD_VOTE_WINDOW_DAYS = 30;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1351,
-        "pattern": "var-declaration",
-        "snippet": "var BOARD_VOTE_LIMIT_PER_WINDOW = 2;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1352,
-        "pattern": "var-declaration",
-        "snippet": "var INVESTOR_TAX_INTERVAL_DAYS = 30;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1353,
-        "pattern": "var-declaration",
-        "snippet": "var TOTAL_SHARES = 1e3;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1354,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_FOUNDER_OWNERSHIP_RATIO = 0.52;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1355,
-        "pattern": "var-declaration",
-        "snippet": "var COMPANY_TRADE_FEE_RATE = 0.018;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1356,
-        "pattern": "var-declaration",
-        "snippet": "var HOLDER_TRADE_FEE_RATE = 0.052;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1357,
-        "pattern": "var-declaration",
-        "snippet": "var MIN_TRADE_AMOUNT = 0.1;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1358,
-        "pattern": "var-declaration",
-        "snippet": "var PLAN_DURATION_DAYS = 30;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1359,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_ACTIVE_COMPANIES = 8;"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1360,
-        "pattern": "var-declaration",
-        "snippet": "var COMPANY_KEYS = [\"cosmic\", \"rmd\", \"heroscop\", \"venture4\", \"venture5\", \"venture6\", \"venture7\", \"venture8\"];"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1361,
-        "pattern": "var-declaration",
-        "snippet": "var CORE_COMPANY_KEYS = [\"cosmic\", \"rmd\", \"heroscop\"];"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1362,
-        "pattern": "var-declaration",
-        "snippet": "var DYNAMIC_COMPANY_KEYS = [\"venture4\", \"venture5\", \"venture6\", \"venture7\", \"venture8\"];"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1363,
-        "pattern": "var-declaration",
-        "snippet": "var PRICE_PRESETS = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1368,
-        "pattern": "var-declaration",
-        "snippet": "var DEFAULT_PROFILE_DRAFT = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1374,
-        "pattern": "var-declaration",
-        "snippet": "var STRATEGY_LABELS = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1381,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_ROLE_META = {"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1407,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_ROLES = Object.keys(EXECUTIVE_ROLE_META);"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1408,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_FIRST_NAMES = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1480,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_LAST_NAMES = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1542,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_NAME_VARIANT_SUFFIXES = [\"a\", \"an\", \"el\", \"er\", \"ia\", \"in\", \"is\", \"on\", \"or\", \"us\"];"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1543,
-        "pattern": "var-declaration",
-        "snippet": "var toTitleCaseToken = (value) => value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();"
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1544,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_FIRST_NAME_POOL = Array.from(/* @__PURE__ */ new Set(["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1548,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_LAST_NAME_POOL = Array.from(/* @__PURE__ */ new Set(["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
-        "line": 1552,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_PERSONAS = ["
-      },
-      {
-        "path": "games/dreambusiness/dream-engine-bundle.js",
         "line": 3008,
         "pattern": "var-declaration",
         "snippet": "var INITIAL_BASELINES = {"
@@ -3879,6 +3357,402 @@
         "line": 349,
         "pattern": "var-declaration",
         "snippet": "var view = lib.getExploreView(personalState);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 358,
+        "pattern": "var-declaration",
+        "snippet": "var view = lib.getPersonalMapView(personalState);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 359,
+        "pattern": "var-declaration",
+        "snippet": "var byId = {};"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 361,
+        "pattern": "var-declaration",
+        "snippet": "var links = [];"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 363,
+        "pattern": "var-declaration",
+        "snippet": "var full = personalState.world.map.locations.find(function(x){ return x.id === loc.id; }) || { neighbors: [] };"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 366,
+        "pattern": "var-declaration",
+        "snippet": "var target = byId[targetId];"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 367,
+        "pattern": "var-declaration",
+        "snippet": "var dx = target.x - loc.x;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 368,
+        "pattern": "var-declaration",
+        "snippet": "var dy = target.y - loc.y;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 369,
+        "pattern": "var-declaration",
+        "snippet": "var len = Math.sqrt(dx * dx + dy * dy);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 370,
+        "pattern": "var-declaration",
+        "snippet": "var ang = Math.atan2(dy, dx) * 180 / Math.PI;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 374,
+        "pattern": "var-declaration",
+        "snippet": "var nodes = view.locations.map(function(loc){"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 380,
+        "pattern": "var-declaration",
+        "snippet": "var plane = $('mapPlane');"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 401,
+        "pattern": "var-declaration",
+        "snippet": "var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 402,
+        "pattern": "var-declaration",
+        "snippet": "var textStrong = $('introText').querySelector('strong');"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 403,
+        "pattern": "var-declaration",
+        "snippet": "var textWrap = $('introText');"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 404,
+        "pattern": "var-declaration",
+        "snippet": "var blackout = $('introBlackout');"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 405,
+        "pattern": "var-declaration",
+        "snippet": "var frames = ["
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 412,
+        "pattern": "var-declaration",
+        "snippet": "var idx = 0;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 413,
+        "pattern": "var-declaration",
+        "snippet": "var minDuration = 1000;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 450,
+        "pattern": "var-declaration",
+        "snippet": "var idx = 0;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 451,
+        "pattern": "var-declaration",
+        "snippet": "var seq = lines || [];"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 452,
+        "pattern": "var-declaration",
+        "snippet": "var timer = setInterval(function(){"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 473,
+        "pattern": "var-declaration",
+        "snippet": "var summary = lib.getPersonalSummary(personalState);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 499,
+        "pattern": "var-declaration",
+        "snippet": "var name = $('nameInput').value;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 500,
+        "pattern": "var-declaration",
+        "snippet": "var race = $('raceInput').value;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 507,
+        "pattern": "var-declaration",
+        "snippet": "var age = ev.target && ev.target.dataset ? Number(ev.target.dataset.age || 0) : 0;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 566,
+        "pattern": "var-declaration",
+        "snippet": "var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 568,
+        "pattern": "var-declaration",
+        "snippet": "var before = personalState.location;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 572,
+        "pattern": "var-declaration",
+        "snippet": "var summary = lib.getPersonalSummary(personalState);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 576,
+        "pattern": "var-declaration",
+        "snippet": "var reg = lib.registerAtGuild(personalState, rng);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 587,
+        "pattern": "var-declaration",
+        "snippet": "var dx = ev.clientX - mapDrag.x;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 588,
+        "pattern": "var-declaration",
+        "snippet": "var dy = ev.clientY - mapDrag.y;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 598,
+        "pattern": "var-declaration",
+        "snippet": "var details = ev.target;"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 603,
+        "pattern": "var-declaration",
+        "snippet": "var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 605,
+        "pattern": "var-declaration",
+        "snippet": "var view = lib.getExploreView(personalState);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 606,
+        "pattern": "var-declaration",
+        "snippet": "var building = view.buildings.find(function(item){ return item.id === id; });"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 612,
+        "pattern": "var-declaration",
+        "snippet": "var id = ev.target && ev.target.id ? ev.target.id : '';"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 620,
+        "pattern": "var-declaration",
+        "snippet": "var reg = lib.registerAtGuild(personalState, rng);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 627,
+        "pattern": "var-declaration",
+        "snippet": "var ranking = lib.getGuildRanking(personalState, rng, 80);"
+      },
+      {
+        "path": "games/rpg/index.html",
+        "line": 640,
+        "pattern": "var-declaration",
+        "snippet": "var re = lib.recheckGrade(personalState, rng);"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 2,
+        "pattern": "var-declaration",
+        "snippet": "var DEBUG_SESSION_KEY = '__hype_debug_once__';"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 3,
+        "pattern": "var-declaration",
+        "snippet": "var DEBUG_DOM_ID = 'hype-debug-once';"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 4,
+        "pattern": "var-declaration",
+        "snippet": "var HISTORY_LIMIT = 320;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 5,
+        "pattern": "var-declaration",
+        "snippet": "var WATCHDOG_INTERVAL_MS = 2600;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 6,
+        "pattern": "var-declaration",
+        "snippet": "var REPORT_DEDUP_WINDOW_MS = 1800;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 37,
+        "pattern": "var-declaration",
+        "snippet": "var core = ["
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 49,
+        "pattern": "var-declaration",
+        "snippet": "var map = getDedupMap();"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 50,
+        "pattern": "var-declaration",
+        "snippet": "var sig = computeSignature(kind, detail);"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 51,
+        "pattern": "var-declaration",
+        "snippet": "var now = Date.now();"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 52,
+        "pattern": "var-declaration",
+        "snippet": "var last = map.get(sig) || 0;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 58,
+        "pattern": "var-declaration",
+        "snippet": "var history = getHistory();"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 65,
+        "pattern": "var-declaration",
+        "snippet": "var causes = [];"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 66,
+        "pattern": "var-declaration",
+        "snippet": "var msg = String((detail && detail.message) || '').toLowerCase();"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 67,
+        "pattern": "var-declaration",
+        "snippet": "var stack = String((detail && detail.stack) || '').toLowerCase();"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 107,
+        "pattern": "var-declaration",
+        "snippet": "var predictions = [];"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 130,
+        "pattern": "var-declaration",
+        "snippet": "var max = 0;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 136,
+        "pattern": "var-declaration",
+        "snippet": "var recent = history.slice(-14);"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 137,
+        "pattern": "var-declaration",
+        "snippet": "var byKind = {};"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 139,
+        "pattern": "var-declaration",
+        "snippet": "var k = recent[i].kind || 'unknown';"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 143,
+        "pattern": "var-declaration",
+        "snippet": "var dominantKind = null;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 144,
+        "pattern": "var-declaration",
+        "snippet": "var dominantCount = 0;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 145,
+        "pattern": "var-declaration",
+        "snippet": "var keys = Object.keys(byKind);"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 153,
+        "pattern": "var-declaration",
+        "snippet": "var trend = dominantKind ? ('Dominan: ' + dominantKind + ' x' + dominantCount + ' (14 event terakhir).') : 'Belum cukup data trend.';"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 154,
+        "pattern": "var-declaration",
+        "snippet": "var nextAction = 'Periksa payload detail + stack pada event terbaru, lalu validasi elemen DOM dan urutan inisialisasi.';"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 183,
+        "pattern": "var-declaration",
+        "snippet": "var doc = global.document;"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 185,
+        "pattern": "var-declaration",
+        "snippet": "var existing = doc.getElementById(DEBUG_DOM_ID);"
+      },
+      {
+        "path": "hype/hype-debugger.js",
+        "line": 188,
+        "pattern": "var-declaration",
+        "snippet": "var panel = doc.createElement('section');"
       }
     ]
   }

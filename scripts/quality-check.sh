@@ -13,19 +13,19 @@ node -e "JSON.parse(require('fs').readFileSync('${ROOT_DIR}/vercel.json','utf8')
 
 echo "[3/7] Build DreamBusiness engine bundle"
 cd "${ROOT_DIR}"
-npx --yes esbuild games/dreambusiness/dream-engine.ts \
+npx --yes esbuild dreambusiness/dream-engine.ts \
   --bundle \
   --format=esm \
   --platform=browser \
   --tsconfig=website/mindmapmaker/tsconfig.json \
-  --outfile=games/dreambusiness/dream-engine-bundle.js > /tmp/dreambusiness-esbuild.log
+  --outfile=dreambusiness/dream-engine-bundle.js > /tmp/dreambusiness-esbuild.log
 tail -n 2 /tmp/dreambusiness-esbuild.log || true
 
 echo "[4/7] JS syntax check (DreamBusiness app)"
-node --check games/dreambusiness/app.js
+node --check dreambusiness/app.js
 
 echo "[5/7] JS syntax check (DreamBusiness bundle)"
-node --check games/dreambusiness/dream-engine-bundle.js
+node --check dreambusiness/dream-engine-bundle.js
 
 echo "[6/7] Lint mindmapmaker"
 cd "${ROOT_DIR}/website/mindmapmaker"

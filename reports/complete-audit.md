@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-05-11T10:01:21Z
+Generated: 2026-05-11T10:19:54Z
 
 ## Executive Summary
 
@@ -16,14 +16,14 @@ Generated: 2026-05-11T10:01:21Z
 - Missing OG description: 1
 - Missing twitter:card: 10
 - Missing JSON-LD: 13
-- Duplicate file groups (all): 82
-- Total LOC (repository): 109283
-- Code LOC (repository): 98754
-- Potential unused static files: 25
-- Deprecated pattern hits: 747
+- Duplicate file groups (all): 81
+- Total LOC (repository): 106809
+- Code LOC (repository): 96292
+- Potential unused static files: 1
+- Deprecated pattern hits: 681
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 26
-- Avg response time (ms): 279.3
-- P95 response time (ms): 382.1
+- Avg response time (ms): 218.2
+- P95 response time (ms): 323.6
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -37,19 +37,19 @@ Generated: 2026-05-11T10:01:21Z
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 349.6 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 296.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | 260.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 217.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/daily-streak` | 200 | — | 164.1 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/dreambusiness` | 200 | — | 376.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 552.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/hype` | 200 | — | 382.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 186.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 195.7 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 153.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 226.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 269.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 323.6 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 423.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | 303.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 222.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/daily-streak` | 200 | — | 200.9 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/dreambusiness` | 200 | — | 104.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 137.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/hype` | 200 | — | 174.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 213.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 168.7 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 228.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 177.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 158.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ## Security Header Coverage (HTTP 200 pages)
 
@@ -69,8 +69,8 @@ Generated: 2026-05-11T10:01:21Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 143.0 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 167.3 | `url-count=12` |
+| `/robots.txt` | 200 | 137.1 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 225.5 | `url-count=12` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -86,200 +86,172 @@ Generated: 2026-05-11T10:01:21Z
 ### Group 1 — files: 2, bytes: 519876
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `assets/public/images/shareideas-2.webp` | 4 | 4 | ✅ | ❌ |
-| `assets/public/images/shareideas.webp` | 1 | 1 | ✅ | ❌ |
+| `assets/public/images/shareideas-2.webp` | 5 | 5 | ✅ | ❌ |
+| `assets/public/images/shareideas.webp` | 2 | 2 | ✅ | ❌ |
 
-### Group 2 — files: 2, bytes: 468916
+### Group 2 — files: 4, bytes: 238528
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `dreambusiness/dream-engine-bundle.js` | 3 | 3 | ❌ | ❌ |
-| `games/dreambusiness/dream-engine-bundle.js` | 2 | 3 | ✅ | ❌ |
+| `assets/public/images/mindmapmaker.webp` | 4 | 7 | ✅ | ❌ |
+| `website/portfolio/testing/images/mindmapmaker.webp` | 2 | 7 | ✅ | ❌ |
+| `website/portfolio/testing/images/portfolio.webp` | 2 | 15 | ✅ | ❌ |
+| `website/portfolio/testing/images/share-ideas.webp` | 2 | 2 | ✅ | ❌ |
 
-### Group 3 — files: 4, bytes: 238528
+### Group 3 — files: 2, bytes: 107586
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `assets/public/images/mindmapmaker.webp` | 3 | 5 | ✅ | ❌ |
-| `website/portfolio/testing/images/mindmapmaker.webp` | 1 | 5 | ✅ | ❌ |
-| `website/portfolio/testing/images/portfolio.webp` | 1 | 14 | ✅ | ❌ |
-| `website/portfolio/testing/images/share-ideas.webp` | 1 | 1 | ✅ | ❌ |
+| `games/hype/industry-ui.js` | 3 | 6 | ✅ | ❌ |
+| `hype/industry-ui.js` | 6 | 6 | ❌ | ❌ |
 
-### Group 4 — files: 2, bytes: 107586
+### Group 4 — files: 2, bytes: 102618
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/industry-ui.js` | 1 | 2 | ✅ | ❌ |
-| `hype/industry-ui.js` | 2 | 2 | ❌ | ❌ |
+| `games/rpg/fadhilwebrpglib.js` | 354 | 364 | ✅ | ❌ |
+| `rpg/fadhilwebrpglib.js` | 358 | 364 | ❌ | ❌ |
 
-### Group 5 — files: 2, bytes: 102618
+### Group 5 — files: 2, bytes: 60930
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/rpg/fadhilwebrpglib.js` | 2 | 10 | ✅ | ❌ |
-| `rpg/fadhilwebrpglib.js` | 4 | 10 | ❌ | ❌ |
+| `fadhil.svg` | 25 | 25 | ❌ | ❌ |
+| `website/fadhil.svg` | 4 | 25 | ✅ | ❌ |
 
-### Group 6 — files: 2, bytes: 60930
+### Group 6 — files: 2, bytes: 45382
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `fadhil.svg` | 21 | 21 | ❌ | ❌ |
-| `website/fadhil.svg` | 2 | 21 | ✅ | ❌ |
+| `fadhil-512x512.png` | 30 | 30 | ❌ | ❌ |
+| `website/fadhil-512x512.png` | 6 | 30 | ✅ | ❌ |
 
-### Group 7 — files: 2, bytes: 45382
+### Group 7 — files: 2, bytes: 33990
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `fadhil-512x512.png` | 26 | 26 | ❌ | ❌ |
-| `website/fadhil-512x512.png` | 4 | 26 | ✅ | ❌ |
+| `games/hype/hype-debugger.js` | 129 | 132 | ✅ | ❌ |
+| `hype/hype-debugger.js` | 132 | 132 | ❌ | ❌ |
 
-### Group 8 — files: 2, bytes: 33990
+### Group 8 — files: 3, bytes: 29067
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/hype-debugger.js` | 1 | 2 | ✅ | ❌ |
-| `hype/hype-debugger.js` | 2 | 2 | ❌ | ❌ |
+| `library/fadhilweblib/styles/theme.css` | 2 | 13 | ✅ | ❌ |
+| `website/home/theme.css` | 2 | 13 | ✅ | ❌ |
+| `website/website/mindmapmaker/theme.css` | 2 | 13 | ✅ | ❌ |
 
-### Group 9 — files: 3, bytes: 29067
+### Group 9 — files: 2, bytes: 24730
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/styles/theme.css` | 1 | 10 | ✅ | ❌ |
-| `website/home/theme.css` | 1 | 10 | ✅ | ❌ |
-| `website/website/mindmapmaker/theme.css` | 1 | 10 | ✅ | ❌ |
+| `games/hype/industry-ui.css` | 3 | 6 | ✅ | ❌ |
+| `hype/industry-ui.css` | 6 | 6 | ❌ | ❌ |
 
-### Group 10 — files: 2, bytes: 24730
+### Group 10 — files: 2, bytes: 18270
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/industry-ui.css` | 1 | 2 | ✅ | ❌ |
-| `hype/industry-ui.css` | 2 | 2 | ❌ | ❌ |
+| `dreambusiness/dream-business-game.tsx` | 6 | 6 | ❌ | ❌ |
+| `games/dreambusiness/dream-business-game.tsx` | 2 | 6 | ✅ | ❌ |
 
-### Group 11 — files: 2, bytes: 18270
+### Group 11 — files: 2, bytes: 17286
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `dreambusiness/dream-business-game.tsx` | 0 | 0 | ❌ | ✅ |
-| `games/dreambusiness/dream-business-game.tsx` | 0 | 0 | ✅ | ❌ |
-Safe candidates: `dreambusiness/dream-business-game.tsx`
+| `games/hype/name-datasets.js` | 3 | 6 | ✅ | ❌ |
+| `hype/name-datasets.js` | 6 | 6 | ❌ | ❌ |
 
-### Group 12 — files: 2, bytes: 17286
+### Group 12 — files: 2, bytes: 14856
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/name-datasets.js` | 1 | 2 | ✅ | ❌ |
-| `hype/name-datasets.js` | 2 | 2 | ❌ | ❌ |
+| `games/rpg/fadhilwebrpglib-test.js` | 2 | 6 | ✅ | ❌ |
+| `rpg/fadhilwebrpglib-test.js` | 6 | 6 | ❌ | ❌ |
 
-### Group 13 — files: 2, bytes: 14856
+### Group 13 — files: 3, bytes: 13248
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/rpg/fadhilwebrpglib-test.js` | 0 | 0 | ✅ | ❌ |
-| `rpg/fadhilwebrpglib-test.js` | 0 | 0 | ❌ | ✅ |
-Safe candidates: `rpg/fadhilwebrpglib-test.js`
+| `library/fadhilweblib/fadhilwebarchivesframework/runtime.js` | 5 | 14 | ✅ | ❌ |
+| `website/archives/runtime.js` | 4 | 14 | ✅ | ❌ |
+| `website/library/fadhilweblib/fadhilwebarchivesframework/runtime.js` | 2 | 14 | ✅ | ❌ |
 
-### Group 14 — files: 3, bytes: 13248
+### Group 14 — files: 2, bytes: 12364
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/fadhilwebarchivesframework/runtime.js` | 1 | 6 | ✅ | ❌ |
-| `website/archives/runtime.js` | 0 | 6 | ✅ | ❌ |
-| `website/library/fadhilweblib/fadhilwebarchivesframework/runtime.js` | 0 | 6 | ✅ | ❌ |
+| `library/fadhilweblib/core/types/hooks.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 15 — files: 2, bytes: 12364
+### Group 15 — files: 2, bytes: 12234
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/types/hooks.ts` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts` | 1 | 2 | ✅ | ❌ |
+| `games/hype/hype-engine-bundle.js` | 3 | 6 | ✅ | ❌ |
+| `hype/hype-engine-bundle.js` | 6 | 6 | ❌ | ❌ |
 
-### Group 16 — files: 2, bytes: 12234
+### Group 16 — files: 2, bytes: 10924
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/hype-engine-bundle.js` | 1 | 2 | ✅ | ❌ |
-| `hype/hype-engine-bundle.js` | 2 | 2 | ❌ | ❌ |
+| `library/fadhilweblib/core/use-dialog.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 17 — files: 2, bytes: 10924
+### Group 17 — files: 2, bytes: 9980
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/use-dialog.ts` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts` | 1 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 18 — files: 2, bytes: 9980
+### Group 18 — files: 2, bytes: 9740
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/syntax/expression.ts` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts` | 1 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/components/collapsible-panel.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 19 — files: 2, bytes: 9740
+### Group 19 — files: 2, bytes: 9532
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/collapsible-panel.tsx` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx` | 1 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/core/state-syntax.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 20 — files: 2, bytes: 9532
+### Group 20 — files: 2, bytes: 9166
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/state-syntax.ts` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts` | 1 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/components/overlay/drawer.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 21 — files: 2, bytes: 9166
+### Group 21 — files: 2, bytes: 9004
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/overlay/drawer.tsx` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx` | 1 | 2 | ✅ | ❌ |
+| `index.html` | 89 | 89 | ❌ | ❌ |
+| `website/portfolio/index.html` | 4 | 89 | ✅ | ❌ |
 
-### Group 22 — files: 2, bytes: 9004
+### Group 22 — files: 2, bytes: 8828
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `index.html` | 19 | 19 | ❌ | ❌ |
-| `website/portfolio/index.html` | 2 | 19 | ✅ | ❌ |
+| `library/fadhilweblib/components/overlay/dialog.tsx` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx` | 2 | 4 | ✅ | ❌ |
 
-### Group 23 — files: 2, bytes: 8828
+### Group 23 — files: 3, bytes: 8349
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/components/overlay/dialog.tsx` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx` | 1 | 2 | ✅ | ❌ |
+| `extension/fadhil-format.js` | 5 | 10 | ❌ | ❌ |
+| `website/archives/fadhil-format.js` | 4 | 10 | ✅ | ❌ |
+| `website/extension/fadhil-format.js` | 2 | 10 | ✅ | ❌ |
 
-### Group 24 — files: 3, bytes: 8349
+### Group 24 — files: 2, bytes: 8142
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `extension/fadhil-format.js` | 1 | 2 | ❌ | ❌ |
-| `website/archives/fadhil-format.js` | 0 | 2 | ✅ | ❌ |
-| `website/extension/fadhil-format.js` | 0 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/core/use-roving-focus.ts` | 2 | 4 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts` | 2 | 4 | ✅ | ❌ |
 
-### Group 25 — files: 2, bytes: 8142
+### Group 25 — files: 2, bytes: 7236
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `library/fadhilweblib/core/use-roving-focus.ts` | 1 | 2 | ✅ | ❌ |
-| `website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts` | 1 | 2 | ✅ | ❌ |
+| `library/fadhilweblib/components/layout/section.tsx` | 0 | 0 | ✅ | ❌ |
+| `website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx` | 0 | 0 | ✅ | ❌ |
 
 ## Static Unused File Audit (High Confidence)
 
 - Candidate files scanned: 72
 - Used via vercel config: 0
-- Used via exact references: 47
-- Potential unused files: 25
+- Used via exact references: 71
+- Potential unused files: 1
 
 | Extension | Count |
 |---|---:|
-| `.css` | 10 |
-| `.html` | 3 |
-| `.js` | 12 |
+| `.js` | 1 |
 
 | Potential unused file | Exact path refs |
 |---|---:|
-| `games/dreambusiness/dreambusiness-module.css` | 0 |
-| `games/dreambusiness/styles.css` | 0 |
-| `website/archives/archives.css` | 0 |
-| `website/home/home.css` | 0 |
-| `website/portfolio/testing/testing.css` | 0 |
-| `website/shareideas/shareideas.css` | 0 |
-| `website/website/books/editor/styles.css` | 0 |
-| `website/website/books/styles.css` | 0 |
-| `website/website/mindmapmaker/editor/editor.css` | 0 |
-| `website/website/mindmapmaker/menu.css` | 0 |
-| `games/dreambusiness/index.html` | 0 |
-| `games/hype/index.html` | 0 |
-| `games/rpg/index.html` | 0 |
-| `website/archives/archives.js` | 0 |
-| `website/archives/fadhil-format.js` | 0 |
-| `website/archives/runtime.js` | 0 |
-| `website/archives/workspace.js` | 0 |
-| `website/portfolio/testing/boot.js` | 0 |
-| `website/portfolio/testing/testing.js` | 0 |
-| `website/shareideas/shareideas-api.js` | 0 |
-| `website/shareideas/shareideas.js` | 0 |
-| `website/website/books/editor/editor.js` | 0 |
-| `website/website/books/lib/fadhilebooklib-browser.js` | 0 |
-| `website/website/mindmapmaker/editor/editor.js` | 0 |
-| `website/website/mindmapmaker/lib/fadhilmindmaplib-browser.js` | 0 |
+| `games/dreambusiness/app.js` | 0 |
 
 ### Notes
 
@@ -289,18 +261,18 @@ Safe candidates: `rpg/fadhilwebrpglib-test.js`
 
 ## LOC Audit (Whole Repository)
 
-- Tracked files scanned: 479
-- Total lines: 109283
-- Code lines: 98754
-- Blank lines: 8630
-- Comment lines: 1899
+- Tracked files scanned: 478
+- Total lines: 106809
+- Code lines: 96292
+- Blank lines: 8625
+- Comment lines: 1892
 
 | Extension | Files | Total | Code | Blank | Comment |
 |---|---:|---:|---:|---:|---:|
 | `.css` | 63 | 10538 | 7810 | 1082 | 1646 |
 | `.html` | 19 | 3247 | 3066 | 167 | 14 |
-| `.js` | 47 | 30749 | 28826 | 1834 | 89 |
-| `.json` | 10 | 9221 | 9221 | 0 | 0 |
+| `.js` | 46 | 25675 | 23764 | 1829 | 82 |
+| `.json` | 10 | 11821 | 11821 | 0 | 0 |
 | `.jsonc` | 1 | 17 | 17 | 0 | 0 |
 | `.mjs` | 1 | 27 | 22 | 5 | 0 |
 | `.py` | 2 | 994 | 846 | 141 | 7 |
@@ -316,12 +288,12 @@ Safe candidates: `rpg/fadhilwebrpglib-test.js`
 
 ## Deprecated Code Audit
 
-- Total pattern hits: 747
-- Files with hits: 9
+- Total pattern hits: 681
+- Files with hits: 8
 
 | Pattern | Hits |
 |---|---:|
-| `var-declaration` | 747 |
+| `var-declaration` | 681 |
 
 | File | Line | Pattern | Snippet |
 |---|---:|---|---|
@@ -391,72 +363,6 @@ Safe candidates: `rpg/fadhilwebrpglib-test.js`
 | `dreambusiness/dream-engine-bundle.js` | 1548 | `var-declaration` | `var NPC_LAST_NAME_POOL = Array.from(/* @__PURE__ */ new Set([` |
 | `dreambusiness/dream-engine-bundle.js` | 1552 | `var-declaration` | `var NPC_PERSONAS = [` |
 | `dreambusiness/dream-engine-bundle.js` | 3008 | `var-declaration` | `var INITIAL_BASELINES = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 2 | `var-declaration` | `var SEMICONDUCTOR_PRIMARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 34 | `var-declaration` | `var SEMICONDUCTOR_SECONDARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 56 | `var-declaration` | `var GAME_PRIMARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 78 | `var-declaration` | `var GAME_SECONDARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 100 | `var-declaration` | `var SOFTWARE_PRIMARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 122 | `var-declaration` | `var SOFTWARE_SECONDARY = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 144 | `var-declaration` | `var TERTIARY = ["Group", "Works", "Labs", "Collective", "Hub", "Division", "Center", "Network"];` |
-| `games/dreambusiness/dream-engine-bundle.js` | 170 | `var-declaration` | `var MAX_CACHE_SIZE = 250;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 171 | `var-declaration` | `var parsedStringSyntaxCache = /* @__PURE__ */ new Map();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 172 | `var-declaration` | `var parsedObjectSyntaxCache = /* @__PURE__ */ new WeakMap();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 173 | `var-declaration` | `var EMPTY_PARSED_SYNTAX = Object.freeze({});` |
-| `games/dreambusiness/dream-engine-bundle.js` | 174 | `var-declaration` | `var EMPTY_STYLE = Object.freeze({});` |
-| `games/dreambusiness/dream-engine-bundle.js` | 175 | `var-declaration` | `var EMPTY_SEMANTICS = Object.freeze({});` |
-| `games/dreambusiness/dream-engine-bundle.js` | 176 | `var-declaration` | `var EMPTY_LOGIC = Object.freeze({});` |
-| `games/dreambusiness/dream-engine-bundle.js` | 177 | `var-declaration` | `var EMPTY_ATTRS = Object.freeze({});` |
-| `games/dreambusiness/dream-engine-bundle.js` | 178 | `var-declaration` | `var EMPTY_RESOLVED_SYNTAX = Object.freeze({` |
-| `games/dreambusiness/dream-engine-bundle.js` | 184 | `var-declaration` | `var KEY_ALIASES = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 407 | `var-declaration` | `var GROUP_ALIASES = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 434 | `var-declaration` | `var GROUP_KEYS = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 615 | `var-declaration` | `var GROUP_KEY_SETS = Object.freeze({` |
-| `games/dreambusiness/dream-engine-bundle.js` | 648 | `var-declaration` | `var FadhilWebSyntaxError = class extends Error {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1061 | `var-declaration` | `var DEFAULT_RELEASE_PROFILE = Object.freeze({` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1080 | `var-declaration` | `var RELEASE_PROFILE_SYNTAX = `vars(` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1136 | `var-declaration` | `var GAME_RELEASE_SYNTAX_PROFILE = buildReleaseSyntaxProfile();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1137 | `var-declaration` | `var ALLOWED_FUNCTIONS = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1143 | `var-declaration` | `var OP_PRIORITY = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1149 | `var-declaration` | `var expressionCache = /* @__PURE__ */ new Map();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1150 | `var-declaration` | `var programCache = /* @__PURE__ */ new Map();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1332 | `var-declaration` | `var GAME_MATH_EXPRESSIONS = Object.freeze({` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1339 | `var-declaration` | `var TICK_MS = 200;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1340 | `var-declaration` | `var START_DATE_UTC = Date.UTC(2e3, 0, 1);` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1341 | `var-declaration` | `var NPC_ACTION_EVERY_TICKS = 10;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1342 | `var-declaration` | `var PLAYER_STARTING_CASH = 140;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1343 | `var-declaration` | `var INITIAL_NPC_COUNT = 75;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1344 | `var-declaration` | `var MAX_ACTIVE_NPCS = 75;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1345 | `var-declaration` | `var NPC_GROWTH_START_DAY = 180;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1346 | `var-declaration` | `var NPC_GROWTH_INTERVAL_DAYS = 60;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1347 | `var-declaration` | `var NPC_GROWTH_BATCH = 3;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1348 | `var-declaration` | `var GOVERNANCE_REFRESH_TICK_INTERVAL = 5;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1349 | `var-declaration` | `var EXECUTIVE_MIN_TENURE_DAYS = 30;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1350 | `var-declaration` | `var BOARD_VOTE_WINDOW_DAYS = 30;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1351 | `var-declaration` | `var BOARD_VOTE_LIMIT_PER_WINDOW = 2;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1352 | `var-declaration` | `var INVESTOR_TAX_INTERVAL_DAYS = 30;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1353 | `var-declaration` | `var TOTAL_SHARES = 1e3;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1354 | `var-declaration` | `var INITIAL_FOUNDER_OWNERSHIP_RATIO = 0.52;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1355 | `var-declaration` | `var COMPANY_TRADE_FEE_RATE = 0.018;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1356 | `var-declaration` | `var HOLDER_TRADE_FEE_RATE = 0.052;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1357 | `var-declaration` | `var MIN_TRADE_AMOUNT = 0.1;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1358 | `var-declaration` | `var PLAN_DURATION_DAYS = 30;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1359 | `var-declaration` | `var MAX_ACTIVE_COMPANIES = 8;` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1360 | `var-declaration` | `var COMPANY_KEYS = ["cosmic", "rmd", "heroscop", "venture4", "venture5", "venture6", "venture7", "venture8"];` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1361 | `var-declaration` | `var CORE_COMPANY_KEYS = ["cosmic", "rmd", "heroscop"];` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1362 | `var-declaration` | `var DYNAMIC_COMPANY_KEYS = ["venture4", "venture5", "venture6", "venture7", "venture8"];` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1363 | `var-declaration` | `var PRICE_PRESETS = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1368 | `var-declaration` | `var DEFAULT_PROFILE_DRAFT = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1374 | `var-declaration` | `var STRATEGY_LABELS = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1381 | `var-declaration` | `var EXECUTIVE_ROLE_META = {` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1407 | `var-declaration` | `var EXECUTIVE_ROLES = Object.keys(EXECUTIVE_ROLE_META);` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1408 | `var-declaration` | `var NPC_FIRST_NAMES = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1480 | `var-declaration` | `var NPC_LAST_NAMES = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1542 | `var-declaration` | `var NPC_NAME_VARIANT_SUFFIXES = ["a", "an", "el", "er", "ia", "in", "is", "on", "or", "us"];` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1543 | `var-declaration` | `var toTitleCaseToken = (value) => value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1544 | `var-declaration` | `var NPC_FIRST_NAME_POOL = Array.from(/* @__PURE__ */ new Set([` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1548 | `var-declaration` | `var NPC_LAST_NAME_POOL = Array.from(/* @__PURE__ */ new Set([` |
-| `games/dreambusiness/dream-engine-bundle.js` | 1552 | `var-declaration` | `var NPC_PERSONAS = [` |
-| `games/dreambusiness/dream-engine-bundle.js` | 3008 | `var-declaration` | `var INITIAL_BASELINES = {` |
 | `games/hype/hype-debugger.js` | 2 | `var-declaration` | `var DEBUG_SESSION_KEY = '__hype_debug_once__';` |
 | `games/hype/hype-debugger.js` | 3 | `var-declaration` | `var DEBUG_DOM_ID = 'hype-debug-once';` |
 | `games/hype/hype-debugger.js` | 4 | `var-declaration` | `var HISTORY_LIMIT = 320;` |
@@ -725,3 +631,69 @@ Safe candidates: `rpg/fadhilwebrpglib-test.js`
 | `games/rpg/index.html` | 334 | `var-declaration` | `var opened = panelOpenState[panel.title] || (panelIndex === 0 && panelOpenState[panel.title] == null);` |
 | `games/rpg/index.html` | 338 | `var-declaration` | `var exploreBtn = $('openExploreBtn');` |
 | `games/rpg/index.html` | 349 | `var-declaration` | `var view = lib.getExploreView(personalState);` |
+| `games/rpg/index.html` | 358 | `var-declaration` | `var view = lib.getPersonalMapView(personalState);` |
+| `games/rpg/index.html` | 359 | `var-declaration` | `var byId = {};` |
+| `games/rpg/index.html` | 361 | `var-declaration` | `var links = [];` |
+| `games/rpg/index.html` | 363 | `var-declaration` | `var full = personalState.world.map.locations.find(function(x){ return x.id === loc.id; }) || { neighbors: [] };` |
+| `games/rpg/index.html` | 366 | `var-declaration` | `var target = byId[targetId];` |
+| `games/rpg/index.html` | 367 | `var-declaration` | `var dx = target.x - loc.x;` |
+| `games/rpg/index.html` | 368 | `var-declaration` | `var dy = target.y - loc.y;` |
+| `games/rpg/index.html` | 369 | `var-declaration` | `var len = Math.sqrt(dx * dx + dy * dy);` |
+| `games/rpg/index.html` | 370 | `var-declaration` | `var ang = Math.atan2(dy, dx) * 180 / Math.PI;` |
+| `games/rpg/index.html` | 374 | `var-declaration` | `var nodes = view.locations.map(function(loc){` |
+| `games/rpg/index.html` | 380 | `var-declaration` | `var plane = $('mapPlane');` |
+| `games/rpg/index.html` | 401 | `var-declaration` | `var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));` |
+| `games/rpg/index.html` | 402 | `var-declaration` | `var textStrong = $('introText').querySelector('strong');` |
+| `games/rpg/index.html` | 403 | `var-declaration` | `var textWrap = $('introText');` |
+| `games/rpg/index.html` | 404 | `var-declaration` | `var blackout = $('introBlackout');` |
+| `games/rpg/index.html` | 405 | `var-declaration` | `var frames = [` |
+| `games/rpg/index.html` | 412 | `var-declaration` | `var idx = 0;` |
+| `games/rpg/index.html` | 413 | `var-declaration` | `var minDuration = 1000;` |
+| `games/rpg/index.html` | 450 | `var-declaration` | `var idx = 0;` |
+| `games/rpg/index.html` | 451 | `var-declaration` | `var seq = lines || [];` |
+| `games/rpg/index.html` | 452 | `var-declaration` | `var timer = setInterval(function(){` |
+| `games/rpg/index.html` | 473 | `var-declaration` | `var summary = lib.getPersonalSummary(personalState);` |
+| `games/rpg/index.html` | 499 | `var-declaration` | `var name = $('nameInput').value;` |
+| `games/rpg/index.html` | 500 | `var-declaration` | `var race = $('raceInput').value;` |
+| `games/rpg/index.html` | 507 | `var-declaration` | `var age = ev.target && ev.target.dataset ? Number(ev.target.dataset.age || 0) : 0;` |
+| `games/rpg/index.html` | 566 | `var-declaration` | `var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';` |
+| `games/rpg/index.html` | 568 | `var-declaration` | `var before = personalState.location;` |
+| `games/rpg/index.html` | 572 | `var-declaration` | `var summary = lib.getPersonalSummary(personalState);` |
+| `games/rpg/index.html` | 576 | `var-declaration` | `var reg = lib.registerAtGuild(personalState, rng);` |
+| `games/rpg/index.html` | 587 | `var-declaration` | `var dx = ev.clientX - mapDrag.x;` |
+| `games/rpg/index.html` | 588 | `var-declaration` | `var dy = ev.clientY - mapDrag.y;` |
+| `games/rpg/index.html` | 598 | `var-declaration` | `var details = ev.target;` |
+| `games/rpg/index.html` | 603 | `var-declaration` | `var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';` |
+| `games/rpg/index.html` | 605 | `var-declaration` | `var view = lib.getExploreView(personalState);` |
+| `games/rpg/index.html` | 606 | `var-declaration` | `var building = view.buildings.find(function(item){ return item.id === id; });` |
+| `games/rpg/index.html` | 612 | `var-declaration` | `var id = ev.target && ev.target.id ? ev.target.id : '';` |
+| `games/rpg/index.html` | 620 | `var-declaration` | `var reg = lib.registerAtGuild(personalState, rng);` |
+| `games/rpg/index.html` | 627 | `var-declaration` | `var ranking = lib.getGuildRanking(personalState, rng, 80);` |
+| `games/rpg/index.html` | 640 | `var-declaration` | `var re = lib.recheckGrade(personalState, rng);` |
+| `hype/hype-debugger.js` | 2 | `var-declaration` | `var DEBUG_SESSION_KEY = '__hype_debug_once__';` |
+| `hype/hype-debugger.js` | 3 | `var-declaration` | `var DEBUG_DOM_ID = 'hype-debug-once';` |
+| `hype/hype-debugger.js` | 4 | `var-declaration` | `var HISTORY_LIMIT = 320;` |
+| `hype/hype-debugger.js` | 5 | `var-declaration` | `var WATCHDOG_INTERVAL_MS = 2600;` |
+| `hype/hype-debugger.js` | 6 | `var-declaration` | `var REPORT_DEDUP_WINDOW_MS = 1800;` |
+| `hype/hype-debugger.js` | 37 | `var-declaration` | `var core = [` |
+| `hype/hype-debugger.js` | 49 | `var-declaration` | `var map = getDedupMap();` |
+| `hype/hype-debugger.js` | 50 | `var-declaration` | `var sig = computeSignature(kind, detail);` |
+| `hype/hype-debugger.js` | 51 | `var-declaration` | `var now = Date.now();` |
+| `hype/hype-debugger.js` | 52 | `var-declaration` | `var last = map.get(sig) || 0;` |
+| `hype/hype-debugger.js` | 58 | `var-declaration` | `var history = getHistory();` |
+| `hype/hype-debugger.js` | 65 | `var-declaration` | `var causes = [];` |
+| `hype/hype-debugger.js` | 66 | `var-declaration` | `var msg = String((detail && detail.message) || '').toLowerCase();` |
+| `hype/hype-debugger.js` | 67 | `var-declaration` | `var stack = String((detail && detail.stack) || '').toLowerCase();` |
+| `hype/hype-debugger.js` | 107 | `var-declaration` | `var predictions = [];` |
+| `hype/hype-debugger.js` | 130 | `var-declaration` | `var max = 0;` |
+| `hype/hype-debugger.js` | 136 | `var-declaration` | `var recent = history.slice(-14);` |
+| `hype/hype-debugger.js` | 137 | `var-declaration` | `var byKind = {};` |
+| `hype/hype-debugger.js` | 139 | `var-declaration` | `var k = recent[i].kind || 'unknown';` |
+| `hype/hype-debugger.js` | 143 | `var-declaration` | `var dominantKind = null;` |
+| `hype/hype-debugger.js` | 144 | `var-declaration` | `var dominantCount = 0;` |
+| `hype/hype-debugger.js` | 145 | `var-declaration` | `var keys = Object.keys(byKind);` |
+| `hype/hype-debugger.js` | 153 | `var-declaration` | `var trend = dominantKind ? ('Dominan: ' + dominantKind + ' x' + dominantCount + ' (14 event terakhir).') : 'Belum cukup data trend.';` |
+| `hype/hype-debugger.js` | 154 | `var-declaration` | `var nextAction = 'Periksa payload detail + stack pada event terbaru, lalu validasi elemen DOM dan urutan inisialisasi.';` |
+| `hype/hype-debugger.js` | 183 | `var-declaration` | `var doc = global.document;` |
+| `hype/hype-debugger.js` | 185 | `var-declaration` | `var existing = doc.getElementById(DEBUG_DOM_ID);` |
+| `hype/hype-debugger.js` | 188 | `var-declaration` | `var panel = doc.createElement('section');` |
