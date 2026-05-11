@@ -7,12 +7,12 @@ import {
   normalizeArchiveName,
   searchArchives,
   upsertArchiveMeta,
-} from './runtime.js';
+} from '/library/fadhilweblib/fadhilwebarchivesframework/runtime.js';
 import {
   createFadhilContainer,
   extractFadhilPayload,
   stringifyFadhil,
-} from './fadhil-format.js';
+} from '/extension/fadhil-format.js';
 
 const searchEl = document.getElementById('archive-search');
 const listEl = document.getElementById('archives-list');
