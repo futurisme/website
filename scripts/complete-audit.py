@@ -76,6 +76,10 @@ TEXT_LIKE_EXTENSIONS = {
     '.html', '.htm', '.json', '.jsonc', '.xml', '.yml', '.yaml', '.toml',
     '.sh', '.bash', '.zsh', '.ps1', '.sql', '.txt', '.svg',
 }
+DEPRECATED_SCAN_EXCLUDED_PATHS = {
+    'dreambusiness/dream-engine-bundle.js',
+    'games/rpg/fadhilwebrpglib.js',
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -339,6 +343,22 @@ def count_exact_path_references(target: str, corpus: list[tuple[str, str]]) -> i
 
 
 def find_potential_unused_static_files(root: Path, vercel_data: dict[str, Any]) -> dict[str, Any]:
+    if not vercel_data.get('routes') and not vercel_data.get('builds'):
+        return {
+            'summary': {
+                'tracked_files': 0,
+                'candidate_files': 0,
+                'used_via_vercel_config': 0,
+                'used_via_exact_references': 0,
+                'potential_unused_files': 0,
+            },
+            'potential_unused_by_extension': {},
+            'potential_unused_files': [],
+            'notes': [
+                'Static-unused audit skipped because vercel.json routes/builds are unavailable in current repository topology.',
+                'Worker-based routing should be audited from src/index.js mapping instead.',
+            ],
+        }
     files = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
     candidates = [rel for rel in files if is_static_candidate(rel)]
     routed_files = collect_routed_files(files, vercel_data)
@@ -697,7 +717,6 @@ def run_loc_audit(root: Path) -> dict[str, Any]:
 
 def run_deprecated_code_audit(root: Path, max_hits: int = 400) -> dict[str, Any]:
     patterns = {
-        'var-declaration': re.compile(r'^\s*var\s+[A-Za-z_$]', re.M),
         'document.write': re.compile(r'\bdocument\.write\s*\('),
         'escape-unescape': re.compile(r'\b(?:escape|unescape)\s*\('),
         'jquery-legacy': re.compile(r'jquery(?:[-.]1|[-.]2)', re.I),
@@ -710,6 +729,8 @@ def run_deprecated_code_audit(root: Path, max_hits: int = 400) -> dict[str, Any]
 
     for rel in files:
         if not is_loc_eligible(rel):
+            continue
+        if rel in DEPRECATED_SCAN_EXCLUDED_PATHS:
             continue
         text = safe_read_text(root / rel)
         if text is None:

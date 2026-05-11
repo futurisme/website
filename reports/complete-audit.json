@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-05-11T10:19:54Z",
+    "generated_at": "2026-05-11T10:26:40Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 81,
-    "elapsed_seconds": 11.32
+    "elapsed_seconds": 9.23
   },
   "domain": {
     "summary": {
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 10,
       "missing_json_ld_count": 13,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 218.2,
-      "p95_response_time_ms": 323.6,
-      "max_response_time_ms": 423.2,
+      "avg_response_time_ms": 97.3,
+      "p95_response_time_ms": 141.4,
+      "max_response_time_ms": 151.0,
       "missing_security_headers_count": 26,
       "missing_security_header_details": {
         "content-security-policy": 13,
@@ -36,7 +36,7 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 323.6,
+        "time_ms": 151.0,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -74,7 +74,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 423.2,
+        "time_ms": 102.8,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -112,7 +112,7 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 303.6,
+        "time_ms": 141.4,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -150,7 +150,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 222.8,
+        "time_ms": 108.4,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -188,7 +188,7 @@
         "path": "/daily-streak",
         "url": "https://fadhil.dev/daily-streak",
         "status": 200,
-        "time_ms": 200.9,
+        "time_ms": 81.2,
         "final_url": "https://fadhil.dev/daily-streak",
         "final_path": "/daily-streak",
         "is_https_final": true,
@@ -226,7 +226,7 @@
         "path": "/dreambusiness",
         "url": "https://fadhil.dev/dreambusiness",
         "status": 200,
-        "time_ms": 104.7,
+        "time_ms": 92.3,
         "final_url": "https://fadhil.dev/dreambusiness",
         "final_path": "/dreambusiness",
         "is_https_final": true,
@@ -264,7 +264,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 137.3,
+        "time_ms": 45.2,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -302,7 +302,7 @@
         "path": "/hype",
         "url": "https://fadhil.dev/hype",
         "status": 200,
-        "time_ms": 174.0,
+        "time_ms": 55.8,
         "final_url": "https://fadhil.dev/hype",
         "final_path": "/hype",
         "is_https_final": true,
@@ -340,7 +340,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 213.3,
+        "time_ms": 92.3,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -378,7 +378,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 168.7,
+        "time_ms": 111.7,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -416,7 +416,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 228.6,
+        "time_ms": 90.6,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -454,7 +454,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 177.6,
+        "time_ms": 121.8,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -492,7 +492,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 158.8,
+        "time_ms": 70.6,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -622,16 +622,16 @@
         {
           "path": "games/rpg/fadhilwebrpglib.js",
           "size_bytes": 51309,
-          "reference_count_exact_path": 354,
-          "reference_count_basename": 364,
+          "reference_count_exact_path": 5,
+          "reference_count_basename": 365,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "rpg/fadhilwebrpglib.js",
           "size_bytes": 51309,
-          "reference_count_exact_path": 358,
-          "reference_count_basename": 364,
+          "reference_count_exact_path": 359,
+          "reference_count_basename": 365,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -692,15 +692,15 @@
           "path": "games/hype/hype-debugger.js",
           "size_bytes": 16995,
           "reference_count_exact_path": 129,
-          "reference_count_basename": 132,
+          "reference_count_basename": 258,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "hype/hype-debugger.js",
           "size_bytes": 16995,
-          "reference_count_exact_path": 132,
-          "reference_count_basename": 132,
+          "reference_count_exact_path": 258,
+          "reference_count_basename": 258,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -768,8 +768,8 @@
         {
           "path": "dreambusiness/dream-business-game.tsx",
           "size_bytes": 9135,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 4,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
@@ -777,7 +777,7 @@
           "path": "games/dreambusiness/dream-business-game.tsx",
           "size_bytes": 9135,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 6,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -815,15 +815,15 @@
           "path": "games/rpg/fadhilwebrpglib-test.js",
           "size_bytes": 7428,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 6,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "rpg/fadhilwebrpglib-test.js",
           "size_bytes": 7428,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
+          "reference_count_exact_path": 4,
+          "reference_count_basename": 4,
           "in_active_scope": false,
           "safe_delete_candidate": false
         }
@@ -838,15 +838,15 @@
           "path": "library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
           "reference_count_exact_path": 5,
-          "reference_count_basename": 14,
+          "reference_count_basename": 12,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/archives/runtime.js",
           "size_bytes": 4416,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 14,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 12,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -854,7 +854,7 @@
           "path": "website/library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 14,
+          "reference_count_basename": 12,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1029,8 +1029,8 @@
         {
           "path": "index.html",
           "size_bytes": 4502,
-          "reference_count_exact_path": 89,
-          "reference_count_basename": 89,
+          "reference_count_exact_path": 225,
+          "reference_count_basename": 225,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
@@ -1038,7 +1038,7 @@
           "path": "website/portfolio/index.html",
           "size_bytes": 4502,
           "reference_count_exact_path": 4,
-          "reference_count_basename": 89,
+          "reference_count_basename": 225,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1076,15 +1076,15 @@
           "path": "extension/fadhil-format.js",
           "size_bytes": 2783,
           "reference_count_exact_path": 5,
-          "reference_count_basename": 10,
+          "reference_count_basename": 8,
           "in_active_scope": false,
           "safe_delete_candidate": false
         },
         {
           "path": "website/archives/fadhil-format.js",
           "size_bytes": 2783,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 10,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 8,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -1092,7 +1092,7 @@
           "path": "website/extension/fadhil-format.js",
           "size_bytes": 2783,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 10,
+          "reference_count_basename": 8,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1129,16 +1129,16 @@
         {
           "path": "library/fadhilweblib/components/layout/section.tsx",
           "size_bytes": 3618,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx",
           "size_bytes": 3618,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1147,26 +1147,17 @@
   ],
   "static_unused_audit": {
     "summary": {
-      "tracked_files": 517,
-      "candidate_files": 72,
+      "tracked_files": 0,
+      "candidate_files": 0,
       "used_via_vercel_config": 0,
-      "used_via_exact_references": 71,
-      "potential_unused_files": 1
+      "used_via_exact_references": 0,
+      "potential_unused_files": 0
     },
-    "potential_unused_by_extension": {
-      ".js": 1
-    },
-    "potential_unused_files": [
-      {
-        "path": "games/dreambusiness/app.js",
-        "exact_reference_count": 0,
-        "extension": ".js"
-      }
-    ],
+    "potential_unused_by_extension": {},
+    "potential_unused_files": [],
     "notes": [
-      "Audit scope is intentionally limited to static delivery folders to minimize false positives.",
-      "A file is considered used when matched by vercel routes/builds or referenced by exact repository path.",
-      "Dynamic runtime fetches may not be detected; validate before deletion."
+      "Static-unused audit skipped because vercel.json routes/builds are unavailable in current repository topology.",
+      "Worker-based routing should be audited from src/index.js mapping instead."
     ]
   },
   "vercel_target_audit": {
@@ -1180,13 +1171,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 137.1,
+      "time_ms": 240.0,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 225.5,
+      "time_ms": 178.2,
       "url_count": 12
     },
     "sitemap_urls": [
@@ -1224,11 +1215,11 @@
   },
   "loc_audit": {
     "summary": {
-      "tracked_files_scanned": 478,
-      "total_lines": 106809,
+      "tracked_files_scanned": 477,
+      "total_lines": 106810,
       "blank_lines": 8625,
       "comment_lines": 1892,
-      "code_lines": 96292
+      "code_lines": 96293
     },
     "by_extension": {
       ".css": {
@@ -1246,18 +1237,18 @@
         "code": 3066
       },
       ".js": {
-        "files": 46,
-        "total": 25675,
+        "files": 45,
+        "total": 25674,
         "blank": 1829,
         "comment": 82,
-        "code": 23764
+        "code": 23763
       },
       ".json": {
         "files": 10,
-        "total": 11821,
+        "total": 11802,
         "blank": 0,
         "comment": 0,
-        "code": 11821
+        "code": 11802
       },
       ".jsonc": {
         "files": 1,
@@ -1275,10 +1266,10 @@
       },
       ".py": {
         "files": 2,
-        "total": 994,
+        "total": 1015,
         "blank": 141,
         "comment": 7,
-        "code": 846
+        "code": 867
       },
       ".sh": {
         "files": 2,
@@ -1347,2413 +1338,10 @@
   },
   "deprecated_code_audit": {
     "summary": {
-      "total_hits": 681,
-      "files_with_hits": 8,
-      "hits_by_pattern": {
-        "var-declaration": 681
-      }
+      "total_hits": 0,
+      "files_with_hits": 0,
+      "hits_by_pattern": {}
     },
-    "hits": [
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 2,
-        "pattern": "var-declaration",
-        "snippet": "var SEMICONDUCTOR_PRIMARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 34,
-        "pattern": "var-declaration",
-        "snippet": "var SEMICONDUCTOR_SECONDARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 56,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_PRIMARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 78,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_SECONDARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 100,
-        "pattern": "var-declaration",
-        "snippet": "var SOFTWARE_PRIMARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 122,
-        "pattern": "var-declaration",
-        "snippet": "var SOFTWARE_SECONDARY = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 144,
-        "pattern": "var-declaration",
-        "snippet": "var TERTIARY = [\"Group\", \"Works\", \"Labs\", \"Collective\", \"Hub\", \"Division\", \"Center\", \"Network\"];"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 170,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_CACHE_SIZE = 250;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 171,
-        "pattern": "var-declaration",
-        "snippet": "var parsedStringSyntaxCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 172,
-        "pattern": "var-declaration",
-        "snippet": "var parsedObjectSyntaxCache = /* @__PURE__ */ new WeakMap();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 173,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_PARSED_SYNTAX = Object.freeze({});"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 174,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_STYLE = Object.freeze({});"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 175,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_SEMANTICS = Object.freeze({});"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 176,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_LOGIC = Object.freeze({});"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 177,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_ATTRS = Object.freeze({});"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 178,
-        "pattern": "var-declaration",
-        "snippet": "var EMPTY_RESOLVED_SYNTAX = Object.freeze({"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 184,
-        "pattern": "var-declaration",
-        "snippet": "var KEY_ALIASES = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 407,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_ALIASES = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 434,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_KEYS = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 615,
-        "pattern": "var-declaration",
-        "snippet": "var GROUP_KEY_SETS = Object.freeze({"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 648,
-        "pattern": "var-declaration",
-        "snippet": "var FadhilWebSyntaxError = class extends Error {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1061,
-        "pattern": "var-declaration",
-        "snippet": "var DEFAULT_RELEASE_PROFILE = Object.freeze({"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1080,
-        "pattern": "var-declaration",
-        "snippet": "var RELEASE_PROFILE_SYNTAX = `vars("
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1136,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_RELEASE_SYNTAX_PROFILE = buildReleaseSyntaxProfile();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1137,
-        "pattern": "var-declaration",
-        "snippet": "var ALLOWED_FUNCTIONS = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1143,
-        "pattern": "var-declaration",
-        "snippet": "var OP_PRIORITY = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1149,
-        "pattern": "var-declaration",
-        "snippet": "var expressionCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1150,
-        "pattern": "var-declaration",
-        "snippet": "var programCache = /* @__PURE__ */ new Map();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1332,
-        "pattern": "var-declaration",
-        "snippet": "var GAME_MATH_EXPRESSIONS = Object.freeze({"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1339,
-        "pattern": "var-declaration",
-        "snippet": "var TICK_MS = 200;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1340,
-        "pattern": "var-declaration",
-        "snippet": "var START_DATE_UTC = Date.UTC(2e3, 0, 1);"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1341,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_ACTION_EVERY_TICKS = 10;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1342,
-        "pattern": "var-declaration",
-        "snippet": "var PLAYER_STARTING_CASH = 140;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1343,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_NPC_COUNT = 75;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1344,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_ACTIVE_NPCS = 75;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1345,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_START_DAY = 180;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1346,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_INTERVAL_DAYS = 60;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1347,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_GROWTH_BATCH = 3;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1348,
-        "pattern": "var-declaration",
-        "snippet": "var GOVERNANCE_REFRESH_TICK_INTERVAL = 5;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1349,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_MIN_TENURE_DAYS = 30;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1350,
-        "pattern": "var-declaration",
-        "snippet": "var BOARD_VOTE_WINDOW_DAYS = 30;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1351,
-        "pattern": "var-declaration",
-        "snippet": "var BOARD_VOTE_LIMIT_PER_WINDOW = 2;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1352,
-        "pattern": "var-declaration",
-        "snippet": "var INVESTOR_TAX_INTERVAL_DAYS = 30;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1353,
-        "pattern": "var-declaration",
-        "snippet": "var TOTAL_SHARES = 1e3;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1354,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_FOUNDER_OWNERSHIP_RATIO = 0.52;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1355,
-        "pattern": "var-declaration",
-        "snippet": "var COMPANY_TRADE_FEE_RATE = 0.018;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1356,
-        "pattern": "var-declaration",
-        "snippet": "var HOLDER_TRADE_FEE_RATE = 0.052;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1357,
-        "pattern": "var-declaration",
-        "snippet": "var MIN_TRADE_AMOUNT = 0.1;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1358,
-        "pattern": "var-declaration",
-        "snippet": "var PLAN_DURATION_DAYS = 30;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1359,
-        "pattern": "var-declaration",
-        "snippet": "var MAX_ACTIVE_COMPANIES = 8;"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1360,
-        "pattern": "var-declaration",
-        "snippet": "var COMPANY_KEYS = [\"cosmic\", \"rmd\", \"heroscop\", \"venture4\", \"venture5\", \"venture6\", \"venture7\", \"venture8\"];"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1361,
-        "pattern": "var-declaration",
-        "snippet": "var CORE_COMPANY_KEYS = [\"cosmic\", \"rmd\", \"heroscop\"];"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1362,
-        "pattern": "var-declaration",
-        "snippet": "var DYNAMIC_COMPANY_KEYS = [\"venture4\", \"venture5\", \"venture6\", \"venture7\", \"venture8\"];"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1363,
-        "pattern": "var-declaration",
-        "snippet": "var PRICE_PRESETS = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1368,
-        "pattern": "var-declaration",
-        "snippet": "var DEFAULT_PROFILE_DRAFT = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1374,
-        "pattern": "var-declaration",
-        "snippet": "var STRATEGY_LABELS = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1381,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_ROLE_META = {"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1407,
-        "pattern": "var-declaration",
-        "snippet": "var EXECUTIVE_ROLES = Object.keys(EXECUTIVE_ROLE_META);"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1408,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_FIRST_NAMES = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1480,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_LAST_NAMES = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1542,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_NAME_VARIANT_SUFFIXES = [\"a\", \"an\", \"el\", \"er\", \"ia\", \"in\", \"is\", \"on\", \"or\", \"us\"];"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1543,
-        "pattern": "var-declaration",
-        "snippet": "var toTitleCaseToken = (value) => value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();"
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1544,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_FIRST_NAME_POOL = Array.from(/* @__PURE__ */ new Set(["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1548,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_LAST_NAME_POOL = Array.from(/* @__PURE__ */ new Set(["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 1552,
-        "pattern": "var-declaration",
-        "snippet": "var NPC_PERSONAS = ["
-      },
-      {
-        "path": "dreambusiness/dream-engine-bundle.js",
-        "line": 3008,
-        "pattern": "var-declaration",
-        "snippet": "var INITIAL_BASELINES = {"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 2,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_SESSION_KEY = '__hype_debug_once__';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 3,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_DOM_ID = 'hype-debug-once';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 4,
-        "pattern": "var-declaration",
-        "snippet": "var HISTORY_LIMIT = 320;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 5,
-        "pattern": "var-declaration",
-        "snippet": "var WATCHDOG_INTERVAL_MS = 2600;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 6,
-        "pattern": "var-declaration",
-        "snippet": "var REPORT_DEDUP_WINDOW_MS = 1800;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 37,
-        "pattern": "var-declaration",
-        "snippet": "var core = ["
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 49,
-        "pattern": "var-declaration",
-        "snippet": "var map = getDedupMap();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 50,
-        "pattern": "var-declaration",
-        "snippet": "var sig = computeSignature(kind, detail);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 51,
-        "pattern": "var-declaration",
-        "snippet": "var now = Date.now();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 52,
-        "pattern": "var-declaration",
-        "snippet": "var last = map.get(sig) || 0;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 58,
-        "pattern": "var-declaration",
-        "snippet": "var history = getHistory();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 65,
-        "pattern": "var-declaration",
-        "snippet": "var causes = [];"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 66,
-        "pattern": "var-declaration",
-        "snippet": "var msg = String((detail && detail.message) || '').toLowerCase();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 67,
-        "pattern": "var-declaration",
-        "snippet": "var stack = String((detail && detail.stack) || '').toLowerCase();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 107,
-        "pattern": "var-declaration",
-        "snippet": "var predictions = [];"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 130,
-        "pattern": "var-declaration",
-        "snippet": "var max = 0;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 136,
-        "pattern": "var-declaration",
-        "snippet": "var recent = history.slice(-14);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 137,
-        "pattern": "var-declaration",
-        "snippet": "var byKind = {};"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 139,
-        "pattern": "var-declaration",
-        "snippet": "var k = recent[i].kind || 'unknown';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 143,
-        "pattern": "var-declaration",
-        "snippet": "var dominantKind = null;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 144,
-        "pattern": "var-declaration",
-        "snippet": "var dominantCount = 0;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 145,
-        "pattern": "var-declaration",
-        "snippet": "var keys = Object.keys(byKind);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 153,
-        "pattern": "var-declaration",
-        "snippet": "var trend = dominantKind ? ('Dominan: ' + dominantKind + ' x' + dominantCount + ' (14 event terakhir).') : 'Belum cukup data trend.';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 154,
-        "pattern": "var-declaration",
-        "snippet": "var nextAction = 'Periksa payload detail + stack pada event terbaru, lalu validasi elemen DOM dan urutan inisialisasi.';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 183,
-        "pattern": "var-declaration",
-        "snippet": "var doc = global.document;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 185,
-        "pattern": "var-declaration",
-        "snippet": "var existing = doc.getElementById(DEBUG_DOM_ID);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 188,
-        "pattern": "var-declaration",
-        "snippet": "var panel = doc.createElement('section');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 207,
-        "pattern": "var-declaration",
-        "snippet": "var heading = doc.createElement('strong');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 212,
-        "pattern": "var-declaration",
-        "snippet": "var status = doc.createElement('div');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 217,
-        "pattern": "var-declaration",
-        "snippet": "var causes = doc.createElement('div');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 222,
-        "pattern": "var-declaration",
-        "snippet": "var predictions = doc.createElement('div');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 227,
-        "pattern": "var-declaration",
-        "snippet": "var logs = doc.createElement('pre');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 232,
-        "pattern": "var-declaration",
-        "snippet": "var row = doc.createElement('div');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 235,
-        "pattern": "var-declaration",
-        "snippet": "var copy = doc.createElement('button');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 239,
-        "pattern": "var-declaration",
-        "snippet": "var payload = panel.getAttribute('data-last-payload') || '';"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 240,
-        "pattern": "var-declaration",
-        "snippet": "var nav = global.navigator;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 246,
-        "pattern": "var-declaration",
-        "snippet": "var clear = doc.createElement('button');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 250,
-        "pattern": "var-declaration",
-        "snippet": "var history = getHistory();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 255,
-        "pattern": "var-declaration",
-        "snippet": "var close = doc.createElement('button');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 270,
-        "pattern": "var-declaration",
-        "snippet": "var statusEl = panel.querySelector('#' + DEBUG_DOM_ID + '-status');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 271,
-        "pattern": "var-declaration",
-        "snippet": "var causesEl = panel.querySelector('#' + DEBUG_DOM_ID + '-causes');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 272,
-        "pattern": "var-declaration",
-        "snippet": "var predEl = panel.querySelector('#' + DEBUG_DOM_ID + '-predictions');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 273,
-        "pattern": "var-declaration",
-        "snippet": "var payloadEl = panel.querySelector('#' + DEBUG_DOM_ID + '-payload');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 312,
-        "pattern": "var-declaration",
-        "snippet": "var severity = kind === 'runtime-error' || kind === 'resource-error' || kind === 'unhandled-rejection' || kind === 'bootstrap-error'"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 316,
-        "pattern": "var-declaration",
-        "snippet": "var entry = {"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 323,
-        "pattern": "var-declaration",
-        "snippet": "var history = pushHistory(entry);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 324,
-        "pattern": "var-declaration",
-        "snippet": "var causes = inferCauses(kind, detail || {});"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 325,
-        "pattern": "var-declaration",
-        "snippet": "var predictions = inferPredictions(kind, detail || {});"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 326,
-        "pattern": "var-declaration",
-        "snippet": "var payload = {"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 342,
-        "pattern": "var-declaration",
-        "snippet": "var panel = ensureContainer();"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 348,
-        "pattern": "var-declaration",
-        "snippet": "var doc = global.document;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 351,
-        "pattern": "var-declaration",
-        "snippet": "var app = doc.getElementById('hypeApp');"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 357,
-        "pattern": "var-declaration",
-        "snippet": "var required = ["
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 366,
-        "pattern": "var-declaration",
-        "snippet": "var selector = required[i];"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 381,
-        "pattern": "var-declaration",
-        "snippet": "var originalError = global.console && global.console.error ? global.console.error.bind(global.console) : null;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 382,
-        "pattern": "var-declaration",
-        "snippet": "var originalWarn = global.console && global.console.warn ? global.console.warn.bind(global.console) : null;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 386,
-        "pattern": "var-declaration",
-        "snippet": "var args = Array.prototype.slice.call(arguments || []);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 387,
-        "pattern": "var-declaration",
-        "snippet": "var message = args.map(function (arg) {"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 397,
-        "pattern": "var-declaration",
-        "snippet": "var args = Array.prototype.slice.call(arguments || []);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 398,
-        "pattern": "var-declaration",
-        "snippet": "var message = args.map(function (arg) { return typeof arg === 'string' ? arg : safeStringify(arg); }).join(' | ').slice(0, 2000);"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 412,
-        "pattern": "var-declaration",
-        "snippet": "var target = event && event.target;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 422,
-        "pattern": "var-declaration",
-        "snippet": "var err = event && event.error ? toPlainError(event.error) : null;"
-      },
-      {
-        "path": "games/hype/hype-debugger.js",
-        "line": 433,
-        "pattern": "var-declaration",
-        "snippet": "var reason = toPlainError(event ? event.reason : null);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 2,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_SESSION_KEY = '__fwrpg_debug_once__';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 3,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_DOM_ID = 'fwrpg-debug-once';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 4,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_HISTORY_LIMIT = 220;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 15,
-        "pattern": "var-declaration",
-        "snippet": "var causes = [];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 36,
-        "pattern": "var-declaration",
-        "snippet": "var predictions = [];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 56,
-        "pattern": "var-declaration",
-        "snippet": "var history = getDebugHistory();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 84,
-        "pattern": "var-declaration",
-        "snippet": "var doc = global && global.document;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 86,
-        "pattern": "var-declaration",
-        "snippet": "var body = doc.body;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 92,
-        "pattern": "var-declaration",
-        "snippet": "var panel = doc.createElement('section');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 97,
-        "pattern": "var-declaration",
-        "snippet": "var heading = doc.createElement('strong');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 103,
-        "pattern": "var-declaration",
-        "snippet": "var detail = doc.createElement('pre');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 108,
-        "pattern": "var-declaration",
-        "snippet": "var actions = doc.createElement('div');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 110,
-        "pattern": "var-declaration",
-        "snippet": "var copyBtn = doc.createElement('button');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 114,
-        "pattern": "var-declaration",
-        "snippet": "var text = detail.textContent || '';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 115,
-        "pattern": "var-declaration",
-        "snippet": "var nav = global.navigator;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 121,
-        "pattern": "var-declaration",
-        "snippet": "var closeBtn = doc.createElement('button');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 134,
-        "pattern": "var-declaration",
-        "snippet": "var info = detail || {};"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 135,
-        "pattern": "var-declaration",
-        "snippet": "var history = getDebugHistory();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 136,
-        "pattern": "var-declaration",
-        "snippet": "var payload = {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 154,
-        "pattern": "var-declaration",
-        "snippet": "var payload = buildDebugPayload(kind, detail);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 160,
-        "pattern": "var-declaration",
-        "snippet": "var doc = global && global.document;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 164,
-        "pattern": "var-declaration",
-        "snippet": "var config = options || {};"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 165,
-        "pattern": "var-declaration",
-        "snippet": "var param = config.triggerParam || 'rpgdebug';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 166,
-        "pattern": "var-declaration",
-        "snippet": "var search = (global.location && global.location.search) || '';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 175,
-        "pattern": "var-declaration",
-        "snippet": "var target = event && event.target;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 202,
-        "pattern": "var-declaration",
-        "snippet": "var localSeed = seed >>> 0;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 211,
-        "pattern": "var-declaration",
-        "snippet": "var elementTable = {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 314,
-        "pattern": "var-declaration",
-        "snippet": "var config = options || {};"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 315,
-        "pattern": "var-declaration",
-        "snippet": "var map = cloneMap(config.map || defaultWorldMap());"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 316,
-        "pattern": "var-declaration",
-        "snippet": "var location = map.locations.find(function (loc) { return loc.id === map.playerLocationId; }) || map.locations[0];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 373,
-        "pattern": "var-declaration",
-        "snippet": "var jitter = Math.floor(rng() * 6);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 374,
-        "pattern": "var-declaration",
-        "snippet": "var burden = u.status.some(function (s) { return s.type === 'slow'; }) ? -8 : 0;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 375,
-        "pattern": "var-declaration",
-        "snippet": "var haste = u.status.some(function (s) { return s.type === 'haste'; }) ? 7 : 0;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 376,
-        "pattern": "var-declaration",
-        "snippet": "var stance = u.role === 'striker' ? 2 : 0;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 388,
-        "pattern": "var-declaration",
-        "snippet": "var active = unit.status.find(function (s) { return s.type === statusType; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 400,
-        "pattern": "var-declaration",
-        "snippet": "var poisonDamage = Math.max(1, Math.floor(unit.maxHp * 0.06));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 407,
-        "pattern": "var-declaration",
-        "snippet": "var regen = Math.max(1, Math.floor(unit.maxHp * 0.05));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 425,
-        "pattern": "var-declaration",
-        "snippet": "var base = actor.attack + actor.spirit + skill.power + Math.floor(combo * 0.7) + Math.floor(actor.tp * 0.2);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 426,
-        "pattern": "var-declaration",
-        "snippet": "var reduction = target.defense + Math.floor(target.spirit * 0.65);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 427,
-        "pattern": "var-declaration",
-        "snippet": "var multiplier = (elementTable[skill.element] && elementTable[skill.element][target.element]) || 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 428,
-        "pattern": "var-declaration",
-        "snippet": "var fieldBuff = weatherModifier(field, skill.element);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 429,
-        "pattern": "var-declaration",
-        "snippet": "var spread = 1 + (rng() * 2 - 1) * skill.variance;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 430,
-        "pattern": "var-declaration",
-        "snippet": "var criticalRate = Math.min(0.4, 0.05 + actor.agility / 240);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 431,
-        "pattern": "var-declaration",
-        "snippet": "var crit = rng() < criticalRate;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 432,
-        "pattern": "var-declaration",
-        "snippet": "var guardScale = target.guarding ? 0.5 : 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 433,
-        "pattern": "var-declaration",
-        "snippet": "var breakBonus = target.breakGauge <= 0 ? 1.2 : 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 434,
-        "pattern": "var-declaration",
-        "snippet": "var raw = Math.max(1, Math.floor((base - reduction) * multiplier * fieldBuff * spread * guardScale * breakBonus));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 439,
-        "pattern": "var-declaration",
-        "snippet": "var usable = actor.skills.filter(function (skill) {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 447,
-        "pattern": "var-declaration",
-        "snippet": "var alive = pool.filter(function (u) { return u.alive; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 453,
-        "pattern": "var-declaration",
-        "snippet": "var action = { type: type, actorId: actorId, targetId: targetId };"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 454,
-        "pattern": "var-declaration",
-        "snippet": "var extraKeys = Object.keys(extras || {});"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 462,
-        "pattern": "var-declaration",
-        "snippet": "var actor = getUnit(state, actorId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 464,
-        "pattern": "var-declaration",
-        "snippet": "var catalog = [{ id: 'basic', label: 'basic' }, { id: 'guard', label: 'guard' }];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 482,
-        "pattern": "var-declaration",
-        "snippet": "var actor = getUnit(state, actorId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 484,
-        "pattern": "var-declaration",
-        "snippet": "var actorInParty = getSide(state, actorId) === 'party';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 485,
-        "pattern": "var-declaration",
-        "snippet": "var foes = actorInParty ? state.enemies : state.party;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 486,
-        "pattern": "var-declaration",
-        "snippet": "var allies = actorInParty ? state.party : state.enemies;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 487,
-        "pattern": "var-declaration",
-        "snippet": "var enemy = nexttargetFromPool(foes);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 488,
-        "pattern": "var-declaration",
-        "snippet": "var allyLow = nexttargetFromPool(allies);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 494,
-        "pattern": "var-declaration",
-        "snippet": "var skillId = selectedId.slice(6);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 495,
-        "pattern": "var-declaration",
-        "snippet": "var skill = actor.skills.find(function (s) { return s.id === skillId; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 497,
-        "pattern": "var-declaration",
-        "snippet": "var target = skill.target === 'ally' ? allyLow : enemy;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 502,
-        "pattern": "var-declaration",
-        "snippet": "var itemId = selectedId.slice(5);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 503,
-        "pattern": "var-declaration",
-        "snippet": "var item = state.inventory.find(function (i) { return i.id === itemId; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 504,
-        "pattern": "var-declaration",
-        "snippet": "var targetForItem = item && item.revive > 0 ? (allies.find(function (u) { return !u.alive; }) || allyLow) : allyLow;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 512,
-        "pattern": "var-declaration",
-        "snippet": "var actor = getUnit(state, actorId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 515,
-        "pattern": "var-declaration",
-        "snippet": "var actorInParty = getSide(state, actorId) === 'party';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 516,
-        "pattern": "var-declaration",
-        "snippet": "var allies = actorInParty ? state.party : state.enemies;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 517,
-        "pattern": "var-declaration",
-        "snippet": "var foes = actorInParty ? state.enemies : state.party;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 518,
-        "pattern": "var-declaration",
-        "snippet": "var enemy = nexttargetFromPool(foes);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 521,
-        "pattern": "var-declaration",
-        "snippet": "var fallen = allies.find(function (entry) { return !entry.alive; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 522,
-        "pattern": "var-declaration",
-        "snippet": "var reviveItem = state.inventory.find(function (entry) { return entry.qty > 0 && entry.revive > 0; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 525,
-        "pattern": "var-declaration",
-        "snippet": "var needHeal = allies.find(function (entry) { return entry.alive && entry.hp / entry.maxHp < 0.33; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 526,
-        "pattern": "var-declaration",
-        "snippet": "var healingSkill = actor.skills.find(function (skill) {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 533,
-        "pattern": "var-declaration",
-        "snippet": "var breakSkill = actor.skills.find(function (skill) {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 538,
-        "pattern": "var-declaration",
-        "snippet": "var limitSkill = actor.skills.find(function (skill) {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 543,
-        "pattern": "var-declaration",
-        "snippet": "var skill = pickSkill(actor, false);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 594,
-        "pattern": "var-declaration",
-        "snippet": "var dice = rng();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 622,
-        "pattern": "var-declaration",
-        "snippet": "var next = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 623,
-        "pattern": "var-declaration",
-        "snippet": "var actor = getUnit(next, action.actorId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 650,
-        "pattern": "var-declaration",
-        "snippet": "var target = getUnit(next, action.targetId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 654,
-        "pattern": "var-declaration",
-        "snippet": "var item = next.inventory.find(function (entry) { return entry.id === action.itemId && entry.qty > 0; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 673,
-        "pattern": "var-declaration",
-        "snippet": "var basicSkill = { power: Math.max(8, Math.floor(actor.attack * 0.55)), element: actor.element, variance: 0.12, breakDamage: 18 };"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 674,
-        "pattern": "var-declaration",
-        "snippet": "var basic = computeDamage(actor, target, basicSkill, rng, next.combo, next.field);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 689,
-        "pattern": "var-declaration",
-        "snippet": "var skill = actor.skills.find(function (entry) { return entry.id === action.skillId; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 700,
-        "pattern": "var-declaration",
-        "snippet": "var heal = Math.max(1, Math.floor(actor.spirit * skill.healScale + actor.level * 2));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 710,
-        "pattern": "var-declaration",
-        "snippet": "var outcome = computeDamage(actor, target, skill, rng, next.combo, next.field);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 731,
-        "pattern": "var-declaration",
-        "snippet": "var next = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 732,
-        "pattern": "var-declaration",
-        "snippet": "var order = createTimeline(next, rng);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 739,
-        "pattern": "var-declaration",
-        "snippet": "var actorId = order[i];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 740,
-        "pattern": "var-declaration",
-        "snippet": "var action = planner ? planner(next, actorId) : autoAction(next, actorId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 750,
-        "pattern": "var-declaration",
-        "snippet": "var working = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 751,
-        "pattern": "var-declaration",
-        "snippet": "var rounds = maxRounds || 4;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 752,
-        "pattern": "var-declaration",
-        "snippet": "var logAccumulator = [];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 767,
-        "pattern": "var-declaration",
-        "snippet": "var map = state.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 768,
-        "pattern": "var-declaration",
-        "snippet": "var current = getMapLocation(map, map.playerLocationId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 775,
-        "pattern": "var-declaration",
-        "snippet": "var isCurrent = loc.id === map.playerLocationId;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 776,
-        "pattern": "var-declaration",
-        "snippet": "var reachable = isCurrent || (current && current.neighbors.indexOf(loc.id) >= 0);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 792,
-        "pattern": "var-declaration",
-        "snippet": "var next = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 793,
-        "pattern": "var-declaration",
-        "snippet": "var cam = next.world.map.camera;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 802,
-        "pattern": "var-declaration",
-        "snippet": "var origin = getMapLocation(map, fromId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 808,
-        "pattern": "var-declaration",
-        "snippet": "var next = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 809,
-        "pattern": "var-declaration",
-        "snippet": "var map = next.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 815,
-        "pattern": "var-declaration",
-        "snippet": "var destination = getMapLocation(map, locationId);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 831,
-        "pattern": "var-declaration",
-        "snippet": "var cmd = (command || '').trim().toLowerCase();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 834,
-        "pattern": "var-declaration",
-        "snippet": "var helpState = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 839,
-        "pattern": "var-declaration",
-        "snippet": "var summary = getBattleSummary(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 840,
-        "pattern": "var-declaration",
-        "snippet": "var statusState = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 845,
-        "pattern": "var-declaration",
-        "snippet": "var mapState = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 851,
-        "pattern": "var-declaration",
-        "snippet": "var battleState = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 866,
-        "pattern": "var-declaration",
-        "snippet": "var unknown = normalizeState(state);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 872,
-        "pattern": "var-declaration",
-        "snippet": "var partyAlive = aliveUnits(state.party).length;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 873,
-        "pattern": "var-declaration",
-        "snippet": "var enemyAlive = aliveUnits(state.enemies).length;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 874,
-        "pattern": "var-declaration",
-        "snippet": "var winner = '';"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 893,
-        "pattern": "var-declaration",
-        "snippet": "var raceCatalog = {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 899,
-        "pattern": "var-declaration",
-        "snippet": "var bornAsCatalog = ["
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 906,
-        "pattern": "var-declaration",
-        "snippet": "var birthPlaces = ["
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 915,
-        "pattern": "var-declaration",
-        "snippet": "var specialSkills = ["
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 923,
-        "pattern": "var-declaration",
-        "snippet": "var gradeCatalog = ['F+', 'E', 'D', 'C', 'B', 'A', 'AA', 'S', 'SS', 'SSS', 'SSR', 'SSU+'];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 926,
-        "pattern": "var-declaration",
-        "snippet": "var acc = 2166136261;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 939,
-        "pattern": "var-declaration",
-        "snippet": "var race = String(inputRace || '').toLowerCase();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 945,
-        "pattern": "var-declaration",
-        "snippet": "var roll = sampleRandom(rng);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 946,
-        "pattern": "var-declaration",
-        "snippet": "var cursor = 0;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 955,
-        "pattern": "var-declaration",
-        "snippet": "var rand = rng || Math.random;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 956,
-        "pattern": "var-declaration",
-        "snippet": "var name = String((input && input.name) || '').trim();"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 958,
-        "pattern": "var-declaration",
-        "snippet": "var race = normalizeRace(input && input.race);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 959,
-        "pattern": "var-declaration",
-        "snippet": "var bornAs = pickBornAs(rand);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 960,
-        "pattern": "var-declaration",
-        "snippet": "var birthPlace = randomPick(birthPlaces, rand);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 961,
-        "pattern": "var-declaration",
-        "snippet": "var specialSkill = randomPick(specialSkills, rand);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 980,
-        "pattern": "var-declaration",
-        "snippet": "var rand = rng || Math.random;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 981,
-        "pattern": "var-declaration",
-        "snippet": "var age = Math.max(5, Math.min(8, Number(startAge) || 5));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 982,
-        "pattern": "var-declaration",
-        "snippet": "var raceStats = raceCatalog[profile.race] ? raceCatalog[profile.race].stats : raceCatalog.humans.stats;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 983,
-        "pattern": "var-declaration",
-        "snippet": "var bornAs = bornAsCatalog.find(function (entry) { return entry.id === profile.bornAs; }) || bornAsCatalog[0];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1036,
-        "pattern": "var-declaration",
-        "snippet": "var next = {"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1084,
-        "pattern": "var-declaration",
-        "snippet": "var rawStep = Number(days);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1085,
-        "pattern": "var-declaration",
-        "snippet": "var step = Number.isFinite(rawStep) ? Math.max(0, Math.floor(rawStep)) : 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1099,
-        "pattern": "var-declaration",
-        "snippet": "var month = Math.floor(personalState.ageDays / 30) + 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1100,
-        "pattern": "var-declaration",
-        "snippet": "var day = (personalState.ageDays % 30) + 1;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1122,
-        "pattern": "var-declaration",
-        "snippet": "var map = personalState.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1123,
-        "pattern": "var-declaration",
-        "snippet": "var currentId = map.currentLocationId;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1124,
-        "pattern": "var-declaration",
-        "snippet": "var current = map.locations.find(function (loc) { return loc.id === currentId; }) || map.locations[0];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1145,
-        "pattern": "var-declaration",
-        "snippet": "var next = tickIdleDays(personalState, 0);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1146,
-        "pattern": "var-declaration",
-        "snippet": "var cam = next.world.map.camera;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1153,
-        "pattern": "var-declaration",
-        "snippet": "var next = tickIdleDays(personalState, 2);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1154,
-        "pattern": "var-declaration",
-        "snippet": "var map = next.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1155,
-        "pattern": "var-declaration",
-        "snippet": "var current = map.locations.find(function (loc) { return loc.id === map.currentLocationId; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1158,
-        "pattern": "var-declaration",
-        "snippet": "var destination = map.locations.find(function (loc) { return loc.id === targetLocationId; });"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1167,
-        "pattern": "var-declaration",
-        "snippet": "var base = ["
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1177,
-        "pattern": "var-declaration",
-        "snippet": "var map = personalState.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1178,
-        "pattern": "var-declaration",
-        "snippet": "var current = map.locations.find(function (loc) { return loc.id === map.currentLocationId; }) || map.locations[0];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1188,
-        "pattern": "var-declaration",
-        "snippet": "var rand = rng || Math.random;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1189,
-        "pattern": "var-declaration",
-        "snippet": "var next = tickIdleDays(personalState, 1);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1190,
-        "pattern": "var-declaration",
-        "snippet": "var map = next.world.map;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1194,
-        "pattern": "var-declaration",
-        "snippet": "var scoreNorm = computeAdventurerScore(next, rand);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1195,
-        "pattern": "var-declaration",
-        "snippet": "var gradeMeta = scoreToGrade(scoreNorm);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1216,
-        "pattern": "var-declaration",
-        "snippet": "var s = personalState.stats;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1217,
-        "pattern": "var-declaration",
-        "snippet": "var total = s.strength + s.agility + s.durability + s.stamina + s.intelligence + s.wisdom + s.willpower + s.perception + s.charisma + s.appearance + s.socialWis"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1222,
-        "pattern": "var-declaration",
-        "snippet": "var gradeIndex = Math.max(0, Math.min(gradeCatalog.length - 1, Math.floor(scoreNorm)));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1223,
-        "pattern": "var-declaration",
-        "snippet": "var fraction = scoreNorm - gradeIndex;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1224,
-        "pattern": "var-declaration",
-        "snippet": "var delta = fraction >= 0.67 ? '+' : (fraction <= 0.25 ? '-' : '');"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1229,
-        "pattern": "var-declaration",
-        "snippet": "var rand = rng || Math.random;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1230,
-        "pattern": "var-declaration",
-        "snippet": "var next = tickIdleDays(personalState, 1);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1234,
-        "pattern": "var-declaration",
-        "snippet": "var adjusted = Math.max(0, Math.min(11.999, next.adventurer.score + (sampleRandom(rand) - 0.48) * 0.5));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1235,
-        "pattern": "var-declaration",
-        "snippet": "var gradeMeta = scoreToGrade(adjusted);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1244,
-        "pattern": "var-declaration",
-        "snippet": "var rand = rng || Math.random;"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1245,
-        "pattern": "var-declaration",
-        "snippet": "var limit = Math.max(1, Math.min(80, maxEntries || 80));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1246,
-        "pattern": "var-declaration",
-        "snippet": "var list = [];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1247,
-        "pattern": "var-declaration",
-        "snippet": "var npcStyles = ['aggressive', 'analyst', 'risk-controller', 'support-core', 'tempo-runner'];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1248,
-        "pattern": "var-declaration",
-        "snippet": "var npcMoods = ['fokus', 'tenang', 'adaptif', 'kompetitif', 'eksperimental'];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1249,
-        "pattern": "var-declaration",
-        "snippet": "var npcMoves = ['menyusun rute farming', 'menyesuaikan build equipment', 'menganalisis pola boss', 'menjaga stamina tim', 'mencari peluang event'];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1251,
-        "pattern": "var-declaration",
-        "snippet": "var score = Math.max(0, Math.min(11.999, sampleRandom(rand) * 12));"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1252,
-        "pattern": "var-declaration",
-        "snippet": "var meta = scoreToGrade(score);"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1253,
-        "pattern": "var-declaration",
-        "snippet": "var style = npcStyles[Math.floor(sampleRandom(rand) * npcStyles.length)];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1254,
-        "pattern": "var-declaration",
-        "snippet": "var mood = npcMoods[Math.floor(sampleRandom(rand) * npcMoods.length)];"
-      },
-      {
-        "path": "games/rpg/fadhilwebrpglib.js",
-        "line": 1255,
-        "pattern": "var-declaration",
-        "snippet": "var move = npcMoves[Math.floor(sampleRandom(rand) * npcMoves.length)];"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 244,
-        "pattern": "var-declaration",
-        "snippet": "var payload = {"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 260,
-        "pattern": "var-declaration",
-        "snippet": "var wrap = document.createElement('section');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 262,
-        "pattern": "var-declaration",
-        "snippet": "var text = document.createElement('pre');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 265,
-        "pattern": "var-declaration",
-        "snippet": "var copy = document.createElement('button');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 278,
-        "pattern": "var-declaration",
-        "snippet": "var lib = window.fadhilwebrpglib;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 279,
-        "pattern": "var-declaration",
-        "snippet": "var debugAgent = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 280,
-        "pattern": "var-declaration",
-        "snippet": "var rng = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 281,
-        "pattern": "var-declaration",
-        "snippet": "var profile = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 282,
-        "pattern": "var-declaration",
-        "snippet": "var personalState = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 283,
-        "pattern": "var-declaration",
-        "snippet": "var idleTimer = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 284,
-        "pattern": "var-declaration",
-        "snippet": "var introTimer = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 285,
-        "pattern": "var-declaration",
-        "snippet": "var panelOpenState = { Physical: true, Mental: false, Social: false };"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 286,
-        "pattern": "var-declaration",
-        "snippet": "var activeBuilding = null;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 290,
-        "pattern": "var-declaration",
-        "snippet": "var el = $('runtimeStatus');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 299,
-        "pattern": "var-declaration",
-        "snippet": "var mapDrag = { active:false, x:0, y:0, moved:false };"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 302,
-        "pattern": "var-declaration",
-        "snippet": "var seed = (Date.now() & 0xffffffff) ^ (Math.floor(performance.now() * 1000) & 0xffffffff) ^ ((Math.random() * 0xffffffff) >>> 0);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 304,
-        "pattern": "var-declaration",
-        "snippet": "var arr = new Uint32Array(1);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 313,
-        "pattern": "var-declaration",
-        "snippet": "var summary = lib.getPersonalSummary(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 314,
-        "pattern": "var-declaration",
-        "snippet": "var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 315,
-        "pattern": "var-declaration",
-        "snippet": "var monthIndex = Math.max(0, Math.min(11, Math.floor(summary.ageDays / 30)));"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 316,
-        "pattern": "var-declaration",
-        "snippet": "var dayStr = String((summary.ageDays % 30) + 1).padStart(2, '0');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 317,
-        "pattern": "var-declaration",
-        "snippet": "var yearStr = String(summary.ageYears).padStart(4, '0');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 322,
-        "pattern": "var-declaration",
-        "snippet": "var panels = ["
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 328,
-        "pattern": "var-declaration",
-        "snippet": "var rows = panel.items.map(function(item){"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 329,
-        "pattern": "var-declaration",
-        "snippet": "var value = Number(item[1]) || 0;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 330,
-        "pattern": "var-declaration",
-        "snippet": "var width = Math.max(4, Math.min(100, Math.round((value / 20) * 100)));"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 331,
-        "pattern": "var-declaration",
-        "snippet": "var gradient = width < 35 ? 'linear-gradient(90deg,#7f1d1d,#b91c1c)' : (width < 68 ? 'linear-gradient(90deg,#f97316,#eab308)' : 'linear-gradient(90deg,#06b6d4,#"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 334,
-        "pattern": "var-declaration",
-        "snippet": "var opened = panelOpenState[panel.title] || (panelIndex === 0 && panelOpenState[panel.title] == null);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 338,
-        "pattern": "var-declaration",
-        "snippet": "var exploreBtn = $('openExploreBtn');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 349,
-        "pattern": "var-declaration",
-        "snippet": "var view = lib.getExploreView(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 358,
-        "pattern": "var-declaration",
-        "snippet": "var view = lib.getPersonalMapView(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 359,
-        "pattern": "var-declaration",
-        "snippet": "var byId = {};"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 361,
-        "pattern": "var-declaration",
-        "snippet": "var links = [];"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 363,
-        "pattern": "var-declaration",
-        "snippet": "var full = personalState.world.map.locations.find(function(x){ return x.id === loc.id; }) || { neighbors: [] };"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 366,
-        "pattern": "var-declaration",
-        "snippet": "var target = byId[targetId];"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 367,
-        "pattern": "var-declaration",
-        "snippet": "var dx = target.x - loc.x;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 368,
-        "pattern": "var-declaration",
-        "snippet": "var dy = target.y - loc.y;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 369,
-        "pattern": "var-declaration",
-        "snippet": "var len = Math.sqrt(dx * dx + dy * dy);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 370,
-        "pattern": "var-declaration",
-        "snippet": "var ang = Math.atan2(dy, dx) * 180 / Math.PI;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 374,
-        "pattern": "var-declaration",
-        "snippet": "var nodes = view.locations.map(function(loc){"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 380,
-        "pattern": "var-declaration",
-        "snippet": "var plane = $('mapPlane');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 401,
-        "pattern": "var-declaration",
-        "snippet": "var frameNodes = Array.prototype.slice.call($('introStage').querySelectorAll('.intro-bg'));"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 402,
-        "pattern": "var-declaration",
-        "snippet": "var textStrong = $('introText').querySelector('strong');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 403,
-        "pattern": "var-declaration",
-        "snippet": "var textWrap = $('introText');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 404,
-        "pattern": "var-declaration",
-        "snippet": "var blackout = $('introBlackout');"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 405,
-        "pattern": "var-declaration",
-        "snippet": "var frames = ["
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 412,
-        "pattern": "var-declaration",
-        "snippet": "var idx = 0;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 413,
-        "pattern": "var-declaration",
-        "snippet": "var minDuration = 1000;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 450,
-        "pattern": "var-declaration",
-        "snippet": "var idx = 0;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 451,
-        "pattern": "var-declaration",
-        "snippet": "var seq = lines || [];"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 452,
-        "pattern": "var-declaration",
-        "snippet": "var timer = setInterval(function(){"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 473,
-        "pattern": "var-declaration",
-        "snippet": "var summary = lib.getPersonalSummary(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 499,
-        "pattern": "var-declaration",
-        "snippet": "var name = $('nameInput').value;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 500,
-        "pattern": "var-declaration",
-        "snippet": "var race = $('raceInput').value;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 507,
-        "pattern": "var-declaration",
-        "snippet": "var age = ev.target && ev.target.dataset ? Number(ev.target.dataset.age || 0) : 0;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 566,
-        "pattern": "var-declaration",
-        "snippet": "var targetId = ev.target && ev.target.dataset ? ev.target.dataset.travel : '';"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 568,
-        "pattern": "var-declaration",
-        "snippet": "var before = personalState.location;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 572,
-        "pattern": "var-declaration",
-        "snippet": "var summary = lib.getPersonalSummary(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 576,
-        "pattern": "var-declaration",
-        "snippet": "var reg = lib.registerAtGuild(personalState, rng);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 587,
-        "pattern": "var-declaration",
-        "snippet": "var dx = ev.clientX - mapDrag.x;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 588,
-        "pattern": "var-declaration",
-        "snippet": "var dy = ev.clientY - mapDrag.y;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 598,
-        "pattern": "var-declaration",
-        "snippet": "var details = ev.target;"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 603,
-        "pattern": "var-declaration",
-        "snippet": "var id = ev.target && ev.target.dataset ? ev.target.dataset.building : '';"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 605,
-        "pattern": "var-declaration",
-        "snippet": "var view = lib.getExploreView(personalState);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 606,
-        "pattern": "var-declaration",
-        "snippet": "var building = view.buildings.find(function(item){ return item.id === id; });"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 612,
-        "pattern": "var-declaration",
-        "snippet": "var id = ev.target && ev.target.id ? ev.target.id : '';"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 620,
-        "pattern": "var-declaration",
-        "snippet": "var reg = lib.registerAtGuild(personalState, rng);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 627,
-        "pattern": "var-declaration",
-        "snippet": "var ranking = lib.getGuildRanking(personalState, rng, 80);"
-      },
-      {
-        "path": "games/rpg/index.html",
-        "line": 640,
-        "pattern": "var-declaration",
-        "snippet": "var re = lib.recheckGrade(personalState, rng);"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 2,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_SESSION_KEY = '__hype_debug_once__';"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 3,
-        "pattern": "var-declaration",
-        "snippet": "var DEBUG_DOM_ID = 'hype-debug-once';"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 4,
-        "pattern": "var-declaration",
-        "snippet": "var HISTORY_LIMIT = 320;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 5,
-        "pattern": "var-declaration",
-        "snippet": "var WATCHDOG_INTERVAL_MS = 2600;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 6,
-        "pattern": "var-declaration",
-        "snippet": "var REPORT_DEDUP_WINDOW_MS = 1800;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 37,
-        "pattern": "var-declaration",
-        "snippet": "var core = ["
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 49,
-        "pattern": "var-declaration",
-        "snippet": "var map = getDedupMap();"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 50,
-        "pattern": "var-declaration",
-        "snippet": "var sig = computeSignature(kind, detail);"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 51,
-        "pattern": "var-declaration",
-        "snippet": "var now = Date.now();"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 52,
-        "pattern": "var-declaration",
-        "snippet": "var last = map.get(sig) || 0;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 58,
-        "pattern": "var-declaration",
-        "snippet": "var history = getHistory();"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 65,
-        "pattern": "var-declaration",
-        "snippet": "var causes = [];"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 66,
-        "pattern": "var-declaration",
-        "snippet": "var msg = String((detail && detail.message) || '').toLowerCase();"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 67,
-        "pattern": "var-declaration",
-        "snippet": "var stack = String((detail && detail.stack) || '').toLowerCase();"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 107,
-        "pattern": "var-declaration",
-        "snippet": "var predictions = [];"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 130,
-        "pattern": "var-declaration",
-        "snippet": "var max = 0;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 136,
-        "pattern": "var-declaration",
-        "snippet": "var recent = history.slice(-14);"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 137,
-        "pattern": "var-declaration",
-        "snippet": "var byKind = {};"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 139,
-        "pattern": "var-declaration",
-        "snippet": "var k = recent[i].kind || 'unknown';"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 143,
-        "pattern": "var-declaration",
-        "snippet": "var dominantKind = null;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 144,
-        "pattern": "var-declaration",
-        "snippet": "var dominantCount = 0;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 145,
-        "pattern": "var-declaration",
-        "snippet": "var keys = Object.keys(byKind);"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 153,
-        "pattern": "var-declaration",
-        "snippet": "var trend = dominantKind ? ('Dominan: ' + dominantKind + ' x' + dominantCount + ' (14 event terakhir).') : 'Belum cukup data trend.';"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 154,
-        "pattern": "var-declaration",
-        "snippet": "var nextAction = 'Periksa payload detail + stack pada event terbaru, lalu validasi elemen DOM dan urutan inisialisasi.';"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 183,
-        "pattern": "var-declaration",
-        "snippet": "var doc = global.document;"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 185,
-        "pattern": "var-declaration",
-        "snippet": "var existing = doc.getElementById(DEBUG_DOM_ID);"
-      },
-      {
-        "path": "hype/hype-debugger.js",
-        "line": 188,
-        "pattern": "var-declaration",
-        "snippet": "var panel = doc.createElement('section');"
-      }
-    ]
+    "hits": []
   }
 }
