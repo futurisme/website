@@ -426,9 +426,7 @@ function isPlanOpenFunding(plan) {
 
 function isCompanyVisibleInUi(companyKey) {
   const company = game.companies[companyKey];
-  if (!company) return false;
-  if (company.isEstablished) return true;
-  return isPlanOpenFunding(game.plans[companyKey]);
+  return Boolean(company?.isEstablished && COMPANY_KEYS.includes(companyKey));
 }
 
 function parseFeedEntry(entry) {
@@ -1008,11 +1006,25 @@ function getRdMonthKey(elapsedDays) {
   return Math.floor(Math.max(0, elapsedDays) / 30);
 }
 
+function estimateDynamicRdMonthlyBudget(company) {
+  const researchBase = Math.max(24, Number(company.researchPerDay ?? 0) * 30 * 0.9);
+  const cash = Math.max(0, Number(company.cash ?? 0));
+  const valuation = Math.max(20, getCompanyValuation(company));
+  const productionReserve = Math.max(18, Number(company.revenuePerDay ?? 0) * 10, valuation * 0.012);
+  const idleCash = Math.max(0, cash - productionReserve);
+  const idleCashRatio = idleCash / Math.max(1, productionReserve);
+  const cashFundedBudget = idleCash * Math.min(0.72, Math.max(0.22, 0.2 + idleCashRatio * 0.08));
+  return Math.max(researchBase, cashFundedBudget, valuation * 0.018);
+}
+
 function ensureRdFund(company, elapsedDays) {
   const monthKey = getRdMonthKey(elapsedDays);
   const existing = rdFundByCompany[company.key];
-  if (existing?.monthKey === monthKey) return existing;
-  const monthlyBudget = Math.max(24, company.researchPerDay * 30 * 0.9);
+  const monthlyBudget = estimateDynamicRdMonthlyBudget(company);
+  if (existing?.monthKey === monthKey) {
+    existing.monthlyBudget = Math.max(existing.monthlyBudget, monthlyBudget);
+    return existing;
+  }
   const refreshed = { monthKey, monthlyBudget, spent: 0 };
   rdFundByCompany[company.key] = refreshed;
   return refreshed;
@@ -1192,7 +1204,22 @@ function applyNpcResearchCycle(state) {
 
     let workingCompany = company;
     const fund = ensureRdFund(workingCompany, next.elapsedDays);
-    const thinkingDepth = 2 + Math.round(traits.strategy * 2);
+    const targetResearchLiquidity = Math.max(workingCompany.research, fund.monthlyBudget * (0.42 + traits.strategy * 0.26));
+    const researchTopUpGap = Math.max(0, targetResearchLiquidity - Number(workingCompany.research ?? 0));
+    const productionReserve = Math.max(18, Number(workingCompany.revenuePerDay ?? 0) * 10, getCompanyValuation(workingCompany) * 0.012);
+    const availableCashForRd = Math.max(0, Number(workingCompany.cash ?? 0) - productionReserve);
+    const rdTopUp = Math.min(researchTopUpGap / 0.92, availableCashForRd * (0.28 + traits.strategy * 0.26));
+    if (rdTopUp > 1) {
+      workingCompany = {
+        ...workingCompany,
+        cash: Math.max(0, workingCompany.cash - rdTopUp),
+        research: workingCompany.research + rdTopUp * 0.92,
+        researchAssetValue: Number(workingCompany.researchAssetValue ?? 0) + rdTopUp * 0.92,
+      };
+      fund.spent += rdTopUp;
+      changed = true;
+    }
+    const thinkingDepth = 2 + Math.round(traits.strategy * 2 + Math.min(3, fund.monthlyBudget / Math.max(1, productionReserve)));
 
     for (let round = 0; round < thinkingDepth; round += 1) {
       const upgradeOptions = Object.entries(workingCompany.upgrades ?? {})
@@ -1311,29 +1338,22 @@ function applyNpcMarketInteractionCycle(state) {
     const sellSignal = investorShares > 0 && (actionBias < 0.41 || currentCompany.marketShare < 1.2);
 
     if (buySignal) {
-      const sharesToBuy = Math.max(0, notionalAmount / pick.sharePrice);
-      next.companies[companyKey] = {
-        ...currentCompany,
-        investors: {
-          ...(currentCompany.investors || {}),
-          [npcId]: investorShares + sharesToBuy,
-        },
-      };
-      changed = true;
+      const result = transactShares(next, npcId, companyKey, 'buy', notionalAmount, 'auto');
+      if (result.tradedValue > 0) {
+        Object.assign(next, result.next);
+        changed = true;
+      }
       continue;
     }
 
     if (sellSignal) {
       const portion = 0.08 + (1 - traits.moral) * 0.22;
-      const sharesToSell = Math.min(investorShares, investorShares * portion);
-      next.companies[companyKey] = {
-        ...currentCompany,
-        investors: {
-          ...(currentCompany.investors || {}),
-          [npcId]: Math.max(0, investorShares - sharesToSell),
-        },
-      };
-      changed = true;
+      const sellValue = Math.min(investorShares * pick.sharePrice, investorShares * portion * pick.sharePrice);
+      const result = transactShares(next, npcId, companyKey, 'sell', sellValue, 'auto');
+      if (result.tradedValue > 0) {
+        Object.assign(next, result.next);
+        changed = true;
+      }
     }
   }
 

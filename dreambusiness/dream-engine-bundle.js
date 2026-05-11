@@ -1859,10 +1859,19 @@ function getCompanyKeyFromCorporateInvestorId(investorId) {
   const key = investorId.replace("corp_", "");
   return COMPANY_KEYS.includes(key) ? key : null;
 }
+function isRegisteredActiveCompany(game, companyKey) {
+  if (!companyKey || !COMPANY_KEYS.includes(companyKey)) return false;
+  return Boolean(game.companies[companyKey]?.isEstablished);
+}
+function canCorporateInvestorTrade(game, investorId, targetCompanyKey) {
+  const sourceCompanyKey = getCompanyKeyFromCorporateInvestorId(investorId);
+  if (!sourceCompanyKey) return true;
+  return sourceCompanyKey !== targetCompanyKey && isRegisteredActiveCompany(game, sourceCompanyKey) && isRegisteredActiveCompany(game, targetCompanyKey);
+}
 function getInvestorCash(game, investorId) {
   if (investorId === game.player.id) return game.player.cash;
   const corporateCompanyKey = getCompanyKeyFromCorporateInvestorId(investorId);
-  if (corporateCompanyKey) return game.companies[corporateCompanyKey].cash;
+  if (corporateCompanyKey) return isRegisteredActiveCompany(game, corporateCompanyKey) ? game.companies[corporateCompanyKey].cash : 0;
   return game.npcs.find((npc) => npc.id === investorId)?.cash ?? 0;
 }
 function getListingAskPrice(company, listing) {
@@ -3050,6 +3059,7 @@ function applyCashToInvestor(game, investorId, amount) {
   }
   const corporateCompanyKey = getCompanyKeyFromCorporateInvestorId(investorId);
   if (corporateCompanyKey) {
+    if (!isRegisteredActiveCompany(game, corporateCompanyKey)) return game;
     return {
       ...game,
       companies: {
@@ -3072,6 +3082,7 @@ function isIndividualInvestorId(investorId) {
 function getInvestorHoldingsValue(game, investorId) {
   return COMPANY_KEYS.reduce((sum, key) => {
     const company = game.companies[key];
+    if (!company.isEstablished) return sum;
     const shares = company.investors[investorId] ?? 0;
     if (shares <= 1e-4) return sum;
     return sum + shares * getSharePrice(company);
@@ -3137,6 +3148,48 @@ function liquidateInvestorHoldingsForTax(game, investorId, neededCash) {
     return false;
   });
   return { next, raisedCash };
+}
+function sanitizeCorporateInvestorHoldings(game) {
+  let changed = false;
+  const companies = { ...game.companies };
+  Object.entries(game.companies).forEach(([targetKey, company]) => {
+    let releasedShares = 0;
+    let nextInvestors = null;
+    Object.entries(company.investors).forEach(([investorId, shares]) => {
+      const sourceCompanyKey = getCompanyKeyFromCorporateInvestorId(investorId);
+      if (!sourceCompanyKey) return;
+      const validCorporateHolder = company.isEstablished && sourceCompanyKey !== targetKey && isRegisteredActiveCompany(game, sourceCompanyKey) && isRegisteredActiveCompany(game, targetKey);
+      if (validCorporateHolder) return;
+      if (!nextInvestors) nextInvestors = { ...company.investors };
+      releasedShares += Math.max(0, shares);
+      delete nextInvestors[investorId];
+      changed = true;
+    });
+    if (nextInvestors) {
+      companies[targetKey] = {
+        ...company,
+        investors: nextInvestors,
+        marketPoolShares: company.isEstablished ? Math.min(company.sharesOutstanding, company.marketPoolShares + releasedShares) : company.marketPoolShares
+      };
+    }
+  });
+  return changed ? { ...game, companies } : game;
+}
+function getCorporatePortfolioPositions(game, sourceCompanyKey) {
+  const investorId = getCorporateInvestorId(sourceCompanyKey);
+  if (!isRegisteredActiveCompany(game, sourceCompanyKey)) return [];
+  return Object.entries(game.companies).filter(([targetKey, company]) => targetKey !== sourceCompanyKey && company.isEstablished).map(([targetKey, company]) => {
+    const shares = company.investors[investorId] ?? 0;
+    const sharePrice = getSharePrice(company);
+    return {
+      targetKey,
+      company,
+      shares,
+      sharePrice,
+      value: shares * sharePrice,
+      cashNeedFit: clamp((game.companies[sourceCompanyKey].cash < 34 ? 0.3 : 0) + getCompanyStressLevel(game.companies[sourceCompanyKey]) * 0.5, 0, 1)
+    };
+  }).filter((entry) => entry.shares > 1e-4 && entry.value > 1e-4).sort((left, right) => right.cashNeedFit + right.value / 160 - (left.cashNeedFit + left.value / 160));
 }
 function applyMonthlyInvestorTaxes(game) {
   const individualIds = /* @__PURE__ */ new Set([game.player.id, ...game.npcs.map((npc) => npc.id)]);
@@ -3497,25 +3550,29 @@ function progressCommunityPlans(game) {
   };
 }
 function transactShares(current, investorId, companyKey, mode, requestedAmount, route = "auto") {
-  const company = current.companies[companyKey];
-  if (requestedAmount <= 0) {
-    return { next: current, tradedValue: 0, sharesMoved: 0, route: "company" };
+  const currentClean = sanitizeCorporateInvestorHoldings(current);
+  const company = currentClean.companies[companyKey];
+  if (!company?.isEstablished || !canCorporateInvestorTrade(currentClean, investorId, companyKey)) {
+    return { next: currentClean, tradedValue: 0, sharesMoved: 0, route: "company" };
   }
-  const investorCash = getInvestorCash(current, investorId);
+  if (requestedAmount <= 0) {
+    return { next: currentClean, tradedValue: 0, sharesMoved: 0, route: "company" };
+  }
+  const investorCash = getInvestorCash(currentClean, investorId);
   const currentShares = company.investors[investorId] ?? 0;
-  const preview = getTradePreview(current, company, investorId, investorCash, currentShares, mode, requestedAmount, route);
+  const preview = getTradePreview(currentClean, company, investorId, investorCash, currentShares, mode, requestedAmount, route);
   if (preview.grossTradeValue < MIN_TRADE_AMOUNT || preview.sharesMoved <= 0) {
-    return { next: current, tradedValue: 0, sharesMoved: 0, route: preview.route };
+    return { next: currentClean, tradedValue: 0, sharesMoved: 0, route: preview.route };
   }
   if (mode === "buy" && preview.netCashDelta * -1 > investorCash + 1e-4) {
-    return { next: current, tradedValue: 0, sharesMoved: 0, route: preview.route };
+    return { next: currentClean, tradedValue: 0, sharesMoved: 0, route: preview.route };
   }
   if (route === "auto" && mode === "buy") {
     const sharePrice2 = preview.sharePrice;
     const companyCapacity = Math.max(0, Math.min(company.marketPoolShares * sharePrice2, requestedAmount, investorCash / (1 + COMPANY_TRADE_FEE_RATE)));
     const companyShares = sharePrice2 > 0 ? companyCapacity / sharePrice2 : 0;
     const companyFee = companyCapacity * COMPANY_TRADE_FEE_RATE;
-    let next2 = current;
+    let next2 = currentClean;
     if (companyCapacity >= MIN_TRADE_AMOUNT && companyShares > 1e-4) {
       next2 = applyCashToInvestor(
         {
@@ -3594,9 +3651,9 @@ function transactShares(current, investorId, companyKey, mode, requestedAmount, 
   if (preview.route === "company") {
     if (mode === "buy") {
       let next3 = {
-        ...current,
+        ...currentClean,
         companies: {
-          ...current.companies,
+          ...currentClean.companies,
           [companyKey]: {
             ...company,
             cash: company.cash + preview.grossTradeValue,
@@ -3619,9 +3676,9 @@ function transactShares(current, investorId, companyKey, mode, requestedAmount, 
     const cashUsed = Math.min(company.cash, preview.grossTradeValue);
     const uncoveredValue = Math.max(0, preview.grossTradeValue - cashUsed);
     let next2 = {
-      ...current,
+      ...currentClean,
       companies: {
-        ...current.companies,
+        ...currentClean.companies,
         [companyKey]: {
           ...company,
           cash: Math.max(0, company.cash - cashUsed),
@@ -3638,9 +3695,9 @@ function transactShares(current, investorId, companyKey, mode, requestedAmount, 
   let remainingShares = preview.sharesMoved;
   let consumedValue = 0;
   let next = {
-    ...current,
+    ...currentClean,
     companies: {
-      ...current.companies,
+      ...currentClean.companies,
       [companyKey]: {
         ...company,
         investors: {
@@ -3687,7 +3744,7 @@ function transactShares(current, investorId, companyKey, mode, requestedAmount, 
       route: preview.route
     };
   }
-  const buyers = Object.keys(company.investors).filter((holderId) => holderId !== investorId).map((holderId) => ({ holderId, budget: getBuyerDemandBudget(current, company, holderId) })).filter((entry) => entry.budget >= MIN_TRADE_AMOUNT).sort((left, right) => right.budget - left.budget);
+  const buyers = Object.keys(company.investors).filter((holderId) => holderId !== investorId).map((holderId) => ({ holderId, budget: getBuyerDemandBudget(currentClean, company, holderId) })).filter((entry) => entry.budget >= MIN_TRADE_AMOUNT).sort((left, right) => right.budget - left.budget);
   buyers.forEach(({ holderId, budget }) => {
     if (remainingShares <= 1e-4) return;
     const sharesAbsorbed = Math.min(remainingShares, budget / sharePrice);
@@ -3808,12 +3865,13 @@ function runNpcCommunityPlanning(current) {
   return next;
 }
 function simulateTick(current) {
+  const sanitizedCurrent = sanitizeCorporateInvestorHoldings(current);
   const tickDays = TICK_MS / 1e3;
-  const nextElapsedDays = current.elapsedDays + tickDays;
-  const reachedNewDay = Math.floor(nextElapsedDays) > Math.floor(current.elapsedDays);
-  const reachedNewTaxMonth = Math.floor(nextElapsedDays / INVESTOR_TAX_INTERVAL_DAYS) > Math.floor(current.elapsedDays / INVESTOR_TAX_INTERVAL_DAYS);
-  const shouldRefreshGovernance = reachedNewDay || current.tickCount % GOVERNANCE_REFRESH_TICK_INTERVAL === 0 || Object.values(current.companies).some((company) => Boolean(company.activeBoardVote));
-  const governedCurrent = shouldRefreshGovernance ? resolveGovernance(current) : current;
+  const nextElapsedDays = sanitizedCurrent.elapsedDays + tickDays;
+  const reachedNewDay = Math.floor(nextElapsedDays) > Math.floor(sanitizedCurrent.elapsedDays);
+  const reachedNewTaxMonth = Math.floor(nextElapsedDays / INVESTOR_TAX_INTERVAL_DAYS) > Math.floor(sanitizedCurrent.elapsedDays / INVESTOR_TAX_INTERVAL_DAYS);
+  const shouldRefreshGovernance = reachedNewDay || sanitizedCurrent.tickCount % GOVERNANCE_REFRESH_TICK_INTERVAL === 0 || Object.values(sanitizedCurrent.companies).some((company) => Boolean(company.activeBoardVote));
+  const governedCurrent = shouldRefreshGovernance ? resolveGovernance(sanitizedCurrent) : sanitizedCurrent;
   let nextPlayerCash = governedCurrent.player.cash;
   const npcCashMap = new Map(governedCurrent.npcs.map((npc) => [npc.id, npc.cash]));
   const corporateCashDelta = /* @__PURE__ */ new Map();
@@ -4061,22 +4119,41 @@ function getUpgradeBalancePressure(game, company) {
 function getManagementResourceContext(company) {
   const maxUpgradeCost = Math.max(...Object.entries(company.upgrades).map(([key, upgrade]) => getUpgradeCost(key, upgrade, company)));
   const maxTeamCost = Math.max(...Object.values(company.teams).map((team) => getTeamCost(team)));
+  const valuation = getCompanyValuation(company);
   const monthlyRevenue = company.revenuePerDay * 30;
   const monthlyRetainedCash = Math.max(8, monthlyRevenue * 0.42 * (1 - company.payoutRatio));
   const monthlyResearchOutput = Math.max(10, company.researchPerDay * 30);
-  const researchReservetarget = Math.max(maxUpgradeCost * 2.1, company.researchPerDay * 9);
-  const cashReservetarget = Math.max(maxTeamCost * 1.75, monthlyRetainedCash * 1.2, 32);
+  const baselineResearchBudget = Math.max(monthlyResearchOutput * 0.9, maxUpgradeCost * 0.82);
+  const strategicCashReserve = Math.max(maxTeamCost * 1.75, monthlyRetainedCash * 1.2, valuation * 0.018, 32);
+  const idleCash = Math.max(0, company.cash - strategicCashReserve);
+  const idleCashIntensity = clamp(idleCash / Math.max(1, strategicCashReserve), 0, 8);
+  const cashFueledResearchBudget = idleCash <= 0 ? 0 : idleCash * clamp(0.18 + idleCashIntensity * 0.075, 0.18, 0.68);
+  const monthlyResearchBudget = Math.max(baselineResearchBudget, cashFueledResearchBudget, company.cash * 0.018);
+  const researchReservetarget = Math.max(maxUpgradeCost * 2.1, company.researchPerDay * 9, monthlyResearchBudget * 0.55);
+  const cashReservetarget = strategicCashReserve;
   const researchOverflow = clamp((company.research - researchReservetarget) / Math.max(1, researchReservetarget), 0, 4);
-  const cashOverflow = clamp((company.cash - cashReservetarget) / Math.max(1, cashReservetarget), 0, 4);
+  const cashOverflow = clamp((company.cash - cashReservetarget) / Math.max(1, cashReservetarget), 0, 8);
   const researchUrgency = clamp(company.research / Math.max(1, monthlyResearchOutput * 0.75), 0, 6);
-  const cashUrgency = clamp(company.cash / Math.max(1, monthlyRetainedCash * 1.4), 0, 6);
-  const managementIntensity = clamp(Math.max(researchOverflow, cashOverflow) * 0.8 + Math.max(researchUrgency, cashUrgency) * 0.22, 0, 4);
+  const cashUrgency = clamp(company.cash / Math.max(1, monthlyRetainedCash * 1.4), 0, 8);
+  const idleCashDeploymentPressure = clamp(idleCash / Math.max(1, monthlyResearchBudget + cashReservetarget), 0, 8);
+  const managementIntensity = clamp(
+    Math.max(researchOverflow, cashOverflow) * 0.82 + Math.max(researchUrgency, cashUrgency) * 0.2 + idleCashDeploymentPressure * 0.58,
+    0,
+    6
+  );
   return {
     maxUpgradeCost,
     maxTeamCost,
+    valuation,
     monthlyRevenue,
     monthlyRetainedCash,
     monthlyResearchOutput,
+    baselineResearchBudget,
+    cashFueledResearchBudget,
+    monthlyResearchBudget,
+    strategicCashReserve,
+    idleCash,
+    idleCashDeploymentPressure,
     researchReservetarget,
     cashReservetarget,
     researchOverflow,
@@ -4164,6 +4241,33 @@ function scoreNpcTeamAction(game, npc, company, key) {
     score,
     label: company.teams[key].label,
     rationale: key === "researchers" ? "menguatkan output R&D" : key === "fabrication" ? "membesarkan kapasitas eksekusi" : "menambah tekanan brand & demand"
+  };
+}
+function scoreNpcResearchBudgetAction(game, npc, company) {
+  const management = getManagementResourceContext(company);
+  const releasePressure = getNpcReleasePressure(game, npc, company);
+  const likelyReleaseWithinWeek = releasePressure.canForceRelease || releasePressure.daysSinceRelease + 7 >= releasePressure.releaseWindow || releasePressure.releaseDistance > 12;
+  const releaseReserve = likelyReleaseWithinWeek ? Math.max(24, calculateLaunchRevenue(calculateCpuScore(company.upgrades), company.teams, company.marketShare, company.reputation, 1) * 0.36) : Math.max(8, management.monthlyRetainedCash * 0.22);
+  const deployableCash = Math.max(0, company.cash - management.cashReservetarget - releaseReserve);
+  if (deployableCash < Math.max(8, management.monthlyResearchBudget * 0.05)) return null;
+  const absorptionGap = Math.max(0, management.monthlyResearchBudget - management.monthlyResearchOutput - company.research * 0.08);
+  const idleCashRatio = clamp(deployableCash / Math.max(1, management.cashReservetarget + releaseReserve), 0, 10);
+  const budgetRatio = likelyReleaseWithinWeek ? clamp(0.1 + npc.intelligence * 0.06, 0.1, 0.22) : clamp(0.2 + idleCashRatio * 0.055 + npc.intelligence * 0.08 + npc.boldness * 0.04, 0.22, 0.72);
+  const cost = clamp(
+    Math.max(absorptionGap, deployableCash * budgetRatio),
+    MIN_TRADE_AMOUNT,
+    deployableCash * (likelyReleaseWithinWeek ? 0.32 : 0.82)
+  );
+  if (cost < MIN_TRADE_AMOUNT) return null;
+  const score = management.idleCashDeploymentPressure * (1.15 + npc.intelligence * 0.5) + management.cashOverflow * 0.54 + clamp(absorptionGap / Math.max(1, management.monthlyResearchBudget), 0, 2) * 1.2 + (likelyReleaseWithinWeek ? -0.45 : 0.2);
+  return {
+    type: "rd-fund",
+    key: "rd-fund",
+    resource: "cash",
+    cost,
+    score,
+    label: "Perbesar anggaran R&D",
+    rationale: likelyReleaseWithinWeek ? "mengalokasikan sebagian kas idle ke R&D sambil menjaga reserve rilis minggu depan" : "menyerap kas cair menganggur menjadi modal teknologi jangka panjang"
   };
 }
 function chooseNpcReleasePriceIndex(npc, company, cpuDelta, cashEmergency) {
@@ -4393,6 +4497,22 @@ function applyNpcCompanyAction(game, companyKey, action) {
       }
     };
   }
+  if (action.type === "rd-fund") {
+    const fundedResearch = action.cost * 0.92;
+    return {
+      ...game,
+      companies: {
+        ...game.companies,
+        [companyKey]: {
+          ...company,
+          cash: Math.max(0, company.cash - action.cost),
+          research: company.research + fundedResearch,
+          researchAssetValue: (company.researchAssetValue ?? 0) + fundedResearch,
+          executivePulse: `${company.ceoName} ${action.rationale}; cash idle dikonversi menjadi pipeline R&D ${formatMoneyCompact(fundedResearch, 2)}.`
+        }
+      }
+    };
+  }
   if (action.type === "appstore-profile") {
     const profileKey = action.key === "appstore-discovery" ? "discovery" : action.key === "appstore-infrastructure" ? "infrastructure" : "trust";
     const nextValue = Math.round(clamp(company.appStoreProfile[profileKey] + 0.08 + Math.max(0, company.reputation - 40) * 12e-4, 0.65, 2.5) * 100) / 100;
@@ -4469,6 +4589,8 @@ function chooseNpcCompanyActionByDomain(game, npc, company, domain) {
   const management = getManagementResourceContext(company);
   const candidates = [];
   if (domain === "technology" || domain === "general") {
+    const rdBudgetAction = scoreNpcResearchBudgetAction(game, npc, company);
+    if (rdBudgetAction) candidates.push(rdBudgetAction);
     candidates.push(...Object.keys(company.upgrades).map((key) => scoreNpcUpgradeAction(game, npc, company, key)));
     candidates.push(scoreNpcTeamAction(game, npc, company, "researchers"));
     if (company.field === "software" && company.softwareSpecialization === "app-store") {
@@ -4504,6 +4626,8 @@ function chooseNpcCompanyActionByDomain(game, npc, company, domain) {
     }
   }
   if (domain === "finance") {
+    const rdBudgetAction = scoreNpcResearchBudgetAction(game, npc, company);
+    if (rdBudgetAction) candidates.push({ ...rdBudgetAction, score: rdBudgetAction.score + management.cashOverflow * 0.2 });
     candidates.push(scoreNpcPayoutAction(npc, company, "up"), scoreNpcPayoutAction(npc, company, "down"));
   }
   const hasResearchOverflow = company.research > management.researchReservetarget;
@@ -4518,6 +4642,7 @@ function chooseNpcCompanyActionByDomain(game, npc, company, domain) {
     }
     const remaining = company.cash - action.cost;
     if (action.type === "release" || action.type === "payout") return action.cost <= company.cash;
+    if (action.type === "rd-fund") return action.cost <= company.cash && remaining >= requiredCashBuffer * 0.38;
     return action.cost <= company.cash && remaining >= requiredCashBuffer;
   }).sort((left, right) => {
     const leftBoost = left.resource === "research" ? management.researchOverflow * 0.7 + management.researchUrgency * 0.12 : management.cashOverflow * 0.55 + management.cashUrgency * 0.1;
@@ -4526,7 +4651,7 @@ function chooseNpcCompanyActionByDomain(game, npc, company, domain) {
   });
   const best = affordable[0] ?? null;
   if (!best) return null;
-  const executionThreshold = best.type === "upgrade" || best.type === "team" ? 0.32 - management.managementIntensity * 0.05 - npc.intelligence * 0.04 : best.type === "release" ? 0.82 - management.managementIntensity * 0.08 - npc.intelligence * 0.05 : 0.52 - management.cashOverflow * 0.05;
+  const executionThreshold = best.type === "upgrade" || best.type === "team" ? 0.32 - management.managementIntensity * 0.05 - npc.intelligence * 0.04 : best.type === "release" ? 0.82 - management.managementIntensity * 0.08 - npc.intelligence * 0.05 : best.type === "rd-fund" ? 0.3 - management.idleCashDeploymentPressure * 0.08 - npc.intelligence * 0.04 : 0.52 - management.cashOverflow * 0.05;
   if ((best.type === "upgrade" || best.type === "team") && best.score < executionThreshold && !hasResearchOverflow && !hasCashOverflow) return null;
   if (best.type === "release" && best.score < executionThreshold) return null;
   if (best.type === "payout" && best.score < 0.55) return null;
@@ -4664,31 +4789,96 @@ function runNpcChiefExecutiveTurn(current) {
     }
     const sourceCompany = workingGame.companies[companyKey];
     const boardVotesRemaining = canStartBoardVote(sourceCompany, workingGame.elapsedDays) ? Math.max(0, BOARD_VOTE_LIMIT_PER_WINDOW - getBoardVoteWindowState(sourceCompany, workingGame.elapsedDays).count) : 0;
-    const investableCash = Math.max(0, sourceCompany.cash - 18);
-    const shouldProposeCrossInvestment = sourceCompany.activeBoardVote === null && investableCash > 6 && sourceCompany.boardMembers.length > 0 && boardVotesRemaining > 0;
+    const managementContext = getManagementResourceContext(sourceCompany);
+    const cashReserveTarget = Math.max(24, managementContext.cashReservetarget * 0.72);
+    const portfolioPositions = getCorporatePortfolioPositions(workingGame, companyKey);
+    const needsCashFromPortfolio = sourceCompany.cash < cashReserveTarget || sourceCompany.cash < Math.max(20, sourceCompany.revenuePerDay * 8) || getCompanyStressLevel(sourceCompany) > 0.62;
+    if (sourceCompany.activeBoardVote === null && needsCashFromPortfolio && portfolioPositions.length > 0 && sourceCompany.boardMembers.length > 0 && boardVotesRemaining > 0) {
+      const positionToTrim = portfolioPositions[0];
+      const cashGap = Math.max(6, cashReserveTarget - sourceCompany.cash);
+      const proposedSaleValue = clamp(
+        Math.min(positionToTrim.value, cashGap * (1.05 + ceoNpc.intelligence * 0.28)),
+        MIN_TRADE_AMOUNT,
+        positionToTrim.value
+      );
+      const proposerId = getBoardProposalActorId(workingGame, sourceCompany, { preferredRole: "cfo", domain: "finance" });
+      const initialVotes = {};
+      if (proposerId !== workingGame.player.id && sourceCompany.boardMembers.some((member) => member.id === proposerId)) {
+        initialVotes[proposerId] = "yes";
+      }
+      const tally = tallyBoardVoteWeights(sourceCompany.boardMembers, initialVotes);
+      const saleVote = {
+        id: `${companyKey}-sell-portfolio-${workingGame.elapsedDays}`,
+        kind: "investasi",
+        proposerId,
+        subject: `${sourceCompany.name} menjual sebagian saham ${positionToTrim.company.name}`,
+        reason: `${investorDisplayName(workingGame, proposerId)} mengusulkan realisasi portofolio karena ${sourceCompany.name} butuh cash operasional, bukan sekadar value di neraca.`,
+        memberVotes: initialVotes,
+        withdrawalValue: proposedSaleValue,
+        decisionAction: { type: "withdraw", sourceCompanyKey: companyKey, targetCompanyKey: positionToTrim.targetKey, amount: proposedSaleValue },
+        yesWeight: tally.yesWeight,
+        noWeight: tally.noWeight,
+        startDay: workingGame.elapsedDays,
+        endDay: workingGame.elapsedDays + 3
+      };
+      const voteUsage = registerBoardVoteUsage(workingGame.companies[companyKey], workingGame.elapsedDays);
+      workingGame = {
+        ...workingGame,
+        companies: {
+          ...workingGame.companies,
+          [companyKey]: {
+            ...workingGame.companies[companyKey],
+            activeBoardVote: saleVote,
+            boardVoteWindowStartDay: voteUsage.startDay,
+            boardVoteCountInWindow: voteUsage.count
+          }
+        }
+      };
+      const corporateInvestorId = getCorporateInvestorId(companyKey);
+      const saleTrade = transactShares(workingGame, corporateInvestorId, positionToTrim.targetKey, "sell", proposedSaleValue, "auto");
+      if (saleTrade.tradedValue > 0) {
+        workingGame = saleTrade.next;
+        workingCompany = workingGame.companies[companyKey];
+        governanceDirty = false;
+        actionsTaken.push(`CFO ${sourceCompany.name}: Jual saham ${positionToTrim.company.name} untuk kas`);
+      }
+    }
+    const refreshedSourceCompany = workingGame.companies[companyKey];
+    const refreshedBoardVotesRemaining = canStartBoardVote(refreshedSourceCompany, workingGame.elapsedDays) ? Math.max(0, BOARD_VOTE_LIMIT_PER_WINDOW - getBoardVoteWindowState(refreshedSourceCompany, workingGame.elapsedDays).count) : 0;
+    const refreshedManagement = getManagementResourceContext(refreshedSourceCompany);
+    const refreshedReleasePressure = getNpcReleasePressure(workingGame, ceoNpc, refreshedSourceCompany);
+    const releaseLikelyWithinWeek = refreshedReleasePressure.canForceRelease || refreshedReleasePressure.daysSinceRelease + 7 >= refreshedReleasePressure.releaseWindow || refreshedReleasePressure.releaseDistance > 12;
+    const launchReserve = releaseLikelyWithinWeek ? Math.max(24, calculateLaunchRevenue(calculateCpuScore(refreshedSourceCompany.upgrades), refreshedSourceCompany.teams, refreshedSourceCompany.marketShare, refreshedSourceCompany.reputation, 1) * 0.42) : Math.max(10, refreshedManagement.monthlyRetainedCash * 0.18);
+    const idleCashAfterRd = Math.max(
+      0,
+      refreshedSourceCompany.cash - refreshedManagement.cashReservetarget - launchReserve - Math.max(0, refreshedManagement.monthlyResearchBudget - refreshedManagement.monthlyResearchOutput)
+    );
+    const investableCash = Math.max(0, releaseLikelyWithinWeek ? idleCashAfterRd * 0.42 : idleCashAfterRd);
+    const shouldProposeCrossInvestment = refreshedSourceCompany.activeBoardVote === null && investableCash > Math.max(6, refreshedManagement.cashReservetarget * 0.16) && refreshedSourceCompany.boardMembers.length > 0 && refreshedBoardVotesRemaining > 0;
     if (shouldProposeCrossInvestment) {
       const investmenttargets = COMPANY_KEYS.filter((targetKey) => targetKey !== companyKey).map((targetKey) => {
         const targetCompany = workingGame.companies[targetKey];
         if (!targetCompany.isEstablished) return null;
-        const attractiveness = targetCompany.marketShare * 0.72 + targetCompany.reputation * 0.46 + calculateCpuScore(targetCompany.upgrades) * 0.018 + clamp((targetCompany.cash - sourceCompany.cash * 0.28) / Math.max(1, sourceCompany.cash), -0.22, 0.18) + clamp((sourceCompany.boardMood - 0.42) * 8, -0.3, 0.4) + ceoNpc.boldness * 0.22;
+        const attractiveness = targetCompany.marketShare * 0.72 + targetCompany.reputation * 0.46 + calculateCpuScore(targetCompany.upgrades) * 0.018 + clamp((targetCompany.cash - refreshedSourceCompany.cash * 0.28) / Math.max(1, refreshedSourceCompany.cash), -0.22, 0.18) + clamp((refreshedSourceCompany.boardMood - 0.42) * 8, -0.3, 0.4) + ceoNpc.boldness * 0.22;
         return { targetKey, targetCompany, attractiveness };
       }).filter((entry) => Boolean(entry)).sort((left, right) => right.attractiveness - left.attractiveness);
       const besttarget = investmenttargets[0];
       if (besttarget) {
-        const riskAwareAllocation = boardVotesRemaining === 1 ? 0.11 + ceoNpc.intelligence * 0.04 + ceoNpc.boldness * 0.02 : 0.16 + ceoNpc.intelligence * 0.05 + ceoNpc.boldness * 0.03;
-        const proposedAmount = clamp(sourceCompany.cash * riskAwareAllocation, 6, investableCash * 0.82);
-        const investmentDecision = boardApproveCompanyInvestment(sourceCompany, besttarget.targetCompany, proposedAmount);
-        const proposerId = getBoardProposalActorId(workingGame, sourceCompany, { preferredRole: "cfo", domain: "finance" });
+        const idleCashPressure = refreshedManagement.idleCashDeploymentPressure;
+        const riskAwareAllocation = releaseLikelyWithinWeek ? 0.16 + ceoNpc.intelligence * 0.04 : refreshedBoardVotesRemaining === 1 ? 0.22 + ceoNpc.intelligence * 0.08 + ceoNpc.boldness * 0.04 + idleCashPressure * 0.025 : 0.34 + ceoNpc.intelligence * 0.1 + ceoNpc.boldness * 0.06 + idleCashPressure * 0.035;
+        const proposedAmount = clamp(investableCash * riskAwareAllocation, 6, investableCash * (releaseLikelyWithinWeek ? 0.5 : 0.92));
+        const investmentDecision = boardApproveCompanyInvestment(refreshedSourceCompany, besttarget.targetCompany, proposedAmount);
+        const proposerId = getBoardProposalActorId(workingGame, refreshedSourceCompany, { preferredRole: "cfo", domain: "finance" });
         const initialVotes = {};
-        if (proposerId !== workingGame.player.id && sourceCompany.boardMembers.some((member) => member.id === proposerId)) {
+        if (proposerId !== workingGame.player.id && refreshedSourceCompany.boardMembers.some((member) => member.id === proposerId)) {
           initialVotes[proposerId] = "yes";
         }
-        const tally = tallyBoardVoteWeights(sourceCompany.boardMembers, initialVotes);
+        const tally = tallyBoardVoteWeights(refreshedSourceCompany.boardMembers, initialVotes);
         const investmentVote = {
           id: `${companyKey}-invest-${workingGame.elapsedDays}`,
           kind: "investasi",
           proposerId,
-          subject: `${sourceCompany.name} \u2192 ${besttarget.targetCompany.name}`,
+          subject: `${refreshedSourceCompany.name} \u2192 ${besttarget.targetCompany.name}`,
           reason: `${investorDisplayName(workingGame, proposerId)} mengusulkan investasi strategis antar-perusahaan.`,
           memberVotes: initialVotes,
           investmentValue: proposedAmount,
@@ -4717,7 +4907,7 @@ function runNpcChiefExecutiveTurn(current) {
             workingGame = investmentTrade.next;
             workingCompany = workingGame.companies[companyKey];
             governanceDirty = false;
-            actionsTaken.push(`Board ${sourceCompany.name}: Investasi ke ${besttarget.targetCompany.name}`);
+            actionsTaken.push(`Board ${refreshedSourceCompany.name}: Investasi ke ${besttarget.targetCompany.name}`);
           }
         }
       }
@@ -4966,7 +5156,7 @@ function runTicksBatched(game, ticks, simulateTick2) {
   return next;
 }
 function getTopCompaniesSnapshot(game, getCompanyValuation2, getSharePrice2, limit = 6) {
-  return Object.values(game.companies).map((company) => ({
+  return Object.values(game.companies).filter((company) => company.isEstablished).map((company) => ({
     key: company.key,
     name: company.name,
     valuation: getCompanyValuation2(company),
@@ -4975,7 +5165,7 @@ function getTopCompaniesSnapshot(game, getCompanyValuation2, getSharePrice2, lim
   })).sort((a, b) => b.valuation - a.valuation).slice(0, Math.max(1, limit));
 }
 function getCompanySelectOptions(game) {
-  return Object.values(game.companies).map((company) => ({
+  return Object.values(game.companies).filter((company) => company.isEstablished).map((company) => ({
     key: company.key,
     label: `${company.name} (${company.key})`
   }));

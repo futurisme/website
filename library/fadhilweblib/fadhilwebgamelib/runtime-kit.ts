@@ -32,6 +32,7 @@ export function getTopCompaniesSnapshot(
   limit = 6
 ): CompanySnapshot[] {
   return Object.values(game.companies)
+    .filter((company) => company.isEstablished)
     .map((company) => ({
       key: company.key,
       name: company.name,
@@ -44,10 +45,12 @@ export function getTopCompaniesSnapshot(
 }
 
 export function getCompanySelectOptions(game: GameState) {
-  return Object.values(game.companies).map((company) => ({
-    key: company.key,
-    label: `${company.name} (${company.key})`,
-  }));
+  return Object.values(game.companies)
+    .filter((company) => company.isEstablished)
+    .map((company) => ({
+      key: company.key,
+      label: `${company.name} (${company.key})`,
+    }));
 }
 
 export function getDisplayCompanies(game: GameState, maxSlots = 10): DisplayCompany[] {
