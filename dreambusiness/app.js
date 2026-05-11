@@ -1021,6 +1021,43 @@ function getNpcCognitionTraits(npcId, companyKey) {
   };
 }
 
+
+function getLeadershipInfluence(company) {
+  const executives = [
+    { role: 'CEO', id: company.ceoId, weight: 1.0 },
+    { role: 'CTO', id: company.executives?.cto?.occupantId ?? null, weight: 0.72 },
+    { role: 'CFO', id: company.executives?.cfo?.occupantId ?? null, weight: 0.66 },
+    { role: 'COO', id: company.executives?.coo?.occupantId ?? null, weight: 0.64 },
+    { role: 'CMO', id: company.executives?.cmo?.occupantId ?? null, weight: 0.58 },
+  ].filter((entry) => entry.id);
+
+  if (!executives.length) {
+    return { strategy: 0.5, courage: 0.5, moral: 0.5, precision: 0.5, discipline: 0.5, authority: 0 };
+  }
+
+  let totalWeight = 0;
+  const aggregate = { strategy: 0, courage: 0, moral: 0, precision: 0, discipline: 0 };
+  for (const executive of executives) {
+    const traits = getNpcCognitionTraits(executive.id, company.key);
+    totalWeight += executive.weight;
+    aggregate.strategy += traits.strategy * executive.weight;
+    aggregate.courage += traits.courage * executive.weight;
+    aggregate.moral += traits.moral * executive.weight;
+    aggregate.precision += traits.precision * executive.weight;
+    aggregate.discipline += traits.discipline * executive.weight;
+  }
+
+  const normalize = (value) => clamp01(value / Math.max(0.0001, totalWeight));
+  return {
+    strategy: normalize(aggregate.strategy),
+    courage: normalize(aggregate.courage),
+    moral: normalize(aggregate.moral),
+    precision: normalize(aggregate.precision),
+    discipline: normalize(aggregate.discipline),
+    authority: totalWeight,
+  };
+}
+
 function scoreUpgradeOpportunity(company, upgradeKey, upgrade, nextTierCost, traits, marketPressure) {
   const step = Math.max(0.0001, Math.abs(Number(upgrade.step ?? 1)));
   const baseCost = Math.max(1, Number(upgrade.baseCost ?? nextTierCost));
@@ -1047,7 +1084,15 @@ function applyNpcResearchCycle(state) {
     if (!company.isEstablished) return;
     if (!company.ceoId || company.ceoId === next.player.id) return;
 
-    const traits = getNpcCognitionTraits(company.ceoId, company.key);
+    const ceoTraits = getNpcCognitionTraits(company.ceoId, company.key);
+    const leadership = getLeadershipInfluence(company);
+    const traits = {
+      strategy: clamp01((ceoTraits.strategy * 0.62) + (leadership.strategy * 0.38)),
+      courage: clamp01((ceoTraits.courage * 0.65) + (leadership.courage * 0.35)),
+      moral: clamp01((ceoTraits.moral * 0.6) + (leadership.moral * 0.4)),
+      precision: clamp01((ceoTraits.precision * 0.58) + (leadership.precision * 0.42)),
+      discipline: clamp01((ceoTraits.discipline * 0.55) + (leadership.discipline * 0.45)),
+    };
     const marketPressure = (Math.max(0, marketAverage - Number(company.marketShare ?? 0)) * 0.08) + ((1 - traits.moral) * 0.5);
 
     let workingCompany = company;
@@ -1149,7 +1194,15 @@ function applyNpcMarketInteractionCycle(state) {
     const currentCompany = next.companies[companyKey];
     if (!currentCompany) continue;
 
-    const traits = getNpcCognitionTraits(npcId, companyKey);
+    const individualTraits = getNpcCognitionTraits(npcId, companyKey);
+    const leadership = getLeadershipInfluence(currentCompany);
+    const traits = {
+      strategy: clamp01((individualTraits.strategy * 0.45) + (leadership.strategy * 0.55)),
+      courage: clamp01((individualTraits.courage * 0.4) + (leadership.courage * 0.6)),
+      moral: clamp01((individualTraits.moral * 0.5) + (leadership.moral * 0.5)),
+      precision: clamp01((individualTraits.precision * 0.48) + (leadership.precision * 0.52)),
+      discipline: clamp01((individualTraits.discipline * 0.42) + (leadership.discipline * 0.58)),
+    };
     const investorShares = Number(currentCompany.investors?.[npcId] ?? 0);
     const riskMood = pseudoNoise(seed, next.elapsedDays, 1.3);
     const conviction = clamp01((traits.strategy * 0.4) + (traits.courage * 0.3) + (traits.precision * 0.3));
