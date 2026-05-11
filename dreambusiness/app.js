@@ -1083,6 +1083,83 @@ function applyNpcResearchCycle(state) {
   };
 }
 
+
+function pseudoNoise(seed, day, salt = 0) {
+  const value = Math.sin((seed * 0.0001) + (day * 0.173) + salt) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+function applyNpcMarketInteractionCycle(state) {
+  const next = { ...state, companies: { ...state.companies } };
+  const npcIds = Array.isArray(next.npcs) ? next.npcs.map((npc) => npc.id) : [];
+  if (!npcIds.length) return state;
+
+  let changed = false;
+  const establishedCompanies = Object.values(next.companies).filter((company) => company?.isEstablished);
+  if (!establishedCompanies.length) return state;
+
+  const valuationRows = establishedCompanies
+    .map((company) => ({
+      company,
+      valuation: Math.max(1, getCompanyValuation(company)),
+      sharePrice: Math.max(0.01, getSharePrice(company)),
+    }))
+    .sort((a, b) => b.valuation - a.valuation);
+
+  for (const npcId of npcIds) {
+    const seed = hashSeedFromText(`${npcId}:market`);
+    const candidateRows = valuationRows.slice(0, 8);
+    if (!candidateRows.length) continue;
+
+    const pickIndex = Math.min(candidateRows.length - 1, Math.floor(pseudoNoise(seed, next.elapsedDays, 0.5) * candidateRows.length));
+    const pick = candidateRows[pickIndex];
+    const companyKey = pick.company.key;
+    const currentCompany = next.companies[companyKey];
+    if (!currentCompany) continue;
+
+    const traits = getNpcCognitionTraits(npcId, companyKey);
+    const investorShares = Number(currentCompany.investors?.[npcId] ?? 0);
+    const riskMood = pseudoNoise(seed, next.elapsedDays, 1.3);
+    const conviction = clamp01((traits.strategy * 0.4) + (traits.courage * 0.3) + (traits.precision * 0.3));
+    const actionBias = (riskMood + conviction) / 2;
+
+    const baseAmount = Math.max(1, currentCompany.cash * (0.00035 + traits.courage * 0.0009));
+    const activityMultiplier = 0.8 + pseudoNoise(seed, next.elapsedDays, 2.1) * 0.6;
+    const notionalAmount = baseAmount * activityMultiplier;
+
+    const buySignal = actionBias > 0.54 && pick.sharePrice < (pick.valuation / Math.max(1, currentCompany.totalShares || 1)) * (1.2 + traits.precision * 0.5);
+    const sellSignal = investorShares > 0 && (actionBias < 0.41 || currentCompany.marketShare < 1.2);
+
+    if (buySignal) {
+      const sharesToBuy = Math.max(0, notionalAmount / pick.sharePrice);
+      next.companies[companyKey] = {
+        ...currentCompany,
+        investors: {
+          ...(currentCompany.investors || {}),
+          [npcId]: investorShares + sharesToBuy,
+        },
+      };
+      changed = true;
+      continue;
+    }
+
+    if (sellSignal) {
+      const portion = 0.08 + (1 - traits.moral) * 0.22;
+      const sharesToSell = Math.min(investorShares, investorShares * portion);
+      next.companies[companyKey] = {
+        ...currentCompany,
+        investors: {
+          ...(currentCompany.investors || {}),
+          [npcId]: Math.max(0, investorShares - sharesToSell),
+        },
+      };
+      changed = true;
+    }
+  }
+
+  return changed ? next : state;
+}
+
 function renderCompanyDetail() {
   const key = selectedCompanyForDetail;
   const company = key ? game.companies[key] : null;
@@ -1198,7 +1275,8 @@ function runTick(n = 1) {
   try {
     const next = runTicksBatched(game, n, simulateTick);
     const withNpcResearch = applyNpcResearchCycle(next);
-    const withSpecializedMarket = applySpecializedReleaseLogic(withNpcResearch);
+    const withNpcMarketInteraction = applyNpcMarketInteractionCycle(withNpcResearch);
+    const withSpecializedMarket = applySpecializedReleaseLogic(withNpcMarketInteraction);
     if (!isValidGameState(withSpecializedMarket)) {
       debugReport('invalid-state', 'Tick produced invalid game state', { elapsedDays: game.elapsedDays, tickCount: game.tickCount });
       setStatus('Tick warning: invalid state detected, previous safe state retained.', true);
