@@ -294,6 +294,28 @@ function getReleaseCadenceDays(company) {
   return Math.max(3, baseCadence + variation - maturityOffset);
 }
 
+
+function getReleaseMarketPressure(type, day) {
+  const windowDays = 10;
+  const recent = releaseRegistry.filter((entry) => entry.type === type && (day - Number(entry.day || 0)) >= 0 && (day - Number(entry.day || 0)) <= windowDays);
+  const sameDay = recent.filter((entry) => Number(entry.day || 0) === day).length;
+  const nearWindow = recent.filter((entry) => (day - Number(entry.day || 0)) <= 3).length;
+  const staleWindow = recent.filter((entry) => (day - Number(entry.day || 0)) > 7).length;
+  const congestion = (sameDay * 0.7) + (nearWindow * 0.33) + (recent.length * 0.12);
+  const marketSilence = staleWindow >= 3 ? 0.15 : 0;
+  return Math.max(0, congestion - marketSilence);
+}
+
+function estimateReleaseProfitDelta(company, spec, pressure) {
+  const revenueSignal = Math.max(0, Number(company.revenuePerDay || 0));
+  const qualitySignal = Math.max(1, Number(spec.tech || spec.chosenLevel || 1));
+  const baseGross = (revenueSignal * 1.8) + (qualitySignal * 2400);
+  const pressurePenalty = Math.min(0.78, pressure * 0.12);
+  const idlePenalty = Number(company.releaseCount || 0) > 0 ? 0 : 0.05;
+  const marginMultiplier = Math.max(0.12, 1 - pressurePenalty - idlePenalty);
+  return baseGross * marginMultiplier;
+}
+
 function applySpecializedReleaseLogic(state) {
   const next = { ...state, companies: { ...state.companies } };
   const cpuPool = Object.values(next.companies)
@@ -302,7 +324,7 @@ function applySpecializedReleaseLogic(state) {
     .sort((a, b) => (b.score / Math.max(1, b.price)) - (a.score / Math.max(1, a.price)));
 
   const today = Number(next.elapsedDays || 0);
-  const releaseSlotsPerDay = Math.max(2, Math.floor(Object.keys(next.companies).length / 6));
+  const releaseSlotsPerDay = Math.max(1, Math.floor(Object.keys(next.companies).length / 8));
   let usedReleaseSlots = 0;
 
   for (const company of Object.values(next.companies)) {
@@ -315,8 +337,10 @@ function applySpecializedReleaseLogic(state) {
     const readyByCadence = (today - lastReleaseDay) >= cadenceDays;
     const slotAvailable = usedReleaseSlots < releaseSlotsPerDay;
     const canReleaseToday = nowCount > prev.releaseCount && readyByCadence && slotAvailable;
+    const launchPressure = getReleaseMarketPressure(type === "Device" ? "Computer" : type, today);
+    const avoidCrowdedLaunch = launchPressure >= 1.2 && (today - lastReleaseDay) < (cadenceDays + 4);
 
-    if (nowCount > prev.releaseCount && !canReleaseToday) {
+    if (nowCount > prev.releaseCount && (!canReleaseToday || avoidCrowdedLaunch)) {
       const waitDays = Math.max(1, cadenceDays - (today - lastReleaseDay));
       next.companies[company.key] = { ...company, releaseCount: prev.releaseCount, lastRelease: `Pipeline queued: launch in ~${waitDays} day(s).` };
       continue;
@@ -362,6 +386,9 @@ function applySpecializedReleaseLogic(state) {
       const productText = compactReleaseName(rawProductText, `${company.name} Release ${nowCount}`);
       const releaseType = type === 'Device' && /phone/i.test(productText) ? 'Phone' : type === 'Device' ? 'Computer' : type;
       const spec = companyReleaseState[company.key]?.lastSpec || estimateReleaseSpecAndPrice(company, releaseType);
+      const profitDelta = estimateReleaseProfitDelta(next.companies[company.key] || company, spec, getReleaseMarketPressure(releaseType, today));
+      const launchCompany = next.companies[company.key] || company;
+      next.companies[company.key] = { ...launchCompany, cash: Math.max(0, Number(launchCompany.cash || 0) + profitDelta) };
       releaseRegistry.push({
         day: next.elapsedDays,
         date: formatHeaderDate(next.elapsedDays),
@@ -371,6 +398,8 @@ function applySpecializedReleaseLogic(state) {
         price: spec.productPrice,
         tech: spec.chosenLevel,
         techMax: spec.techLevel,
+        pressure: Number(getReleaseMarketPressure(releaseType, today).toFixed(3)),
+        projectedProfit: Math.round(profitDelta),
       });
     }
   }
