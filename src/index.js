@@ -120,10 +120,35 @@ function mapPath(pathname) {
   return asset ? { type: 'asset', value: asset } : { type: 'deny' };
 }
 
-function withPerfHeaders(response, pathname) {
+function ensureSeoHtml(html, pathname) {
+  if (typeof html !== 'string' || !html) return html;
+  const canonical = `https://fadhil.dev${pathname === '/' ? '/' : pathname}`;
+  const description = 'Fadhil Akbar Cariearsa official page and projects hub.';
+  const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+  const title = (titleMatch?.[1] || 'Fadhil.dev').trim();
+  let next = html;
+  const headInsert = [];
+  if (!/<meta[^>]+name=["']description["']/i.test(next)) headInsert.push(`<meta name="description" content="${description}" />`);
+  if (!/<link[^>]+rel=["']canonical["']/i.test(next)) headInsert.push(`<link rel="canonical" href="${canonical}" />`);
+  if (!/<meta[^>]+property=["']og:title["']/i.test(next)) headInsert.push(`<meta property="og:title" content="${title}" />`);
+  if (!/<meta[^>]+property=["']og:description["']/i.test(next)) headInsert.push(`<meta property="og:description" content="${description}" />`);
+  if (!/<meta[^>]+name=["']twitter:card["']/i.test(next)) headInsert.push('<meta name="twitter:card" content="summary_large_image" />');
+  if (!/<script[^>]+type=["']application\/ld\+json["']/i.test(next)) {
+    headInsert.push(`<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":${JSON.stringify(title)},"url":${JSON.stringify(canonical)},"description":${JSON.stringify(description)}}</script>`);
+  }
+  if (headInsert.length) next = next.replace(/<\/head>/i, `${headInsert.join('\n')}\n</head>`);
+  if (!/<h1\b/i.test(next)) {
+    next = next.replace(/<body([^>]*)>/i, `<body$1><h1 style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">${title}</h1>`);
+  }
+  return next;
+}
+
+async function withPerfHeaders(response, pathname) {
   const h = new Headers(response.headers);
   h.set('X-Content-Type-Options', 'nosniff');
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  h.set('Content-Security-Policy', "default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-src https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'");
+  h.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   const isHtml = pathname.endsWith('.html') || !pathname.includes('.');
   const isAsset = /\.(css|js|mjs|png|jpg|jpeg|webp|avif|svg|woff2?|ico|txt|xml)$/i.test(pathname);
   const filename = pathname.split('/').pop() || '';
@@ -138,6 +163,11 @@ function withPerfHeaders(response, pathname) {
   } else if (isAsset) {
     // Non-fingerprinted assets must revalidate to avoid stale copies after deploys.
     h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=604800');
+  }
+  if (isHtml) {
+    const text = ensureSeoHtml(await response.text(), pathname);
+    h.set('content-type', 'text/html; charset=utf-8');
+    return new Response(text, { status: response.status, statusText: response.statusText, headers: h });
   }
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });
 }
@@ -160,7 +190,7 @@ export default {
       const url = new URL(req.url);
       url.pathname = r.value;
       const res = await env.ASSETS.fetch(new Request(url.toString(), req));
-      return withPerfHeaders(res, r.value);
+      return await withPerfHeaders(res, r.value);
     } catch (error) {
       return new Response(`Worker runtime error: ${error instanceof Error ? error.message : String(error)}`, {
         status: 500,

@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-05-11T10:26:40Z
+Generated: 2026-05-11T10:38:14Z
 
 ## Executive Summary
 
@@ -17,13 +17,13 @@ Generated: 2026-05-11T10:26:40Z
 - Missing twitter:card: 10
 - Missing JSON-LD: 13
 - Duplicate file groups (all): 81
-- Total LOC (repository): 106810
-- Code LOC (repository): 96293
+- Total LOC (repository): 104321
+- Code LOC (repository): 93803
 - Potential unused static files: 0
 - Deprecated pattern hits: 0
 - Missing security headers (CSP/HSTS/XCTO/Referrer): 26
-- Avg response time (ms): 97.3
-- P95 response time (ms): 141.4
+- Avg response time (ms): 191.2
+- P95 response time (ms): 249.5
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -37,19 +37,19 @@ Generated: 2026-05-11T10:26:40Z
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 151.0 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 102.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | 141.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 108.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/daily-streak` | 200 | — | 81.2 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/dreambusiness` | 200 | — | 92.3 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 45.2 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/hype` | 200 | — | 55.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 92.3 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 111.7 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 90.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 121.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 70.6 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 274.2 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/archives` | 200 | — | 235.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/books` | 200 | — | 235.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/books/editor` | 200 | — | 228.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/daily-streak` | 200 | — | 215.6 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/dreambusiness` | 200 | — | 196.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/home` | 200 | — | 152.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/hype` | 200 | — | 249.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker` | 200 | — | 153.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 166.6 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
+| `/rpg` | 200 | — | 156.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas` | 200 | — | 121.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/shareideas/page/1` | 200 | — | 100.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
 
 ## Security Header Coverage (HTTP 200 pages)
 
@@ -69,8 +69,8 @@ Generated: 2026-05-11T10:26:40Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 240.0 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 178.2 | `url-count=12` |
+| `/robots.txt` | 200 | 128.3 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 50.2 | `url-count=12` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -106,8 +106,8 @@ Generated: 2026-05-11T10:26:40Z
 ### Group 4 — files: 2, bytes: 102618
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/rpg/fadhilwebrpglib.js` | 5 | 365 | ✅ | ❌ |
-| `rpg/fadhilwebrpglib.js` | 359 | 365 | ❌ | ❌ |
+| `games/rpg/fadhilwebrpglib.js` | 5 | 15 | ✅ | ❌ |
+| `rpg/fadhilwebrpglib.js` | 9 | 15 | ❌ | ❌ |
 
 ### Group 5 — files: 2, bytes: 60930
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -124,8 +124,8 @@ Generated: 2026-05-11T10:26:40Z
 ### Group 7 — files: 2, bytes: 33990
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `games/hype/hype-debugger.js` | 129 | 258 | ✅ | ❌ |
-| `hype/hype-debugger.js` | 258 | 258 | ❌ | ❌ |
+| `games/hype/hype-debugger.js` | 3 | 6 | ✅ | ❌ |
+| `hype/hype-debugger.js` | 6 | 6 | ❌ | ❌ |
 
 ### Group 8 — files: 3, bytes: 29067
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -210,8 +210,8 @@ Generated: 2026-05-11T10:26:40Z
 ### Group 21 — files: 2, bytes: 9004
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
 |---|---:|---:|:---:|:---:|
-| `index.html` | 225 | 225 | ❌ | ❌ |
-| `website/portfolio/index.html` | 4 | 225 | ✅ | ❌ |
+| `index.html` | 23 | 23 | ❌ | ❌ |
+| `website/portfolio/index.html` | 4 | 23 | ✅ | ❌ |
 
 ### Group 22 — files: 2, bytes: 8828
 | File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |
@@ -259,17 +259,17 @@ Generated: 2026-05-11T10:26:40Z
 ## LOC Audit (Whole Repository)
 
 - Tracked files scanned: 477
-- Total lines: 106810
-- Code lines: 96293
-- Blank lines: 8625
+- Total lines: 104321
+- Code lines: 93803
+- Blank lines: 8626
 - Comment lines: 1892
 
 | Extension | Files | Total | Code | Blank | Comment |
 |---|---:|---:|---:|---:|---:|
 | `.css` | 63 | 10538 | 7810 | 1082 | 1646 |
 | `.html` | 19 | 3247 | 3066 | 167 | 14 |
-| `.js` | 45 | 25674 | 23763 | 1829 | 82 |
-| `.json` | 10 | 11802 | 11802 | 0 | 0 |
+| `.js` | 45 | 25704 | 23792 | 1830 | 82 |
+| `.json` | 10 | 9283 | 9283 | 0 | 0 |
 | `.jsonc` | 1 | 17 | 17 | 0 | 0 |
 | `.mjs` | 1 | 27 | 22 | 5 | 0 |
 | `.py` | 2 | 1015 | 867 | 141 | 7 |
