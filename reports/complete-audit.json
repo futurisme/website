@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-05-11T10:46:38Z",
+    "generated_at": "2026-05-11T10:53:25Z",
     "base_url": "https://fadhil.dev",
-    "duplicate_groups_total": 76,
-    "elapsed_seconds": 9.91
+    "duplicate_groups_total": 69,
+    "elapsed_seconds": 8.86
   },
   "domain": {
     "summary": {
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 0,
       "missing_json_ld_count": 0,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 191.7,
-      "p95_response_time_ms": 260.6,
-      "max_response_time_ms": 264.5,
+      "avg_response_time_ms": 183.0,
+      "p95_response_time_ms": 249.6,
+      "max_response_time_ms": 275.2,
       "missing_security_headers_count": 0,
       "missing_security_header_details": {
         "content-security-policy": 0,
@@ -36,7 +36,7 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 264.5,
+        "time_ms": 275.2,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -75,7 +75,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 244.2,
+        "time_ms": 241.2,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -114,7 +114,7 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 235.2,
+        "time_ms": 249.6,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -153,7 +153,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 228.3,
+        "time_ms": 174.9,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -192,7 +192,7 @@
         "path": "/daily-streak",
         "url": "https://fadhil.dev/daily-streak",
         "status": 200,
-        "time_ms": 260.6,
+        "time_ms": 178.6,
         "final_url": "https://fadhil.dev/daily-streak",
         "final_path": "/daily-streak",
         "is_https_final": true,
@@ -231,7 +231,7 @@
         "path": "/dreambusiness",
         "url": "https://fadhil.dev/dreambusiness",
         "status": 200,
-        "time_ms": 246.8,
+        "time_ms": 193.5,
         "final_url": "https://fadhil.dev/dreambusiness",
         "final_path": "/dreambusiness",
         "is_https_final": true,
@@ -270,7 +270,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 144.2,
+        "time_ms": 134.0,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -309,7 +309,7 @@
         "path": "/hype",
         "url": "https://fadhil.dev/hype",
         "status": 200,
-        "time_ms": 195.8,
+        "time_ms": 136.2,
         "final_url": "https://fadhil.dev/hype",
         "final_path": "/hype",
         "is_https_final": true,
@@ -348,7 +348,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 96.5,
+        "time_ms": 146.4,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -387,7 +387,7 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 101.7,
+        "time_ms": 153.9,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
@@ -426,7 +426,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 201.3,
+        "time_ms": 171.9,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -465,7 +465,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 172.2,
+        "time_ms": 167.5,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -504,7 +504,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 100.7,
+        "time_ms": 156.2,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -543,75 +543,6 @@
   },
   "duplicate_analysis": [
     {
-      "group_size": 2,
-      "group_total_bytes": 107586,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/hype/industry-ui.js",
-          "size_bytes": 53793,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 6,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "hype/industry-ui.js",
-          "size_bytes": 53793,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 102618,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/rpg/fadhilwebrpglib.js",
-          "size_bytes": 51309,
-          "reference_count_exact_path": 5,
-          "reference_count_basename": 15,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "rpg/fadhilwebrpglib.js",
-          "size_bytes": 51309,
-          "reference_count_exact_path": 9,
-          "reference_count_basename": 15,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 33990,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/hype/hype-debugger.js",
-          "size_bytes": 16995,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 6,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "hype/hype-debugger.js",
-          "size_bytes": 16995,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
       "group_size": 3,
       "group_total_bytes": 29067,
       "safe_delete_candidates": [],
@@ -644,29 +575,6 @@
     },
     {
       "group_size": 2,
-      "group_total_bytes": 24730,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/hype/industry-ui.css",
-          "size_bytes": 12365,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 6,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "hype/industry-ui.css",
-          "size_bytes": 12365,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
       "group_total_bytes": 18270,
       "safe_delete_candidates": [],
       "items": [
@@ -689,52 +597,6 @@
       ]
     },
     {
-      "group_size": 2,
-      "group_total_bytes": 17286,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/hype/name-datasets.js",
-          "size_bytes": 8643,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 6,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "hype/name-datasets.js",
-          "size_bytes": 8643,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 14856,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/rpg/fadhilwebrpglib-test.js",
-          "size_bytes": 7428,
-          "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "rpg/fadhilwebrpglib-test.js",
-          "size_bytes": 7428,
-          "reference_count_exact_path": 4,
-          "reference_count_basename": 4,
-          "in_active_scope": false,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
       "group_size": 3,
       "group_total_bytes": 13248,
       "safe_delete_candidates": [],
@@ -743,7 +605,7 @@
           "path": "library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
           "reference_count_exact_path": 5,
-          "reference_count_basename": 12,
+          "reference_count_basename": 11,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -751,7 +613,7 @@
           "path": "website/archives/runtime.js",
           "size_bytes": 4416,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 12,
+          "reference_count_basename": 11,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
@@ -759,7 +621,7 @@
           "path": "website/library/fadhilweblib/fadhilwebarchivesframework/runtime.js",
           "size_bytes": 4416,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 12,
+          "reference_count_basename": 11,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -784,29 +646,6 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
-        }
-      ]
-    },
-    {
-      "group_size": 2,
-      "group_total_bytes": 12234,
-      "safe_delete_candidates": [],
-      "items": [
-        {
-          "path": "games/hype/hype-engine-bundle.js",
-          "size_bytes": 6117,
-          "reference_count_exact_path": 3,
-          "reference_count_basename": 6,
-          "in_active_scope": true,
-          "safe_delete_candidate": false
-        },
-        {
-          "path": "hype/hype-engine-bundle.js",
-          "size_bytes": 6117,
-          "reference_count_exact_path": 6,
-          "reference_count_basename": 6,
-          "in_active_scope": false,
           "safe_delete_candidate": false
         }
       ]
@@ -1034,16 +873,16 @@
         {
           "path": "library/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1057,16 +896,16 @@
         {
           "path": "library/fadhilweblib/components/navigation/tabs.tsx",
           "size_bytes": 3203,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/tabs.tsx",
           "size_bytes": 3203,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1080,16 +919,16 @@
         {
           "path": "library/fadhilweblib/components/forms/field.tsx",
           "size_bytes": 3194,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/field.tsx",
           "size_bytes": 3194,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1098,23 +937,21 @@
     {
       "group_size": 2,
       "group_total_bytes": 6276,
-      "safe_delete_candidates": [
-        "dreambusiness/dreambusiness-module.css"
-      ],
+      "safe_delete_candidates": [],
       "items": [
         {
           "path": "dreambusiness/dreambusiness-module.css",
           "size_bytes": 3138,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 6,
+          "reference_count_basename": 8,
           "in_active_scope": false,
-          "safe_delete_candidate": true
+          "safe_delete_candidate": false
         },
         {
           "path": "games/dreambusiness/dreambusiness-module.css",
           "size_bytes": 3138,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 2,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 8,
           "in_active_scope": true,
           "safe_delete_candidate": false
         }
@@ -1128,14 +965,175 @@
         {
           "path": "library/fadhilweblib/core/use-tabs.ts",
           "size_bytes": 2985,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
           "safe_delete_candidate": false
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-tabs.ts",
           "size_bytes": 2985,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5828,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/recipe.ts",
+          "size_bytes": 2914,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/recipe.ts",
+          "size_bytes": 2914,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5662,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-disclosure.ts",
+          "size_bytes": 2831,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-disclosure.ts",
+          "size_bytes": 2831,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5488,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/presets/index.ts",
+          "size_bytes": 2744,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts",
+          "size_bytes": 2744,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5472,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/header-shell.tsx",
+          "size_bytes": 2736,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/header-shell.tsx",
+          "size_bytes": 2736,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5434,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/forms/switch.tsx",
+          "size_bytes": 2717,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/switch.tsx",
+          "size_bytes": 2717,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 5012,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/forms/checkbox.tsx",
+          "size_bytes": 2506,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/checkbox.tsx",
+          "size_bytes": 2506,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4966,
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/navigation/segmented-control.tsx",
+          "size_bytes": 2483,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/segmented-control.tsx",
+          "size_bytes": 2483,
           "reference_count_exact_path": 0,
           "reference_count_basename": 0,
           "in_active_scope": true,
@@ -1170,13 +1168,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 202.0,
+      "time_ms": 158.5,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 125.0,
+      "time_ms": 108.0,
       "url_count": 12
     },
     "sitemap_urls": [
@@ -1214,40 +1212,40 @@
   },
   "loc_audit": {
     "summary": {
-      "tracked_files_scanned": 475,
-      "total_lines": 104257,
-      "blank_lines": 8628,
-      "comment_lines": 1892,
-      "code_lines": 93737
+      "tracked_files_scanned": 466,
+      "total_lines": 97406,
+      "blank_lines": 8140,
+      "comment_lines": 1848,
+      "code_lines": 87418
     },
     "by_extension": {
       ".css": {
-        "files": 63,
-        "total": 10538,
-        "blank": 1082,
-        "comment": 1646,
-        "code": 7810
+        "files": 62,
+        "total": 10253,
+        "blank": 1080,
+        "comment": 1618,
+        "code": 7555
       },
       ".html": {
         "files": 18,
-        "total": 3155,
-        "blank": 167,
-        "comment": 14,
-        "code": 2974
+        "total": 2257,
+        "blank": 116,
+        "comment": 7,
+        "code": 2134
       },
       ".js": {
-        "files": 45,
-        "total": 25704,
-        "blank": 1830,
-        "comment": 82,
-        "code": 23792
+        "files": 37,
+        "total": 20050,
+        "blank": 1395,
+        "comment": 73,
+        "code": 18582
       },
       ".json": {
         "files": 10,
-        "total": 9296,
+        "total": 9282,
         "blank": 0,
         "comment": 0,
-        "code": 9296
+        "code": 9282
       },
       ".jsonc": {
         "files": 1,
