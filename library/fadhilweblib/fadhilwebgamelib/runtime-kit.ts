@@ -53,7 +53,7 @@ export function getCompanySelectOptions(game: GameState) {
     }));
 }
 
-export function getDisplayCompanies(game: GameState, maxSlots = 10): DisplayCompany[] {
+export function getDisplayCompanies(game: GameState, maxSlots = 20): DisplayCompany[] {
   return getCompanySelectOptions(game)
     .slice(0, Math.max(1, maxSlots))
     .map((item, index) => ({

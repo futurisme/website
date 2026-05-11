@@ -1025,9 +1025,22 @@ function ensureRdFund(company, elapsedDays) {
     existing.monthlyBudget = Math.max(existing.monthlyBudget, monthlyBudget);
     return existing;
   }
-  const refreshed = { monthKey, monthlyBudget, spent: 0 };
+  const carryover = existing ? Math.max(0, existing.monthlyBudget - existing.spent) : 0;
+  const refreshed = {
+    monthKey,
+    monthlyBudget: monthlyBudget + Math.min(carryover, monthlyBudget * 0.85),
+    spent: 0,
+    carryover,
+  };
   rdFundByCompany[company.key] = refreshed;
   return refreshed;
+}
+
+function getRdSpendCap(fund, elapsedDays) {
+  const dayInMonth = Math.max(0, elapsedDays - fund.monthKey * 30);
+  const progress = Math.min(1, dayInMonth / 30);
+  const plannedProgress = Math.min(1, 0.16 + progress * 0.84);
+  return Math.max(0, fund.monthlyBudget * plannedProgress - fund.spent);
 }
 
 function getRdFundRemaining(company, elapsedDays) {
@@ -1204,11 +1217,12 @@ function applyNpcResearchCycle(state) {
 
     let workingCompany = company;
     const fund = ensureRdFund(workingCompany, next.elapsedDays);
+    const spendCap = getRdSpendCap(fund, next.elapsedDays);
     const targetResearchLiquidity = Math.max(workingCompany.research, fund.monthlyBudget * (0.42 + traits.strategy * 0.26));
     const researchTopUpGap = Math.max(0, targetResearchLiquidity - Number(workingCompany.research ?? 0));
     const productionReserve = Math.max(18, Number(workingCompany.revenuePerDay ?? 0) * 10, getCompanyValuation(workingCompany) * 0.012);
     const availableCashForRd = Math.max(0, Number(workingCompany.cash ?? 0) - productionReserve);
-    const rdTopUp = Math.min(researchTopUpGap / 0.92, availableCashForRd * (0.28 + traits.strategy * 0.26));
+    const rdTopUp = Math.min(researchTopUpGap / 0.92, availableCashForRd * (0.28 + traits.strategy * 0.26), spendCap * 0.55);
     if (rdTopUp > 1) {
       workingCompany = {
         ...workingCompany,
@@ -1231,7 +1245,7 @@ function applyNpcResearchCycle(state) {
         .sort((a, b) => b.decisionScore - a.decisionScore);
 
       const candidate = upgradeOptions.find((option, index) => {
-        const remainingFund = Math.max(0, fund.monthlyBudget - fund.spent);
+        const remainingFund = Math.min(Math.max(0, fund.monthlyBudget - fund.spent), getRdSpendCap(fund, next.elapsedDays));
         const liquidityGuard = Math.max(1, workingCompany.cash * (0.02 + (1 - traits.courage) * 0.04));
         const budgetSafe = remainingFund >= option.nextTierCost && workingCompany.research >= option.nextTierCost;
         const canAffordRisk = (workingCompany.cash - option.nextTierCost) >= liquidityGuard;

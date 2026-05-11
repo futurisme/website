@@ -5,7 +5,7 @@ export type UpgradeKey = 'architecture' | 'lithography' | 'clockSpeed' | 'coreDe
 export type TeamKey = 'researchers' | 'marketing' | 'fabrication';
 export type PanelKey = 'profile' | 'intel';
 export type CompanyDetailPanelKey = 'overview' | 'management' | 'operations' | 'ownership' | 'governance' | 'intel';
-export type CompanyKey = 'cosmic' | 'rmd' | 'heroscop' | 'venture4' | 'venture5' | 'venture6' | 'venture7' | 'venture8';
+export type CompanyKey = 'cosmic' | 'rmd' | 'heroscop' | `venture${number}`;
 export type InvestorActionMode = 'buy' | 'sell';
 export type StrategyStyle = 'value' | 'growth' | 'dividend' | 'activist' | 'balanced';
 export type ExecutiveRole = 'coo' | 'cfo' | 'cto' | 'cmo';
@@ -218,6 +218,7 @@ export type CommunityCompanyPlan = {
   targetCapital: number;
   pledgedCapital: number;
   investorIds: string[];
+  pledges: PlanInvestorPledge[];
   status: 'funding' | 'established' | 'expired';
   competesWith: string;
 };
@@ -350,10 +351,10 @@ export const COMPANY_TRADE_FEE_RATE = 0.018;
 export const HOLDER_TRADE_FEE_RATE = 0.052;
 export const MIN_TRADE_AMOUNT = 0.1;
 export const PLAN_DURATION_DAYS = 30;
-export const MAX_ACTIVE_COMPANIES = 8;
-export const COMPANY_KEYS: CompanyKey[] = ['cosmic', 'rmd', 'heroscop', 'venture4', 'venture5', 'venture6', 'venture7', 'venture8'];
+export const MAX_ACTIVE_COMPANIES = 20;
 export const CORE_COMPANY_KEYS: CompanyKey[] = ['cosmic', 'rmd', 'heroscop'];
-export const DYNAMIC_COMPANY_KEYS: CompanyKey[] = ['venture4', 'venture5', 'venture6', 'venture7', 'venture8'];
+export const DYNAMIC_COMPANY_KEYS: CompanyKey[] = Array.from({ length: MAX_ACTIVE_COMPANIES - CORE_COMPANY_KEYS.length }, (_, index) => `venture${index + 4}` as CompanyKey);
+export const COMPANY_KEYS: CompanyKey[] = [...CORE_COMPANY_KEYS, ...DYNAMIC_COMPANY_KEYS];
 export const TRANSACTION_SLIDER_STOPS: SliderStop[] = [
   { label: '0%', value: 0 },
   { label: '25%', value: 25 },
@@ -2343,16 +2344,41 @@ export function createInitialGameState(profile: ProfileDraft): GameState {
     return acc;
   }, {} as Record<CompanyKey, { name: string; founder: string }>);
 
+  const createDormantVentureCompany = (key: CompanyKey) => {
+    const seed = ventureSeeds[key];
+    return {
+      ...cosmic.company,
+      key,
+      name: seed.name,
+      founder: seed.founder,
+      founderInvestorId: `founder_${key}`,
+      ceoId: `founder_${key}`,
+      ceoName: seed.founder,
+      focus: 'Belum aktif',
+      lastRelease: 'Menunggu plan pendirian.',
+      isEstablished: false,
+      establishedDay: null,
+      cash: 0,
+      research: 0,
+      researchAssetValue: 0,
+      marketShare: 0,
+      reputation: 0,
+      releaseCount: 0,
+      revenuePerDay: 0,
+      researchPerDay: 0,
+      payoutRatio: 0.08,
+      dividendPerShare: 0,
+      investors: { [`founder_${key}`]: 0 },
+      shareListings: [],
+    } satisfies CompanyState;
+  };
+
   const companies = {
     cosmic: { ...cosmic.company, isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0 },
     rmd: { ...rmd.company, isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0 },
     heroscop: { ...heroscop.company, isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0 },
-    venture4: { ...cosmic.company, key: 'venture4', name: ventureSeeds.venture4.name, founder: ventureSeeds.venture4.founder, founderInvestorId: 'founder_venture4', ceoId: 'founder_venture4', ceoName: ventureSeeds.venture4.founder, focus: 'Belum aktif', lastRelease: 'Menunggu plan pendirian.', isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0, investors: { founder_venture4: 0 }, shareListings: [] },
-    venture5: { ...cosmic.company, key: 'venture5', name: ventureSeeds.venture5.name, founder: ventureSeeds.venture5.founder, founderInvestorId: 'founder_venture5', ceoId: 'founder_venture5', ceoName: ventureSeeds.venture5.founder, focus: 'Belum aktif', lastRelease: 'Menunggu plan pendirian.', isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0, investors: { founder_venture5: 0 }, shareListings: [] },
-    venture6: { ...cosmic.company, key: 'venture6', name: ventureSeeds.venture6.name, founder: ventureSeeds.venture6.founder, founderInvestorId: 'founder_venture6', ceoId: 'founder_venture6', ceoName: ventureSeeds.venture6.founder, focus: 'Belum aktif', lastRelease: 'Menunggu plan pendirian.', isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0, investors: { founder_venture6: 0 }, shareListings: [] },
-    venture7: { ...cosmic.company, key: 'venture7', name: ventureSeeds.venture7.name, founder: ventureSeeds.venture7.founder, founderInvestorId: 'founder_venture7', ceoId: 'founder_venture7', ceoName: ventureSeeds.venture7.founder, focus: 'Belum aktif', lastRelease: 'Menunggu plan pendirian.', isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0, investors: { founder_venture7: 0 }, shareListings: [] },
-    venture8: { ...cosmic.company, key: 'venture8', name: ventureSeeds.venture8.name, founder: ventureSeeds.venture8.founder, founderInvestorId: 'founder_venture8', ceoId: 'founder_venture8', ceoName: ventureSeeds.venture8.founder, focus: 'Belum aktif', lastRelease: 'Menunggu plan pendirian.', isEstablished: false, establishedDay: null, cash: 0, research: 0, researchAssetValue: 0, marketShare: 0, reputation: 0, releaseCount: 0, revenuePerDay: 0, researchPerDay: 0, payoutRatio: 0.08, dividendPerShare: 0, investors: { founder_venture8: 0 }, shareListings: [] },
-  } satisfies Record<CompanyKey, CompanyState>;
+    ...Object.fromEntries(DYNAMIC_COMPANY_KEYS.map((key) => [key, createDormantVentureCompany(key)])),
+  } as Record<CompanyKey, CompanyState>;
 
   const plans = {
     cosmic: {
@@ -2397,11 +2423,20 @@ export function createInitialGameState(profile: ProfileDraft): GameState {
       pledges: [{ investorId: companies.heroscop.founderInvestorId, amount: 36, pledgedDay: 0 }],
       isEstablished: false,
     },
-    venture4: { companyKey: 'venture4', field: 'semiconductor', companyName: companies.venture4.name, founderInvestorId: 'founder_venture4', founderName: companies.venture4.founder, startDay: 0, dueDay: 0, targetCapital: 0, pledgedCapital: 0, pledges: [], isEstablished: true },
-    venture5: { companyKey: 'venture5', field: 'semiconductor', companyName: companies.venture5.name, founderInvestorId: 'founder_venture5', founderName: companies.venture5.founder, startDay: 0, dueDay: 0, targetCapital: 0, pledgedCapital: 0, pledges: [], isEstablished: true },
-    venture6: { companyKey: 'venture6', field: 'semiconductor', companyName: companies.venture6.name, founderInvestorId: 'founder_venture6', founderName: companies.venture6.founder, startDay: 0, dueDay: 0, targetCapital: 0, pledgedCapital: 0, pledges: [], isEstablished: true },
-    venture7: { companyKey: 'venture7', field: 'semiconductor', companyName: companies.venture7.name, founderInvestorId: 'founder_venture7', founderName: companies.venture7.founder, startDay: 0, dueDay: 0, targetCapital: 0, pledgedCapital: 0, pledges: [], isEstablished: true },
-    venture8: { companyKey: 'venture8', field: 'semiconductor', companyName: companies.venture8.name, founderInvestorId: 'founder_venture8', founderName: companies.venture8.founder, startDay: 0, dueDay: 0, targetCapital: 0, pledgedCapital: 0, pledges: [], isEstablished: true },
+    ...Object.fromEntries(DYNAMIC_COMPANY_KEYS.map((key) => [key, {
+      companyKey: key,
+      field: chooseBalancedCompanyField(companies as Record<CompanyKey, CompanyState>, key),
+      softwareSpecialization: null,
+      companyName: companies[key].name,
+      founderInvestorId: `founder_${key}`,
+      founderName: companies[key].founder,
+      startDay: 0,
+      dueDay: 0,
+      targetCapital: 0,
+      pledgedCapital: 0,
+      pledges: [],
+      isEstablished: true,
+    } satisfies CompanyEstablishmentPlan])),
   } satisfies Record<CompanyKey, CompanyEstablishmentPlan>;
 
   const npcSeed = `${worldSeed}-market`;
@@ -2795,12 +2830,33 @@ function getActiveCompanyCountByField(game: GameState, field: CompanyField) {
 }
 
 function gettargetActiveCompanyCount(elapsedDays: number) {
-  if (elapsedDays <= 365) return 5;
+  if (elapsedDays <= 365) return 6;
   if (elapsedDays <= 1095) {
     const progress = (elapsedDays - 365) / (1095 - 365);
-    return Math.round(5 + progress * 3);
+    return Math.round(6 + progress * 6);
   }
-  return 8;
+  if (elapsedDays <= 2190) {
+    const progress = (elapsedDays - 1095) / (2190 - 1095);
+    return Math.round(12 + progress * 8);
+  }
+  return MAX_ACTIVE_COMPANIES;
+}
+
+function chooseBalancedCompanyField(companies: Record<CompanyKey, CompanyState>, seedKey: string): CompanyField {
+  const activeCompanies = Object.values(companies).filter((company) => company.isEstablished);
+  const activeCount = activeCompanies.length;
+  const counts = {
+    semiconductor: activeCompanies.filter((company) => company.field === 'semiconductor').length,
+    game: activeCompanies.filter((company) => company.field === 'game').length,
+    software: activeCompanies.filter((company) => company.field === 'software').length,
+  } satisfies Record<CompanyField, number>;
+  const hash = seedKey.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const preferredLateFields: CompanyField[] = hash % 2 === 0 ? ['game', 'software', 'semiconductor'] : ['software', 'game', 'semiconductor'];
+  const earlyFields: CompanyField[] = ['semiconductor', 'game', 'software'];
+  const fieldOrder = activeCount >= 5 ? preferredLateFields : earlyFields;
+  return fieldOrder
+    .map((field) => ({ field, count: counts[field] }))
+    .sort((left, right) => left.count - right.count || fieldOrder.indexOf(left.field) - fieldOrder.indexOf(right.field))[0].field;
 }
 
 export function getCompanyFieldLabel(field: CompanyField) {
@@ -2922,8 +2978,12 @@ export function chooseBestCompanyFieldForNpc(game: GameState, npc: NpcInvestor):
         : npc.strategy === 'dividend'
           ? -0.08
           : 0;
+  const activeCount = getActiveCompanyCount(game);
+  const cpuCrowdingPenalty = activeCount >= 5 ? 0.85 + semiconductor.competitors * 0.12 : 0;
+  const lateGameSoftwareBoost = activeCount >= 5 ? 0.42 + npc.intelligence * 0.16 : 0;
+  const lateGameGameBoost = activeCount >= 5 ? 0.38 + npc.boldness * 0.14 : 0;
   const strategySemiconductorBias = npc.strategy === 'value' || npc.strategy === 'dividend' ? 0.1 : 0;
-  const gamePriorityBoost = 0.22 + npc.intelligence * 0.08 + npc.boldness * 0.06;
+  const gamePriorityBoost = 0.22 + npc.intelligence * 0.08 + npc.boldness * 0.06 + lateGameGameBoost;
   const gameScore =
     gameField.opportunity * (1.08 + npc.intelligence * 0.38)
     + (1 - gameField.saturation / 4) * (0.45 + npc.boldness * 0.32)
@@ -2933,10 +2993,12 @@ export function chooseBestCompanyFieldForNpc(game: GameState, npc: NpcInvestor):
   const semiconductorScore =
     semiconductor.opportunity * (1.04 + npc.patience * 0.26)
     + (1 - semiconductor.saturation / 4) * (0.52 + npc.intelligence * 0.3)
-    + strategySemiconductorBias;
+    + strategySemiconductorBias
+    - cpuCrowdingPenalty;
   const softwareScore =
     softwareField.opportunity * (1.1 + npc.intelligence * 0.32)
     + (1 - softwareField.saturation / 4) * (0.5 + npc.boldness * 0.3)
+    + lateGameSoftwareBoost
     + (npc.strategy === 'growth' ? 0.14 : 0)
     + (npc.strategy === 'balanced' ? 0.08 : 0);
   if (softwareScore >= gameScore && softwareScore >= semiconductorScore) return 'software';
@@ -2984,6 +3046,7 @@ export function createCommunityCompanyPlan(
     targetCapital,
     pledgedCapital: contribution,
     investorIds: [founderId],
+    pledges: [{ investorId: founderId, amount: contribution, pledgedDay: game.elapsedDays }],
     status: 'funding',
     competesWith: competetarget,
   };
@@ -3001,10 +3064,15 @@ export function investInCommunityPlan(game: GameState, investorId: string, planI
   const contribution = clamp(amount, 0, investorCash);
   if (contribution < MIN_TRADE_AMOUNT) return game;
   const plan = game.communityPlans[planIndex];
+  const existingPledges = plan.pledges ?? plan.investorIds.map((id) => ({ investorId: id, amount: plan.pledgedCapital / Math.max(1, plan.investorIds.length), pledgedDay: plan.startDay }));
+  const mergedPledges = existingPledges.some((pledge) => pledge.investorId === investorId)
+    ? existingPledges.map((pledge) => pledge.investorId === investorId ? { ...pledge, amount: pledge.amount + contribution, pledgedDay: game.elapsedDays } : pledge)
+    : [...existingPledges, { investorId, amount: contribution, pledgedDay: game.elapsedDays }];
   const updatedPlan: CommunityCompanyPlan = {
     ...plan,
     pledgedCapital: plan.pledgedCapital + contribution,
     investorIds: plan.investorIds.includes(investorId) ? plan.investorIds : [...plan.investorIds, investorId],
+    pledges: mergedPledges,
   };
   const nextPlans = [...game.communityPlans];
   nextPlans[planIndex] = updatedPlan;
@@ -3021,7 +3089,7 @@ export function progressCommunityPlans(game: GameState) {
   const nextPlans = game.communityPlans.map((plan) => {
     if (plan.status !== 'funding' || game.elapsedDays < plan.dueDay) return plan;
     changed = true;
-    if (plan.pledgedCapital >= plan.targetCapital * 0.6 && getActiveCompanyCount(game) < MAX_ACTIVE_COMPANIES) {
+    if (plan.pledgedCapital >= 6 && getActiveCompanyCount(game) < MAX_ACTIVE_COMPANIES) {
       return { ...plan, status: 'established' as const };
     }
     return { ...plan, status: 'expired' as const };
@@ -3034,11 +3102,34 @@ export function progressCommunityPlans(game: GameState) {
     const availableSlot = DYNAMIC_COMPANY_KEYS.find((key) => !next.companies[key].isEstablished);
     if (availableSlot) {
       const company = next.companies[availableSlot];
-      const targetShareSheets = pickShareSheetTotal(plan.targetCapital);
-      const founderShares = Math.round(Math.max(0, targetShareSheets * 0.4) * 100) / 100;
-      const marketPoolShares = Math.max(0, targetShareSheets - founderShares);
-      const seededTeams = createTeams({ researchers: 2, marketing: 1, fabrication: 1 });
+      const actualCapital = Math.max(0, plan.pledgedCapital);
+      const targetShareSheets = pickShareSheetTotal(Math.max(actualCapital, 6));
+      const pledgeRows = (plan.pledges?.length ? plan.pledges : plan.investorIds.map((investorId) => ({
+        investorId,
+        amount: actualCapital / Math.max(1, plan.investorIds.length),
+        pledgedDay: plan.startDay,
+      }))).filter((pledge) => pledge.amount > 0.0001);
+      const investorCapital = pledgeRows.reduce((sum, pledge) => sum + pledge.amount, 0) || actualCapital || 1;
+      const founderEquityPool = clamp(0.58 + actualCapital / Math.max(40, plan.targetCapital * 2.8), 0.58, 0.82);
+      const investors = Object.fromEntries(pledgeRows.map((pledge) => [
+        pledge.investorId,
+        Math.max(0.01, targetShareSheets * founderEquityPool * (pledge.amount / investorCapital)),
+      ]));
+      const allocatedShares = Object.values(investors).reduce((sum, shares) => sum + shares, 0);
+      const marketPoolShares = Math.max(0, targetShareSheets - allocatedShares);
+      const seededTeams = createTeams({
+        researchers: actualCapital >= 80 ? 2 : 1,
+        marketing: plan.field === 'game' || plan.field === 'software' ? 2 : 1,
+        fabrication: plan.field === 'semiconductor' ? 2 : 1,
+      });
       const seededUpgrades = createUpgrades({ architecture: 2, lithography: 170, clockSpeed: 1.5, coreDesign: 2, cacheStack: 512, powerEfficiency: 96 });
+      const corporateFounderKey = getCompanyKeyFromCorporateInvestorId(plan.founderId);
+      const controllerId = corporateFounderKey && next.companies[corporateFounderKey]?.isEstablished
+        ? next.companies[corporateFounderKey].ceoId
+        : plan.founderId;
+      const controllerName = investorDisplayName(next, controllerId);
+      const openingCash = Math.max(1, actualCapital * 0.82);
+      const openingResearch = Math.max(0.4, actualCapital * 0.18);
       next.companies[availableSlot] = {
         ...company,
         key: availableSlot,
@@ -3047,32 +3138,32 @@ export function progressCommunityPlans(game: GameState) {
         name: plan.companyName,
         founder: plan.founderName,
         founderInvestorId: plan.founderId,
-        ceoId: plan.founderId,
-        ceoName: plan.founderName,
-        cash: Math.max(16, plan.pledgedCapital * 0.74),
-        research: Math.max(10, plan.pledgedCapital * 0.34),
-        researchAssetValue: Math.max(10, plan.pledgedCapital * 0.34),
-        marketShare: clamp(plan.pledgedCapital / 30, 2.4, 11),
-        reputation: clamp(8 + plan.pledgedCapital / 18, 8, 34),
+        ceoId: controllerId,
+        ceoName: controllerName,
+        cash: openingCash,
+        research: openingResearch,
+        researchAssetValue: openingResearch,
+        marketShare: clamp(actualCapital / 32, 0.7, 11),
+        reputation: clamp(5 + actualCapital / 20 + pledgeRows.length * 0.8, 5, 34),
         releaseCount: 1,
         lastProductName: `${plan.companyName.split(/\s+/)[0]} Prime ${plan.field === 'game' ? 'Game' : plan.field === 'software' ? 'App' : 'Chip'} 1`,
-        lastProductScore: Math.max(1, plan.pledgedCapital * 2),
+        lastProductScore: Math.max(1, actualCapital * 1.8),
         bestCpuScore: calculateCpuScore(seededUpgrades),
-        revenuePerDay: Math.max(1.8, plan.pledgedCapital / 24),
-        researchPerDay: Math.max(1.1, plan.pledgedCapital / 34),
-        lastRelease: `${plan.companyName} menyiapkan lineup pembuka ${plan.field === 'game' ? 'game' : 'chip'} untuk menantang ${plan.competesWith}.`,
+        revenuePerDay: Math.max(0.25, actualCapital / 28),
+        researchPerDay: Math.max(0.18, actualCapital / 42),
+        lastRelease: `${plan.companyName} berdiri dengan modal nyata ${formatMoneyCompact(actualCapital, 2)} dan menyiapkan lineup pembuka ${plan.field === 'game' ? 'game' : plan.field === 'software' ? 'perangkat lunak' : 'chip'} untuk menantang ${plan.competesWith}.`,
         focus: `Pendatang baru sektor ${getCompanyFieldLabel(plan.field).toLowerCase()} yang menantang ${plan.competesWith}.`,
         upgrades: seededUpgrades,
         teams: seededTeams,
-        investors: { [plan.founderId]: founderShares },
+        investors,
         sharesOutstanding: targetShareSheets,
         shareSheetTotal: targetShareSheets,
         lastShareSheetChangeDay: next.elapsedDays,
         marketPoolShares,
         dividendPerShare: 0.01,
         payoutRatio: 0.09,
-        ceoSalaryPerDay: Math.max(0.7, plan.pledgedCapital * 0.018),
-        boardMood: 0.56,
+        ceoSalaryPerDay: Math.max(0.15, actualCapital * 0.014),
+        boardMood: pledgeRows.length >= 2 ? 0.58 : 0.52,
         shareListings: [],
         activeBoardVote: null,
         boardVoteWindowStartDay: next.elapsedDays,
@@ -3081,7 +3172,8 @@ export function progressCommunityPlans(game: GameState) {
         establishedDay: next.elapsedDays,
       };
     }
-    next.activityFeed = addFeedEntry(next.activityFeed, `${formatDateFromDays(next.elapsedDays)}: ${plan.companyName} resmi berdiri sebagai perusahaan ${getCompanyFieldLabel(plan.field)} dan mulai menantang ${plan.competesWith}.`);
+    const bootstrapLabel = plan.pledgedCapital < plan.targetCapital * 0.6 ? 'secara bootstrap/apa adanya' : 'dengan pendanaan penuh';
+    next.activityFeed = addFeedEntry(next.activityFeed, `${formatDateFromDays(next.elapsedDays)}: ${plan.companyName} resmi berdiri ${bootstrapLabel} sebagai perusahaan ${getCompanyFieldLabel(plan.field)} dengan modal nyata ${formatMoneyCompact(plan.pledgedCapital, 2)}.`);
   });
   expiredNow.forEach((plan) => {
     next.activityFeed = addFeedEntry(next.activityFeed, `${formatDateFromDays(next.elapsedDays)}: Plan ${plan.companyName} gagal mencapai modal minimum dan ditutup.`);
@@ -3297,7 +3389,7 @@ export function transactShares(current: GameState, investorId: string, companyKe
   const sharePrice = preview.sharePrice;
   let remainingShares = preview.sharesMoved;
   let consumedValue = 0;
-  let next = {
+  let next: GameState = {
     ...currentClean,
     companies: {
       ...currentClean.companies,
@@ -3433,13 +3525,13 @@ export function runNpcCommunityPlanning(current: GameState) {
   const getOpenFundingPlans = () => next.communityPlans.filter((plan) => plan.status === 'funding');
   const getOpenFundingCount = () => getOpenFundingPlans().length;
   const lastInitiationDay = next.communityPlans.reduce((max, plan) => Math.max(max, plan.startDay), -Infinity);
-  const minInitiationGapDays = next.elapsedDays < 365 ? 40 : next.elapsedDays < 1095 ? 28 : 20;
+  const minInitiationGapDays = next.elapsedDays < 365 ? 32 : next.elapsedDays < 1095 ? 18 : 12;
   const canForceInitiate = !Number.isFinite(lastInitiationDay) || (next.elapsedDays - lastInitiationDay >= minInitiationGapDays);
   const marketNeedsCompetition = (Object.values(next.companies) as CompanyState[])
     .filter((company) => company.isEstablished)
     .some((company) => company.marketShare > 34 || company.boardMood < 0.46 || company.reputation < 26);
   const targetActiveCompanies = gettargetActiveCompanyCount(next.elapsedDays);
-  const openFundingLimit = next.elapsedDays < 365 ? 2 : next.elapsedDays < 1095 ? 3 : 4;
+  const openFundingLimit = next.elapsedDays < 365 ? 3 : next.elapsedDays < 1095 ? 5 : 7;
 
   const rankedFounderCandidates = [...next.npcs]
     .sort((left, right) => (
@@ -3463,6 +3555,20 @@ export function runNpcCommunityPlanning(current: GameState) {
     const candidateName = generateUniqueCompanyName(next, seed, field);
     next = createCommunityCompanyPlan(next, founder.id, candidateName, contribution, field);
   });
+
+  if (canForceInitiate && getActiveCompanyCount(next) < Math.min(MAX_ACTIVE_COMPANIES, targetActiveCompanies) && getOpenFundingCount() < openFundingLimit) {
+    const corporateFounders = (Object.values(next.companies) as CompanyState[])
+      .filter((company) => company.isEstablished && company.cash > Math.max(38, getManagementResourceContext(company).cashReservetarget * 1.35))
+      .sort((left, right) => (right.cash - getManagementResourceContext(right).cashReservetarget) - (left.cash - getManagementResourceContext(left).cashReservetarget));
+    const leadCompany = corporateFounders[0];
+    if (leadCompany) {
+      const seed = createSeededRandom(`${leadCompany.key}-${Math.floor(next.elapsedDays)}-corporate-spinoff`);
+      const field = chooseBalancedCompanyField(next.companies, `${leadCompany.key}-${Math.floor(next.elapsedDays)}`);
+      const contribution = clamp((leadCompany.cash - getManagementResourceContext(leadCompany).cashReservetarget) * (0.07 + seed() * 0.08), 8, 46);
+      const candidateName = generateUniqueCompanyName(next, seed, field);
+      next = createCommunityCompanyPlan(next, getCorporateInvestorId(leadCompany.key), candidateName, contribution, field);
+    }
+  }
 
   if (
     canForceInitiate
@@ -3507,6 +3613,27 @@ export function runNpcCommunityPlanning(current: GameState) {
     const contribution = clamp(npc.cash * (0.02 + npc.intelligence * 0.04), 0, 7.5);
     if (contribution >= MIN_TRADE_AMOUNT) {
       next = investInCommunityPlan(next, npc.id, selected.id, contribution);
+    }
+  });
+
+  const activeCompaniesForSyndicate = (Object.values(next.companies) as CompanyState[])
+    .filter((company) => company.isEstablished && company.cash > Math.max(24, getManagementResourceContext(company).cashReservetarget * 1.12));
+  activeCompaniesForSyndicate.forEach((company) => {
+    const plans = next.communityPlans
+      .filter((plan) => plan.status === 'funding' && !plan.investorIds.includes(getCorporateInvestorId(company.key)))
+      .sort((left, right) => {
+        const leftFit = left.field === company.field ? 0.2 : (left.field === 'game' || left.field === 'software' ? 0.36 : 0);
+        const rightFit = right.field === company.field ? 0.2 : (right.field === 'game' || right.field === 'software' ? 0.36 : 0);
+        return (rightFit + right.pledgedCapital / Math.max(1, right.targetCapital)) - (leftFit + left.pledgedCapital / Math.max(1, left.targetCapital));
+      });
+    const selected = plans[0];
+    if (!selected) return;
+    const management = getManagementResourceContext(company);
+    const deployable = Math.max(0, company.cash - management.cashReservetarget);
+    const gap = Math.max(0, selected.targetCapital - selected.pledgedCapital);
+    const contribution = clamp(Math.min(gap * 0.45, deployable * 0.08), 0, 28);
+    if (contribution >= MIN_TRADE_AMOUNT) {
+      next = investInCommunityPlan(next, getCorporateInvestorId(company.key), selected.id, contribution);
     }
   });
   return next;
@@ -4002,10 +4129,17 @@ export function scoreNpcResearchBudgetAction(game: GameState, npc: NpcInvestor, 
   const budgetRatio = likelyReleaseWithinWeek
     ? clamp(0.1 + npc.intelligence * 0.06, 0.1, 0.22)
     : clamp(0.2 + idleCashRatio * 0.055 + npc.intelligence * 0.08 + npc.boldness * 0.04, 0.22, 0.72);
+  const dayInMonth = Math.max(0, game.elapsedDays % INVESTOR_TAX_INTERVAL_DAYS);
+  const monthProgress = clamp(dayInMonth / INVESTOR_TAX_INTERVAL_DAYS, 0, 1);
+  const plannedMonthlyDeployment = clamp(0.14 + monthProgress * 0.86, 0.14, 1);
+  const pacedBudgetCap = Math.max(
+    management.monthlyResearchBudget * 0.08,
+    management.monthlyResearchBudget * plannedMonthlyDeployment - company.research * 0.18
+  );
   const cost = clamp(
     Math.max(absorptionGap, deployableCash * budgetRatio),
     MIN_TRADE_AMOUNT,
-    deployableCash * (likelyReleaseWithinWeek ? 0.32 : 0.82)
+    Math.min(deployableCash * (likelyReleaseWithinWeek ? 0.32 : 0.82), pacedBudgetCap)
   );
   if (cost < MIN_TRADE_AMOUNT) return null;
 
