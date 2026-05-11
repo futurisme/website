@@ -58,7 +58,7 @@ const STATIC_PREFIXES = [
   ['/hype/', '/hype/'],
   ['/dreambusiness/', '/dreambusiness/'],
   ['/rpg/', '/rpg/'],
-  ['/assets/public/images/', '/assets/public/images/'],
+  ['/assets/public/', '/assets/public/'],
   ['/portfolio/', '/website/portfolio/']
 ];
 
@@ -164,7 +164,8 @@ async function withPerfHeaders(response, pathname) {
     // Non-fingerprinted assets must revalidate to avoid stale copies after deploys.
     h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=604800');
   }
-  if (isHtml) {
+  const shouldRewriteHtml = isHtml && (pathname === '/website/portfolio/index.html' || pathname === '/website/daily-streak/index.html' || pathname === '/website/website/mindmapmaker/editor/index.html');
+  if (shouldRewriteHtml) {
     const text = ensureSeoHtml(await response.text(), pathname);
     h.set('content-type', 'text/html; charset=utf-8');
     return new Response(text, { status: response.status, statusText: response.statusText, headers: h });
