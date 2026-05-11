@@ -286,6 +286,14 @@ function renderMarketsFrame() {
     .join('');
 }
 
+function getReleaseCadenceDays(company) {
+  const keySeed = hashSeedFromText(`${company.key}:${company.ceoId || company.founder || 'npc'}`);
+  const baseCadence = company.field === 'semiconductor' ? 9 : company.field === 'game' ? 6 : 7;
+  const variation = keySeed % 4;
+  const maturityOffset = Math.max(0, 2 - Math.min(2, Math.floor((company.releaseCount || 0) / 6)));
+  return Math.max(3, baseCadence + variation - maturityOffset);
+}
+
 function applySpecializedReleaseLogic(state) {
   const next = { ...state, companies: { ...state.companies } };
   const cpuPool = Object.values(next.companies)
@@ -293,11 +301,26 @@ function applySpecializedReleaseLogic(state) {
     .map((company) => ({ key: company.key, company: company.name, score: Math.max(1, getCompanyValuation(company)), price: Math.max(0.01, getSharePrice(company)) }))
     .sort((a, b) => (b.score / Math.max(1, b.price)) - (a.score / Math.max(1, a.price)));
 
+  const today = Number(next.elapsedDays || 0);
+  const releaseSlotsPerDay = Math.max(2, Math.floor(Object.keys(next.companies).length / 6));
+  let usedReleaseSlots = 0;
+
   for (const company of Object.values(next.companies)) {
     if (!company?.isEstablished) continue;
     const prev = companyReleaseState[company.key] ?? { releaseCount: 0 };
     const nowCount = Number(company.releaseCount ?? 0);
     const type = classifyCompanyType(company);
+    const cadenceDays = getReleaseCadenceDays(company);
+    const lastReleaseDay = Number(companyReleaseState[company.key]?.lastReleaseDay ?? -9999);
+    const readyByCadence = (today - lastReleaseDay) >= cadenceDays;
+    const slotAvailable = usedReleaseSlots < releaseSlotsPerDay;
+    const canReleaseToday = nowCount > prev.releaseCount && readyByCadence && slotAvailable;
+
+    if (nowCount > prev.releaseCount && !canReleaseToday) {
+      const waitDays = Math.max(1, cadenceDays - (today - lastReleaseDay));
+      next.companies[company.key] = { ...company, releaseCount: prev.releaseCount, lastRelease: `Pipeline queued: launch in ~${waitDays} day(s).` };
+      continue;
+    }
 
     if (type === 'CPU' && nowCount > prev.releaseCount) {
       const spec = estimateReleaseSpecAndPrice(company, 'CPU');
@@ -334,6 +357,7 @@ function applySpecializedReleaseLogic(state) {
     }
 
     if (nowCount > prev.releaseCount) {
+      usedReleaseSlots += 1;
       const rawProductText = next.companies[company.key]?.lastRelease ?? company.lastRelease ?? `${company.name} Release ${nowCount}`;
       const productText = compactReleaseName(rawProductText, `${company.name} Release ${nowCount}`);
       const releaseType = type === 'Device' && /phone/i.test(productText) ? 'Phone' : type === 'Device' ? 'Computer' : type;
@@ -351,8 +375,16 @@ function applySpecializedReleaseLogic(state) {
     }
   }
 
+  const releasedCompanyNamesToday = new Set(releaseRegistry.filter((entry) => entry.day === today).map((entry) => entry.company));
   Object.values(next.companies).forEach((company) => {
-    companyReleaseState[company.key] = { releaseCount: Number(company.releaseCount ?? 0) };
+    const previous = companyReleaseState[company.key] || {};
+    const releaseCount = Number(company.releaseCount ?? 0);
+    const hadReleaseToday = releasedCompanyNamesToday.has(company.name);
+    companyReleaseState[company.key] = {
+      ...previous,
+      releaseCount,
+      lastReleaseDay: hadReleaseToday ? today : Number(previous.lastReleaseDay ?? -9999),
+    };
   });
   return next;
 }
