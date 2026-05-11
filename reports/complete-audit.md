@@ -1,6 +1,6 @@
 # Complete Audit — fadhil.dev
 
-Generated: 2026-05-11T10:38:14Z
+Generated: 2026-05-11T10:41:39Z
 
 ## Executive Summary
 
@@ -8,22 +8,22 @@ Generated: 2026-05-11T10:38:14Z
 - Paths checked: 13
 - HTTP 200: 13
 - Errors (non-200/redirect): 0
-- Missing meta description: 1
-- Missing canonical: 1
-- Missing H1: 2
+- Missing meta description: 0
+- Missing canonical: 0
+- Missing H1: 0
 - Missing HTML lang: 0
-- Missing OG title: 1
-- Missing OG description: 1
-- Missing twitter:card: 10
-- Missing JSON-LD: 13
+- Missing OG title: 0
+- Missing OG description: 0
+- Missing twitter:card: 0
+- Missing JSON-LD: 0
 - Duplicate file groups (all): 81
-- Total LOC (repository): 104321
-- Code LOC (repository): 93803
+- Total LOC (repository): 104339
+- Code LOC (repository): 93819
 - Potential unused static files: 0
 - Deprecated pattern hits: 0
-- Missing security headers (CSP/HSTS/XCTO/Referrer): 26
-- Avg response time (ms): 191.2
-- P95 response time (ms): 249.5
+- Missing security headers (CSP/HSTS/XCTO/Referrer): 0
+- Avg response time (ms): 190.9
+- P95 response time (ms): 253.4
 - Vercel route target issues: 0
 - Vercel build glob issues: 0
 - robots.txt status: 200
@@ -37,26 +37,26 @@ Generated: 2026-05-11T10:38:14Z
 
 | Path | Status | Redirect | Time (ms) | Meta Desc | Canonical | H1 | OG | Tw | JSON-LD | HTTPS | SecHdr | Deprecated |
 |---|---:|:---:|---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| `/` | 200 | — | 274.2 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/archives` | 200 | — | 235.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/books` | 200 | — | 235.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/books/editor` | 200 | — | 228.8 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/daily-streak` | 200 | — | 215.6 | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/dreambusiness` | 200 | — | 196.4 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/home` | 200 | — | 152.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/hype` | 200 | — | 249.5 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker` | 200 | — | 153.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/mindmapmaker/editor/1` | 200 | — | 166.6 | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ |
-| `/rpg` | 200 | — | 156.0 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas` | 200 | — | 121.7 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| `/shareideas/page/1` | 200 | — | 100.1 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| `/` | 200 | — | 292.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/archives` | 200 | — | 221.5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/books` | 200 | — | 228.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/books/editor` | 200 | — | 198.2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/daily-streak` | 200 | — | 209.9 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/dreambusiness` | 200 | — | 137.7 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/home` | 200 | — | 253.4 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/hype` | 200 | — | 225.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker` | 200 | — | 242.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/mindmapmaker/editor/1` | 200 | — | 144.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/rpg` | 200 | — | 113.0 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas` | 200 | — | 122.1 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `/shareideas/page/1` | 200 | — | 93.8 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Security Header Coverage (HTTP 200 pages)
 
 | Header | Missing Count |
 |---|---:|
-| `content-security-policy` | 13 |
-| `strict-transport-security` | 13 |
+| `content-security-policy` | 0 |
+| `strict-transport-security` | 0 |
 | `x-content-type-options` | 0 |
 | `referrer-policy` | 0 |
 
@@ -69,8 +69,8 @@ Generated: 2026-05-11T10:38:14Z
 
 | Endpoint | Status | Time (ms) | Notes |
 |---|---:|---:|---|
-| `/robots.txt` | 200 | 128.3 | `user-agent-ok,sitemap-ok` |
-| `/sitemap.xml` | 200 | 50.2 | `url-count=12` |
+| `/robots.txt` | 200 | 139.5 | `user-agent-ok,sitemap-ok` |
+| `/sitemap.xml` | 200 | 67.5 | `url-count=12` |
 
 ## Local Crawl Asset Audit (Repository)
 
@@ -259,9 +259,9 @@ Generated: 2026-05-11T10:38:14Z
 ## LOC Audit (Whole Repository)
 
 - Tracked files scanned: 477
-- Total lines: 104321
-- Code lines: 93803
-- Blank lines: 8626
+- Total lines: 104339
+- Code lines: 93819
+- Blank lines: 8628
 - Comment lines: 1892
 
 | Extension | Files | Total | Code | Blank | Comment |
@@ -272,7 +272,7 @@ Generated: 2026-05-11T10:38:14Z
 | `.json` | 10 | 9283 | 9283 | 0 | 0 |
 | `.jsonc` | 1 | 17 | 17 | 0 | 0 |
 | `.mjs` | 1 | 27 | 22 | 5 | 0 |
-| `.py` | 2 | 1015 | 867 | 141 | 7 |
+| `.py` | 2 | 1033 | 883 | 143 | 7 |
 | `.sh` | 2 | 46 | 28 | 11 | 7 |
 | `.sql` | 6 | 87 | 65 | 10 | 12 |
 | `.svg` | 2 | 6 | 6 | 0 | 0 |

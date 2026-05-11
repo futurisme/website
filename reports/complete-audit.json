@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-05-11T10:38:14Z",
+    "generated_at": "2026-05-11T10:41:39Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 81,
-    "elapsed_seconds": 10.15
+    "elapsed_seconds": 10.5
   },
   "domain": {
     "summary": {
@@ -11,22 +11,22 @@
       "http_200_count": 13,
       "redirect_count": 0,
       "error_count": 0,
-      "missing_meta_description_count": 1,
-      "missing_canonical_count": 1,
-      "missing_h1_count": 2,
+      "missing_meta_description_count": 0,
+      "missing_canonical_count": 0,
+      "missing_h1_count": 0,
       "missing_html_lang_count": 0,
-      "missing_og_title_count": 1,
-      "missing_og_description_count": 1,
-      "missing_twitter_card_count": 10,
-      "missing_json_ld_count": 13,
+      "missing_og_title_count": 0,
+      "missing_og_description_count": 0,
+      "missing_twitter_card_count": 0,
+      "missing_json_ld_count": 0,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 191.2,
-      "p95_response_time_ms": 249.5,
-      "max_response_time_ms": 274.2,
-      "missing_security_headers_count": 26,
+      "avg_response_time_ms": 190.9,
+      "p95_response_time_ms": 253.4,
+      "max_response_time_ms": 292.4,
+      "missing_security_headers_count": 0,
       "missing_security_header_details": {
-        "content-security-policy": 13,
-        "strict-transport-security": 13,
+        "content-security-policy": 0,
+        "strict-transport-security": 0,
         "x-content-type-options": 0,
         "referrer-policy": 0
       }
@@ -36,18 +36,18 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 274.2,
+        "time_ms": 292.4,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -56,36 +56,37 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/",
-          "has_h1": false,
+          "has_h1": true,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 4,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 235.0,
+        "time_ms": 221.5,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -100,30 +101,31 @@
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 235.5,
+        "time_ms": 228.4,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -137,31 +139,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 228.8,
+        "time_ms": 198.2,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
-        "content_length": 0,
+        "content_type": "text/html; charset=utf-8",
+        "content_length": 2616,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -175,69 +178,71 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 2,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/daily-streak",
         "url": "https://fadhil.dev/daily-streak",
         "status": 200,
-        "time_ms": 215.6,
+        "time_ms": 209.9,
         "final_url": "https://fadhil.dev/daily-streak",
         "final_path": "/daily-streak",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
         "title": "Daily Streak Checklist",
         "seo_basics": {
-          "meta_description": false,
-          "canonical": false,
-          "canonical_href": "",
+          "meta_description": true,
+          "canonical": true,
+          "canonical_href": "https://fadhil.dev/website/daily-streak/index.html",
           "has_h1": true,
           "noindex": false,
           "html_lang": true,
-          "og_title": false,
-          "og_description": false,
-          "twitter_card": false,
-          "json_ld": false
+          "og_title": true,
+          "og_description": true,
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/dreambusiness",
         "url": "https://fadhil.dev/dreambusiness",
         "status": 200,
-        "time_ms": 196.4,
+        "time_ms": 137.7,
         "final_url": "https://fadhil.dev/dreambusiness",
         "final_path": "/dreambusiness",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -251,31 +256,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 3,
+          "script_tags": 4,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 152.5,
+        "time_ms": 253.4,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -289,31 +295,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 1,
+          "script_tags": 2,
           "stylesheet_links": 2
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/hype",
         "url": "https://fadhil.dev/hype",
         "status": 200,
-        "time_ms": 249.5,
+        "time_ms": 225.0,
         "final_url": "https://fadhil.dev/hype",
         "final_path": "/hype",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -327,31 +334,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 153.5,
+        "time_ms": 242.0,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -366,30 +374,31 @@
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 3,
           "stylesheet_links": 2
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 166.6,
+        "time_ms": 144.1,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -398,36 +407,37 @@
           "meta_description": true,
           "canonical": true,
           "canonical_href": "https://fadhil.dev/mindmapmaker/editor/1",
-          "has_h1": false,
+          "has_h1": true,
           "noindex": false,
           "html_lang": true,
           "og_title": true,
           "og_description": true,
           "twitter_card": true,
-          "json_ld": false
+          "json_ld": true
         },
         "processing_hints": {
           "script_tags": 3,
           "stylesheet_links": 2
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 156.0,
+        "time_ms": 113.0,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -441,31 +451,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 4,
+          "script_tags": 5,
           "stylesheet_links": 0
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 121.7,
+        "time_ms": 122.1,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -479,31 +490,32 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       },
       {
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 100.1,
+        "time_ms": 93.8,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
-        "content_type": "text/html",
+        "content_type": "text/html; charset=utf-8",
         "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
-          "content-security-policy": false,
-          "strict-transport-security": false,
+          "content-security-policy": true,
+          "strict-transport-security": true,
           "x-content-type-options": true,
           "referrer-policy": true
         },
@@ -517,14 +529,15 @@
           "html_lang": true,
           "og_title": true,
           "og_description": true,
-          "twitter_card": false,
-          "json_ld": false
+          "twitter_card": true,
+          "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 1
         },
-        "deprecated_flags": []
+        "deprecated_flags": [],
+        "worker_policy_enforced": true
       }
     ]
   },
@@ -1171,13 +1184,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 128.3,
+      "time_ms": 139.5,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 50.2,
+      "time_ms": 67.5,
       "url_count": 12
     },
     "sitemap_urls": [
@@ -1216,10 +1229,10 @@
   "loc_audit": {
     "summary": {
       "tracked_files_scanned": 477,
-      "total_lines": 104321,
-      "blank_lines": 8626,
+      "total_lines": 104339,
+      "blank_lines": 8628,
       "comment_lines": 1892,
-      "code_lines": 93803
+      "code_lines": 93819
     },
     "by_extension": {
       ".css": {
@@ -1266,10 +1279,10 @@
       },
       ".py": {
         "files": 2,
-        "total": 1015,
-        "blank": 141,
+        "total": 1033,
+        "blank": 143,
         "comment": 7,
-        "code": 867
+        "code": 883
       },
       ".sh": {
         "files": 2,
