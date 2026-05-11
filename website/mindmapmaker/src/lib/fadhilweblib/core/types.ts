@@ -1,4 +1,2 @@
-export * from './types/layout';
-export * from './types/syntax';
-export * from './types/hooks';
-export * from './types/components';
+export * from '../../../../../../library/fadhilweblib/core/types.ts';
+// mirror-wrapper: mindmapmaker types

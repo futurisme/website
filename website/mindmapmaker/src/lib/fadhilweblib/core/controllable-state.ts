@@ -1,5 +1,2 @@
-import type { ControlledStateAction } from './types';
-
-export function resolveNextState<T>(current: T, next: ControlledStateAction<T>) {
-  return typeof next === 'function' ? (next as (value: T) => T)(current) : next;
-}
+export * from '../../../../../../library/fadhilweblib/core/controllable-state.ts';
+// mirror-wrapper: mindmapmaker controllable-state

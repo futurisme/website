@@ -1,2 +1,2 @@
-export { FadhilWebSyntaxError, compileSyntax, composeSyntax, defineSyntax, mergeSyntax, parseSyntaxInput } from './syntax/parse';
-export { resolveSyntax } from './syntax/style';
+export * from '../../../../../../library/fadhilweblib/core/syntax.ts';
+// mirror-wrapper: mindmapmaker syntax
