@@ -26,7 +26,7 @@ from typing import Any
 DEFAULT_BASE_URL = 'https://fadhil.dev'
 DEFAULT_TIMEOUT = 20
 DEFAULT_MAX_BODY_BYTES = 450_000
-DEFAULT_TOP_DUPLICATE_GROUPS = 25
+DEFAULT_TOP_DUPLICATE_GROUPS = 30
 SECURITY_HEADERS = (
     'content-security-policy',
     'strict-transport-security',
@@ -270,15 +270,47 @@ def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], 
     duplicate_groups = [group for group in hashed.values() if len(group) > 1]
 
     analyses: list[dict[str, Any]] = []
+    def mirror_rank(rel: str) -> tuple[int, int, str]:
+        # Lower tuple is preferred canonical keeper.
+        priority = 3
+        if rel.startswith('src/'):
+            priority = 0
+        elif rel.startswith('dreambusiness/'):
+            priority = 0
+        elif rel.startswith('hype/') or rel.startswith('rpg/'):
+            priority = 1
+        elif rel.startswith('library/'):
+            priority = 1
+        elif rel.startswith('website/'):
+            priority = 2
+        elif rel.startswith('games/'):
+            priority = 4
+        return (priority, len(rel), rel)
+
+    def mirror_family(rel: str) -> str:
+        if rel.startswith('library/fadhilweblib/') or rel.startswith('website/mindmapmaker/src/lib/fadhilweblib/'):
+            return 'fadhilweblib-mirror'
+        if rel.startswith('hype/') or rel.startswith('games/hype/'):
+            return 'hype-legacy-mirror'
+        if rel.startswith('rpg/') or rel.startswith('games/rpg/'):
+            return 'rpg-legacy-mirror'
+        if rel.startswith('dreambusiness/') or rel.startswith('games/dreambusiness/'):
+            return 'dreambusiness-legacy-mirror'
+        if rel.startswith('extension/') or rel.startswith('website/extension/'):
+            return 'extension-mirror'
+        return 'general'
+
     for group in duplicate_groups:
         items = []
         safe_candidates = []
+        recommended_keep = sorted(group, key=mirror_rank)[0] if group else ''
+        family = mirror_family(recommended_keep) if recommended_keep else 'general'
         for rel in sorted(group):
             basename = Path(rel).name
             basename_refs = safe_rg_count(root, basename, rel, fixed=True)
             exact_refs = safe_rg_count(root, rel, rel, fixed=True)
             in_active_scope = rel.startswith(ACTIVE_PREFIXES)
-            can_delete = (exact_refs == 0) and (not in_active_scope)
+            can_delete = (exact_refs == 0) and (not in_active_scope) and (rel != recommended_keep)
             if can_delete:
                 safe_candidates.append(rel)
             items.append(
@@ -289,6 +321,7 @@ def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], 
                     'reference_count_basename': basename_refs,
                     'in_active_scope': in_active_scope,
                     'safe_delete_candidate': can_delete,
+                    'is_recommended_keep': rel == recommended_keep,
                 }
             )
 
@@ -296,6 +329,8 @@ def find_duplicate_files(root: Path, top_n: int) -> tuple[list[dict[str, Any]], 
             {
                 'group_size': len(group),
                 'group_total_bytes': sum(i['size_bytes'] for i in items),
+                'mirror_family': family,
+                'recommended_keep': recommended_keep,
                 'safe_delete_candidates': safe_candidates,
                 'items': items,
             }
@@ -609,13 +644,14 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     ])
 
     for idx, group in enumerate(report['duplicate_analysis'], start=1):
-        lines.append(f"### Group {idx} — files: {group['group_size']}, bytes: {group['group_total_bytes']}")
-        lines.append('| File | Refs (exact path) | Refs (basename) | Active Scope | Safe Delete Candidate |')
-        lines.append('|---|---:|---:|:---:|:---:|')
+        lines.append(f"### Group {idx} — files: {group['group_size']}, bytes: {group['group_total_bytes']}, family: {group.get('mirror_family','general')}")
+        lines.append(f"Recommended keep: `{group.get('recommended_keep','')}`")
+        lines.append('| File | Refs (exact path) | Refs (basename) | Active Scope | Recommended Keep | Safe Delete Candidate |')
+        lines.append('|---|---:|---:|:---:|:---:|:---:|')
         for item in group['items']:
             lines.append(
                 f"| `{item['path']}` | {item['reference_count_exact_path']} | {item['reference_count_basename']} | "
-                f"{'✅' if item['in_active_scope'] else '❌'} | {'✅' if item['safe_delete_candidate'] else '❌'} |"
+                f"{'✅' if item['in_active_scope'] else '❌'} | {'✅' if item.get('is_recommended_keep') else '❌'} | {'✅' if item['safe_delete_candidate'] else '❌'} |"
             )
         if group['safe_delete_candidates']:
             lines.append('Safe candidates: ' + ', '.join(f"`{x}`" for x in group['safe_delete_candidates']))

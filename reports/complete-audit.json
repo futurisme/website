@@ -1,9 +1,9 @@
 {
   "summary": {
-    "generated_at": "2026-05-11T11:05:54Z",
+    "generated_at": "2026-05-11T11:10:59Z",
     "base_url": "https://fadhil.dev",
     "duplicate_groups_total": 64,
-    "elapsed_seconds": 8.48
+    "elapsed_seconds": 8.45
   },
   "domain": {
     "summary": {
@@ -20,9 +20,9 @@
       "missing_twitter_card_count": 0,
       "missing_json_ld_count": 0,
       "non_https_final_count": 0,
-      "avg_response_time_ms": 184.3,
-      "p95_response_time_ms": 256.9,
-      "max_response_time_ms": 326.2,
+      "avg_response_time_ms": 163.5,
+      "p95_response_time_ms": 243.4,
+      "max_response_time_ms": 246.1,
       "missing_security_headers_count": 0,
       "missing_security_header_details": {
         "content-security-policy": 0,
@@ -36,7 +36,7 @@
         "path": "/",
         "url": "https://fadhil.dev/",
         "status": 200,
-        "time_ms": 326.2,
+        "time_ms": 246.1,
         "final_url": "https://fadhil.dev/",
         "final_path": "/",
         "is_https_final": true,
@@ -75,7 +75,7 @@
         "path": "/archives",
         "url": "https://fadhil.dev/archives",
         "status": 200,
-        "time_ms": 256.9,
+        "time_ms": 243.4,
         "final_url": "https://fadhil.dev/archives",
         "final_path": "/archives",
         "is_https_final": true,
@@ -114,7 +114,7 @@
         "path": "/books",
         "url": "https://fadhil.dev/books",
         "status": 200,
-        "time_ms": 216.8,
+        "time_ms": 130.4,
         "final_url": "https://fadhil.dev/books",
         "final_path": "/books",
         "is_https_final": true,
@@ -153,7 +153,7 @@
         "path": "/books/editor",
         "url": "https://fadhil.dev/books/editor",
         "status": 200,
-        "time_ms": 185.4,
+        "time_ms": 150.0,
         "final_url": "https://fadhil.dev/books/editor",
         "final_path": "/books/editor",
         "is_https_final": true,
@@ -192,7 +192,7 @@
         "path": "/daily-streak",
         "url": "https://fadhil.dev/daily-streak",
         "status": 200,
-        "time_ms": 230.2,
+        "time_ms": 209.8,
         "final_url": "https://fadhil.dev/daily-streak",
         "final_path": "/daily-streak",
         "is_https_final": true,
@@ -231,7 +231,7 @@
         "path": "/dreambusiness",
         "url": "https://fadhil.dev/dreambusiness",
         "status": 200,
-        "time_ms": 157.9,
+        "time_ms": 185.0,
         "final_url": "https://fadhil.dev/dreambusiness",
         "final_path": "/dreambusiness",
         "is_https_final": true,
@@ -270,7 +270,7 @@
         "path": "/home",
         "url": "https://fadhil.dev/home",
         "status": 200,
-        "time_ms": 229.3,
+        "time_ms": 138.8,
         "final_url": "https://fadhil.dev/home",
         "final_path": "/home",
         "is_https_final": true,
@@ -309,7 +309,7 @@
         "path": "/hype",
         "url": "https://fadhil.dev/hype",
         "status": 200,
-        "time_ms": 141.0,
+        "time_ms": 111.8,
         "final_url": "https://fadhil.dev/hype",
         "final_path": "/hype",
         "is_https_final": true,
@@ -348,7 +348,7 @@
         "path": "/mindmapmaker",
         "url": "https://fadhil.dev/mindmapmaker",
         "status": 200,
-        "time_ms": 154.6,
+        "time_ms": 201.3,
         "final_url": "https://fadhil.dev/mindmapmaker",
         "final_path": "/mindmapmaker",
         "is_https_final": true,
@@ -387,14 +387,14 @@
         "path": "/mindmapmaker/editor/1",
         "url": "https://fadhil.dev/mindmapmaker/editor/1",
         "status": 200,
-        "time_ms": 95.5,
+        "time_ms": 194.2,
         "final_url": "https://fadhil.dev/mindmapmaker/editor/1",
         "final_path": "/mindmapmaker/editor/1",
         "is_https_final": true,
         "redirected": false,
         "redirect_target": "",
         "content_type": "text/html; charset=utf-8",
-        "content_length": 4703,
+        "content_length": 0,
         "cache_control": "public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300",
         "security_headers": {
           "content-security-policy": true,
@@ -416,7 +416,7 @@
           "json_ld": true
         },
         "processing_hints": {
-          "script_tags": 2,
+          "script_tags": 3,
           "stylesheet_links": 2
         },
         "deprecated_flags": [],
@@ -426,7 +426,7 @@
         "path": "/rpg",
         "url": "https://fadhil.dev/rpg",
         "status": 200,
-        "time_ms": 85.8,
+        "time_ms": 97.6,
         "final_url": "https://fadhil.dev/rpg",
         "final_path": "/rpg",
         "is_https_final": true,
@@ -465,7 +465,7 @@
         "path": "/shareideas",
         "url": "https://fadhil.dev/shareideas",
         "status": 200,
-        "time_ms": 165.3,
+        "time_ms": 128.1,
         "final_url": "https://fadhil.dev/shareideas",
         "final_path": "/shareideas",
         "is_https_final": true,
@@ -504,7 +504,7 @@
         "path": "/shareideas/page/1",
         "url": "https://fadhil.dev/shareideas/page/1",
         "status": 200,
-        "time_ms": 151.4,
+        "time_ms": 89.2,
         "final_url": "https://fadhil.dev/shareideas/page/1",
         "final_path": "/shareideas/page/1",
         "is_https_final": true,
@@ -545,6 +545,8 @@
     {
       "group_size": 3,
       "group_total_bytes": 29067,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/styles/theme.css",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -553,7 +555,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 13,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/home/theme.css",
@@ -561,7 +564,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 13,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         },
         {
           "path": "website/website/mindmapmaker/theme.css",
@@ -569,13 +573,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 13,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 12364,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/types/hooks.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -584,7 +591,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/types/hooks.ts",
@@ -592,13 +600,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 10924,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-dialog.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -607,7 +618,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-dialog.ts",
@@ -615,13 +627,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 9980,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/syntax/expression.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -630,7 +645,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/syntax/expression.ts",
@@ -638,13 +654,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 9740,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/collapsible-panel.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -653,7 +672,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/collapsible-panel.tsx",
@@ -661,13 +681,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 9532,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/state-syntax.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -676,7 +699,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/state-syntax.ts",
@@ -684,13 +708,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 9166,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/overlay/drawer.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -699,7 +726,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/drawer.tsx",
@@ -707,13 +735,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 8828,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/overlay/dialog.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -722,7 +753,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/overlay/dialog.tsx",
@@ -730,13 +762,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 8142,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-roving-focus.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -745,7 +780,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-roving-focus.ts",
@@ -753,13 +789,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 7236,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/layout/section.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -768,7 +807,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/layout/section.tsx",
@@ -776,36 +816,43 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 6900,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/button.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
           "path": "library/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 8,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/button.tsx",
           "size_bytes": 3450,
           "reference_count_exact_path": 2,
-          "reference_count_basename": 4,
+          "reference_count_basename": 8,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 6406,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/navigation/tabs.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -814,7 +861,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/tabs.tsx",
@@ -822,13 +870,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 6388,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/forms/field.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -837,7 +888,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/field.tsx",
@@ -845,13 +897,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5970,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-tabs.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -860,7 +915,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-tabs.ts",
@@ -868,13 +924,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5828,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/recipe.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -883,7 +942,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/recipe.ts",
@@ -891,13 +951,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5662,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-disclosure.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -906,7 +969,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-disclosure.ts",
@@ -914,13 +978,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5488,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/presets/index.ts",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -929,7 +996,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/presets/index.ts",
@@ -937,13 +1005,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5472,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/header-shell.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -952,7 +1023,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/header-shell.tsx",
@@ -960,13 +1032,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5434,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/forms/switch.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -975,7 +1050,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/switch.tsx",
@@ -983,13 +1059,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 5012,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/forms/checkbox.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -998,7 +1077,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/forms/checkbox.tsx",
@@ -1006,13 +1086,16 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 4966,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/navigation/segmented-control.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
@@ -1021,7 +1104,8 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/navigation/segmented-control.tsx",
@@ -1029,99 +1113,251 @@
           "reference_count_exact_path": 2,
           "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 4888,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/icon-button.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
           "path": "library/fadhilweblib/components/icon-button.tsx",
           "size_bytes": 2444,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/icon-button.tsx",
           "size_bytes": 2444,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 4368,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/feedback/progress-bar.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
           "path": "library/fadhilweblib/components/feedback/progress-bar.tsx",
           "size_bytes": 2184,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/progress-bar.tsx",
           "size_bytes": 2184,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 4322,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/feedback/notice.tsx",
       "safe_delete_candidates": [],
       "items": [
         {
           "path": "library/fadhilweblib/components/feedback/notice.tsx",
           "size_bytes": 2161,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/notice.tsx",
           "size_bytes": 2161,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     },
     {
       "group_size": 2,
       "group_total_bytes": 4318,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/space.ts",
       "safe_delete_candidates": [],
       "items": [
         {
           "path": "library/fadhilweblib/core/space.ts",
           "size_bytes": 2159,
-          "reference_count_exact_path": 0,
-          "reference_count_basename": 0,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
         },
         {
           "path": "website/mindmapmaker/src/lib/fadhilweblib/core/space.ts",
           "size_bytes": 2159,
+          "reference_count_exact_path": 2,
+          "reference_count_basename": 4,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4294,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/feedback/empty-state.tsx",
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/feedback/empty-state.tsx",
+          "size_bytes": 2147,
           "reference_count_exact_path": 0,
           "reference_count_basename": 0,
           "in_active_scope": true,
-          "safe_delete_candidate": false
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/feedback/empty-state.tsx",
+          "size_bytes": 2147,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4240,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/recipe-test.ts",
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/recipe-test.ts",
+          "size_bytes": 2120,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/recipe-test.ts",
+          "size_bytes": 2120,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4180,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-selection-state.ts",
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-selection-state.ts",
+          "size_bytes": 2090,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-selection-state.ts",
+          "size_bytes": 2090,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4110,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/core/use-async-action.ts",
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/core/use-async-action.ts",
+          "size_bytes": 2055,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/core/use-async-action.ts",
+          "size_bytes": 2055,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
+        }
+      ]
+    },
+    {
+      "group_size": 2,
+      "group_total_bytes": 4088,
+      "mirror_family": "fadhilweblib-mirror",
+      "recommended_keep": "library/fadhilweblib/components/status-chip.tsx",
+      "safe_delete_candidates": [],
+      "items": [
+        {
+          "path": "library/fadhilweblib/components/status-chip.tsx",
+          "size_bytes": 2044,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": true
+        },
+        {
+          "path": "website/mindmapmaker/src/lib/fadhilweblib/components/status-chip.tsx",
+          "size_bytes": 2044,
+          "reference_count_exact_path": 0,
+          "reference_count_basename": 0,
+          "in_active_scope": true,
+          "safe_delete_candidate": false,
+          "is_recommended_keep": false
         }
       ]
     }
@@ -1152,13 +1388,13 @@
   "crawl_support_audit": {
     "robots": {
       "status": 200,
-      "time_ms": 124.5,
+      "time_ms": 181.2,
       "has_user_agent_wildcard": true,
       "has_sitemap_directive": true
     },
     "sitemap": {
       "status": 200,
-      "time_ms": 53.0,
+      "time_ms": 152.1,
       "url_count": 12
     },
     "sitemap_urls": [
@@ -1197,10 +1433,10 @@
   "loc_audit": {
     "summary": {
       "tracked_files_scanned": 458,
-      "total_lines": 96635,
-      "blank_lines": 8054,
-      "comment_lines": 1848,
-      "code_lines": 86733
+      "total_lines": 96655,
+      "blank_lines": 8056,
+      "comment_lines": 1849,
+      "code_lines": 86750
     },
     "by_extension": {
       ".css": {
@@ -1226,10 +1462,10 @@
       },
       ".json": {
         "files": 10,
-        "total": 9280,
+        "total": 9264,
         "blank": 0,
         "comment": 0,
-        "code": 9280
+        "code": 9264
       },
       ".jsonc": {
         "files": 1,
@@ -1247,10 +1483,10 @@
       },
       ".py": {
         "files": 2,
-        "total": 1033,
-        "blank": 143,
-        "comment": 7,
-        "code": 883
+        "total": 1069,
+        "blank": 145,
+        "comment": 8,
+        "code": 916
       },
       ".sh": {
         "files": 2,
