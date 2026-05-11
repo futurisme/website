@@ -962,30 +962,82 @@ function getRdFundRemaining(company, elapsedDays) {
   return Math.max(0, entry.monthlyBudget - entry.spent);
 }
 
+
+function hashSeedFromText(text) {
+  let hash = 2166136261;
+  const value = String(text || '');
+  for (let i = 0; i < value.length; i += 1) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return Math.abs(hash >>> 0);
+}
+
+function clamp01(value) {
+  return Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0));
+}
+
+function getNpcCognitionTraits(npcId, companyKey) {
+  const seed = hashSeedFromText(`${npcId}:${companyKey}`);
+  const sample = (shift) => ((seed >>> shift) & 1023) / 1023;
+  return {
+    strategy: clamp01(0.25 + sample(1) * 0.75),
+    courage: clamp01(0.2 + sample(5) * 0.8),
+    moral: clamp01(0.25 + sample(9) * 0.75),
+    precision: clamp01(0.2 + sample(13) * 0.8),
+    discipline: clamp01(0.2 + sample(17) * 0.8),
+  };
+}
+
+function scoreUpgradeOpportunity(company, upgradeKey, upgrade, nextTierCost, traits, marketPressure) {
+  const step = Math.max(0.0001, Math.abs(Number(upgrade.step ?? 1)));
+  const baseCost = Math.max(1, Number(upgrade.baseCost ?? nextTierCost));
+  const efficiency = step / Math.max(1, nextTierCost / baseCost);
+  const isRisky = upgradeKey === 'clockSpeed' || upgradeKey === 'architecture';
+  const isSafe = upgradeKey === 'powerEfficiency' || upgradeKey === 'cooling';
+  const shortTerm = (company.revenuePerDay * 0.0012) + (company.marketShare * 0.04) + (traits.precision * 1.3);
+  const longTerm = (company.researchPerDay * 0.05) + (company.reputation * 0.03) + (traits.strategy * 2.4);
+  const courageBias = isRisky ? traits.courage * 1.6 : 0;
+  const moralBias = isSafe ? traits.moral * 1.2 : 0;
+  const disciplinePenalty = (1 - traits.discipline) * 0.8;
+  return (efficiency * 18) + shortTerm + longTerm + courageBias + moralBias + marketPressure - disciplinePenalty;
+}
+
 function applyNpcResearchCycle(state) {
   let next = state;
   const companies = { ...next.companies };
   let changed = false;
+
+  const marketAverage = Object.values(companies).reduce((sum, c) => sum + Math.max(0, Number(c.marketShare ?? 0)), 0) / Math.max(1, Object.keys(companies).length);
 
   Object.values(companies).forEach((company) => {
     ensureCompanyUpgradeBaseline(company);
     if (!company.isEstablished) return;
     if (!company.ceoId || company.ceoId === next.player.id) return;
 
+    const traits = getNpcCognitionTraits(company.ceoId, company.key);
+    const marketPressure = (Math.max(0, marketAverage - Number(company.marketShare ?? 0)) * 0.08) + ((1 - traits.moral) * 0.5);
+
     let workingCompany = company;
     const fund = ensureRdFund(workingCompany, next.elapsedDays);
+    const thinkingDepth = 2 + Math.round(traits.strategy * 2);
 
-    for (let round = 0; round < 2; round += 1) {
+    for (let round = 0; round < thinkingDepth; round += 1) {
       const upgradeOptions = Object.entries(workingCompany.upgrades ?? {})
         .map(([upgradeKey, upgrade]) => {
           const { nextTierCost } = estimateUpgradeTierAndCost(workingCompany.key, upgradeKey, upgrade);
-          return { upgradeKey, upgrade, nextTierCost };
+          const decisionScore = scoreUpgradeOpportunity(workingCompany, upgradeKey, upgrade, nextTierCost, traits, marketPressure);
+          return { upgradeKey, upgrade, nextTierCost, decisionScore };
         })
-        .sort((a, b) => a.nextTierCost - b.nextTierCost);
+        .sort((a, b) => b.decisionScore - a.decisionScore);
 
-      const candidate = upgradeOptions.find((option) => {
-        const remainingFund = fund.monthlyBudget - fund.spent;
-        return remainingFund >= option.nextTierCost && workingCompany.research >= option.nextTierCost;
+      const candidate = upgradeOptions.find((option, index) => {
+        const remainingFund = Math.max(0, fund.monthlyBudget - fund.spent);
+        const liquidityGuard = Math.max(1, workingCompany.cash * (0.02 + (1 - traits.courage) * 0.04));
+        const budgetSafe = remainingFund >= option.nextTierCost && workingCompany.research >= option.nextTierCost;
+        const canAffordRisk = (workingCompany.cash - option.nextTierCost) >= liquidityGuard;
+        const variationGate = index === 0 || Math.random() < (0.45 + traits.precision * 0.35);
+        return budgetSafe && canAffordRisk && variationGate;
       });
       if (!candidate) break;
 
@@ -994,9 +1046,15 @@ function applyNpcResearchCycle(state) {
         ? Math.max(candidate.upgradeKey === 'lithography' ? 5 : 28, current.value + current.step)
         : current.value + current.step;
 
+      const researchCost = candidate.nextTierCost;
+      const shortTermPenalty = Math.max(0, researchCost * (0.0004 + (1 - traits.discipline) * 0.0005));
+      const strategicBoost = Math.max(0, candidate.decisionScore * (0.02 + traits.strategy * 0.05));
+
       workingCompany = {
         ...workingCompany,
-        research: Math.max(0, workingCompany.research - candidate.nextTierCost),
+        cash: Math.max(0, workingCompany.cash - shortTermPenalty),
+        research: Math.max(0, workingCompany.research - researchCost),
+        reputation: Math.max(1, workingCompany.reputation + (traits.moral - 0.5) * 0.04 + (strategicBoost * 0.002)),
         upgrades: {
           ...workingCompany.upgrades,
           [candidate.upgradeKey]: {
@@ -1009,7 +1067,7 @@ function applyNpcResearchCycle(state) {
         ...workingCompany,
         researchPerDay: calculateResearchPerDayFromState(workingCompany),
       };
-      fund.spent += candidate.nextTierCost;
+      fund.spent += researchCost;
       changed = true;
     }
 
