@@ -1072,6 +1072,72 @@ function scoreUpgradeOpportunity(company, upgradeKey, upgrade, nextTierCost, tra
   return (efficiency * 18) + shortTerm + longTerm + courageBias + moralBias + marketPressure - disciplinePenalty;
 }
 
+
+function getExecutiveRoleFit(role, candidateTraits, ceoTraits) {
+  const target = role === 'cto'
+    ? { strategy: 0.82, courage: 0.56, moral: 0.52, precision: 0.86, discipline: 0.72 }
+    : role === 'cfo'
+      ? { strategy: 0.7, courage: 0.42, moral: 0.68, precision: 0.9, discipline: 0.88 }
+      : role === 'coo'
+        ? { strategy: 0.68, courage: 0.62, moral: 0.64, precision: 0.66, discipline: 0.92 }
+        : { strategy: 0.64, courage: 0.72, moral: 0.6, precision: 0.58, discipline: 0.64 };
+
+  const ceoPrinciple = (ceoTraits.moral * 0.35) + (ceoTraits.strategy * 0.4) + (ceoTraits.discipline * 0.25);
+  const alignment = 1 - Math.abs(candidateTraits.moral - ceoTraits.moral) * 0.45;
+  const distancePenalty =
+    Math.abs(candidateTraits.strategy - target.strategy) * 0.26 +
+    Math.abs(candidateTraits.courage - target.courage) * 0.16 +
+    Math.abs(candidateTraits.moral - target.moral) * 0.2 +
+    Math.abs(candidateTraits.precision - target.precision) * 0.22 +
+    Math.abs(candidateTraits.discipline - target.discipline) * 0.16;
+  return (ceoPrinciple * 0.34) + (alignment * 0.26) + (1 - distancePenalty);
+}
+
+function applyNpcExecutiveGovernanceCycle(state) {
+  const next = { ...state, companies: { ...state.companies } };
+  const npcPool = Array.isArray(next.npcs) ? next.npcs.map((npc) => npc.id).filter(Boolean) : [];
+  if (!npcPool.length) return state;
+
+  let changed = false;
+  for (const company of Object.values(next.companies)) {
+    if (!company?.isEstablished) continue;
+    if (!company.ceoId || company.ceoId === next.player.id) continue;
+
+    const ceoTraits = getNpcCognitionTraits(company.ceoId, company.key);
+    const governancePulse = (Number(next.elapsedDays || 0) + (hashSeedFromText(company.key) % 11)) % 7;
+    if (governancePulse !== 0) continue;
+
+    const candidateIds = npcPool.filter((id) => id !== company.ceoId);
+    if (!candidateIds.length) continue;
+
+    const roles = ['cto', 'cfo', 'coo', 'cmo'];
+    const used = new Set([company.ceoId]);
+    const updatedExecutives = { ...(company.executives || {}) };
+
+    for (const role of roles) {
+      const ranked = candidateIds
+        .filter((id) => !used.has(id))
+        .map((id) => {
+          const traits = getNpcCognitionTraits(id, company.key);
+          const fit = getExecutiveRoleFit(role, traits, ceoTraits);
+          const variability = pseudoNoise(hashSeedFromText(`${id}:${role}`), next.elapsedDays, 0.77) * 0.18;
+          return { id, score: fit + variability };
+        })
+        .sort((a, b) => b.score - a.score);
+      const chosen = ranked[0];
+      if (!chosen) continue;
+      used.add(chosen.id);
+      const previous = updatedExecutives[role] || {};
+      updatedExecutives[role] = { ...previous, occupantId: chosen.id };
+    }
+
+    next.companies[company.key] = { ...company, executives: updatedExecutives };
+    changed = true;
+  }
+
+  return changed ? next : state;
+}
+
 function applyNpcResearchCycle(state) {
   let next = state;
   const companies = { ...next.companies };
@@ -1359,7 +1425,8 @@ function renderCompanyDetail() {
 function runTick(n = 1) {
   try {
     const next = runTicksBatched(game, n, simulateTick);
-    const withNpcResearch = applyNpcResearchCycle(next);
+    const withNpcGovernance = applyNpcExecutiveGovernanceCycle(next);
+    const withNpcResearch = applyNpcResearchCycle(withNpcGovernance);
     const withNpcMarketInteraction = applyNpcMarketInteractionCycle(withNpcResearch);
     const withSpecializedMarket = applySpecializedReleaseLogic(withNpcMarketInteraction);
     if (!isValidGameState(withSpecializedMarket)) {
