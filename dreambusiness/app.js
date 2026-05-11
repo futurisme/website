@@ -38,6 +38,9 @@ const frameRanking = document.getElementById('frameRanking');
 const frameInvestment = document.getElementById('frameInvestment');
 const frameNews = document.getElementById('frameNews');
 const frameSub = document.getElementById('frameSub');
+const frameProfile = document.getElementById('frameProfile');
+const frameMarkets = document.getElementById('frameMarkets');
+const frameMyCompany = document.getElementById('frameMyCompany');
 const newsTimeline = document.getElementById('newsTimeline');
 const companyFrameList = document.getElementById('companyFrameList');
 const companyDetailTitle = document.getElementById('companyDetailTitle');
@@ -46,20 +49,36 @@ const toFullframeBtn = document.getElementById('toFullframe');
 const toInvestmentBtn = document.getElementById('toInvestment');
 const toRankingBtn = document.getElementById('toRanking');
 const toNewsBtn = document.getElementById('toNews');
+const toProfileBtn = document.getElementById('toProfile');
+const toMarketsBtn = document.getElementById('toMarkets');
+const toMyCompanyBtn = document.getElementById('toMyCompany');
 const backFromFullBtn = document.getElementById('backFromFull');
 const backFromRankingBtn = document.getElementById('backFromRanking');
 const backFromInvestmentBtn = document.getElementById('backFromInvestment');
 const backFromNewsBtn = document.getElementById('backFromNews');
 const backFromSubBtn = document.getElementById('backFromSub');
+const backFromProfileBtn = document.getElementById('backFromProfile');
+const backFromMarketsBtn = document.getElementById('backFromMarkets');
+const backFromMyCompanyBtn = document.getElementById('backFromMyCompany');
 const rankingList = document.getElementById('rankingList');
 const rankingTopCompaniesBtn = document.getElementById('rankingTopCompanies');
 const rankingRichestBtn = document.getElementById('rankingRichest');
-const rankingProductsBtn = document.getElementById('rankingProducts');
+const rankingCpuBtn = document.getElementById('rankingCpu');
+const rankingGameBtn = document.getElementById('rankingGame');
+const rankingComputerBtn = document.getElementById('rankingComputer');
+const rankingPhoneBtn = document.getElementById('rankingPhone');
 const buyBtn = document.getElementById('buyBtn');
 const sellBtn = document.getElementById('sellBtn');
 const investPlanBtn = document.getElementById('investPlanBtn');
 const licenseBtn = document.getElementById('licenseBtn');
 const communityBtn = document.getElementById('communityBtn');
+const topDate = document.getElementById('topDate');
+const profileBody = document.getElementById('profileBody');
+const topCash = document.getElementById('topCash');
+const marketsBody = document.getElementById('marketsBody');
+const myCompanyTabs = document.getElementById('myCompanyTabs');
+const myCompanyBody = document.getElementById('myCompanyBody');
+const foundCompanyBtn = document.getElementById('foundCompanyBtn');
 
 let game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
 let auto = false;
@@ -69,16 +88,274 @@ let selectedCompanyForDetail = null;
 let rankingMode = 'companies';
 let previousSharePrices = {};
 let sliderMode = 'invest';
+let previousPlayerCash = null;
+let selectedMyCompanyKey = null;
 const sliderPercentByMode = { invest: 25, sell: 25 };
 const RICHEST_ROWS_LIMIT = 76; // 75 NPC + 1 player
 const rankingCache = {
   tick: -1,
   companies: null,
   richest: null,
-  products: null,
+products: null,
 };
 const upgradeBaselineByCompany = {};
 const rdFundByCompany = {};
+const releaseRegistry = [];
+const companyReleaseState = {};
+
+function on(element, eventName, handler) {
+  if (!element) return;
+  element.addEventListener(eventName, handler);
+}
+
+function debugReport(kind, message, detail = {}) {
+  if (window.__dreambusinessDebug && typeof window.__dreambusinessDebug.report === "function") {
+    window.__dreambusinessDebug.report(kind, message, detail);
+  }
+}
+
+
+function formatSignedCompact(value) {
+  const safe = Number.isFinite(value) ? value : 0;
+  const sign = safe >= 0 ? '+' : '-';
+  return `${sign}${formatMoneyCompact(Math.abs(safe), 2)}`;
+}
+
+function formatHeaderDate(dayIndex) {
+  const safeDayIndex = Number.isFinite(dayIndex) ? dayIndex : 0;
+  const base = new Date(Date.UTC(2000, 0, 1));
+  base.setUTCDate(base.getUTCDate() + Math.max(0, Math.floor(safeDayIndex)));
+  const yy = String(base.getUTCFullYear() % 100).padStart(2, '0');
+  const mm = String(base.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(base.getUTCDate()).padStart(2, '0');
+  return `${yy}/${mm}/${dd}`;
+}
+
+function renderHoldingsPie(rows, palette) {
+  const normalized = rows.length ? rows : [{ key: "Cash", value: 1, amount: 0 }];
+  let start = 0;
+  const slices = normalized.map((row, index) => {
+    const share = Math.max(0, Number(row.value) || 0);
+    const end = start + share;
+    const largeArc = end - start > 0.5 ? 1 : 0;
+    const x1 = 50 + Math.cos(2 * Math.PI * start - Math.PI / 2) * 44;
+    const y1 = 50 + Math.sin(2 * Math.PI * start - Math.PI / 2) * 44;
+    const x2 = 50 + Math.cos(2 * Math.PI * end - Math.PI / 2) * 44;
+    const y2 = 50 + Math.sin(2 * Math.PI * end - Math.PI / 2) * 44;
+    start = end;
+    return `<path d="M 50 50 L ${x1.toFixed(2)} ${y1.toFixed(2)} A 44 44 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${palette[index % palette.length]}"></path>`;
+  }).join();
+  return `<svg viewBox="0 0 100 100" class="holdings-pie" aria-hidden="true">${slices}</svg>`;
+}
+
+function getMyCompanyCandidates() {
+  return Object.values(game.companies).filter((company) => {
+    if (!company.isEstablished) return false;
+    const playerShares = Number(company.investors?.[game.player.id] ?? 0);
+    const totalShares = Math.max(1, Number(company.totalShares ?? 1));
+    const ownership = (playerShares / totalShares) * 100;
+    return company.ceoId === game.player.id || ownership >= 50;
+  });
+}
+
+function renderMyCompanyFrame() {
+  if (!myCompanyTabs || !myCompanyBody) return;
+  const companies = getMyCompanyCandidates();
+  if (!selectedMyCompanyKey || !companies.some((entry) => entry.key === selectedMyCompanyKey)) {
+    selectedMyCompanyKey = companies[0]?.key ?? null;
+  }
+  myCompanyTabs.innerHTML = companies.length
+    ? companies.map((entry) => `<button data-my-company="${entry.key}" class="${entry.key === selectedMyCompanyKey ? 'switch-active' : ''}">${escapeHtml(entry.name)}</button>`).join('')
+    : '<small>No controlled company yet.</small>';
+  const active = companies.find((entry) => entry.key === selectedMyCompanyKey);
+  if (!active) {
+    myCompanyBody.innerHTML = '<p>Use Found Company to start your own company.</p>';
+    return;
+  }
+  const investorBoard = Object.entries(active.investors ?? {})
+    .map(([investorId, shares]) => ({ investorId, shares: Number(shares ?? 0) }))
+    .filter((entry) => entry.shares > 0)
+    .sort((a, b) => b.shares - a.shares);
+  const playerShares = Number(active.investors?.[game.player.id] ?? 0);
+  const totalShares = Math.max(1, investorBoard.reduce((sum, entry) => sum + entry.shares, 0));
+  const ownershipRaw = (playerShares / totalShares) * 100;
+  const ownership = Math.max(0, Math.min(100, ownershipRaw));
+  const playerRank = investorBoard.findIndex((entry) => entry.investorId === game.player.id) + 1;
+  const execRole = active.ceoId === game.player.id ? 'CEO'
+    : active.executives?.cto?.occupantId === game.player.id ? 'CTO'
+      : active.executives?.cfo?.occupantId === game.player.id ? 'CFO'
+        : active.executives?.cmo?.occupantId === game.player.id ? 'CMO'
+          : active.executives?.coo?.occupantId === game.player.id ? 'COO'
+            : playerRank > 0 && playerRank <= 3 ? 'Majority Shareholder' : 'Shareholder';
+  const rdFund = ensureRdFund(active, game.elapsedDays);
+  const hasMajorityInfluence = playerRank > 0 && playerRank <= 3;
+  const canTech = (execRole === 'CEO' || execRole === 'CTO') && rdFund.monthlyBudget - rdFund.spent > 150;
+  const canOps = execRole === 'CEO' || execRole === 'COO' || hasMajorityInfluence;
+  const canFinance = execRole === 'CEO' || execRole === 'CFO' || hasMajorityInfluence;
+  const canBrand = execRole === 'CEO' || execRole === 'CMO' || hasMajorityInfluence;
+  const canCritique = execRole === 'Shareholder' || hasMajorityInfluence;
+  const upgradeOptions = Object.keys(active.upgrades ?? {}).map((key) => `<option value="${key}">${toTitleCase(key)}</option>`).join('');
+  const actionLine = (label, allow, reason) => `<li class="${allow ? 'mgmt-allow' : 'mgmt-block'}">${allow ? '🟢' : '🔴'} ${label} — ${reason}</li>`;
+  myCompanyBody.innerHTML = `
+    <article class="detail-tile">
+      <h3>${escapeHtml(active.name)}</h3>
+      <p>Role: ${execRole}</p>
+      <p>Ownership: ${ownership.toFixed(4)}%</p>
+      <p>Shareholder Rank: ${playerRank > 0 ? `#${playerRank}` : 'N/A'}</p>
+      <p>Cash: ${formatMoneyCompact(active.cash)}</p>
+      <p>Last Release: ${escapeHtml(active.lastRelease || '-')}</p>
+    </article>
+    <article class="detail-tile">
+      <h3>Manajemen</h3>
+      <ul class="mgmt-list">
+        ${actionLine('Teknologi / Spek', canTech, canTech ? 'R&D fund cukup, aksi upgrade dimungkinkan.' : 'Butuh role CEO dan dana R&D memadai.')}
+        ${actionLine('Operasional / Visi Produk', canOps, canOps ? 'Bisa ikut menentukan ritme dan arah rilis.' : 'Wewenang terbatas pada role saat ini.')}
+        ${actionLine('Keuangan / Biaya', canFinance, canFinance ? 'Bisa usulkan kontrol biaya & harga pasar.' : 'Akses keuangan terbatas.')}
+        ${actionLine('Marketing / Demand', canBrand, canBrand ? 'Bisa memberi arahan branding & promo.' : 'Akses marketing terbatas.')}
+        ${actionLine('Kritik / Saran', canCritique, canCritique ? 'Bisa memberi tekanan/intimidasi strategis terbatas.' : 'Role eksekutif fokus eksekusi, bukan kritik pasif.')}
+      </ul>
+      <div class="button-row">
+        <select id="myCompanyUpgradeSelect">${upgradeOptions}</select>
+        <button data-mgmt-action="upgrade-tech" ${canTech ? '' : 'disabled'}>Upgrade Tech</button>
+        <button data-mgmt-action="ops-push" ${canOps ? '' : 'disabled'}>Push Ops Plan</button>
+        <button data-mgmt-action="finance-tune" ${canFinance ? '' : 'disabled'}>Tune Cost</button>
+        <button data-mgmt-action="brand-push" ${canBrand ? '' : 'disabled'}>Boost Brand</button>
+        <button data-mgmt-action="shareholder-pressure" ${canCritique ? '' : 'disabled'}>Critic/Pressure</button>
+      </div>
+      <p id="myCompanyMgmtStatus"></p>
+    </article>
+  `;
+}
+
+function renderProfileFrame() {
+  if (!profileBody) return;
+  const holdings = getInvestorHoldingsValue(game, game.player.id);
+  const netWorth = game.player.cash + holdings;
+  const weekly = getInvestorWeeklyIncomeEstimate(game, game.player.id);
+  const topSnapshot = getTopCompaniesSnapshot(game, getCompanyValuation, getSharePrice, 5)
+    .filter((row) => isCompanyVisibleInUi(row.key))
+    .map((row) => `<li>${escapeHtml(row.name)} • ${formatMoneyCompact(row.valuation)} • $${row.sharePrice.toFixed(2)}</li>`)
+    .join('');
+
+  profileBody.innerHTML = `
+    <article class="profile-metric"><h3>Identity</h3><p>${escapeHtml(game.player.name)} (${escapeHtml(game.player.id)})</p></article>
+    <article class="profile-metric"><h3>Net Worth</h3><p>${formatMoneyCompact(netWorth)}</p></article>
+    <article class="profile-metric"><h3>Cash</h3><p>${formatMoneyCompact(game.player.cash)}</p></article>
+    <article class="profile-metric"><h3>Portfolio Value</h3><p>${formatMoneyCompact(holdings)}</p></article>
+    <article class="profile-metric"><h3>Weekly Income</h3><p>${formatMoneyCompact(weekly)}</p></article>
+    <article class="profile-metric"><h3>Top Portfolio Universe</h3><ul>${topSnapshot || '<li>No company snapshot available.</li>'}</ul></article>
+  `;
+}
+
+function estimateReleaseSpecAndPrice(company, type) {
+  const techLevel = Math.max(1, Math.round(((Number(company.upgrades?.architecture?.value ?? 1) + Number(company.upgrades?.coreDesign?.value ?? 1) + Number(company.upgrades?.clockSpeed?.value ?? 1)) / 3)));
+  const environmentBudget = Math.max(1, company.cash * 0.004 + company.researchPerDay * 20);
+  const chosenLevel = Math.max(1, Math.min(techLevel, Math.round(environmentBudget / 120)));
+  const basePrice = type === "CPU" ? 180 : type === "Game" ? 60 : type === "Computer" ? 620 : 420;
+  const productPrice = Math.max(20, basePrice + chosenLevel * (type === "CPU" ? 38 : type === "Game" ? 12 : 28));
+  return { techLevel, chosenLevel, productPrice };
+}
+
+function compactReleaseName(raw, fallback) {
+  const text = String(raw || '').trim();
+  if (!text) return fallback;
+  const rilisIdx = text.toLowerCase().indexOf(' rilis ');
+  if (rilisIdx > 0) return text.slice(0, rilisIdx).trim();
+  const parenIdx = text.indexOf('(');
+  if (parenIdx > 0) return text.slice(0, parenIdx).trim();
+  return text;
+}
+
+function classifyCompanyType(company) {
+  if (company.field === 'semiconductor') return 'CPU';
+  if (company.field === 'game') return 'Game';
+  return 'Device';
+}
+
+function renderMarketsFrame() {
+  if (!marketsBody) return;
+  const rowsByType = { CPU: [], Game: [], Computer: [], Phone: [] };
+  releaseRegistry.forEach((row) => rowsByType[row.type]?.push(row));
+  marketsBody.innerHTML = Object.entries(rowsByType)
+    .map(([type, rows]) => `
+      <section class="market-group">
+        <h3>${type} Releases</h3>
+        <ul>${rows.length ? rows.map((row) => `<li>${escapeHtml(row.date)} • ${escapeHtml(row.company)} • ${escapeHtml(row.product)} • L${row.tech}/${row.techMax} • $${Number(row.price ?? 0).toFixed(0)}</li>`).join('') : '<li>No releases yet.</li>'}</ul>
+      </section>
+    `)
+    .join('');
+}
+
+function applySpecializedReleaseLogic(state) {
+  const next = { ...state, companies: { ...state.companies } };
+  const cpuPool = Object.values(next.companies)
+    .filter((company) => company.isEstablished && company.field === 'semiconductor' && (company.releaseCount ?? 0) > 0)
+    .map((company) => ({ key: company.key, company: company.name, score: Math.max(1, getCompanyValuation(company)), price: Math.max(0.01, getSharePrice(company)) }))
+    .sort((a, b) => (b.score / Math.max(1, b.price)) - (a.score / Math.max(1, a.price)));
+
+  for (const company of Object.values(next.companies)) {
+    if (!company?.isEstablished) continue;
+    const prev = companyReleaseState[company.key] ?? { releaseCount: 0 };
+    const nowCount = Number(company.releaseCount ?? 0);
+    const type = classifyCompanyType(company);
+
+    if (type === 'CPU' && nowCount > prev.releaseCount) {
+      const spec = estimateReleaseSpecAndPrice(company, 'CPU');
+      next.companies[company.key] = { ...company, lastRelease: `${company.name} Core ${nowCount}` };
+      companyReleaseState[company.key] = { ...(companyReleaseState[company.key] || {}), lastSpec: spec };
+    }
+
+    if (type === 'Game' && nowCount > prev.releaseCount) {
+      const spec = estimateReleaseSpecAndPrice(company, 'Game');
+      next.companies[company.key] = { ...company, lastRelease: `${company.name} Game ${nowCount}` };
+      companyReleaseState[company.key] = { ...(companyReleaseState[company.key] || {}), lastSpec: spec };
+    }
+
+    if (type === 'Device' && nowCount > prev.releaseCount) {
+      if (!cpuPool.length) {
+        next.companies[company.key] = { ...company, releaseCount: prev.releaseCount, lastRelease: 'Blocked: device release needs at least one released CPU in market.' };
+        debugReport('release-blocked', `${company.name} blocked release without CPU`, { companyKey: company.key, day: next.elapsedDays });
+        continue;
+      }
+      const selectedCpu = cpuPool[0];
+      const unitType = company.releaseCount % 2 === 0 ? 'Computer' : 'Phone';
+      const spec = estimateReleaseSpecAndPrice(company, unitType);
+      const productName = `${company.name} ${unitType} ${String(nowCount).padStart(2, '0')} (${selectedCpu.company} CPU)`;
+      const licensingFee = Math.max(1, company.cash * 0.012);
+      const cpuCompany = next.companies[selectedCpu.key];
+      const taxedIncome = licensingFee * 0.75;
+      const deviceCash = Math.max(0, company.cash - licensingFee);
+      next.companies[company.key] = { ...company, cash: deviceCash, lastRelease: productName };
+      if (cpuCompany) {
+        next.companies[selectedCpu.key] = { ...cpuCompany, cash: cpuCompany.cash + taxedIncome };
+      }
+      companyReleaseState[company.key] = { ...(companyReleaseState[company.key] || {}), lastSpec: spec, cpuPartner: selectedCpu.company };
+      debugReport('cpu-license', `${company.name} paid ${formatMoneyCompact(licensingFee)} to ${selectedCpu.company} (net ${formatMoneyCompact(taxedIncome)})`, { companyKey: company.key, cpuKey: selectedCpu.key });
+    }
+
+    if (nowCount > prev.releaseCount) {
+      const rawProductText = next.companies[company.key]?.lastRelease ?? company.lastRelease ?? `${company.name} Release ${nowCount}`;
+      const productText = compactReleaseName(rawProductText, `${company.name} Release ${nowCount}`);
+      const releaseType = type === 'Device' && /phone/i.test(productText) ? 'Phone' : type === 'Device' ? 'Computer' : type;
+      const spec = companyReleaseState[company.key]?.lastSpec || estimateReleaseSpecAndPrice(company, releaseType);
+      releaseRegistry.push({
+        day: next.elapsedDays,
+        date: formatHeaderDate(next.elapsedDays),
+        company: company.name,
+        product: productText,
+        type: releaseType,
+        price: spec.productPrice,
+        tech: spec.chosenLevel,
+        techMax: spec.techLevel,
+      });
+    }
+  }
+
+  Object.values(next.companies).forEach((company) => {
+    companyReleaseState[company.key] = { releaseCount: Number(company.releaseCount ?? 0) };
+  });
+  return next;
+}
 
 function isPlanOpenFunding(plan) {
   if (!plan || plan.isEstablished) return false;
@@ -263,7 +540,8 @@ function applyActionSafely(action, options = {}) {
 function stopAutoIfRunning() {
   if (!auto) return;
   auto = false;
-  autoBtn.textContent = 'Start Auto';
+  autoBtn.textContent = 'Start';
+  autoBtn.setAttribute('aria-pressed', 'false');
   if (timer) clearInterval(timer);
   timer = null;
 }
@@ -441,13 +719,43 @@ function render() {
   }
 
   const investorWorth = getInvestorHoldingsValue(game, game.player.id);
-  const investorWeekly = getInvestorWeeklyIncomeEstimate(game, game.player.id);
+  const dailyDelta = previousPlayerCash === null ? 0 : game.player.cash - previousPlayerCash;
+  previousPlayerCash = game.player.cash;
+
+  const palette = ['#1d4ed8','#dc2626','#059669','#d97706','#7c3aed','#0ea5e9','#be123c','#65a30d','#ea580c','#4338ca','#0891b2','#e11d48','#16a34a','#a16207','#9333ea','#0284c7','#b91c1c','#4d7c0f','#c2410c','#5b21b6','#0f766e','#9f1239','#14b8a6','#f59e0b','#ef4444','#22c55e','#06b6d4','#a855f7'];
+  const holdingsRows = Object.values(game.companies)
+    .map((company) => {
+      const shares = Number(company.investors?.[game.player.id] ?? 0);
+      if (shares <= 0) return null;
+      const amount = shares * getSharePrice(company);
+      return { key: company.name, amount };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 6);
+  const totalHoldings = holdingsRows.reduce((sum, row) => sum + row.amount, 0);
+  const normalized = holdingsRows.map((row) => ({ ...row, value: totalHoldings > 0 ? row.amount / totalHoldings : 0 }));
+
   statsEl.innerHTML = `
-    <article><h2>Simulation Day</h2><strong>${game.elapsedDays}</strong><small>${formatDateFromDays(game.elapsedDays)}</small></article>
-    <article><h2>Cash Player</h2><strong>${formatMoneyCompact(game.player.cash)}</strong><small>${game.player.name}</small></article>
-    <article><h2>Total Holdings</h2><strong>${formatMoneyCompact(investorWorth)}</strong><small>ownership value</small></article>
-    <article><h2>Weekly Income</h2><strong>${formatMoneyCompact(investorWeekly)}</strong><small>weekly estimate</small></article>
+    <article>
+      <h2>Total Holdings</h2>
+      <strong>${formatMoneyCompact(investorWorth)}</strong>
+      <div class="holdings-chart-wrap">
+        <div class="holdings-chart">${renderHoldingsPie(normalized, palette)}</div>
+        <ul class="holdings-legend">${normalized.length ? normalized.map((row, index) => `<li><span class="holdings-dot" style="background:${palette[index % palette.length]}"></span>${escapeHtml(row.key)} • ${(row.value * 100).toFixed(1)}% • ${formatMoneyCompact(row.amount)}</li>`).join('') : '<li>No shares yet.</li>'}</ul>
+      </div>
+    </article>
   `;
+
+  if (topDate) {
+    const dateSource = Number.isFinite(game.elapsedDays) && game.elapsedDays > 0 ? game.elapsedDays : game.tickCount;
+    topDate.textContent = formatHeaderDate(dateSource);
+  }
+  if (topCash) {
+    topCash.textContent = `💵${formatMoneyCompact(game.player.cash)} ${formatSignedCompact(dailyDelta)}`;
+    topCash.classList.toggle('top-cash-positive', dailyDelta >= 0);
+    topCash.classList.toggle('top-cash-negative', dailyDelta < 0);
+  }
 
   if (frame === 'investment') {
     updateSliderPreview();
@@ -458,6 +766,9 @@ function render() {
   }
   if (frame === 'ranking') renderRankingFrame();
   if (frame === 'news') renderNewsFrame();
+  if (frame === 'profile') renderProfileFrame();
+  if (frame === 'markets') renderMarketsFrame();
+  if (frame === 'myCompany') renderMyCompanyFrame();
   renderFrameVisibility();
 }
 
@@ -468,6 +779,9 @@ function renderFrameVisibility() {
   frameInvestment.classList.toggle('frame-active', frame === 'investment');
   frameNews.classList.toggle('frame-active', frame === 'news');
   frameSub.classList.toggle('frame-active', frame === 'sub');
+  frameProfile?.classList.toggle('frame-active', frame === 'profile');
+  frameMarkets?.classList.toggle('frame-active', frame === 'markets');
+  frameMyCompany?.classList.toggle('frame-active', frame === 'myCompany');
 }
 
 function renderCompanyFrames() {
@@ -529,10 +843,24 @@ function renderRankingFrame() {
     return;
   }
 
-  renderRankingCards(
-    rankingCache.products,
-    (row) => `Product Score ${row.score.toFixed(1)} • Company ${escapeHtml(row.companyName ?? '-')} • Release ${row.releaseCount} • Reputation ${row.reputation.toFixed(1)}`
-  );
+  const marketRows = releaseRegistry
+    .slice()
+    .reverse()
+    .map((row, index) => ({ rank: index + 1, name: row.product, type: row.type, companyName: row.company, day: row.day }));
+
+  const filtered = marketRows.filter((row) => {
+    if (rankingMode === 'cpu') return row.type === 'CPU';
+    if (rankingMode === 'game') return row.type === 'Game';
+    if (rankingMode === 'computer') return row.type === 'Computer';
+    if (rankingMode === 'phone') return row.type === 'Phone';
+    return false;
+  }).slice(0, 24).map((row, index) => ({ ...row, rank: index + 1 }));
+
+  renderRankingCards(filtered, (row) => {
+    const release = releaseRegistry.find((entry) => entry.product === row.name && entry.company === row.companyName);
+    const spec = release ? `L${release.tech}/${release.techMax} • $${Number(release.price).toFixed(0)}` : '-';
+    return `Type ${row.type} • Company ${escapeHtml(row.companyName)} • Day ${Math.floor(row.day)} • ${spec}`;
+  });
 }
 
 function formatPersonNameByInvestorId(investorId) {
@@ -775,7 +1103,7 @@ function renderCompanyDetail() {
   const rdCoordinationNote = !hasCto
     ? 'CTO belum terisi, riset cenderung tidak merata.'
     : rdBalanceIndex < 70
-      ? 'Distribusi riset belum rata, upgrade tier terendah diprioritaskan.'
+      ? 'Distribusi riset belum rata.'
       : 'Koordinasi CEO/CTO cukup stabil untuk riset merata.';
 
   const buildingRows = Object.entries(company.teams ?? {})
@@ -812,16 +1140,18 @@ function runTick(n = 1) {
   try {
     const next = runTicksBatched(game, n, simulateTick);
     const withNpcResearch = applyNpcResearchCycle(next);
-    if (!isValidGameState(withNpcResearch)) {
-      stopAutoIfRunning();
-      setStatus('Tick failed: simulation produced an invalid game state.', true);
+    const withSpecializedMarket = applySpecializedReleaseLogic(withNpcResearch);
+    if (!isValidGameState(withSpecializedMarket)) {
+      debugReport('invalid-state', 'Tick produced invalid game state', { elapsedDays: game.elapsedDays, tickCount: game.tickCount });
+      setStatus('Tick warning: invalid state detected, previous safe state retained.', true);
       return;
     }
-    game = withNpcResearch;
+    game = withSpecializedMarket;
     render();
   } catch (error) {
-    stopAutoIfRunning();
     const reason = error instanceof Error ? error.message : String(error);
+    debugReport('tick-error', reason, { stack: error instanceof Error ? error.stack : null });
+    stopAutoIfRunning();
     setStatus(`Tick failed due to engine error: ${reason}`, true);
   }
 }
@@ -964,40 +1294,47 @@ function handleCommunityPlanSeed() {
   render();
 }
 
-document.getElementById('tick1').addEventListener('click', () => runTick(1));
-document.getElementById('tick25').addEventListener('click', () => runTick(25));
-buyBtn.addEventListener('click', () => handleTrade('buy'));
-sellBtn.addEventListener('click', () => handleTrade('sell'));
-investPlanBtn.addEventListener('click', handleInvestCompanyPlan);
-licenseBtn.addEventListener('click', handleLicenseRequest);
-communityBtn.addEventListener('click', handleCommunityPlanSeed);
-sliderModeInvestBtn.addEventListener('click', () => {
+on(buyBtn, 'click', () => handleTrade('buy'));
+on(sellBtn, 'click', () => handleTrade('sell'));
+on(investPlanBtn, 'click', handleInvestCompanyPlan);
+on(licenseBtn, 'click', handleLicenseRequest);
+on(communityBtn, 'click', handleCommunityPlanSeed);
+on(sliderModeInvestBtn, 'click', () => {
   sliderMode = 'invest';
   updateSliderPreview();
 });
-sliderModeSellBtn.addEventListener('click', () => {
+on(sliderModeSellBtn, 'click', () => {
   sliderMode = 'sell';
   updateSliderPreview();
 });
-investSlider.addEventListener('input', () => {
+on(investSlider, 'input', () => {
   const raw = Number(investSlider.value);
   sliderPercentByMode[sliderMode] = Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
   updateSliderPreview();
 });
-companySelect.addEventListener('change', updateSliderPreview);
-toFullframeBtn.addEventListener('click', () => { frame = 'full'; renderCompanyFrames(); renderFrameVisibility(); });
-toInvestmentBtn.addEventListener('click', () => { frame = 'investment'; updateSliderPreview(); updateInvestmentActionState(); renderFrameVisibility(); });
-toRankingBtn.addEventListener('click', () => { frame = 'ranking'; renderRankingFrame(); renderFrameVisibility(); });
-toNewsBtn.addEventListener('click', () => { frame = 'news'; renderNewsFrame(); renderFrameVisibility(); });
-backFromFullBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
-backFromRankingBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
-backFromInvestmentBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
-backFromNewsBtn.addEventListener('click', () => { frame = 'main'; renderFrameVisibility(); });
-backFromSubBtn.addEventListener('click', () => { frame = 'full'; renderFrameVisibility(); });
-rankingTopCompaniesBtn.addEventListener('click', () => { rankingMode = 'companies'; renderRankingFrame(); });
-rankingRichestBtn.addEventListener('click', () => { rankingMode = 'richest'; renderRankingFrame(); });
-rankingProductsBtn.addEventListener('click', () => { rankingMode = 'products'; renderRankingFrame(); });
-companyFrameList.addEventListener('click', (event) => {
+on(companySelect, 'change', updateSliderPreview);
+on(toFullframeBtn, 'click', () => { frame = 'full'; renderCompanyFrames(); renderFrameVisibility(); });
+on(toInvestmentBtn, 'click', () => { frame = 'investment'; updateSliderPreview(); updateInvestmentActionState(); renderFrameVisibility(); });
+on(toRankingBtn, 'click', () => { frame = 'ranking'; renderRankingFrame(); renderFrameVisibility(); });
+on(toNewsBtn, 'click', () => { frame = 'news'; renderNewsFrame(); renderFrameVisibility(); });
+on(toProfileBtn, 'click', () => { frame = 'profile'; renderProfileFrame(); renderFrameVisibility(); });
+on(toMarketsBtn, 'click', () => { frame = 'markets'; renderMarketsFrame(); renderFrameVisibility(); });
+on(toMyCompanyBtn, 'click', () => { frame = 'myCompany'; renderMyCompanyFrame(); renderFrameVisibility(); });
+on(backFromFullBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromRankingBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromInvestmentBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromNewsBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromSubBtn, 'click', () => { frame = 'full'; renderFrameVisibility(); });
+on(backFromProfileBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromMarketsBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(backFromMyCompanyBtn, 'click', () => { frame = 'main'; renderFrameVisibility(); });
+on(rankingTopCompaniesBtn, 'click', () => { rankingMode = 'companies'; renderRankingFrame(); });
+on(rankingRichestBtn, 'click', () => { rankingMode = 'richest'; renderRankingFrame(); });
+on(rankingCpuBtn, 'click', () => { rankingMode = 'cpu'; renderRankingFrame(); });
+on(rankingGameBtn, 'click', () => { rankingMode = 'game'; renderRankingFrame(); });
+on(rankingComputerBtn, 'click', () => { rankingMode = 'computer'; renderRankingFrame(); });
+on(rankingPhoneBtn, 'click', () => { rankingMode = 'phone'; renderRankingFrame(); });
+on(companyFrameList, 'click', (event) => {
   const target = event.target.closest('[data-company-card]');
   if (!target) return;
   selectedCompanyForDetail = target.getAttribute('data-company-card');
@@ -1005,16 +1342,104 @@ companyFrameList.addEventListener('click', (event) => {
   renderCompanyDetail();
   renderFrameVisibility();
 });
-document.getElementById('reset').addEventListener('click', () => {
+on(myCompanyTabs, 'click', (event) => {
+  const target = event.target.closest('[data-my-company]');
+  if (!target) return;
+  selectedMyCompanyKey = target.getAttribute('data-my-company');
+  renderMyCompanyFrame();
+});
+on(foundCompanyBtn, 'click', () => {
+  const candidate = Object.values(game.plans ?? {}).find((plan) => !plan.isEstablished);
+  if (!candidate) {
+    setStatus('No available company plan to found.', true);
+    return;
+  }
+  const amount = Math.max(10, game.player.cash * 0.35);
+  const changed = applyActionSafely(
+    (state) => investInCompanyPlan(state, state.player.id, candidate.companyKey, amount),
+    { successMessage: `Founding flow started for ${candidate.companyName}.`, errorMessage: 'Found company failed' }
+  );
+  if (changed) {
+    frame = 'myCompany';
+    render();
+  }
+});
+
+on(myCompanyBody, 'click', (event) => {
+  const trigger = event.target.closest('[data-mgmt-action]');
+  if (!trigger || !selectedMyCompanyKey) return;
+  const action = trigger.getAttribute('data-mgmt-action');
+  const company = game.companies[selectedMyCompanyKey];
+  if (!company) return;
+  const statusEl = document.getElementById('myCompanyMgmtStatus');
+  const setMgmtStatus = (text, isError = false) => {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.style.color = isError ? '#b91c1c' : '#166534';
+  };
+
+  const selectEl = document.getElementById('myCompanyUpgradeSelect');
+  const upgradeKey = selectEl?.value;
+  const changed = applyActionSafely((state) => {
+    const target = state.companies[selectedMyCompanyKey];
+    if (!target) return state;
+    if (action === 'upgrade-tech') {
+      if (!upgradeKey || !target.upgrades?.[upgradeKey]) return state;
+      const current = target.upgrades[upgradeKey];
+      const nextValue = upgradeKey === 'lithography' || upgradeKey === 'powerEfficiency'
+        ? Math.max(upgradeKey === 'lithography' ? 5 : 20, current.value + current.step)
+        : current.value + current.step;
+      const cost = Math.max(10, Number(current.baseCost ?? 1000) * 0.1);
+      if (target.research < cost) return state;
+      return {
+        ...state,
+        companies: {
+          ...state.companies,
+          [selectedMyCompanyKey]: {
+            ...target,
+            research: Math.max(0, target.research - cost),
+            upgrades: { ...target.upgrades, [upgradeKey]: { ...current, value: nextValue } },
+            lastRelease: `${target.lastRelease || target.name} • tech tuned`,
+          }
+        }
+      };
+    }
+    if (action === 'ops-push') {
+      return { ...state, companies: { ...state.companies, [selectedMyCompanyKey]: { ...target, boardMood: Math.min(1.5, target.boardMood + 0.05), reputation: Math.min(100, target.reputation + 0.4) } } };
+    }
+    if (action === 'finance-tune') {
+      return { ...state, companies: { ...state.companies, [selectedMyCompanyKey]: { ...target, cash: target.cash + Math.max(5, target.revenuePerDay * 0.2), boardMood: Math.min(1.4, target.boardMood + 0.02) } } };
+    }
+    if (action === 'brand-push') {
+      return { ...state, companies: { ...state.companies, [selectedMyCompanyKey]: { ...target, reputation: Math.min(100, target.reputation + 1.1), marketShare: Math.min(100, target.marketShare + 0.2) } } };
+    }
+    if (action === 'shareholder-pressure') {
+      return { ...state, companies: { ...state.companies, [selectedMyCompanyKey]: { ...target, boardMood: Math.max(0.4, target.boardMood - 0.06), reputation: Math.max(1, target.reputation - 0.15) } } };
+    }
+    return state;
+  }, { errorMessage: 'Management action failed' });
+
+  if (changed) {
+    setMgmtStatus('Management action executed.');
+    renderMyCompanyFrame();
+  } else {
+    setMgmtStatus('Action blocked by role, budget, or company state.', true);
+  }
+});
+on(document.getElementById('reset'), 'click', () => {
   game = createInitialGameState(DEFAULT_PROFILE_DRAFT);
   auto = false;
-  autoBtn.textContent = 'Start Auto';
+  autoBtn.textContent = 'Start';
+  autoBtn.setAttribute('aria-pressed', 'false');
   if (timer) clearInterval(timer);
   timer = null;
   companySelect.innerHTML = '';
   previousSharePrices = {};
+  previousPlayerCash = game.player.cash;
   Object.keys(upgradeBaselineByCompany).forEach((key) => delete upgradeBaselineByCompany[key]);
   Object.keys(rdFundByCompany).forEach((key) => delete rdFundByCompany[key]);
+  Object.keys(companyReleaseState).forEach((key) => delete companyReleaseState[key]);
+  releaseRegistry.splice(0, releaseRegistry.length);
   rankingCache.tick = -1;
   rankingCache.companies = null;
   rankingCache.richest = null;
@@ -1022,15 +1447,17 @@ document.getElementById('reset').addEventListener('click', () => {
   sliderMode = 'invest';
   sliderPercentByMode.invest = 25;
   sliderPercentByMode.sell = 25;
+  debugReport('reset', 'Game reset by user');
   setStatus('Game has been reset.');
   frame = 'main';
   selectedCompanyForDetail = null;
   render();
 });
 
-autoBtn.addEventListener('click', () => {
+on(autoBtn, 'click', () => {
   auto = !auto;
-  autoBtn.textContent = auto ? 'Stop Auto' : 'Start Auto';
+  autoBtn.textContent = auto ? 'Pause' : 'Start';
+  autoBtn.setAttribute('aria-pressed', auto ? 'true' : 'false');
   if (auto) {
     timer = setInterval(() => runTick(1), 200);
   } else if (timer) {

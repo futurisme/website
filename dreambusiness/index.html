@@ -18,29 +18,42 @@
   <body data-fwlb-theme="utility">
     <main class="shell">
       <section id="frameMain" class="frame frame-active">
-        <header class="header">
-          <h1>DreamBusiness</h1>
-          <p>Mainframe • business simulator powered by dream-engine.</p>
+        <header class="header topheader">
+          <div class="topheader-row">
+            <div class="topheader-left">
+              <h1><span class="brand-dream">Dream</span><span class="brand-business">Business</span></h1>
+              <span id="topDate" class="top-date" aria-label="Simulation date">00/01/01</span>
+              <button id="auto" class="topheader-start" aria-pressed="false">Start</button>
+              <span id="topCash" class="top-cash" aria-label="Cash and daily income">💵0 +0</span>
+            </div>
+            <button id="toProfile" class="profile-icon" aria-label="Open profile" title="Profile">◉</button>
+          </div>
           <div class="actions">
-            <button id="tick1">Simulate 1 Tick</button>
-            <button id="tick25">Simulate 25 Tick</button>
-            <button id="auto">Start Auto</button>
             <button id="reset">Reset</button>
             <button id="toInvestment">Investment</button>
             <button id="toRanking">Ranking</button>
             <button id="toFullframe">Companies</button>
             <button id="toNews">News</button>
+            <button id="toMarkets">Markets</button>
           </div>
         </header>
 
         <section class="stats" id="stats"></section>
+        <div class="main-actions">
+          <button id="toMyCompany">My Company</button>
+        </div>
+      </section>
 
-        <section class="grid">
-          <article class="card">
-            <h2>Mainframe Notice</h2>
-            <p>Use News to read 5 major events only, while other fullframes focus on deeper analysis.</p>
-          </article>
-        </section>
+      <section id="frameMyCompany" class="frame">
+        <button id="backFromMyCompany" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>My Company Fullframe</h2>
+          <div id="myCompanyTabs" class="button-row"></div>
+          <div class="button-row">
+            <button id="foundCompanyBtn">Found Company</button>
+          </div>
+          <div id="myCompanyBody" class="company-detail-body"></div>
+        </article>
       </section>
 
       <section id="frameNews" class="frame">
@@ -68,7 +81,10 @@
           <div class="button-row">
             <button id="rankingTopCompanies">Top Companies</button>
             <button id="rankingRichest">Top Richest People</button>
-            <button id="rankingProducts">Product Ranking</button>
+            <button id="rankingCpu">CPU</button>
+            <button id="rankingGame">Game</button>
+            <button id="rankingComputer">Computer</button>
+            <button id="rankingPhone">Phone</button>
           </div>
           <ol id="rankingList" class="ranking-list"></ol>
         </article>
@@ -115,8 +131,25 @@
           <div id="companyDetailBody" class="company-detail-body"></div>
         </article>
       </section>
+
+      <section id="frameMarkets" class="frame">
+        <button id="backFromMarkets" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Markets Fullframe</h2>
+          <div id="marketsBody" class="markets-body"></div>
+        </article>
+      </section>
+
+      <section id="frameProfile" class="frame">
+        <button id="backFromProfile" class="frame-back" aria-label="Back to mainframe">↩</button>
+        <article class="card fullframe">
+          <h2>Player Profile Fullframe</h2>
+          <div id="profileBody" class="profile-body"></div>
+        </article>
+      </section>
     </main>
 
+    <script src="/dreambusiness/dreambusiness-debugger.js"></script>
     <script type="module" src="/dreambusiness/app.js"></script>
   </body>
 </html>

@@ -15,6 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Fadhil Akbar Cariearsa | Generalist & Student of the Craft" />
     <meta name="twitter:description" content="Fadhil Akbar Cariearsa: A trilingual hobbyist generalist in development, writing, cybersecurity, editing, and analysis. A student of the craft." />
+    <meta http-equiv="Permissions-Policy" content="compute-pressure=()" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -79,35 +80,50 @@
               <div class="archives-panel-fill">
                 <div class="image-archives-carousel" aria-label="Image archives carousel">
                   <div class="banner-stack" aria-hidden="true">
-                    <img class="embed-banner-layer layer-far-left" id="image-archives-back-far-left" alt="" loading="lazy" decoding="async" />
-                    <img class="embed-banner-layer layer-left" id="image-archives-back-left" alt="" loading="lazy" decoding="async" />
-                    <img class="embed-banner-layer layer-right" id="image-archives-back-right" alt="" loading="lazy" decoding="async" />
-                    <img class="embed-banner-layer layer-far-right" id="image-archives-back-far-right" alt="" loading="lazy" decoding="async" />
+                    <img class="embed-banner-layer layer-far-left" id="image-archives-back-far-left" alt="" loading="eager" decoding="async" fetchpriority="high" />
+                    <img class="embed-banner-layer layer-left" id="image-archives-back-left" alt="" loading="eager" decoding="async" fetchpriority="high" />
+                    <img class="embed-banner-layer layer-right" id="image-archives-back-right" alt="" loading="eager" decoding="async" fetchpriority="high" />
+                    <img class="embed-banner-layer layer-far-right" id="image-archives-back-far-right" alt="" loading="eager" decoding="async" fetchpriority="high" />
                     <img
                       class="embed-banner layer-main"
                       id="image-archives-main"
                       src="/assets/public/images/portfolio.webp"
                       alt="Image archives preview"
-                      loading="lazy"
+                      loading="eager"
                       decoding="async"
+                      fetchpriority="high"
                     />
                   </div>
                 </div>
               </div>
             </details>
+            <details class="archives-panel" open>
+              <summary>Fadhil AI Generated No-Copyright Music Archives</summary>
+              <div class="archives-panel-fill music-panel-fill">
+                <div class="music-player-slim">
+                  <div class="music-player-custom" id="music-player-custom">
+                    <button id="music-play-toggle" type="button" aria-label="Play" aria-pressed="false">▶</button>
+                    <span id="music-time-label">0:00 / 0:00</span>
+                    <input id="music-progress" type="range" min="0" max="1000" step="1" value="0" />
+                  </div>
+                  <audio id="fadhil-music-player" src="https://audio.jukehost.co.uk/019e1606-064c-727f-bf03-0f007212a347" preload="auto" crossorigin="anonymous"></audio>
+                </div>
+              </div>
+            </details>
 
             <div class="spotify-embed-wrap" aria-label="Spotify playlist embed">
-              <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0XAFNL803fy4ilhHpjCkSp?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+              <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0XAFNL803fy4ilhHpjCkSp?utm_source=generator" width="100%" height="152" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
 
             <details class="archives-panel" open>
               <summary>Asset Archives</summary>
               <div class="archives-panel-fill">
-                <div class="asset-archives-embed-wrap">
+                <div class="asset-archives-embed-wrap" aria-label="Google Drive asset archives embed">
                   <iframe
-                    title="Asset Archives Drive Folder"
-                    src="https://drive.google.com/embeddedfolderview?id=1htmZRQY-JN647ffZ74-t2GCJpPN35w7o#list"
+                    src="https://drive.google.com/embeddedfolderview?id=1htmZRQY-JN647ffZ74-t2GCJpPN35w7o#grid"
+                    title="Google Drive Asset Archives"
                     loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
                   ></iframe>
                 </div>
                 <a class="asset-archives-link" href="https://drive.google.com/drive/folders/1htmZRQY-JN647ffZ74-t2GCJpPN35w7o?hl=ID" target="_blank" rel="noopener noreferrer">Open Asset Archives</a>

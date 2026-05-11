@@ -7,12 +7,12 @@ import {
   normalizeArchiveName,
   searchArchives,
   upsertArchiveMeta,
-} from '/library/fadhilweblib/fadhilwebarchivesframework/runtime.js';
+} from './runtime.js';
 import {
   createFadhilContainer,
   extractFadhilPayload,
   stringifyFadhil,
-} from '/extension/fadhil-format.js';
+} from './fadhil-format.js';
 
 const searchEl = document.getElementById('archive-search');
 const listEl = document.getElementById('archives-list');
@@ -36,7 +36,35 @@ const imageArchivesBackLeftEl = document.getElementById('image-archives-back-lef
 const imageArchivesBackRightEl = document.getElementById('image-archives-back-right');
 const imageArchivesBackFarLeftEl = document.getElementById('image-archives-back-far-left');
 const imageArchivesBackFarRightEl = document.getElementById('image-archives-back-far-right');
-const PLAYLIST_ID = 'PLxFmUU-8D-UbX24xnBaf64-mqoRZjsqdf';
+const fadhilMusicPlayerEl = document.getElementById('fadhil-music-player');
+const musicPlayToggleEl = document.getElementById('music-play-toggle');
+const musicTimeLabelEl = document.getElementById('music-time-label');
+const musicProgressEl = document.getElementById('music-progress');
+const ARCHIVES_MUSIC_URL = 'https://audio.jukehost.co.uk/019e1606-064c-727f-bf03-0f007212a347';
+
+let archivesErrorShown = false;
+function reportArchivesError(kind, message) {
+  if (archivesErrorShown) return;
+  archivesErrorShown = true;
+  const panel = document.createElement('aside');
+  panel.textContent = `archives-error | ${kind}: ${message}`;
+  panel.style.cssText = 'position:fixed;left:10px;right:10px;bottom:10px;z-index:2147483647;background:#22090d;color:#fecaca;border:1px solid #ef4444;border-radius:8px;padding:8px;font:12px/1.3 ui-monospace,monospace;';
+  document.body.appendChild(panel);
+  window.setTimeout(() => {
+    panel.remove();
+    // one-shot: never show/load again after first anomaly report
+    window.removeEventListener('error', onWindowError);
+    window.removeEventListener('unhandledrejection', onUnhandledRejection);
+  }, 2000);
+}
+
+function onWindowError(event) {
+  reportArchivesError('runtime-error', event?.message || 'unknown');
+}
+
+function onUnhandledRejection(event) {
+  reportArchivesError('unhandled-rejection', event?.reason?.message || String(event?.reason || 'unknown'));
+}
 const PRIMARY_PLAYLIST_BANNER = '/assets/public/images/youtube-playlist-banner.avif';
 
 let playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER];
@@ -53,46 +81,18 @@ function candidateThumbs(videoId) {
   ];
 }
 
-function applyBannerWithFallback(imgEl, sources) {
-  if (!imgEl || !sources.length) return;
-  let idx = 0;
-  const setNext = () => {
-    if (idx >= sources.length) return;
-    imgEl.src = sources[idx++];
-  };
-  imgEl.onerror = setNext;
-  setNext();
-}
-
 async function hydratePlaylistBanner() {
   if (!playlistBannerEl) return;
 
   const fallbackImage = '/assets/public/images/portfolio.webp';
   playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER, fallbackImage];
   setPlaylistBanner(0);
-
-  try {
-    const response = await fetch(`https://www.youtube.com/feeds/videos.xml?playlist_id=${PLAYLIST_ID}`, {
-      cache: 'no-store',
-      mode: 'cors',
-    });
-    if (!response.ok) throw new Error(`Feed status ${response.status}`);
-
-    const xmlText = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xmlText, 'application/xml');
-    const firstVideoId = doc.querySelector('entry > video\:videoId, entry > yt\:videoId')?.textContent?.trim();
-
-    if (!firstVideoId) throw new Error('Playlist feed tidak punya videoId.');
-
-    const dynamicThumbs = candidateThumbs(firstVideoId);
-    playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER, ...dynamicThumbs, fallbackImage]
-      .filter((value, idx, arr) => Boolean(value) && arr.indexOf(value) === idx);
-    setPlaylistBanner(0);
-  } catch (error) {
-    console.warn('Playlist banner fallback used:', error);
-    setPlaylistBanner(0);
-  }
+  // CORS-safe: skip direct YouTube feed fetch in browser static context.
+  // Keep deterministic local/thumbnail gallery to avoid console errors and failed requests.
+  const staticThumbs = candidateThumbs('dQw4w9WgXcQ');
+  playlistBannerGallery = [PRIMARY_PLAYLIST_BANNER, ...staticThumbs, fallbackImage]
+    .filter((value, idx, arr) => Boolean(value) && arr.indexOf(value) === idx);
+  setPlaylistBanner(0);
 }
 
 
@@ -164,16 +164,58 @@ const IMAGE_ARCHIVES_GALLERY = [
   '/assets/public/images/mindmapmaker.webp'
 ];
 let imageArchivesIndex = 0;
+let validatedImageArchivesGallery = [...IMAGE_ARCHIVES_GALLERY];
+const imagePrewarmPromises = new Map();
+
+function validateImageSource(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+async function hydrateImageArchivesGallery() {
+  const checked = await Promise.all(IMAGE_ARCHIVES_GALLERY.map((src) => validateImageSource(src)));
+  const valid = checked.filter(Boolean);
+  validatedImageArchivesGallery = valid.length ? valid : ['/assets/public/images/portfolio.webp'];
+  await Promise.all(validatedImageArchivesGallery.map((src) => prewarmImageDecode(src)));
+}
+
+function prewarmImageDecode(src) {
+  if (!src) return Promise.resolve();
+  const existing = imagePrewarmPromises.get(src);
+  if (existing) return existing;
+  const pending = new Promise((resolve) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = async () => {
+      try {
+        if (typeof img.decode === 'function') {
+          await img.decode();
+        }
+      } catch (_) {
+        // noop: decode may reject if browser already has decoded frame.
+      }
+      resolve();
+    };
+    img.onerror = () => resolve();
+    img.src = src;
+  });
+  imagePrewarmPromises.set(src, pending);
+  return pending;
+}
 
 function setImageArchivesSlide(index) {
-  if (!imageArchivesMainEl || !IMAGE_ARCHIVES_GALLERY.length) return;
-  imageArchivesIndex = (index + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length;
+  if (!imageArchivesMainEl || !validatedImageArchivesGallery.length) return;
+  imageArchivesIndex = (index + validatedImageArchivesGallery.length) % validatedImageArchivesGallery.length;
 
-  const mainSrc = IMAGE_ARCHIVES_GALLERY[imageArchivesIndex];
-  const leftSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex - 1 + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length];
-  const rightSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex + 1) % IMAGE_ARCHIVES_GALLERY.length];
-  const farLeftSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex - 2 + IMAGE_ARCHIVES_GALLERY.length) % IMAGE_ARCHIVES_GALLERY.length];
-  const farRightSrc = IMAGE_ARCHIVES_GALLERY[(imageArchivesIndex + 2) % IMAGE_ARCHIVES_GALLERY.length];
+  const mainSrc = validatedImageArchivesGallery[imageArchivesIndex];
+  const leftSrc = validatedImageArchivesGallery[(imageArchivesIndex - 1 + validatedImageArchivesGallery.length) % validatedImageArchivesGallery.length];
+  const rightSrc = validatedImageArchivesGallery[(imageArchivesIndex + 1) % validatedImageArchivesGallery.length];
+  const farLeftSrc = validatedImageArchivesGallery[(imageArchivesIndex - 2 + validatedImageArchivesGallery.length) % validatedImageArchivesGallery.length];
+  const farRightSrc = validatedImageArchivesGallery[(imageArchivesIndex + 2) % validatedImageArchivesGallery.length];
 
   imageArchivesMainEl.src = mainSrc;
   if (imageArchivesBackLeftEl) imageArchivesBackLeftEl.src = leftSrc;
@@ -199,8 +241,10 @@ function stopImageArchivesCarousel() {
 
 function setupImageArchivesCarousel() {
   if (!imageArchivesMainEl) return;
-  setImageArchivesSlide(0);
-  startImageArchivesCarousel();
+  hydrateImageArchivesGallery().then(() => {
+    setImageArchivesSlide(0);
+    startImageArchivesCarousel();
+  });
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -209,6 +253,109 @@ function setupImageArchivesCarousel() {
     }
     startImageArchivesCarousel();
   }, { passive: true });
+}
+
+function setupMusicPlayer() {
+  if (!fadhilMusicPlayerEl) return;
+  fadhilMusicPlayerEl.src = ARCHIVES_MUSIC_URL;
+  fadhilMusicPlayerEl.volume = 1;
+  fadhilMusicPlayerEl.preload = 'auto';
+  fadhilMusicPlayerEl.crossOrigin = 'anonymous';
+  const buildFallbackTrack = () => {
+    console.warn('Music player source failed to load, generating local fallback track.');
+    const sampleRate = 44100;
+    const durationSec = 45;
+    const channels = 1;
+    const totalSamples = sampleRate * durationSec;
+    const dataSize = totalSamples * 2;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+    const writeString = (offset, text) => { for (let i = 0; i < text.length; i += 1) view.setUint8(offset + i, text.charCodeAt(i)); };
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, channels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * channels * 2, true);
+    view.setUint16(32, channels * 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, dataSize, true);
+    let offset = 44;
+    for (let i = 0; i < totalSamples; i += 1) {
+      const t = i / sampleRate;
+      const envelope = Math.max(0.2, 1 - (t / durationSec));
+      const sample = Math.sin(2 * Math.PI * 220 * t) * 0.22 * envelope + Math.sin(2 * Math.PI * 330 * t) * 0.12 * envelope;
+      const intSample = Math.max(-1, Math.min(1, sample)) * 32767;
+      view.setInt16(offset, intSample, true);
+      offset += 2;
+    }
+    const blobUrl = URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+    fadhilMusicPlayerEl.src = blobUrl;
+    fadhilMusicPlayerEl.load();
+    return blobUrl;
+  };
+
+  fadhilMusicPlayerEl.addEventListener('error', () => {
+    buildFallbackTrack();
+    reportArchivesError('music-load-fallback', 'Primary source failed, fallback track generated.');
+  });
+
+  fadhilMusicPlayerEl.addEventListener('play', () => { archivesErrorShown = false; });
+
+  const formatTime = (seconds) => {
+    const safe = Number.isFinite(seconds) && seconds >= 0 ? seconds : 0;
+    const mins = Math.floor(safe / 60);
+    const secs = Math.floor(safe % 60);
+    return `${mins}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const syncMusicUI = () => {
+    const duration = Number.isFinite(fadhilMusicPlayerEl.duration) ? fadhilMusicPlayerEl.duration : 0;
+    const current = Number.isFinite(fadhilMusicPlayerEl.currentTime) ? fadhilMusicPlayerEl.currentTime : 0;
+    if (musicTimeLabelEl) {
+      musicTimeLabelEl.textContent = `${formatTime(current)} / ${formatTime(duration)}`;
+    }
+    if (musicProgressEl) {
+      const nextValue = duration > 0 ? Math.round((current / duration) * 1000) : 0;
+      musicProgressEl.value = String(nextValue);
+    }
+    if (musicPlayToggleEl) {
+      const isPlaying = !fadhilMusicPlayerEl.paused;
+      musicPlayToggleEl.textContent = isPlaying ? '❚❚' : '▶';
+      musicPlayToggleEl.setAttribute('aria-label', isPlaying ? 'Pause' : 'Play');
+      musicPlayToggleEl.setAttribute('aria-pressed', String(isPlaying));
+    }
+  };
+
+  musicPlayToggleEl?.addEventListener('click', async () => {
+    try {
+      if (fadhilMusicPlayerEl.paused) {
+        await fadhilMusicPlayerEl.play();
+      } else {
+        fadhilMusicPlayerEl.pause();
+      }
+      syncMusicUI();
+    } catch (error) {
+      reportArchivesError('music-play-toggle', error instanceof Error ? error.message : String(error));
+    }
+  });
+
+  musicProgressEl?.addEventListener('input', () => {
+    const duration = Number.isFinite(fadhilMusicPlayerEl.duration) ? fadhilMusicPlayerEl.duration : 0;
+    if (duration <= 0) return;
+    const ratio = Number(musicProgressEl.value || 0) / 1000;
+    fadhilMusicPlayerEl.currentTime = duration * Math.max(0, Math.min(1, ratio));
+    syncMusicUI();
+  });
+
+  ['loadedmetadata', 'timeupdate', 'durationchange', 'play', 'pause', 'ended'].forEach((type) => {
+    fadhilMusicPlayerEl.addEventListener(type, syncMusicUI, { passive: true });
+  });
+  syncMusicUI();
 }
 
 
@@ -454,3 +601,6 @@ hydratePlaylistBanner();
 setupInteractionGuards();
 setupImageArchivesCarousel();
 setupProceduralImageLoad();
+setupMusicPlayer();
+window.addEventListener('error', onWindowError);
+window.addEventListener('unhandledrejection', onUnhandledRejection);

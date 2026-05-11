@@ -63,6 +63,19 @@ STATIC_AUDIT_EXCLUDED_GLOBS = (
     '**/*.test.*',
     '**/*-test.*',
 )
+LOC_EXCLUDED_DIR_PREFIXES = (
+    '.git/',
+    'node_modules/',
+    'dist/',
+    'build/',
+    '.next/',
+)
+TEXT_LIKE_EXTENSIONS = {
+    '.py', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx',
+    '.css', '.scss', '.sass', '.less',
+    '.html', '.htm', '.json', '.jsonc', '.xml', '.yml', '.yaml', '.toml',
+    '.sh', '.bash', '.zsh', '.ps1', '.sql', '.txt', '.svg',
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -84,8 +97,8 @@ def is_dynamic_route(src: str) -> bool:
     return bool(re.search(r'\((?:\.\*|\[0-9\]\+|\[\^\)\]\+)\)|\$\d+', src))
 
 
-def collect_paths(vercel_path: Path) -> list[str]:
-    data = json.loads(vercel_path.read_text(encoding='utf-8'))
+def collect_paths(config_data: dict[str, Any] | None = None) -> list[str]:
+    data = config_data or {}
     routes = data.get('routes', [])
     paths = {'/'}
 
@@ -106,6 +119,7 @@ def collect_paths(vercel_path: Path) -> list[str]:
         paths.add(candidate)
 
     # Dynamic route smoke samples.
+    paths.update({'/home', '/archives', '/shareideas', '/mindmapmaker', '/books', '/daily-streak', '/hype', '/dreambusiness', '/rpg'})
     paths.update({'/mindmapmaker/editor/1', '/shareideas/page/1', '/books/editor'})
     return sorted(paths)
 
@@ -431,6 +445,8 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     vercel_cfg = report['vercel_target_audit']
     crawl = report['crawl_support_audit']
     local_crawl = report['local_crawl_audit']
+    loc = report['loc_audit']
+    deprecated = report['deprecated_code_audit']
 
     lines = [
         '# Complete Audit — fadhil.dev',
@@ -452,7 +468,10 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
         f"- Missing twitter:card: {domain['summary']['missing_twitter_card_count']}",
         f"- Missing JSON-LD: {domain['summary']['missing_json_ld_count']}",
         f"- Duplicate file groups (all): {summary['duplicate_groups_total']}",
+        f"- Total LOC (repository): {loc['summary']['total_lines']}",
+        f"- Code LOC (repository): {loc['summary']['code_lines']}",
         f"- Potential unused static files: {static['summary']['potential_unused_files']}",
+        f"- Deprecated pattern hits: {deprecated['summary']['total_hits']}",
         f"- Missing security headers (CSP/HSTS/XCTO/Referrer): {domain['summary']['missing_security_headers_count']}",
         f"- Avg response time (ms): {domain['summary']['avg_response_time_ms']}",
         f"- P95 response time (ms): {domain['summary']['p95_response_time_ms']}",
@@ -587,7 +606,131 @@ def build_markdown(report: dict[str, Any], top_duplicates: int) -> str:
     for note in static['notes']:
         lines.append(f'- {note}')
 
+    lines.extend([
+        '',
+        '## LOC Audit (Whole Repository)',
+        '',
+        f"- Tracked files scanned: {loc['summary']['tracked_files_scanned']}",
+        f"- Total lines: {loc['summary']['total_lines']}",
+        f"- Code lines: {loc['summary']['code_lines']}",
+        f"- Blank lines: {loc['summary']['blank_lines']}",
+        f"- Comment lines: {loc['summary']['comment_lines']}",
+        '',
+        '| Extension | Files | Total | Code | Blank | Comment |',
+        '|---|---:|---:|---:|---:|---:|',
+    ])
+    for ext, item in loc['by_extension'].items():
+        lines.append(f"| `{ext}` | {item['files']} | {item['total']} | {item['code']} | {item['blank']} | {item['comment']} |")
+
+    lines.extend([
+        '',
+        '## Deprecated Code Audit',
+        '',
+        f"- Total pattern hits: {deprecated['summary']['total_hits']}",
+        f"- Files with hits: {deprecated['summary']['files_with_hits']}",
+        '',
+        '| Pattern | Hits |',
+        '|---|---:|',
+    ])
+    for pattern, hits in deprecated['summary']['hits_by_pattern'].items():
+        lines.append(f'| `{pattern}` | {hits} |')
+
+    if deprecated['hits']:
+        lines.extend(['', '| File | Line | Pattern | Snippet |', '|---|---:|---|---|'])
+        for hit in deprecated['hits']:
+            lines.append(f"| `{hit['path']}` | {hit['line']} | `{hit['pattern']}` | `{hit['snippet']}` |")
+
     return '\n'.join(lines) + '\n'
+
+
+def is_loc_eligible(rel: str) -> bool:
+    return not any(rel.startswith(prefix) for prefix in LOC_EXCLUDED_DIR_PREFIXES)
+
+
+def count_lines_for_file(text: str, suffix: str) -> dict[str, int]:
+    total = 0
+    blank = 0
+    comment = 0
+    line_comment_markers = ('#', '//', '--')
+    block_comment_like = ('/*', '*', '*/', '<!--', '-->')
+    for raw in text.splitlines():
+        total += 1
+        stripped = raw.strip()
+        if not stripped:
+            blank += 1
+            continue
+        if stripped.startswith(line_comment_markers) or stripped.startswith(block_comment_like):
+            comment += 1
+    code = max(total - blank - comment, 0)
+    return {'total': total, 'blank': blank, 'comment': comment, 'code': code}
+
+
+def run_loc_audit(root: Path) -> dict[str, Any]:
+    files = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
+    summary = {'tracked_files_scanned': 0, 'total_lines': 0, 'blank_lines': 0, 'comment_lines': 0, 'code_lines': 0}
+    by_extension: dict[str, dict[str, int]] = defaultdict(lambda: {'files': 0, 'total': 0, 'blank': 0, 'comment': 0, 'code': 0})
+
+    for rel in files:
+        if not is_loc_eligible(rel):
+            continue
+        suffix = Path(rel).suffix.lower() or '[no-ext]'
+        if suffix not in TEXT_LIKE_EXTENSIONS and suffix != '[no-ext]':
+            continue
+        text = safe_read_text(root / rel)
+        if text is None:
+            continue
+        counts = count_lines_for_file(text, suffix)
+        summary['tracked_files_scanned'] += 1
+        summary['total_lines'] += counts['total']
+        summary['blank_lines'] += counts['blank']
+        summary['comment_lines'] += counts['comment']
+        summary['code_lines'] += counts['code']
+        ext_bucket = by_extension[suffix]
+        ext_bucket['files'] += 1
+        ext_bucket['total'] += counts['total']
+        ext_bucket['blank'] += counts['blank']
+        ext_bucket['comment'] += counts['comment']
+        ext_bucket['code'] += counts['code']
+
+    return {'summary': summary, 'by_extension': dict(sorted(by_extension.items(), key=lambda kv: kv[0]))}
+
+
+def run_deprecated_code_audit(root: Path, max_hits: int = 400) -> dict[str, Any]:
+    patterns = {
+        'var-declaration': re.compile(r'^\s*var\s+[A-Za-z_$]', re.M),
+        'document.write': re.compile(r'\bdocument\.write\s*\('),
+        'escape-unescape': re.compile(r'\b(?:escape|unescape)\s*\('),
+        'jquery-legacy': re.compile(r'jquery(?:[-.]1|[-.]2)', re.I),
+        'html-font-center-marquee': re.compile(r'<(font|center|marquee)\b', re.I),
+    }
+    files = subprocess.check_output(['git', 'ls-files'], cwd=root, text=True).splitlines()
+    hits = []
+    hits_by_pattern: dict[str, int] = defaultdict(int)
+    files_with_hits = set()
+
+    for rel in files:
+        if not is_loc_eligible(rel):
+            continue
+        text = safe_read_text(root / rel)
+        if text is None:
+            continue
+        lines = text.splitlines()
+        for idx, line in enumerate(lines, start=1):
+            for name, regex in patterns.items():
+                if regex.search(line):
+                    files_with_hits.add(rel)
+                    hits_by_pattern[name] += 1
+                    if len(hits) < max_hits:
+                        hits.append({'path': rel, 'line': idx, 'pattern': name, 'snippet': line.strip()[:160]})
+
+    return {
+        'summary': {
+            'total_hits': int(sum(hits_by_pattern.values())),
+            'files_with_hits': len(files_with_hits),
+            'hits_by_pattern': dict(sorted(hits_by_pattern.items())),
+        },
+        'hits': hits,
+    }
 
 
 def audit_crawl_support(base_url: str, timeout: int, audited_paths: list[str]) -> dict[str, Any]:
@@ -670,10 +813,11 @@ def audit_local_crawl_assets(root: Path, audited_paths: list[str]) -> dict[str, 
 def main() -> None:
     args = parse_args()
     root = Path(__file__).resolve().parents[1]
-    vercel_data = json.loads((root / 'vercel.json').read_text(encoding='utf-8'))
+    vercel_path = root / 'vercel.json'
+    vercel_data = json.loads(vercel_path.read_text(encoding='utf-8')) if vercel_path.exists() else {'routes': [], 'builds': []}
 
     started = time.time()
-    paths = collect_paths(root / 'vercel.json')
+    paths = collect_paths(vercel_data)
     domain_results = [fetch_path(args.base_url, path, args.timeout, args.max_body_bytes) for path in paths]
 
     duplicate_analysis, duplicate_groups_total = find_duplicate_files(root, args.top_duplicate_groups)
@@ -681,6 +825,8 @@ def main() -> None:
     vercel_target_audit = audit_vercel_targets(root, vercel_data)
     crawl_support_audit = audit_crawl_support(args.base_url, args.timeout, paths)
     local_crawl_audit = audit_local_crawl_assets(root, paths)
+    loc_audit = run_loc_audit(root)
+    deprecated_code_audit = run_deprecated_code_audit(root)
 
     successful_rows = [row for row in domain_results if row.get('status') == 200]
     response_times = [float(row.get('time_ms', 0.0)) for row in domain_results if isinstance(row.get('time_ms'), (int, float))]
@@ -722,6 +868,8 @@ def main() -> None:
         'vercel_target_audit': vercel_target_audit,
         'crawl_support_audit': crawl_support_audit,
         'local_crawl_audit': local_crawl_audit,
+        'loc_audit': loc_audit,
+        'deprecated_code_audit': deprecated_code_audit,
     }
 
     out_json = root / 'reports' / 'complete-audit.json'

@@ -126,8 +126,19 @@ function withPerfHeaders(response, pathname) {
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   const isHtml = pathname.endsWith('.html') || !pathname.includes('.');
   const isAsset = /\.(css|js|mjs|png|jpg|jpeg|webp|avif|svg|woff2?|ico|txt|xml)$/i.test(pathname);
-  if (isHtml) h.set('Cache-Control', 'public, max-age=0, must-revalidate');
-  else if (isAsset) h.set('Cache-Control', 'public, max-age=31536000, immutable');
+  const filename = pathname.split('/').pop() || '';
+  const hasContentHash = /(?:^|[.\-_])[a-f0-9]{8,}(?:[.\-_]|$)/i.test(filename);
+  if (isHtml) {
+    // Always revalidate documents so refresh/open-tab shows latest deploy without hard refresh.
+    // Keep edge fast via short shared cache + stale-while-revalidate.
+    h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300');
+  } else if (isAsset && hasContentHash) {
+    // Long browser caching only for fingerprinted assets.
+    h.set('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (isAsset) {
+    // Non-fingerprinted assets must revalidate to avoid stale copies after deploys.
+    h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=604800');
+  }
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers: h });
 }
 

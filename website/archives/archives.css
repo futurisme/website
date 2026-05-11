@@ -493,6 +493,49 @@ label { display:block; margin-bottom:6px; color:#bfdbfe; }
   overflow: hidden;
 }
 
+.music-panel-fill {
+  padding: 6px 8px;
+}
+
+.music-player-slim {
+  width: min(560px, 100%);
+  display: grid;
+  gap: 6px;
+  margin: 0 auto;
+}
+
+.music-player-custom {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+#music-play-toggle {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #0b57d0;
+  border-radius: 10px;
+  background: #02133a;
+  color: #f8fafc;
+  cursor: pointer;
+}
+
+#music-time-label {
+  color: #ffe4cc;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#music-progress {
+  width: 100%;
+}
+
+.music-player-slim audio {
+  display: none;
+}
+
 
 .image-archives-carousel {
   width: 100%;
