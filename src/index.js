@@ -146,6 +146,7 @@ function ensureSeoHtml(html, pathname) {
 async function withPerfHeaders(response, pathname) {
   const h = new Headers(response.headers);
   h.set('X-Content-Type-Options', 'nosniff');
+  h.set('Vary', 'Accept-Encoding');
   h.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   h.set('Content-Security-Policy', "default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; media-src 'self' https: data: blob:; frame-src https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'");
   h.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
@@ -156,13 +157,13 @@ async function withPerfHeaders(response, pathname) {
   if (isHtml) {
     // Always revalidate documents so refresh/open-tab shows latest deploy without hard refresh.
     // Keep edge fast via short shared cache + stale-while-revalidate.
-    h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=60, stale-while-revalidate=300');
+    h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=120, stale-while-revalidate=600, stale-if-error=86400');
   } else if (isAsset && hasContentHash) {
     // Long browser caching only for fingerprinted assets.
     h.set('Cache-Control', 'public, max-age=31536000, immutable');
   } else if (isAsset) {
     // Non-fingerprinted assets must revalidate to avoid stale copies after deploys.
-    h.set('Cache-Control', 'public, max-age=0, must-revalidate, s-maxage=86400, stale-while-revalidate=604800');
+    h.set('Cache-Control', 'public, max-age=3600, s-maxage=2592000, stale-while-revalidate=604800, stale-if-error=604800');
   }
   const shouldRewriteHtml = isHtml && (pathname === '/website/portfolio/index.html' || pathname === '/website/daily-streak/index.html' || pathname === '/website/website/mindmapmaker/editor/index.html');
   if (shouldRewriteHtml) {
