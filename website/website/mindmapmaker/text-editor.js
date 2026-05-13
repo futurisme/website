@@ -11,7 +11,7 @@ function parseAdvanced(text){
   const nodes=[{id:1,title:'Root',x:460,y:220,color:'#111827'}], links=[]; let id=2;
   let currentParent='Root'; let siblingAnchor='Root';
   const idx=new Map([['root',1]]); const lvlCount=[0,0,0,0,0,0];
-  const getOrCreate=(title,level,parentId,color='#1f2937')=>{const key=`${parentId}:${title.toLowerCase()}`; if(idx.has(key)) return idx.get(key); lvlCount[level]=(lvlCount[level]||0)+1; const nx=180+lvlCount[level]*210, ny=140+level*110; nodes.push({id,title,x:nx,y:ny,color}); idx.set(key,id); links.push({from:parentId,to:id}); return id++;};
+  const getOrCreate=(title,level,parentId,color='#1f2937')=>{const key=`${parentId}:${title.toLowerCase()}`; if(idx.has(key)) return idx.get(key); lvlCount[level]=(lvlCount[level]||0)+1; const nx=40+lvlCount[level]*190, ny=40+level*110; nodes.push({id,title,x:nx,y:ny,color}); idx.set(key,id); links.push({from:parentId,to:id}); return id++;};
   for(const raw of lines){
     const colorMatch=raw.match(/color:\s*(#[0-9a-f]{3,8})/i); const color=colorMatch?.[1]||'#1f2937';
     const line=raw.replace(/color:\s*#[0-9a-f]{3,8}/ig,'').trim();
@@ -25,17 +25,12 @@ function parseAdvanced(text){
 }
 
 function drawPreview(snapshot){
-  const rect=preview.getBoundingClientRect(),dpr=devicePixelRatio||1,w=rect.width|0,h=rect.height|0; preview.width=w*dpr; preview.height=h*dpr;
+  const dpr=devicePixelRatio||1,w=1400,h=900; preview.width=w*dpr; preview.height=h*dpr;
   const c=preview.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#ffffff'; c.fillRect(0,0,w,h);
   c.strokeStyle='rgba(37,99,235,.22)'; for(let x=0;x<w;x+=42){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=0;y<h;y+=42){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();}
 
   const nodes = snapshot.nodes || []; if(!nodes.length) return;
-  const minX=Math.min(...nodes.map(n=>n.x)), maxX=Math.max(...nodes.map(n=>n.x+150));
-  const minY=Math.min(...nodes.map(n=>n.y)), maxY=Math.max(...nodes.map(n=>n.y+42));
-  const pad=24, bw=Math.max(1,maxX-minX), bh=Math.max(1,maxY-minY);
-  const scale=Math.min((w-pad*2)/bw,(h-pad*2)/bh,1);
-  const ox=pad-minX*scale, oy=pad-minY*scale;
-  const tx=(x)=>x*scale+ox, ty=(y)=>y*scale+oy;
+  const scale=1; const tx=(x)=>x; const ty=(y)=>y;
 
   const byId=new Map(nodes.map(n=>[n.id,n])); c.strokeStyle='#0f766e'; c.lineWidth=Math.max(1,1.4*scale);
   for(const l of snapshot.links||[]){const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)continue; c.beginPath(); c.moveTo(tx(a.x+75),ty(a.y+21)); c.bezierCurveTo(tx(a.x+130),ty(a.y+21),tx(b.x+20),ty(b.y+21),tx(b.x+75),ty(b.y+21)); c.stroke();}
