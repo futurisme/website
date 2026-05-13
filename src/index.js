@@ -33,6 +33,15 @@ async function handleMindmap(req, env) { /* unchanged */
   return json({ ok: false, error: 'Method not allowed.' }, 405);
 }
 
+
+function handleMindmapAuthConfig(req, env) {
+  if (req.method !== 'GET') return json({ ok: false, error: 'Method not allowed.' }, 405);
+  const supabaseUrl = env.SUPABASE_URL || env.PUBLIC_SUPABASE_URL || '';
+  const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.PUBLIC_SUPABASE_ANON_KEY || '';
+  if (!supabaseUrl || !supabaseAnonKey) return json({ ok: false, error: 'Supabase auth config is missing on the server.' }, 503);
+  return json({ ok: true, supabaseUrl, supabaseAnonKey });
+}
+
 const ROUTES = new Map([
   ['/', '/website/portfolio/index.html'],
   ['/home', '/website/home/index.html'],
@@ -179,6 +188,7 @@ export default {
     try {
       const u = new URL(req.url);
       if (u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req, env);
+      if (u.pathname === '/api/mindmapmaker/auth-config') return handleMindmapAuthConfig(req, env);
       if (u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req, env);
       const r = mapPath(u.pathname);
       if (r.type === 'redirect') return Response.redirect(`${u.origin}${appendSearch(r.value, u.search)}`, 308);
