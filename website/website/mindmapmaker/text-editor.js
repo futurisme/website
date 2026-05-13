@@ -5,9 +5,9 @@ const GRID_SIZE=10, GRID_UNITS=120; let currentSnapshot = null; let drag = null;
 
 function fixToken(v){const k=v.toLowerCase(); return TYPO.get(k)||k;}
 function normalizeText(t){return t.split(/\s+/).map(fixToken).join(' ').replace(/\s{2,}/g,' ').trim();}
-function aiNormalizeLine(line){let s=normalizeText(line.trim()); if(!s) return ''; s=s.replace(/[—–-]+/g,'>').replace(/\s*>\s*/g,' > ').replace(/\s*:\s*/g,': '); if(!/(parent:|child:|sibling:|node:)/.test(s) && !s.includes('>')) s=`child: ${s}`; return s;}
+function aiNormalizeLine(line){let s=normalizeText(line.trim()); s=s.replace(/^\d+\.\s*/, ''); if(!s) return ''; s=s.replace(/[—–-]+/g,'>').replace(/\s*>\s*/g,' > ').replace(/\s*:\s*/g,': '); if(!/(parent:|child:|sibling:|node:)/.test(s) && !s.includes('>')) s=`child: ${s}`; return s;}
 
-function parseXY(text){const m=String(text).match(/x\s*:\s*(-?\d+(?:\.\d+)?)\s*,?\s*y\s*:\s*(-?\d+(?:\.\d+)?)/i); return m?{x:Number(m[1]),y:Number(m[2])}:null;}
+function parseXY(text){const m=String(text).match(/x\s*:\s*(-?\d+(?:\.\d+)?)\s*[,;]?\s*y\s*:\s*(-?\d+(?:\.\d+)?)/i); return m?{x:Number(m[1]),y:Number(m[2])}:null;}
 function parseColor(text){const m=String(text).match(/color\s*:\s*(#[0-9a-f]{3,8})/i); return m?m[1]:'#1f2937';}
 
 function parseAdvanced(text){
@@ -59,7 +59,7 @@ preview.addEventListener('pointerup',()=>{ if(!drag||!currentSnapshot) return; d
 
 function saveSnapshot(s){ localStorage.setItem(`mindmap:${mapId}`, JSON.stringify(s)); }
 document.getElementById('autofix').onclick=()=>{ source.value=source.value.split(/\r?\n/).map(aiNormalizeLine).filter(Boolean).join('\n'); statusEl.textContent='AI auto-fix: typo + struktur + format koordinat.'; };
-document.getElementById('render').onclick=()=>{ currentSnapshot=parseAdvanced(source.value); drawPreview(currentSnapshot); source.value=snapshotToText(currentSnapshot); statusEl.textContent=`Preview: ${currentSnapshot.nodes.length} nodes, ${currentSnapshot.links.length} links.`; };
+document.getElementById('render').onclick=()=>{ currentSnapshot=parseAdvanced(source.value); drawPreview(currentSnapshot); source.value=snapshotToText(currentSnapshot); statusEl.textContent=`Preview updated: ${currentSnapshot.nodes.length} nodes, ${currentSnapshot.links.length} links.`; };
 document.getElementById('submit').onclick=()=>{ const snap=parseAdvanced(source.value); saveSnapshot(snap); location.href=`/mindmapmaker/edit/${mapId}`; };
 window.addEventListener('resize',()=>{ if(currentSnapshot) drawPreview(currentSnapshot); });
 document.getElementById('render').click();
