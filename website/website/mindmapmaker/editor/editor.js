@@ -211,14 +211,41 @@ function syncToolbarButtons() {
   }
 }
 
-function save() {
-  if (!Number.isFinite(engine.version) || engine.version === lastSavedVersion) {
+let remoteSaveInFlight = false;
+let remoteSaveQueued = false;
+
+async function pushRemoteSnapshot(snapshot, version) {
+  if (remoteSaveInFlight) {
+    remoteSaveQueued = true;
     return;
   }
-  const didSave = saveSnapshot(safeMapId, engine.getSnapshot());
-  if (didSave) {
-    lastSavedVersion = engine.version;
+  remoteSaveInFlight = true;
+  try {
+    await fetch(`/api/mindmapmaker?id=${safeMapId}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ data: snapshot, expectedVersion: version - 1 }),
+      keepalive: true,
+    });
+    setRemoteOnline(true);
+  } catch {
+    setRemoteOnline(false);
+  } finally {
+    remoteSaveInFlight = false;
+    if (remoteSaveQueued) {
+      remoteSaveQueued = false;
+      void pushRemoteSnapshot(engine.getSnapshot(), engine.version);
+    }
   }
+}
+
+function save() {
+  if (!Number.isFinite(engine.version) || engine.version === lastSavedVersion) return;
+  const snapshot = engine.getSnapshot();
+  const didSave = saveSnapshot(safeMapId, snapshot);
+  if (!didSave) return;
+  lastSavedVersion = engine.version;
+  void pushRemoteSnapshot(snapshot, engine.version);
 }
 
 async function hydrateFromRemote() {
