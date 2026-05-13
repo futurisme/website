@@ -35,3 +35,17 @@ function topKeywords(words, limit) {
   for (const w of words) m.set(w, (m.get(w) || 0) + 1);
   return [...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0, limit).map(([w])=>w);
 }
+
+
+export function classifyContributionActivity(events) {
+  const result = { node_add: 0, text_add: 0, link_add: 0, other: 0 };
+  for (const ev of Array.isArray(events) ? events : []) {
+    const t = String(ev?.type || 'other');
+    const delta = Math.max(1, Number(ev?.delta || 1));
+    if (t === 'node_add') result.node_add += delta;
+    else if (t === 'text_add') result.text_add += delta;
+    else if (t === 'link_add') result.link_add += delta;
+    else result.other += delta;
+  }
+  return result;
+}
