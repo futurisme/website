@@ -116,13 +116,18 @@ function mappedAsset(pathname) {
   if (ROUTES.has(pathname)) return ROUTES.get(pathname);
   if (/^\/shareideas\/page\/[^/]+$/.test(pathname)) return '/website/shareideas/workspace.html';
   if (/^\/archives\/[^/.]+$/.test(pathname)) return '/website/archives/workspace.html';
-  if (/^\/mindmapmaker\/editor(?:\/[^/]+)?$/.test(pathname)) return '/website/website/mindmapmaker/editor/index.html';
+  if (/^\/mindmapmaker\/(?:edit|editor)(?:\/[^/]+)?$/.test(pathname)) return '/website/website/mindmapmaker/editor/index.html';
   if (/^\/books\/editor(?:\/[^/]+)?$/.test(pathname)) return '/website/website/books/editor/index.html';
   for (const [from, to] of STATIC_PREFIXES) if (pathname.startsWith(from)) return to + pathname.slice(from.length);
   return ROOT_ASSETS[pathname] || null;
 }
 
 function mapPath(pathname) {
+
+  if (/^\/mindmapmaker\/editor(?:\/|$)/.test(pathname)) {
+    const suffix = pathname.slice('/mindmapmaker/editor'.length);
+    return { type: 'redirect', value: `/mindmapmaker/edit${suffix || ''}` };
+  }
   const canonical = canonicalPath(pathname);
   if (canonical) return { type: 'redirect', value: canonical };
   const asset = mappedAsset(normalizePath(pathname));

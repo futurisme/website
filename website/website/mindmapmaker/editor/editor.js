@@ -27,7 +27,7 @@ const undoBtn = document.getElementById('undo-node');
 const redoBtn = document.getElementById('redo-node');
 const syncStatusDotEl = document.getElementById('sync-status-dot');
 
-const mapIdMatch = window.location.pathname.match(/\/(mindmapmaker\/)?editor\/(\d+)/);
+const mapIdMatch = window.location.pathname.match(/\/(mindmapmaker\/)?(?:edit|editor)\/(\d+)/);
 const safeMapId = Number.isInteger(Number(mapIdMatch?.[2])) && Number(mapIdMatch[2]) > 0 ? Number(mapIdMatch[2]) : 1;
 mapIdEl.textContent = String(safeMapId);
 
