@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const mapIdEl = $('map-id'), statusEl = $('status'), nodesLayer = $('nodes'), edgesLayer = $('edges'), viewport = $('viewport');
 const gridCanvas = $('grid-canvas'), addNodeBtn = $('add-node'), removeNodeBtn = $('remove-node'), connectBtn = $('connect-node');
 const saveCsvBtn = $('save-csv'), saveFdhlBtn = $('save-fdhl'), loadBtn = $('load-map'), loadInput = $('load-input');
-const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot');
+const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot'), hardRefreshBtn = $('hard-refresh');
 const m = location.pathname.match(/\/mindmapmaker\/(?:edit|editor)\/(\d+)/); const safeMapId = Number(m?.[1] || 1); mapIdEl.textContent = String(safeMapId);
 
 const STORAGE_KEY = `mindmap:${safeMapId}`; const GRID = 100;
@@ -47,3 +47,6 @@ function toCsv(){const h='id,title,x,y\n';return h+state.nodes.map(n=>`${n.id},"
 function fromCsv(text){const lines=text.trim().split(/\r?\n/).slice(1);const nodes=lines.map(l=>{const p=l.split(',');return{id:Number(p[0]),title:p[1]?.replaceAll('"','')||'',x:Number(p[p.length-2]),y:Number(p[p.length-1])}}).filter(n=>n.id>0);return {version:(state.version||1)+1,nodes:nodes.length?nodes:[{id:1,title:'Root',x:400,y:240}],links:[]};}
 window.addEventListener('resize', render);
 render(); syncHistory(); void hydrateRemote();
+
+async function hardRefreshPage(){try{if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}}catch{}const u=new URL(location.href);u.searchParams.set('_hr',String(Date.now()));location.replace(u.toString());}
+hardRefreshBtn && (hardRefreshBtn.onclick=()=>hardRefreshPage());
