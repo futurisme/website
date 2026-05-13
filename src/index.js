@@ -170,6 +170,9 @@ async function withPerfHeaders(response, pathname) {
   } else if (isAsset && hasContentHash) {
     // Long browser caching only for fingerprinted assets.
     h.set('Cache-Control', 'public, max-age=31536000, immutable');
+  } else if (/\/website\/website\/mindmapmaker\/editor\/(editor\.css|editor\.js)$/i.test(pathname)) {
+    // Force fresh editor assets to avoid stale UI on mobile CDN/browser cache.
+    h.set('Cache-Control', 'no-store, max-age=0');
   } else if (isAsset) {
     // Non-fingerprinted assets must revalidate to avoid stale copies after deploys.
     h.set('Cache-Control', 'public, max-age=3600, s-maxage=2592000, stale-while-revalidate=604800, stale-if-error=604800');
