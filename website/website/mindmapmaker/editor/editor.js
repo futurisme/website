@@ -15,7 +15,7 @@ const statusEl = document.getElementById('status');
 const nodesLayer = document.getElementById('nodes');
 const edgesLayer = document.getElementById('edges');
 const viewport = document.getElementById('viewport');
-const boundaryLayer = document.getElementById('workspace-boundary');
+const gridCanvas = document.getElementById('grid-canvas');
 const addNodeBtn = document.getElementById('add-node');
 const removeNodeBtn = document.getElementById('remove-node');
 const connectBtn = document.getElementById('connect-node');
@@ -72,8 +72,7 @@ function render() {
   }
   fullRenderRequired = false;
   const snapshot = engine.getSnapshot();
-  const bounds = getWorkspaceBounds(snapshot.nodes);
-  renderWorkspaceBoundary(bounds);
+  drawGridCanvas();
 
   const byId = new Map(snapshot.nodes.map((n) => [n.id, n]));
   edgesLayer.innerHTML = snapshot.links
@@ -118,9 +117,32 @@ function applyViewportTransform() {
   const transform = `translate3d(${snappedX}px, ${snappedY}px, 0) scale(${camera.scale})`;
   edgesLayer.style.transform = transform;
   nodesLayer.style.transform = transform;
-  if (boundaryLayer) {
-    boundaryLayer.style.transform = transform;
+}
+
+
+function drawGridCanvas() {
+  if (!gridCanvas) return;
+  const rect = viewport.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.floor(rect.width));
+  const h = Math.max(1, Math.floor(rect.height));
+  if (gridCanvas.width !== Math.floor(w * dpr) || gridCanvas.height !== Math.floor(h * dpr)) {
+    gridCanvas.width = Math.floor(w * dpr);
+    gridCanvas.height = Math.floor(h * dpr);
   }
+  const ctx = gridCanvas.getContext('2d');
+  if (!ctx) return;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+  const step = Math.max(24, GRID_SIZE * camera.scale * 0.5);
+  const ox = ((camera.x % step) + step) % step;
+  const oy = ((camera.y % step) + step) % step;
+  ctx.strokeStyle = 'rgba(15,118,110,0.10)';
+  ctx.lineWidth = 1;
+  for (let x = ox; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (let y = oy; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
 }
 
 function rebuildRenderIndexes() {
@@ -1040,3 +1062,5 @@ function hasVisibleNodeInViewport(nodes) {
   }
   return false;
 }
+
+window.addEventListener('resize', () => requestRender({ full: true }));
