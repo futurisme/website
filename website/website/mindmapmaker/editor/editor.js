@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const mapIdEl = $('map-id'), statusEl = $('status'), nodesLayer = $('nodes'), edgesLayer = $('edges'), viewport = $('viewport');
 const gridCanvas = $('grid-canvas'), addNodeBtn = $('add-node'), removeNodeBtn = $('remove-node'), connectBtn = $('connect-node');
 const saveCsvBtn = $('save-csv'), saveFdhlBtn = $('save-fdhl'), loadBtn = $('load-map'), loadInput = $('load-input');
-const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot'), hardRefreshBtn = $('hard-refresh');
+const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot');
 const m = location.pathname.match(/\/mindmapmaker\/(?:edit|editor)\/(\d+)/); const safeMapId = Number(m?.[1] || 1); mapIdEl.textContent = String(safeMapId);
 
 const STORAGE_KEY = `mindmap:${safeMapId}`; const GRID = 100;
@@ -30,7 +30,8 @@ function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setS
 function undo(){ if(!history.length)return; future.push(JSON.stringify(state)); state=JSON.parse(history.pop()); saveLocal(); render(); syncHistory(); }
 function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); state=JSON.parse(future.pop()); saveLocal(); render(); syncHistory(); }
 
-async function pushRemote(){ if(remoteSaveInFlight){ remoteSaveQueued=true; return; } remoteSaveInFlight=true; try{ await fetch(`/api/mindmapmaker?id=${safeMapId}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({data:state})}); setRemoteOnline(true);}catch{ setRemoteOnline(false);} finally{ remoteSaveInFlight=false; if(remoteSaveQueued){remoteSaveQueued=false; void pushRemote();}} }
+function notifyDanger(msg){const t=document.getElementById('toast'); if(!t)return; t.hidden=false; t.textContent=msg; t.className='toast show'; clearTimeout(notifyDanger._tm); notifyDanger._tm=setTimeout(()=>{t.className='toast';},2600);}
+async function pushRemote(){ if(remoteSaveInFlight){ remoteSaveQueued=true; return; } remoteSaveInFlight=true; try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({data:state})}); if(!r.ok) throw new Error('timeout'); setRemoteOnline(true);}catch{ setRemoteOnline(false); notifyDanger('Bahaya: database timeout/gagal simpan.'); } finally{ remoteSaveInFlight=false; if(remoteSaveQueued){remoteSaveQueued=false; void pushRemote();}} }
 async function hydrateRemote(){ try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{cache:'no-store'}); if(!r.ok)return; const d=await r.json(); if(d?.data?.nodes){ state=d.data; saveLocal(); render(); setRemoteOnline(true);} }catch{ setRemoteOnline(false);} }
 
 viewport.addEventListener('pointerdown',(e)=>{ const node=e.target.closest('.node'); if(node){ const id=Number(node.dataset.id); selectedId=id; if(connectSource) { doConnect(id); return; } const src=state.nodes.find(n=>n.id===id); dragging={id,sx:e.clientX,sy:e.clientY,nx:src.x,ny:src.y}; } else { panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y}; } viewport.setPointerCapture(e.pointerId); render(); });
@@ -47,6 +48,3 @@ function toCsv(){const h='id,title,x,y\n';return h+state.nodes.map(n=>`${n.id},"
 function fromCsv(text){const lines=text.trim().split(/\r?\n/).slice(1);const nodes=lines.map(l=>{const p=l.split(',');return{id:Number(p[0]),title:p[1]?.replaceAll('"','')||'',x:Number(p[p.length-2]),y:Number(p[p.length-1])}}).filter(n=>n.id>0);return {version:(state.version||1)+1,nodes:nodes.length?nodes:[{id:1,title:'Root',x:400,y:240}],links:[]};}
 window.addEventListener('resize', render);
 render(); syncHistory(); void hydrateRemote();
-
-async function hardRefreshPage(){try{if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}}catch{}const u=new URL(location.href);u.searchParams.set('_hr',String(Date.now()));location.replace(u.toString());}
-hardRefreshBtn && (hardRefreshBtn.onclick=()=>hardRefreshPage());

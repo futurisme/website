@@ -63,6 +63,3 @@ document.getElementById('render').onclick=()=>{ currentSnapshot=parseAdvanced(so
 document.getElementById('submit').onclick=()=>{ const snap=parseAdvanced(source.value); saveSnapshot(snap); location.href=`/mindmapmaker/edit/${mapId}`; };
 window.addEventListener('resize',()=>{ if(currentSnapshot) drawPreview(currentSnapshot); });
 document.getElementById('render').click();
-
-async function hardRefreshPage(){try{if('caches' in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));}}catch{}const u=new URL(location.href);u.searchParams.set('_hr',String(Date.now()));location.replace(u.toString());}
-document.getElementById('hard-refresh').onclick=()=>hardRefreshPage();
