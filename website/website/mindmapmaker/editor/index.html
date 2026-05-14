@@ -39,6 +39,20 @@
       <div class="modal-box">
         <h3>Rename Node</h3>
         <textarea id="rename-input" class="modal-input" rows="5" spellcheck="false"></textarea>
+        <div class="modal-grid">
+          <label class="modal-field">
+            <span>Width (px)</span>
+            <input id="rename-width" class="modal-text" type="number" min="80" max="1200" step="1" placeholder="default" />
+          </label>
+          <label class="modal-field">
+            <span>Height (px)</span>
+            <input id="rename-height" class="modal-text" type="number" min="48" max="900" step="1" placeholder="default" />
+          </label>
+          <label class="modal-field modal-field-full">
+            <span>Inner Fill HEX</span>
+            <input id="rename-color" class="modal-text" type="text" maxlength="7" placeholder="#FFFFFF" spellcheck="false" />
+          </label>
+        </div>
         <div class="modal-actions">
           <button id="rename-cancel" class="btn" type="button">✖</button>
           <button id="rename-confirm" class="btn" type="button">✔</button>
