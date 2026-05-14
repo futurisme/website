@@ -161,6 +161,29 @@ function handleMindmapAuthConfig(req, env) {
   return json({ ok: true, supabaseUrl, supabaseAnonKey });
 }
 
+async function handleMindmapPeoples(req, env) {
+  if (req.method !== 'GET') return json({ ok: false, error: 'Method not allowed.' }, 405);
+  const p = await getPool(env);
+  if (p) {
+    try {
+      const exists = await p.query("SELECT to_regclass('public.user_profiles') AS t");
+      if (!exists.rows[0]?.t) return json({ ok: true, rows: [], externalNotice: 'missing_table' });
+      const r = await p.query('SELECT id, display_name FROM public.user_profiles ORDER BY id ASC LIMIT 50');
+      return json({ ok: true, rows: r.rows });
+    } catch (error) {
+      return json({ ok: false, error: `Failed to load peoples from DB: ${error instanceof Error ? error.message : String(error)}` }, 500);
+    }
+  }
+  const { supabaseUrl, supabaseAnonKey } = getRuntimeConfig(env);
+  if (!supabaseUrl || !supabaseAnonKey) return json({ ok: true, rows: [], externalNotice: 'missing_config' });
+  const u = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/user_profiles?select=id,display_name&limit=50`;
+  const r = await fetch(u, { headers: { apikey: supabaseAnonKey, authorization: `Bearer ${supabaseAnonKey}` }, cache: 'no-store' });
+  if (r.status === 404) return json({ ok: true, rows: [], externalNotice: 'missing_table' });
+  if (!r.ok) return json({ ok: false, error: `Supabase REST error: ${await r.text()}` }, 500);
+  const rows = await r.json();
+  return json({ ok: true, rows: Array.isArray(rows) ? rows : [] });
+}
+
 const ROUTES = new Map([
   ['/', '/website/portfolio/index.html'],
   ['/home', '/website/home/index.html'],
@@ -319,6 +342,7 @@ export default {
       const u = new URL(req.url);
       if (u.pathname.startsWith('/api/shareideas')) return handleShareIdeas(req, env);
       if (u.pathname === '/api/mindmapmaker/auth-config') return handleMindmapAuthConfig(req, env);
+      if (u.pathname === '/api/mindmapmaker/peoples') return handleMindmapPeoples(req, env);
       if (u.pathname.startsWith('/api/mindmapmaker')) return handleMindmap(req, env);
       const r = mapPath(u.pathname);
       if (r.type === 'redirect') return Response.redirect(`${u.origin}${appendSearch(r.value, u.search)}`, 308);
