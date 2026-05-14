@@ -10,12 +10,13 @@
   "vars": {
     "SUPABASE_URL": "https://gnhkhnmvggltqszbhfev.supabase.co",
     "SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduaGtobm12Z2dsdHFzemJoZmV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODQ0NzEsImV4cCI6MjA5NDI2MDQ3MX0.GgAuXnMvhjc5txh_ggB0WEheUE6YMAQMGvQz8p4vGxE",
-    "DATABASE_URL": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
-    "DATABASE_PUBLIC_URL": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
-    "DATABASE_URL_PUBLIC": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
-    "POSTGRES_URL": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
-    "POSTGRES_URL_NON_POOLING": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
-    "POSTGRES_PRISMA_URL": "postgresql://postgres:FadhilAkbar12345Akun2011@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require"
+    "DATABASE_URL": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "SUPABASE_DB_POOLER_URL": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "DATABASE_PUBLIC_URL": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "DATABASE_URL_PUBLIC": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "POSTGRES_URL": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "POSTGRES_URL_NON_POOLING": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require",
+    "POSTGRES_PRISMA_URL": "postgresql://postgres:FadhilAkbar12345Akun2011%21@db.gnhkhnmvggltqszbhfev.supabase.co:5432/postgres?sslmode=require"
   },
   "assets": {
     "directory": ".",
