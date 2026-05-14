@@ -42,7 +42,7 @@ function snap(v){ return Math.round(v/GRID)*GRID; }
 
 function addNode(){ const n=clone(); const id=Math.max(...n.nodes.map(x=>x.id))+1; const p=n.nodes.find(x=>x.id===selectedId)||n.nodes[0]; n.nodes.push({id,title:`Node ${id}`,x:snap(p.x+200),y:snap(p.y+120)}); commit(n,'Node ditambahkan.'); selectedId=id; render(); }
 function removeNode(){ if(selectedId===1)return setStatus('Root tidak dapat dihapus.'); const n=clone(); n.nodes=n.nodes.filter(x=>x.id!==selectedId); n.links=n.links.filter(l=>l.from!==selectedId&&l.to!==selectedId); selectedId=1; commit(n,'Node dihapus.'); }
-function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; } const n=clone(); if(n.links.some(l=>l.from===connectSource&&l.to===targetId)){ connectSource=null; notify('Konektor ganda ditolak: child ini sudah terhubung.', 'danger', 3000); render(); return; } n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000); }
+function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; } const n=clone(); const same = n.links.some(l=>l.from===connectSource&&l.to===targetId); const reverse = n.links.some(l=>l.from===targetId&&l.to===connectSource); if(same||reverse){ connectSource=null; notify('Konektor ganda ditolak: pasangan node ini sudah terhubung.', 'danger', 3000); render(); return; } n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000); }
 function undo(){ if(!history.length)return; future.push(JSON.stringify(state)); state=JSON.parse(history.pop()); saveLocal(); render(); syncHistory(); }
 function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); state=JSON.parse(future.pop()); saveLocal(); render(); syncHistory(); }
 
@@ -73,5 +73,6 @@ document.addEventListener('contextmenu',(e)=>e.preventDefault());
 document.addEventListener('copy',(e)=>e.preventDefault());
 document.addEventListener('cut',(e)=>e.preventDefault());
 document.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey)&&['c','x','s','u','p'].includes(e.key.toLowerCase())) e.preventDefault(); });
+document.addEventListener('keydown',(e)=>{ if(e.repeat) return; if(e.shiftKey&&e.key.toLowerCase()==='a'&&matchMedia('(pointer:fine)').matches){ e.preventDefault(); addNode(); notify('Shortcut Shift+A: node ditambahkan.','success',3000); }});
 window.addEventListener('offline',()=>notifyDanger('Offline: progress disimpan lokal otomatis.'));
 window.addEventListener('online',()=>notify('Online kembali: sinkronisasi dilanjutkan.','success',3000));
