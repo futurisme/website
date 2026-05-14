@@ -25,7 +25,7 @@ function clone(){ return JSON.parse(JSON.stringify(state)); }
 function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#000'; c.fillRect(0,0,w,h); }
 function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; const r=viewport.getBoundingClientRect(); const w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); edgesLayer.setAttribute('viewBox',`0 0 ${w} ${h}`); edgesLayer.setAttribute('width',String(w)); edgesLayer.setAttribute('height',String(h)); edgesLayer.setAttribute('preserveAspectRatio','none'); drawGrid(); }
 function orthogonalPath(from,to,rects){
-  const r1=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, r2=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
+  const r1=rects.get(from.id)||{x:from.x,y:from.y,w:140,h:64}, r2=rects.get(to.id)||{x:to.x,y:to.y,w:140,h:64};
   const c1x=r1.x+r1.w/2, c1y=r1.y+r1.h/2, c2x=r2.x+r2.w/2, c2y=r2.y+r2.h/2;
   const upper = (c1y<=c2y) ? {r:r1,cx:c1x} : {r:r2,cx:c2x};
   const lower = (c1y<=c2y) ? {r:r2,cx:c2x} : {r:r1,cx:c1x};
@@ -48,7 +48,7 @@ function sizeForTitle(t){
   const h=Math.max(64,Math.min(260,Math.round(rawHeight)));
   return {w,h};
 }
-function render(){ applyTransform(); nodesLayer.innerHTML=state.nodes.map(n=>{const s=sizeForTitle(n.title); return `<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px;width:${s.w}px;height:${s.h}px">${escape(n.title)}<small>ID ${n.id}</small></button>`;}).join(''); const rects=new Map([...nodesLayer.querySelectorAll('.node')].map(el=>[Number(el.dataset.id),{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}])); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b,rects)}"></path>`;}).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
+function render(){ applyTransform(); nodesLayer.innerHTML=state.nodes.map(n=>{const s=sizeForTitle(n.title); return `<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px;width:${s.w}px;height:${s.h}px">${escape(n.title)}</button>`;}).join(''); const rects=new Map([...nodesLayer.querySelectorAll('.node')].map(el=>[Number(el.dataset.id),{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}])); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b,rects)}"></path>`;}).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
 function scheduleRender(){ if(framePending) return; framePending=true; requestAnimationFrame(()=>{ framePending=false; render(); }); }
 function escape(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function snap(v){ return Math.round(v/GRID)*GRID; }
