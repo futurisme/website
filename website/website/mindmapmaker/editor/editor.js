@@ -20,7 +20,12 @@ function clone(){ return JSON.parse(JSON.stringify(state)); }
 
 function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(15,118,110,.12)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
 function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; drawGrid(); }
-function render(){ applyTransform(); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="M ${a.x+80} ${a.y+40} C ${a.x+140} ${a.y+40}, ${b.x+20} ${b.y+40}, ${b.x+80} ${b.y+40}"></path>`;}).join(''); nodesLayer.innerHTML=state.nodes.map(n=>`<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px">${escape(n.title)}<small>ID ${n.id}</small></button>`).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
+function orthogonalPath(a,b){
+  const sx=a.x+80, sy=a.y+80, tx=b.x+80, ty=b.y;
+  if(Math.abs(sx-tx)<=0.5) return `M ${sx} ${sy} L ${tx} ${ty}`;
+  return `M ${sx} ${sy} L ${tx} ${sy} L ${tx} ${ty}`;
+}
+function render(){ applyTransform(); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b)}"></path>`;}).join(''); nodesLayer.innerHTML=state.nodes.map(n=>`<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px">${escape(n.title)}<small>ID ${n.id}</small></button>`).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
 function escape(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function snap(v){ return Math.round(v/GRID)*GRID; }
 
