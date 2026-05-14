@@ -19,7 +19,7 @@ function syncHistory(){ undoBtn.disabled = history.length===0; redoBtn.disabled 
 function clone(){ return JSON.parse(JSON.stringify(state)); }
 
 function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(15,118,110,.12)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
-function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; drawGrid(); }
+function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; const r=viewport.getBoundingClientRect(); const w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); edgesLayer.setAttribute('viewBox',`0 0 ${w} ${h}`); edgesLayer.setAttribute('width',String(w)); edgesLayer.setAttribute('height',String(h)); edgesLayer.setAttribute('preserveAspectRatio','none'); drawGrid(); }
 function orthogonalPath(from,to,rects){
   const rf=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, rt=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
   const fx=rf.x+rf.w/2, fy=rf.y+rf.h/2, tx=rt.x+rt.w/2, ty=rt.y+rt.h/2;
