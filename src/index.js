@@ -135,15 +135,12 @@ async function handleMindmap(req, env) {
 
     return json({ ok: false, error: 'Method not allowed.' }, 405);
   } catch (error) {
-<<<<<<< HEAD
     try {
       const fallbackId = Number(new URL(req.url).searchParams.get('id'));
       if (!Number.isInteger(fallbackId) || fallbackId < 1) return json({ ok: false, error: 'Invalid map id.' }, 400);
       const fallback = await handleMindmapViaSupabaseRest(req, env, fallbackId);
       if (fallback.status < 500 || fallback.status === 409 || fallback.status === 404) return fallback;
     } catch {}
-    return json({ ok: false, error: `Mindmap API failure: ${error instanceof Error ? error.message : String(error)}` }, 500);
-=======
     const message = error instanceof Error ? error.message : String(error);
     const isConnectIssue = /connect|ECONN|ENOTFOUND|timeout|network|SSL|certificate|terminated/i.test(message);
     return json({
@@ -153,7 +150,6 @@ async function handleMindmap(req, env) {
         ? 'Use Supabase Session Pooler URL for IPv4-only networks and ensure password characters are URL-encoded (e.g. ! => %21).'
         : undefined
     }, 500);
->>>>>>> dce6098 (Fix mindmap DB connectivity and encode Supabase password in env URLs)
   }
 }
 
