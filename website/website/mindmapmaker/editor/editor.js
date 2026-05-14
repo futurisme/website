@@ -21,7 +21,7 @@ function commit(next, msg){ history.push(JSON.stringify(state)); if(history.leng
 function syncHistory(){ undoBtn.disabled = history.length===0; redoBtn.disabled = future.length===0; }
 function clone(){ return JSON.parse(JSON.stringify(state)); }
 
-function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(15,118,110,.12)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
+function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#000'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(34,211,238,.18)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
 function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; const r=viewport.getBoundingClientRect(); const w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); edgesLayer.setAttribute('viewBox',`0 0 ${w} ${h}`); edgesLayer.setAttribute('width',String(w)); edgesLayer.setAttribute('height',String(h)); edgesLayer.setAttribute('preserveAspectRatio','none'); drawGrid(); }
 function orthogonalPath(from,to,rects){
   const r1=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, r2=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
@@ -43,7 +43,17 @@ function snap(v){ return Math.round(v/GRID)*GRID; }
 function addNode(){ const n=clone(); const id=Math.max(...n.nodes.map(x=>x.id))+1; const p=n.nodes.find(x=>x.id===selectedId)||n.nodes[0]; n.nodes.push({id,title:`Node ${id}`,x:snap(p.x+200),y:snap(p.y+120)}); commit(n,'Node ditambahkan.'); selectedId=id; render(); }
 function removeNode(){ if(selectedId===1)return setStatus('Root tidak dapat dihapus.'); const n=clone(); n.nodes=n.nodes.filter(x=>x.id!==selectedId); n.links=n.links.filter(l=>l.from!==selectedId&&l.to!==selectedId); selectedId=1; commit(n,'Node dihapus.'); }
 function renameNode(){ const n=clone(); const node=n.nodes.find(x=>x.id===selectedId); if(!node){ notify('Node tidak ditemukan.','danger',3000); return; } const next=window.prompt('Rename node:',node.title); if(next===null) return; const t=next.trim(); if(!t){ notify('Nama node tidak boleh kosong.','danger',3000); return; } node.title=t.slice(0,64); commit(n,'Nama node diperbarui.'); notify('Rename berhasil disimpan.','success',3000); }
-function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; } const n=clone(); const same = n.links.some(l=>l.from===connectSource&&l.to===targetId); const reverse = n.links.some(l=>l.from===targetId&&l.to===connectSource); if(same||reverse){ connectSource=null; notify('Konektor ganda ditolak: pasangan node ini sudah terhubung.', 'danger', 3000); render(); return; } n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000); }
+function doConnect(targetId){
+  if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; }
+  if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; }
+  const n=clone();
+  const hasPair = n.links.some(l=>(l.from===connectSource&&l.to===targetId)||(l.from===targetId&&l.to===connectSource));
+  if(hasPair){
+    n.links=n.links.filter(l=>!((l.from===connectSource&&l.to===targetId)||(l.from===targetId&&l.to===connectSource)));
+    connectSource=null; commit(n,'Konektor diputus.'); notify('Konektor pasangan node diputus.','success',3000); return;
+  }
+  n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000);
+}
 function undo(){ if(!history.length)return; future.push(JSON.stringify(state)); state=JSON.parse(history.pop()); saveLocal(); render(); syncHistory(); }
 function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); state=JSON.parse(future.pop()); saveLocal(); render(); syncHistory(); }
 
