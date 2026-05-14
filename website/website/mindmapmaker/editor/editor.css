@@ -12,6 +12,7 @@
 .toast.success{background:#166534}
 .toast.danger{background:#991b1b}
 .modal{position:fixed;inset:0;background:rgb(0 0 0 /.6);display:grid;place-items:center;z-index:1100}
+.modal[hidden]{display:none!important}
 .modal-box{width:min(92vw,560px);background:#0b0b0b;border:1px solid #38bdf8;border-radius:12px;padding:.7rem;box-shadow:0 0 18px rgb(56 189 248 /.45)}
 .modal-box h3{margin:.1rem 0 .45rem;color:#e0f2fe;font-size:.9rem}
 .modal-input{width:100%;background:#000;color:#e0f2fe;border:1px solid #fff;border-radius:8px;padding:.55rem;font:600 .82rem/1.35 ui-monospace,monospace;resize:vertical;min-height:120px;white-space:pre-wrap}
