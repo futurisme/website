@@ -3,7 +3,7 @@ const mapIdEl = $('map-id'), statusEl = $('status'), nodesLayer = $('nodes'), ed
 const gridCanvas = $('grid-canvas'), addNodeBtn = $('add-node'), renameNodeBtn = $('rename-node'), removeNodeBtn = $('remove-node'), connectBtn = $('connect-node');
 const saveCsvBtn = $('save-csv'), saveFdhlBtn = $('save-fdhl'), loadBtn = $('load-map'), loadInput = $('load-input');
 const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot');
-const m = location.pathname.match(/\/mindmapmaker\/(?:edit|editor)\/(\d+)/); const safeMapId = Number(m?.[1] || 1); mapIdEl.textContent = String(safeMapId);
+const m = location.pathname.match(/\/mindmapmaker\/(?:edit|editor)\/(\d+)/); const safeMapId = Number(m?.[1] || 1); if (mapIdEl) mapIdEl.textContent = String(safeMapId);
 
 const STORAGE_KEY = `mindmap:${safeMapId}`; const GRID = 100;
 let state = loadLocal() || { version: 1, nodes: [{ id: 1, title: 'Root', x: 400, y: 240 }], links: [] };
@@ -14,7 +14,7 @@ const activePointers = new Map(); let pinch = null;
 
 function loadLocal(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{return null} }
 function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-function setStatus(t){ statusEl.textContent = t; }
+function setStatus(t){ if(statusEl) statusEl.textContent = t; }
 function setRemoteOnline(on){ syncStatusDotEl.dataset.online = String(!!on); }
 function normalizeLinksUnique(data){ const seen=new Set(); data.links=(data.links||[]).filter(l=>{const k=`${Number(l.from)}->${Number(l.to)}`; if(Number(l.from)===Number(l.to)||seen.has(k)) return false; seen.add(k); return true;}).map(l=>({from:Number(l.from),to:Number(l.to)})); return data; }
 function commit(next, msg){ history.push(JSON.stringify(state)); if(history.length>80)history.shift(); future.length=0; state=normalizeLinksUnique(next); state.version=(state.version||1)+1; saveLocal(); void pushRemote(); render(); setStatus(msg); syncHistory(); }
