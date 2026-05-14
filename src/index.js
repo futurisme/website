@@ -24,7 +24,7 @@ async function getPool(env) {
   if (!cs) return null;
   try {
     const { Pool } = await import('pg');
-    pool = new Pool({ connectionString: cs, ssl: { rejectUnauthorized: false }, max: 4, idleTimeoutMillis: 15000, connectionTimeoutMillis: 10000 });
+    pool = new Pool({ connectionString: cs, ssl: false, max: 6, idleTimeoutMillis: 10000, connectionTimeoutMillis: 5000 });
     return pool;
   } catch (error) {
     console.error('DB pool init failed:', error);
