@@ -21,17 +21,16 @@ function clone(){ return JSON.parse(JSON.stringify(state)); }
 function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(15,118,110,.12)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
 function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; const r=viewport.getBoundingClientRect(); const w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); edgesLayer.setAttribute('viewBox',`0 0 ${w} ${h}`); edgesLayer.setAttribute('width',String(w)); edgesLayer.setAttribute('height',String(h)); edgesLayer.setAttribute('preserveAspectRatio','none'); drawGrid(); }
 function orthogonalPath(from,to,rects){
-  const rf=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, rt=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
-  const fx=rf.x+rf.w/2, fy=rf.y+rf.h/2, tx=rt.x+rt.w/2, ty=rt.y+rt.h/2;
-  const topFirst = fy <= ty;
-  if(Math.abs(fx-tx)<=0.5){
-    const sy=topFirst?rf.y+rf.h:rf.y, ey=topFirst?rt.y:rt.y+rt.h;
-    return `M ${fx} ${sy} L ${tx} ${ey}`;
+  const r1=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, r2=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
+  const c1x=r1.x+r1.w/2, c1y=r1.y+r1.h/2, c2x=r2.x+r2.w/2, c2y=r2.y+r2.h/2;
+  const upper = (c1y<=c2y) ? {r:r1,cx:c1x} : {r:r2,cx:c2x};
+  const lower = (c1y<=c2y) ? {r:r2,cx:c2x} : {r:r1,cx:c1x};
+  if(Math.abs(upper.cx-lower.cx)<=0.5){
+    return `M ${upper.cx} ${upper.r.y+upper.r.h} L ${lower.cx} ${lower.r.y}`;
   }
-  const sx = tx>fx ? rf.x+rf.w : rf.x;
-  const sy = fy;
-  const ey = topFirst ? rt.y : rt.y+rt.h;
-  return `M ${sx} ${sy} L ${tx} ${sy} L ${tx} ${ey}`;
+  const sy = upper.r.y + upper.r.h/2;
+  const sx = lower.cx>upper.cx ? upper.r.x+upper.r.w : upper.r.x;
+  return `M ${sx} ${sy} L ${lower.cx} ${sy} L ${lower.cx} ${lower.r.y}`;
 }
 function render(){ applyTransform(); nodesLayer.innerHTML=state.nodes.map(n=>`<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px">${escape(n.title)}<small>ID ${n.id}</small></button>`).join(''); const rects=new Map([...nodesLayer.querySelectorAll('.node')].map(el=>[Number(el.dataset.id),{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}])); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b,rects)}"></path>`;}).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
 function escape(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
