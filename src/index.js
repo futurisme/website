@@ -262,7 +262,6 @@ function mappedAsset(pathname) {
   if (/^\/archives\/[^/.]+$/.test(pathname)) return '/website/archives/workspace.html';
   if (/^\/mindmapmaker\/edit\/editor\.css$/i.test(pathname)) return '/website/website/mindmapmaker/editor/editor.css';
   if (/^\/mindmapmaker\/edit\/editor\.js$/i.test(pathname)) return '/website/website/mindmapmaker/editor/editor.js';
-  if (/^\/mindmapmaker\/edit-text(?:\/[^/]+)?$/.test(pathname)) return '/website/website/mindmapmaker/text-editor.html';
   if (/^\/mindmapmaker\/(?:edit|editor)(?:\/[^/]+)?$/.test(pathname)) return '/website/website/mindmapmaker/editor/index.html';
   if (/^\/books\/editor(?:\/[^/]+)?$/.test(pathname)) return '/website/website/books/editor/index.html';
   for (const [from, to] of STATIC_PREFIXES) if (pathname.startsWith(from)) return to + pathname.slice(from.length);
