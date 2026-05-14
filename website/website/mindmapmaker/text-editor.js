@@ -1,7 +1,7 @@
 const source = document.getElementById('source'); const statusEl = document.getElementById('status'); const preview = document.getElementById('preview');
 const mapId = Number((location.pathname.match(/\/mindmapmaker\/edit-text\/(\d+)/)||[])[1]||1); document.getElementById('to-visual').href=`/mindmapmaker/edit/${mapId}`;
 const TYPO = new Map([['markting','marketing'],['prodk','produk'],['fitur utma','fitur utama'],['reseach','riset'],['parrent','parent'],['chlid','child'],['silbing','sibling']]);
-const GRID_SIZE=10, GRID_UNITS=120; let currentSnapshot = null; let drag = null;
+const GRID_SIZE=10, GRID_UNITS=120; let currentSnapshot = null; let drag = null; let gridCache = null;
 
 function fixToken(v){const k=v.toLowerCase(); return TYPO.get(k)||k;}
 function normalizeText(t){return t.split(/\s+/).map(fixToken).join(' ').replace(/\s{2,}/g,' ').trim();}
@@ -45,7 +45,8 @@ function snapshotToText(s){
 
 function drawPreview(snapshot){
   const dpr=devicePixelRatio||1,w=GRID_UNITS*GRID_SIZE,h=GRID_UNITS*GRID_SIZE; preview.width=w*dpr; preview.height=h*dpr; const c=preview.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
-  c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); c.strokeStyle='rgba(37,99,235,.22)'; for(let x=0;x<=w;x+=GRID_SIZE){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=0;y<=h;y+=GRID_SIZE){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();}
+  if(!gridCache||gridCache.w!==w||gridCache.h!==h){const g=document.createElement('canvas');g.width=w;g.height=h;const gc=g.getContext('2d');gc.fillStyle='#fff';gc.fillRect(0,0,w,h);gc.strokeStyle='rgba(37,99,235,.22)';for(let x=0;x<=w;x+=GRID_SIZE){gc.beginPath();gc.moveTo(x,0);gc.lineTo(x,h);gc.stroke();}for(let y=0;y<=h;y+=GRID_SIZE){gc.beginPath();gc.moveTo(0,y);gc.lineTo(w,y);gc.stroke();}gridCache={w,h,img:g};}
+  c.clearRect(0,0,w,h); c.drawImage(gridCache.img,0,0);
   const byId=new Map(snapshot.nodes.map(n=>[n.id,n])); c.strokeStyle='#0f766e'; c.lineWidth=1.5;
   for(const l of snapshot.links){const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)continue; const ax=a.x*GRID_SIZE, ay=a.y*GRID_SIZE, bx=b.x*GRID_SIZE, by=b.y*GRID_SIZE; c.beginPath(); c.moveTo(ax+75,ay+21); c.bezierCurveTo(ax+130,ay+21,bx+20,by+21,bx+75,by+21); c.stroke();}
   for(const n of snapshot.nodes){ const px=n.x*GRID_SIZE, py=n.y*GRID_SIZE; box(c,px,py,150,42,9,n.color||'#1f2937'); c.fillStyle='#fff'; c.font='12px Inter'; c.fillText(n.title,px+8,py+25); }
@@ -53,13 +54,15 @@ function drawPreview(snapshot){
 function box(c,x,y,w,h,r,color){c.fillStyle=color;c.strokeStyle='#dbeafe';c.beginPath();c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.quadraticCurveTo(x+w,y,x+w,y+r);c.lineTo(x+w,y+h-r);c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);c.lineTo(x+r,y+h);c.quadraticCurveTo(x,y+h,x,y+h-r);c.lineTo(x,y+r);c.quadraticCurveTo(x,y,x+r,y);c.closePath();c.fill();c.stroke();}
 
 function nodeAt(x,y){ if(!currentSnapshot) return null; for(let i=currentSnapshot.nodes.length-1;i>=0;i--){const n=currentSnapshot.nodes[i]; const px=n.x*GRID_SIZE, py=n.y*GRID_SIZE; if(x>=px&&x<=px+150&&y>=py&&y<=py+42) return n;} return null; }
-preview.addEventListener('pointerdown',(e)=>{const r=preview.getBoundingClientRect();const x=(e.clientX-r.left)*(preview.width/r.width)/(devicePixelRatio||1),y=(e.clientY-r.top)*(preview.height/r.height)/(devicePixelRatio||1);const n=nodeAt(x,y); if(!n) return; drag={id:n.id,dx:x-(n.x*GRID_SIZE),dy:y-(n.y*GRID_SIZE)}; preview.setPointerCapture(e.pointerId);});
-preview.addEventListener('pointermove',(e)=>{ if(!drag||!currentSnapshot) return; const r=preview.getBoundingClientRect(); const x=(e.clientX-r.left)*(preview.width/r.width)/(devicePixelRatio||1),y=(e.clientY-r.top)*(preview.height/r.height)/(devicePixelRatio||1); const n=currentSnapshot.nodes.find(v=>v.id===drag.id); n.x=Number((((x-drag.dx)/GRID_SIZE)).toFixed(1)); n.y=Number((((y-drag.dy)/GRID_SIZE)).toFixed(1)); drawPreview(currentSnapshot); });
-preview.addEventListener('pointerup',()=>{ if(!drag||!currentSnapshot) return; drag=null; spreadOverlaps(currentSnapshot.nodes); drawPreview(currentSnapshot); source.value=snapshotToText(currentSnapshot); statusEl.textContent='Posisi node diperbarui + text otomatis sinkron.'; });
+preview.addEventListener('pointerdown',(e)=>{const r=preview.getBoundingClientRect();const x=(e.clientX-r.left)*(preview.width/r.width)/(devicePixelRatio||1),y=(e.clientY-r.top)*(preview.height/r.height)/(devicePixelRatio||1);const n=nodeAt(x,y); if(!n) return; e.preventDefault(); drag={id:n.id,dx:x-(n.x*GRID_SIZE),dy:y-(n.y*GRID_SIZE)}; preview.setPointerCapture(e.pointerId);},{passive:false});
+preview.addEventListener('pointermove',(e)=>{ if(!drag||!currentSnapshot) return; e.preventDefault(); const r=preview.getBoundingClientRect(); const x=(e.clientX-r.left)*(preview.width/r.width)/(devicePixelRatio||1),y=(e.clientY-r.top)*(preview.height/r.height)/(devicePixelRatio||1); const n=currentSnapshot.nodes.find(v=>v.id===drag.id); n.x=Number((((x-drag.dx)/GRID_SIZE)).toFixed(1)); n.y=Number((((y-drag.dy)/GRID_SIZE)).toFixed(1)); drawPreview(currentSnapshot); },{passive:false});
+function endDrag(){ if(!drag||!currentSnapshot) return; drag=null; spreadOverlaps(currentSnapshot.nodes); drawPreview(currentSnapshot); source.value=snapshotToText(currentSnapshot); statusEl.textContent='Posisi node diperbarui + text sinkron.'; }
+preview.addEventListener('pointerup',endDrag);
+preview.addEventListener('pointercancel',endDrag);
 
 function saveSnapshot(s){ localStorage.setItem(`mindmap:${mapId}`, JSON.stringify(s)); }
 document.getElementById('autofix').onclick=()=>{ source.value=source.value.split(/\r?\n/).map(aiNormalizeLine).filter(Boolean).join('\n'); statusEl.textContent='AI auto-fix: typo + struktur + format koordinat.'; };
-document.getElementById('render').onclick=()=>{ currentSnapshot=parseAdvanced(source.value); drawPreview(currentSnapshot); source.value=snapshotToText(currentSnapshot); statusEl.textContent=`Preview updated: ${currentSnapshot.nodes.length} nodes, ${currentSnapshot.links.length} links.`; };
+document.getElementById('render').onclick=()=>{ currentSnapshot=parseAdvanced(source.value); drawPreview(currentSnapshot); statusEl.textContent=`Preview updated: ${currentSnapshot.nodes.length} nodes, ${currentSnapshot.links.length} links.`; };
 document.getElementById('submit').onclick=()=>{ const snap=parseAdvanced(source.value); saveSnapshot(snap); location.href=`/mindmapmaker/edit/${mapId}`; };
 window.addEventListener('resize',()=>{ if(currentSnapshot) drawPreview(currentSnapshot); });
 document.getElementById('render').click();
