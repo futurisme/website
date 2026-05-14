@@ -170,18 +170,20 @@ async function handleMindmapPeoples(req, env) {
       if (!exists.rows[0]?.t) return json({ ok: true, rows: [], externalNotice: 'missing_table' });
       const r = await p.query('SELECT id, display_name FROM public.user_profiles ORDER BY id ASC LIMIT 50');
       return json({ ok: true, rows: r.rows });
-    } catch (error) {
-      return json({ ok: false, error: `Failed to load peoples from DB: ${error instanceof Error ? error.message : String(error)}` }, 500);
-    }
+    } catch {}
   }
   const { supabaseUrl, supabaseAnonKey } = getRuntimeConfig(env);
   if (!supabaseUrl || !supabaseAnonKey) return json({ ok: true, rows: [], externalNotice: 'missing_config' });
-  const u = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/user_profiles?select=id,display_name&limit=50`;
-  const r = await fetch(u, { headers: { apikey: supabaseAnonKey, authorization: `Bearer ${supabaseAnonKey}` }, cache: 'no-store' });
-  if (r.status === 404) return json({ ok: true, rows: [], externalNotice: 'missing_table' });
-  if (!r.ok) return json({ ok: false, error: `Supabase REST error: ${await r.text()}` }, 500);
-  const rows = await r.json();
-  return json({ ok: true, rows: Array.isArray(rows) ? rows : [] });
+  try {
+    const u = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/user_profiles?select=id,display_name&limit=50`;
+    const r = await fetch(u, { headers: { apikey: supabaseAnonKey, authorization: `Bearer ${supabaseAnonKey}` }, cache: 'no-store' });
+    if (r.status === 404) return json({ ok: true, rows: [], externalNotice: 'missing_table' });
+    if (!r.ok) return json({ ok: true, rows: [], externalNotice: 'rest_unavailable' });
+    const rows = await r.json();
+    return json({ ok: true, rows: Array.isArray(rows) ? rows : [] });
+  } catch {
+    return json({ ok: true, rows: [], externalNotice: 'rest_unavailable' });
+  }
 }
 
 const ROUTES = new Map([
