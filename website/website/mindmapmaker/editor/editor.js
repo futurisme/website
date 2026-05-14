@@ -20,20 +20,20 @@ function clone(){ return JSON.parse(JSON.stringify(state)); }
 
 function drawGrid(){ const r=viewport.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.max(1,r.width|0),h=Math.max(1,r.height|0); if(gridCanvas.width!==w*dpr||gridCanvas.height!==h*dpr){gridCanvas.width=w*dpr;gridCanvas.height=h*dpr;} const c=gridCanvas.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); c.fillStyle='#fff'; c.fillRect(0,0,w,h); const step=Math.max(24,GRID*cam.scale*0.5),ox=((cam.x%step)+step)%step,oy=((cam.y%step)+step)%step; c.strokeStyle='rgba(15,118,110,.12)'; for(let x=ox;x<w;x+=step){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();} for(let y=oy;y<h;y+=step){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();} }
 function applyTransform(){ const t=`translate3d(${cam.x}px,${cam.y}px,0) scale(${cam.scale})`; nodesLayer.style.transform=t; edgesLayer.style.transform=t; drawGrid(); }
-function orthogonalPath(from,to){
-  const NODE_W=160,NODE_H=80,HALF_W=NODE_W/2,HALF_H=NODE_H/2;
-  const a=(from.y<=to.y)?from:to,b=(from.y<=to.y)?to:from; // auto-adapt top node as parent visual
-  const ax=a.x+HALF_W, ay=a.y+HALF_H, bx=b.x+HALF_W, by=b.y+HALF_H;
-  const dx=bx-ax, dy=by-ay;
-  if(Math.abs(dx)<=0.5){
-    const sy=a.y+NODE_H, ty=b.y;
-    return `M ${ax} ${sy} L ${ax} ${ty}`;
+function orthogonalPath(from,to,rects){
+  const rf=rects.get(from.id)||{x:from.x,y:from.y,w:160,h:80}, rt=rects.get(to.id)||{x:to.x,y:to.y,w:160,h:80};
+  const fx=rf.x+rf.w/2, fy=rf.y+rf.h/2, tx=rt.x+rt.w/2, ty=rt.y+rt.h/2;
+  const topFirst = fy <= ty;
+  if(Math.abs(fx-tx)<=0.5){
+    const sy=topFirst?rf.y+rf.h:rf.y, ey=topFirst?rt.y:rt.y+rt.h;
+    return `M ${fx} ${sy} L ${tx} ${ey}`;
   }
-  const sx=dx>0?a.x+NODE_W:a.x, sy=ay;
-  const tx=bx, ty=dy>=0?b.y:b.y+NODE_H;
-  return `M ${sx} ${sy} L ${tx} ${sy} L ${tx} ${ty}`;
+  const sx = tx>fx ? rf.x+rf.w : rf.x;
+  const sy = fy;
+  const ey = topFirst ? rt.y : rt.y+rt.h;
+  return `M ${sx} ${sy} L ${tx} ${sy} L ${tx} ${ey}`;
 }
-function render(){ applyTransform(); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b)}"></path>`;}).join(''); nodesLayer.innerHTML=state.nodes.map(n=>`<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px">${escape(n.title)}<small>ID ${n.id}</small></button>`).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
+function render(){ applyTransform(); nodesLayer.innerHTML=state.nodes.map(n=>`<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px">${escape(n.title)}<small>ID ${n.id}</small></button>`).join(''); const rects=new Map([...nodesLayer.querySelectorAll('.node')].map(el=>[Number(el.dataset.id),{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}])); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b,rects)}"></path>`;}).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
 function escape(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
 function snap(v){ return Math.round(v/GRID)*GRID; }
 
