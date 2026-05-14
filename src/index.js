@@ -3,9 +3,24 @@ const RECORD_KEY = '__SYSTEM__SHARE_IDEAS_V1';
 const ID_PATTERN = /^[1-9][0-9]{0,95}$/;
 let pool, schemaShare, schemaMap;
 
+function firstEnv(env, keys) {
+  for (const key of keys) {
+    const value = env?.[key];
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return '';
+}
+
+function getRuntimeConfig(env) {
+  const databaseUrl = firstEnv(env, ['DATABASE_URL', 'DATABASE_PUBLIC_URL', 'DATABASE_URL_PUBLIC', 'POSTGRES_PRISMA_URL', 'POSTGRES_URL_NON_POOLING', 'POSTGRES_URL']);
+  const supabaseUrl = firstEnv(env, ['SUPABASE_URL', 'PUBLIC_SUPABASE_URL']);
+  const supabaseAnonKey = firstEnv(env, ['SUPABASE_ANON_KEY', 'PUBLIC_SUPABASE_ANON_KEY']);
+  return { databaseUrl, supabaseUrl, supabaseAnonKey };
+}
+
 async function getPool(env) {
   if (pool) return pool;
-  const cs = env.DATABASE_PUBLIC_URL || env.DATABASE_URL_PUBLIC || env.POSTGRES_PRISMA_URL || env.POSTGRES_URL_NON_POOLING || env.POSTGRES_URL || env.DATABASE_URL;
+  const { databaseUrl: cs } = getRuntimeConfig(env);
   if (!cs) return null;
   try {
     const { Pool } = await import('pg');
@@ -72,8 +87,7 @@ async function handleMindmap(req, env) {
 
 function handleMindmapAuthConfig(req, env) {
   if (req.method !== 'GET') return json({ ok: false, error: 'Method not allowed.' }, 405);
-  const supabaseUrl = env.SUPABASE_URL || env.PUBLIC_SUPABASE_URL || '';
-  const supabaseAnonKey = env.SUPABASE_ANON_KEY || env.PUBLIC_SUPABASE_ANON_KEY || '';
+  const { supabaseUrl, supabaseAnonKey } = getRuntimeConfig(env);
   if (!supabaseUrl || !supabaseAnonKey) return json({ ok: false, error: 'Supabase auth config is missing on the server.' }, 503);
   return json({ ok: true, supabaseUrl, supabaseAnonKey });
 }
