@@ -33,6 +33,61 @@ async function getPool(env) {
 
 const json = (obj, s = 200) => new Response(JSON.stringify(obj), { status: s, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 
+async function handleMindmapViaSupabaseRest(req, env, mapId) {
+  const { supabaseUrl, supabaseAnonKey } = getRuntimeConfig(env);
+  const serviceKey = firstEnv(env, ['SUPABASE_SERVICE_ROLE_KEY']);
+  const apiKey = serviceKey || supabaseAnonKey;
+  if (!supabaseUrl || !apiKey) return json({ ok: false, error: 'Database is not configured. Missing Supabase REST credentials.' }, 500);
+
+  const base = `${supabaseUrl.replace(/\/$/, '')}/rest/v1/mindmapmaker_state`;
+  const headers = {
+    'content-type': 'application/json',
+    apikey: apiKey,
+    authorization: `Bearer ${apiKey}`,
+    prefer: 'return=representation,resolution=merge-duplicates'
+  };
+
+  if (req.method === 'GET') {
+    const u = `${base}?id=eq.${encodeURIComponent(mapId)}&select=id,version,data,updated_at&limit=1`;
+    const r = await fetch(u, { headers, cache: 'no-store' });
+    if (!r.ok) return json({ ok: false, error: `Supabase REST error: ${await r.text()}` }, 500);
+    const rows = await r.json();
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if (!row) return json({ ok: false, error: 'Map not found.' }, 404);
+    return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at });
+  }
+
+  if (req.method === 'PUT') {
+    const body = await req.json().catch(() => ({}));
+    const data = body?.data ?? body ?? {};
+    const expected = Number.isInteger(Number(body?.expectedVersion)) ? Number(body.expectedVersion) : null;
+
+    if (expected !== null) {
+      const patchUrl = `${base}?id=eq.${encodeURIComponent(mapId)}&version=eq.${expected}&select=id,version,data,updated_at`;
+      const patch = await fetch(patchUrl, { method: 'PATCH', headers, body: JSON.stringify({ data, version: expected + 1, updated_at: new Date().toISOString() }) });
+      if (patch.ok) {
+        const rows = await patch.json();
+        const row = Array.isArray(rows) ? rows[0] : null;
+        if (row) return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at });
+      }
+      return json({ ok: false, conflict: true }, 409);
+    }
+
+    const upsert = await fetch(base, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify([{ id: Number(mapId), data }])
+    });
+    if (!upsert.ok) return json({ ok: false, error: `Supabase REST error: ${await upsert.text()}` }, 500);
+    const rows = await upsert.json();
+    const row = Array.isArray(rows) ? rows[0] : null;
+    return json({ ok: true, mapId: Number(row?.id ?? mapId), version: Number(row?.version ?? 1), data: row?.data ?? data, updatedAt: row?.updated_at ?? new Date().toISOString() });
+  }
+
+  return json({ ok: false, error: 'Method not allowed.' }, 405);
+}
+
+
 async function handleShareIdeas(req, env) { /* unchanged */
   const p = await getPool(env); if (!p) return json({ ok: false, error: 'Database is not configured.' }, 500); if (!schemaShare) { schemaShare = p.query(`CREATE TABLE IF NOT EXISTS shareideas_state (key TEXT PRIMARY KEY,version INTEGER NOT NULL DEFAULT 1,data JSONB NOT NULL,updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());CREATE TABLE IF NOT EXISTS shareideas_meta (id INTEGER PRIMARY KEY CHECK (id = 1),next_id BIGINT NOT NULL);INSERT INTO shareideas_meta(id,next_id) VALUES (1,1) ON CONFLICT (id) DO NOTHING;`); } await schemaShare; const u = new URL(req.url); const id = u.pathname.split('/').filter(Boolean)[2] || null; if (req.method === 'POST' && u.pathname === '/api/shareideas') { const c = await p.connect(); try { await c.query('BEGIN'); const cur = await c.query('SELECT next_id FROM shareideas_meta WHERE id=1 FOR UPDATE'); const nextId = Number(cur.rows[0]?.next_id ?? 1); const wid = String(nextId); await c.query('INSERT INTO shareideas_state(key,version,data) VALUES($1,1,$2::jsonb)', [`${RECORD_KEY}:${wid}`, JSON.stringify(DEFAULT_DATA)]); await c.query('UPDATE shareideas_meta SET next_id=$1 WHERE id=1', [nextId + 1]); await c.query('COMMIT'); return json({ ok: true, id: wid }, 201); } catch (e) { await c.query('ROLLBACK'); return json({ ok: false, error: String(e) }, 500); } finally { c.release(); } }
   if (!id || !ID_PATTERN.test(id)) return json({ ok: false, error: 'Invalid workspace id.' }, 400); const key = `${RECORD_KEY}:${id}`; if (req.method === 'GET') { const r = await p.query('SELECT version,data,updated_at FROM shareideas_state WHERE key=$1 LIMIT 1', [key]); if (!r.rowCount) return json({ ok: false, error: 'Workspace not found.' }, 404); const row = r.rows[0]; return json({ ok: true, id, version: Number(row.version), data: row.data, updatedAt: row.updated_at }); }
@@ -43,18 +98,17 @@ async function handleShareIdeas(req, env) { /* unchanged */
 
 async function handleMindmap(req, env) {
   try {
+    const id = Number(new URL(req.url).searchParams.get('id'));
+    if (!Number.isInteger(id) || id < 1) return json({ ok: false, error: 'Invalid map id.' }, 400);
+
     const p = await getPool(env);
-    if (!p) {
-      return json({ ok: false, error: 'Database is not configured. Set DATABASE_PUBLIC_URL (or DATABASE_URL) to your Supabase Postgres connection string.' }, 500);
-    }
+    if (!p) return handleMindmapViaSupabaseRest(req, env, id);
 
     if (!schemaMap) {
       schemaMap = p.query('CREATE TABLE IF NOT EXISTS mindmapmaker_state (id BIGINT PRIMARY KEY, version INTEGER NOT NULL DEFAULT 1, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())');
     }
     await schemaMap;
 
-    const id = Number(new URL(req.url).searchParams.get('id'));
-    if (!Number.isInteger(id) || id < 1) return json({ ok: false, error: 'Invalid map id.' }, 400);
 
     if (req.method === 'GET') {
       const r = await p.query('SELECT id,version,data,updated_at FROM mindmapmaker_state WHERE id=$1::bigint LIMIT 1', [String(id)]);
@@ -80,6 +134,12 @@ async function handleMindmap(req, env) {
 
     return json({ ok: false, error: 'Method not allowed.' }, 405);
   } catch (error) {
+    try {
+      const fallbackId = Number(new URL(req.url).searchParams.get('id'));
+      if (!Number.isInteger(fallbackId) || fallbackId < 1) return json({ ok: false, error: 'Invalid map id.' }, 400);
+      const fallback = await handleMindmapViaSupabaseRest(req, env, fallbackId);
+      if (fallback.status < 500 || fallback.status === 409 || fallback.status === 404) return fallback;
+    } catch {}
     return json({ ok: false, error: `Mindmap API failure: ${error instanceof Error ? error.message : String(error)}` }, 500);
   }
 }
