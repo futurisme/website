@@ -14,7 +14,8 @@ function loadLocal(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'
 function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function setStatus(t){ statusEl.textContent = t; }
 function setRemoteOnline(on){ syncStatusDotEl.dataset.online = String(!!on); }
-function commit(next, msg){ history.push(JSON.stringify(state)); if(history.length>80)history.shift(); future.length=0; state=next; state.version=(state.version||1)+1; saveLocal(); void pushRemote(); render(); setStatus(msg); syncHistory(); }
+function normalizeLinksUnique(data){ const seen=new Set(); data.links=(data.links||[]).filter(l=>{const k=`${Number(l.from)}->${Number(l.to)}`; if(Number(l.from)===Number(l.to)||seen.has(k)) return false; seen.add(k); return true;}).map(l=>({from:Number(l.from),to:Number(l.to)})); return data; }
+function commit(next, msg){ history.push(JSON.stringify(state)); if(history.length>80)history.shift(); future.length=0; state=normalizeLinksUnique(next); state.version=(state.version||1)+1; saveLocal(); void pushRemote(); render(); setStatus(msg); syncHistory(); }
 function syncHistory(){ undoBtn.disabled = history.length===0; redoBtn.disabled = future.length===0; }
 function clone(){ return JSON.parse(JSON.stringify(state)); }
 
@@ -38,13 +39,14 @@ function snap(v){ return Math.round(v/GRID)*GRID; }
 
 function addNode(){ const n=clone(); const id=Math.max(...n.nodes.map(x=>x.id))+1; const p=n.nodes.find(x=>x.id===selectedId)||n.nodes[0]; n.nodes.push({id,title:`Node ${id}`,x:snap(p.x+200),y:snap(p.y+120)}); commit(n,'Node ditambahkan.'); selectedId=id; render(); }
 function removeNode(){ if(selectedId===1)return setStatus('Root tidak dapat dihapus.'); const n=clone(); n.nodes=n.nodes.filter(x=>x.id!==selectedId); n.links=n.links.filter(l=>l.from!==selectedId&&l.to!==selectedId); selectedId=1; commit(n,'Node dihapus.'); }
-function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; render(); return; } const n=clone(); if(!n.links.some(l=>l.from===connectSource&&l.to===targetId)) n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); }
+function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; } const n=clone(); if(n.links.some(l=>l.from===connectSource&&l.to===targetId)){ connectSource=null; notify('Konektor ganda ditolak: child ini sudah terhubung.', 'danger', 3000); render(); return; } n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000); }
 function undo(){ if(!history.length)return; future.push(JSON.stringify(state)); state=JSON.parse(history.pop()); saveLocal(); render(); syncHistory(); }
 function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); state=JSON.parse(future.pop()); saveLocal(); render(); syncHistory(); }
 
-function notifyDanger(msg){const t=document.getElementById('toast'); if(!t)return; t.hidden=false; t.textContent=msg; t.className='toast show'; clearTimeout(notifyDanger._tm); notifyDanger._tm=setTimeout(()=>{t.className='toast';},2600);}
+function notify(msg, mode='danger', ms=3000){const t=document.getElementById('toast'); if(!t)return; t.hidden=false; t.textContent=msg; t.className=`toast show ${mode}`; clearTimeout(notify._tm); notify._tm=setTimeout(()=>{t.className='toast';},ms);}
+function notifyDanger(msg){ notify(msg,'danger',3000); }
 async function pushRemote(){ if(remoteSaveInFlight){ remoteSaveQueued=true; return; } remoteSaveInFlight=true; try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({data:state})}); if(!r.ok) throw new Error('timeout'); setRemoteOnline(true);}catch{ setRemoteOnline(false); notifyDanger('Bahaya: database timeout/gagal simpan.'); } finally{ remoteSaveInFlight=false; if(remoteSaveQueued){remoteSaveQueued=false; void pushRemote();}} }
-async function hydrateRemote(){ try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{cache:'no-store'}); if(!r.ok)return; const d=await r.json(); if(d?.data?.nodes){ state=d.data; saveLocal(); render(); setRemoteOnline(true);} }catch{ setRemoteOnline(false);} }
+async function hydrateRemote(){ try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{cache:'no-store'}); if(!r.ok)return; const d=await r.json(); if(d?.data?.nodes){ state=normalizeLinksUnique(d.data); saveLocal(); render(); setRemoteOnline(true);} }catch{ setRemoteOnline(false);} }
 
 viewport.addEventListener('pointerdown',(e)=>{ const node=e.target.closest('.node'); if(node){ const id=Number(node.dataset.id); selectedId=id; if(connectSource) { doConnect(id); return; } const src=state.nodes.find(n=>n.id===id); dragging={id,sx:e.clientX,sy:e.clientY,nx:src.x,ny:src.y}; } else { panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y}; } viewport.setPointerCapture(e.pointerId); render(); });
 viewport.addEventListener('pointermove',(e)=>{ if(dragging){ const n=state.nodes.find(x=>x.id===dragging.id); n.x=snap(dragging.nx+(e.clientX-dragging.sx)/cam.scale); n.y=snap(dragging.ny+(e.clientY-dragging.sy)/cam.scale); render(); } else if(panning){ cam.x=panning.cx+(e.clientX-panning.sx); cam.y=panning.cy+(e.clientY-panning.sy); render(); }});
@@ -60,3 +62,9 @@ function toCsv(){const h='id,title,x,y\n';return h+state.nodes.map(n=>`${n.id},"
 function fromCsv(text){const lines=text.trim().split(/\r?\n/).slice(1);const nodes=lines.map(l=>{const p=l.split(',');return{id:Number(p[0]),title:p[1]?.replaceAll('"','')||'',x:Number(p[p.length-2]),y:Number(p[p.length-1])}}).filter(n=>n.id>0);return {version:(state.version||1)+1,nodes:nodes.length?nodes:[{id:1,title:'Root',x:400,y:240}],links:[]};}
 window.addEventListener('resize', render);
 render(); syncHistory(); void hydrateRemote();
+document.addEventListener('selectstart',(e)=>e.preventDefault());
+document.addEventListener('dragstart',(e)=>e.preventDefault());
+document.addEventListener('contextmenu',(e)=>e.preventDefault());
+document.addEventListener('copy',(e)=>e.preventDefault());
+document.addEventListener('cut',(e)=>e.preventDefault());
+document.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey)&&['c','x','s','u','p'].includes(e.key.toLowerCase())) e.preventDefault(); });
