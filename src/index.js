@@ -26,11 +26,47 @@ async function handleShareIdeas(req, env) { /* unchanged */
   return json({ ok: false, error: 'Method not allowed.' }, 405);
 }
 
-async function handleMindmap(req, env) { /* unchanged */
-  const p = await getPool(env); if (!p) return json({ ok: false, error: 'Database is not configured.' }, 500); if (!schemaMap) { schemaMap = p.query('CREATE TABLE IF NOT EXISTS mindmapmaker_state (id BIGINT PRIMARY KEY, version INTEGER NOT NULL DEFAULT 1, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())'); } await schemaMap; const id = Number(new URL(req.url).searchParams.get('id')); if (!Number.isInteger(id) || id < 1) return json({ ok: false, error: 'Invalid map id.' }, 400); if (req.method === 'GET') { const r = await p.query('SELECT id,version,data,updated_at FROM mindmapmaker_state WHERE id=$1::bigint LIMIT 1', [String(id)]); if (!r.rowCount) return json({ ok: false, error: 'Map not found.' }, 404); const row = r.rows[0]; return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at }); }
-  if (req.method === 'PUT') { const body = await req.json().catch(() => ({})); const data = body.data ?? {}; const expected = Number.isInteger(Number(body.expectedVersion)) ? Number(body.expectedVersion) : null; if (expected !== null) { const r = await p.query('UPDATE mindmapmaker_state SET data=$1::jsonb,version=version+1,updated_at=NOW() WHERE id=$2::bigint AND version=$3 RETURNING id,version,data,updated_at', [JSON.stringify(data), String(id), expected]); if (!r.rowCount) return json({ ok: false, conflict: true }, 409); const row = r.rows[0]; return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at }); }
-    const r = await p.query('INSERT INTO mindmapmaker_state(id,version,data) VALUES($1::bigint,1,$2::jsonb) ON CONFLICT (id) DO UPDATE SET data=EXCLUDED.data,version=mindmapmaker_state.version+1,updated_at=NOW() RETURNING id,version,data,updated_at', [String(id), JSON.stringify(data)]); const row = r.rows[0]; return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at }); }
-  return json({ ok: false, error: 'Method not allowed.' }, 405);
+async function handleMindmap(req, env) {
+  try {
+    const p = await getPool(env);
+    if (!p) {
+      return json({ ok: false, error: 'Database is not configured. Set DATABASE_PUBLIC_URL (or DATABASE_URL) to your Supabase Postgres connection string.' }, 500);
+    }
+
+    if (!schemaMap) {
+      schemaMap = p.query('CREATE TABLE IF NOT EXISTS mindmapmaker_state (id BIGINT PRIMARY KEY, version INTEGER NOT NULL DEFAULT 1, data JSONB NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())');
+    }
+    await schemaMap;
+
+    const id = Number(new URL(req.url).searchParams.get('id'));
+    if (!Number.isInteger(id) || id < 1) return json({ ok: false, error: 'Invalid map id.' }, 400);
+
+    if (req.method === 'GET') {
+      const r = await p.query('SELECT id,version,data,updated_at FROM mindmapmaker_state WHERE id=$1::bigint LIMIT 1', [String(id)]);
+      if (!r.rowCount) return json({ ok: false, error: 'Map not found.' }, 404);
+      const row = r.rows[0];
+      return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at });
+    }
+
+    if (req.method === 'PUT') {
+      const body = await req.json().catch(() => ({}));
+      const data = body?.data ?? body ?? {};
+      const expected = Number.isInteger(Number(body?.expectedVersion)) ? Number(body.expectedVersion) : null;
+      if (expected !== null) {
+        const r = await p.query('UPDATE mindmapmaker_state SET data=$1::jsonb,version=version+1,updated_at=NOW() WHERE id=$2::bigint AND version=$3 RETURNING id,version,data,updated_at', [JSON.stringify(data), String(id), expected]);
+        if (!r.rowCount) return json({ ok: false, conflict: true }, 409);
+        const row = r.rows[0];
+        return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at });
+      }
+      const r = await p.query('INSERT INTO mindmapmaker_state(id,version,data) VALUES($1::bigint,1,$2::jsonb) ON CONFLICT (id) DO UPDATE SET data=EXCLUDED.data,version=mindmapmaker_state.version+1,updated_at=NOW() RETURNING id,version,data,updated_at', [String(id), JSON.stringify(data)]);
+      const row = r.rows[0];
+      return json({ ok: true, mapId: Number(row.id), version: Number(row.version), data: row.data, updatedAt: row.updated_at });
+    }
+
+    return json({ ok: false, error: 'Method not allowed.' }, 405);
+  } catch (error) {
+    return json({ ok: false, error: `Mindmap API failure: ${error instanceof Error ? error.message : String(error)}` }, 500);
+  }
 }
 
 
