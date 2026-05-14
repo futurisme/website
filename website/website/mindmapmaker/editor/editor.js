@@ -36,7 +36,18 @@ function orthogonalPath(from,to,rects){
   const sx = lower.cx>upper.cx ? upper.r.x+upper.r.w : upper.r.x;
   return `M ${sx} ${sy} L ${lower.cx} ${sy} L ${lower.cx} ${lower.r.y}`;
 }
-function sizeForTitle(t){ const chars=[...String(t||'')].length||1; const w=160+Math.round(chars*7.2*0.8); const h=80+Math.round(chars*1.8*0.2); return {w:Math.max(160,w),h:Math.max(80,h)}; }
+function sizeForTitle(t){
+  const text=String(t||'');
+  const chars=Math.max(1,[...text].length);
+  const widthWeight=0.7, heightWeight=0.3;
+  const rawWidth=140 + chars*6.8*widthWeight;
+  const w=Math.max(140,Math.min(520,Math.round(rawWidth)));
+  const perLine=Math.max(10,Math.floor((w-18)/7));
+  const lines=Math.ceil(chars/perLine);
+  const rawHeight=58 + (lines*14) + (chars*0.08*heightWeight);
+  const h=Math.max(64,Math.min(260,Math.round(rawHeight)));
+  return {w,h};
+}
 function render(){ applyTransform(); nodesLayer.innerHTML=state.nodes.map(n=>{const s=sizeForTitle(n.title); return `<button class="node" data-id="${n.id}" data-selected="${n.id===selectedId}" style="left:${n.x}px;top:${n.y}px;width:${s.w}px;height:${s.h}px">${escape(n.title)}<small>ID ${n.id}</small></button>`;}).join(''); const rects=new Map([...nodesLayer.querySelectorAll('.node')].map(el=>[Number(el.dataset.id),{x:el.offsetLeft,y:el.offsetTop,w:el.offsetWidth,h:el.offsetHeight}])); const byId = new Map(state.nodes.map(n=>[n.id,n])); edgesLayer.innerHTML=state.links.map(l=>{const a=byId.get(l.from),b=byId.get(l.to); if(!a||!b)return ''; return `<path class="edge-path edge-link" d="${orthogonalPath(a,b,rects)}"></path>`;}).join(''); connectBtn.textContent = connectSource ? 'Link→' : '🔗'; }
 function scheduleRender(){ if(framePending) return; framePending=true; requestAnimationFrame(()=>{ framePending=false; render(); }); }
 function escape(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
