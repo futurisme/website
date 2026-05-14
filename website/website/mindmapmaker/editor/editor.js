@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const mapIdEl = $('map-id'), statusEl = $('status'), nodesLayer = $('nodes'), edgesLayer = $('edges'), viewport = $('viewport');
-const gridCanvas = $('grid-canvas'), addNodeBtn = $('add-node'), removeNodeBtn = $('remove-node'), connectBtn = $('connect-node');
+const gridCanvas = $('grid-canvas'), addNodeBtn = $('add-node'), renameNodeBtn = $('rename-node'), removeNodeBtn = $('remove-node'), connectBtn = $('connect-node');
 const saveCsvBtn = $('save-csv'), saveFdhlBtn = $('save-fdhl'), loadBtn = $('load-map'), loadInput = $('load-input');
 const undoBtn = $('undo-node'), redoBtn = $('redo-node'), syncStatusDotEl = $('sync-status-dot');
 const m = location.pathname.match(/\/mindmapmaker\/(?:edit|editor)\/(\d+)/); const safeMapId = Number(m?.[1] || 1); mapIdEl.textContent = String(safeMapId);
@@ -42,6 +42,7 @@ function snap(v){ return Math.round(v/GRID)*GRID; }
 
 function addNode(){ const n=clone(); const id=Math.max(...n.nodes.map(x=>x.id))+1; const p=n.nodes.find(x=>x.id===selectedId)||n.nodes[0]; n.nodes.push({id,title:`Node ${id}`,x:snap(p.x+200),y:snap(p.y+120)}); commit(n,'Node ditambahkan.'); selectedId=id; render(); }
 function removeNode(){ if(selectedId===1)return setStatus('Root tidak dapat dihapus.'); const n=clone(); n.nodes=n.nodes.filter(x=>x.id!==selectedId); n.links=n.links.filter(l=>l.from!==selectedId&&l.to!==selectedId); selectedId=1; commit(n,'Node dihapus.'); }
+function renameNode(){ const n=clone(); const node=n.nodes.find(x=>x.id===selectedId); if(!node){ notify('Node tidak ditemukan.','danger',3000); return; } const next=window.prompt('Rename node:',node.title); if(next===null) return; const t=next.trim(); if(!t){ notify('Nama node tidak boleh kosong.','danger',3000); return; } node.title=t.slice(0,64); commit(n,'Nama node diperbarui.'); notify('Rename berhasil disimpan.','success',3000); }
 function doConnect(targetId){ if(!connectSource){ connectSource=selectedId; setStatus('Pilih node tujuan.'); render(); return; } if(connectSource===targetId){ connectSource=null; notify('Tidak bisa menghubungkan node ke dirinya sendiri.','danger',3000); render(); return; } const n=clone(); const same = n.links.some(l=>l.from===connectSource&&l.to===targetId); const reverse = n.links.some(l=>l.from===targetId&&l.to===connectSource); if(same||reverse){ connectSource=null; notify('Konektor ganda ditolak: pasangan node ini sudah terhubung.', 'danger', 3000); render(); return; } n.links.push({from:connectSource,to:targetId}); connectSource=null; commit(n,'Node terhubung.'); notify('Konektor berhasil ditambahkan.','success',3000); }
 function undo(){ if(!history.length)return; future.push(JSON.stringify(state)); state=JSON.parse(history.pop()); saveLocal(); render(); syncHistory(); }
 function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); state=JSON.parse(future.pop()); saveLocal(); render(); syncHistory(); }
@@ -58,7 +59,7 @@ viewport.addEventListener('pointerup',endPointer);
 viewport.addEventListener('pointercancel',endPointer);
 viewport.addEventListener('wheel',(e)=>{ e.preventDefault(); const next=Math.min(2.2,Math.max(.45,cam.scale+(e.deltaY>0?-0.05:0.05))); cam.scale=next; render(); },{passive:false});
 
-addNodeBtn.onclick=addNode; removeNodeBtn.onclick=removeNode; connectBtn.onclick=()=>doConnect(selectedId); undoBtn.onclick=undo; redoBtn.onclick=redo;
+addNodeBtn.onclick=addNode; renameNodeBtn.onclick=renameNode; removeNodeBtn.onclick=removeNode; connectBtn.onclick=()=>doConnect(selectedId); undoBtn.onclick=undo; redoBtn.onclick=redo;
 saveCsvBtn.onclick=()=>download(`mindmap-${safeMapId}.csv`, toCsv(), 'text/csv;charset=utf-8');
 saveFdhlBtn.onclick=()=>download(`mindmap-${safeMapId}.json`, JSON.stringify(state), 'application/json');
 loadBtn.onclick=()=>loadInput.click(); loadInput.onchange=async()=>{const f=loadInput.files?.[0];if(!f)return;const t=await f.text();try{const n=f.name.endsWith('.csv')?fromCsv(t):JSON.parse(t); if(n?.nodes){commit(n,'Map dimuat.');}}catch{setStatus('Format file tidak valid.')}};

@@ -13,23 +13,24 @@
       <section class="workspace panel">
         <div class="help" id="status">Drag area untuk pan · Tap node untuk pilih · Drag node untuk pindah.</div>
         <div id="viewport" class="viewport" aria-label="Mindmap canvas">
+          <span class="status-dot status-dot-floating" id="sync-status-dot" data-online="false"></span>
           <canvas id="grid-canvas" class="grid-canvas" aria-hidden="true"></canvas>
           <svg id="edges" class="edges" aria-hidden="true"></svg>
           <div id="nodes" class="nodes"></div>
         </div>
       </section>
       <footer class="bottombar panel">
-        <div class="meta"><p class="eyebrow">Map <strong id="map-id">--</strong></p><span class="status-dot" id="sync-status-dot" data-online="false"></span></div>
         <div class="actions">
           <button id="add-node" class="btn" type="button">＋</button>
+          <button id="rename-node" class="btn" type="button">✎</button>
           <button id="connect-node" class="btn" type="button">🔗</button>
           <button id="remove-node" class="btn danger" type="button">🗑</button>
-          <button id="undo-node" class="btn" type="button" disabled>Undo</button>
-          <button id="redo-node" class="btn" type="button" disabled>Redo</button>
-          <button id="save-csv" class="btn" type="button">CSV</button>
-          <button id="save-fdhl" class="btn" type="button">Export</button>
-          <button id="load-map" class="btn" type="button">Import</button>
-          <a class="btn" href="/mindmapmaker">Menu</a>
+          <button id="undo-node" class="btn" type="button" disabled>↶</button>
+          <button id="redo-node" class="btn" type="button" disabled>↷</button>
+          <button id="save-csv" class="btn" type="button">⤓</button>
+          <button id="save-fdhl" class="btn" type="button">⎘</button>
+          <button id="load-map" class="btn" type="button">⤒</button>
+          <a class="btn" href="/mindmapmaker">⌂</a>
           <input id="load-input" type="file" accept=".csv,.fdhl,.fadhil,.fAdHiL,.cws" hidden />
         </div>
       </footer>
