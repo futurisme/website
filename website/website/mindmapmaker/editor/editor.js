@@ -10,6 +10,7 @@ let state = loadLocal() || { version: 1, nodes: [{ id: 1, title: 'Root', x: 400,
 let selectedId = 1, connectSource = null, dragging = null, panning = null, cam = { x: 0, y: 0, scale: 1 };
 const history = []; const future = []; let remoteSaveInFlight = false, remoteSaveQueued = false;
 let framePending = false;
+const activePointers = new Map(); let pinch = null;
 
 function loadLocal(){ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{return null} }
 function saveLocal(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -47,12 +48,14 @@ function redo(){ if(!future.length)return; history.push(JSON.stringify(state)); 
 
 function notify(msg, mode='danger', ms=3000){const t=document.getElementById('toast'); if(!t)return; t.hidden=false; t.textContent=msg; t.className=`toast show ${mode}`; clearTimeout(notify._tm); notify._tm=setTimeout(()=>{t.className='toast'; setTimeout(()=>{t.hidden=true;},180);},ms);}
 function notifyDanger(msg){ notify(msg,'danger',3000); }
-async function pushRemote(){ if(remoteSaveInFlight){ remoteSaveQueued=true; return; } remoteSaveInFlight=true; try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({data:state})}); if(!r.ok) throw new Error('timeout'); setRemoteOnline(true);}catch{ setRemoteOnline(false); notifyDanger('Bahaya: database timeout/gagal simpan.'); } finally{ remoteSaveInFlight=false; if(remoteSaveQueued){remoteSaveQueued=false; void pushRemote();}} }
+async function pushRemote(){ if(remoteSaveInFlight){ remoteSaveQueued=true; return; } remoteSaveInFlight=true; const ctl=new AbortController(); const tm=setTimeout(()=>ctl.abort('timeout'),7000); try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({data:state}),signal:ctl.signal}); if(!r.ok) throw new Error('bad_status'); setRemoteOnline(true);}catch{ setRemoteOnline(false); notifyDanger('Bahaya: save gagal / timeout. Progress lokal aman.'); } finally{ clearTimeout(tm); remoteSaveInFlight=false; if(remoteSaveQueued){remoteSaveQueued=false; void pushRemote();}} }
 async function hydrateRemote(){ try{ const r=await fetch(`/api/mindmapmaker?id=${safeMapId}`,{cache:'no-store'}); if(!r.ok)return; const d=await r.json(); if(d?.data?.nodes){ state=normalizeLinksUnique(d.data); saveLocal(); render(); setRemoteOnline(true);} }catch{ setRemoteOnline(false);} }
 
-viewport.addEventListener('pointerdown',(e)=>{ const node=e.target.closest('.node'); if(node){ const id=Number(node.dataset.id); selectedId=id; if(connectSource) { doConnect(id); return; } const src=state.nodes.find(n=>n.id===id); dragging={id,sx:e.clientX,sy:e.clientY,nx:src.x,ny:src.y}; } else { panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y}; } viewport.setPointerCapture(e.pointerId); scheduleRender(); });
-viewport.addEventListener('pointermove',(e)=>{ if(dragging){ const n=state.nodes.find(x=>x.id===dragging.id); n.x=snap(dragging.nx+(e.clientX-dragging.sx)/cam.scale); n.y=snap(dragging.ny+(e.clientY-dragging.sy)/cam.scale); scheduleRender(); } else if(panning){ cam.x=panning.cx+(e.clientX-panning.sx); cam.y=panning.cy+(e.clientY-panning.sy); scheduleRender(); }});
-viewport.addEventListener('pointerup',()=>{ if(dragging){ commit(clone(),'Node dipindah.'); } dragging=null; panning=null; });
+viewport.addEventListener('pointerdown',(e)=>{ activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); const node=e.target.closest('.node'); if(activePointers.size===2){ const [a,b]=[...activePointers.values()]; pinch={dist:Math.hypot(a.x-b.x,a.y-b.y),scale:cam.scale}; dragging=null; panning=null; scheduleRender(); return; } if(node){ const id=Number(node.dataset.id); selectedId=id; if(connectSource) { doConnect(id); return; } const src=state.nodes.find(n=>n.id===id); dragging={id,sx:e.clientX,sy:e.clientY,nx:src.x,ny:src.y}; } else { panning={sx:e.clientX,sy:e.clientY,cx:cam.x,cy:cam.y}; } viewport.setPointerCapture(e.pointerId); scheduleRender(); });
+viewport.addEventListener('pointermove',(e)=>{ if(activePointers.has(e.pointerId)) activePointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(activePointers.size===2&&pinch){ const [a,b]=[...activePointers.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); cam.scale=Math.min(2.2,Math.max(.45,pinch.scale*(d/Math.max(1,pinch.dist)))); scheduleRender(); return; } if(dragging){ const n=state.nodes.find(x=>x.id===dragging.id); n.x=snap(dragging.nx+(e.clientX-dragging.sx)/cam.scale); n.y=snap(dragging.ny+(e.clientY-dragging.sy)/cam.scale); scheduleRender(); } else if(panning){ cam.x=panning.cx+(e.clientX-panning.sx); cam.y=panning.cy+(e.clientY-panning.sy); scheduleRender(); }});
+function endPointer(e){ activePointers.delete(e.pointerId); if(activePointers.size<2) pinch=null; if(dragging){ commit(clone(),'Node dipindah.'); } dragging=null; panning=null; }
+viewport.addEventListener('pointerup',endPointer);
+viewport.addEventListener('pointercancel',endPointer);
 viewport.addEventListener('wheel',(e)=>{ e.preventDefault(); const next=Math.min(2.2,Math.max(.45,cam.scale+(e.deltaY>0?-0.05:0.05))); cam.scale=next; render(); },{passive:false});
 
 addNodeBtn.onclick=addNode; removeNodeBtn.onclick=removeNode; connectBtn.onclick=()=>doConnect(selectedId); undoBtn.onclick=undo; redoBtn.onclick=redo;
@@ -70,3 +73,5 @@ document.addEventListener('contextmenu',(e)=>e.preventDefault());
 document.addEventListener('copy',(e)=>e.preventDefault());
 document.addEventListener('cut',(e)=>e.preventDefault());
 document.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey)&&['c','x','s','u','p'].includes(e.key.toLowerCase())) e.preventDefault(); });
+window.addEventListener('offline',()=>notifyDanger('Offline: progress disimpan lokal otomatis.'));
+window.addEventListener('online',()=>notify('Online kembali: sinkronisasi dilanjutkan.','success',3000));
