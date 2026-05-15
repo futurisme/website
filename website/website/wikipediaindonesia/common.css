@@ -63,8 +63,7 @@
   gap: 0;
 }
 
-.up-fadhil-box,
-.up-fadhil-console {
+.up-fadhil-box {
   flex: 1 1 320px;
   border: 1px solid var(--line);
   border-left: 0;
@@ -121,20 +120,11 @@
   background: linear-gradient(180deg, #fff, #f8fbff);
 }
 
-.up-fadhil-console {
-  background: #1f2228;
-  color: #32d74b;
-  border-color: #4a505d;
-  font-family: Consolas, Menlo, monospace;
-  font-size: 12.5px;
-}
-
 .up-fadhil-root a { color: var(--link); }
 .up-fadhil-foot { text-align: center; font-size: 11px; color: #72777d; margin-top: .2rem; }
 
 @media (max-width: 720px) {
-  .up-fadhil-box,
-  .up-fadhil-console { flex-basis: 100%; }
+  .up-fadhil-box { flex-basis: 100%; }
   .up-fadhil-title { font-size: 1.46rem; }
   .up-fadhil-card-title { font-size: 1.2rem; }
   .up-fadhil-info-card { grid-template-columns: 40px 1fr; }
