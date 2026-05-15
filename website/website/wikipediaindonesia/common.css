@@ -93,7 +93,10 @@
 
 .up-fadhil-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00f5ff 0%, #ff38c8 33%, #f7ff00 66%, #9b4dff 100%);
+  background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 20%, #f7ff00 40%, #39ff14 60%, #9b4dff 80%, #00f5ff 100%);
+  background-size: 200% 100%;
+  animation: upBarSway 1.5s ease-in-out infinite, upBarHue 1.5s linear infinite;
+  will-change: transform, background-position, filter;
 }
 
 .up-fadhil-sep { border-top: 1px solid #c8ccd1; margin: .5rem 0; }
@@ -150,4 +153,7 @@
 .up-fadhil-title-anim--c{animation-delay:.5s}
 @keyframes upTitleSway{0%{transform:translateX(0)}25%{transform:translateX(1px)}50%{transform:translateX(-1px)}75%{transform:translateX(.6px)}100%{transform:translateX(0)}}
 @keyframes upNeonGlyph{0%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}33%{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}66%{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}100%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}}
-@media (prefers-reduced-motion: reduce){.up-fadhil-title{animation:none}.up-fadhil-title-anim{animation:none}.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}}
+@media (prefers-reduced-motion: reduce){.up-fadhil-title{animation:none}.up-fadhil-title-anim{animation:none}.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}.up-fadhil-fill{animation:none}}
+
+@keyframes upBarSway{0%{transform:translateX(0)}25%{transform:translateX(1px)}50%{transform:translateX(-1px)}75%{transform:translateX(.6px)}100%{transform:translateX(0)}}
+@keyframes upBarHue{0%{background-position:0% 50%;filter:brightness(1)}50%{background-position:100% 50%;filter:brightness(1.08)}100%{background-position:0% 50%;filter:brightness(1)}}
