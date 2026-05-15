@@ -140,3 +140,10 @@
 .up-fadhil-skill-inner{background:linear-gradient(180deg,#060606 0%,#141414 48%,#222 100%);padding:.35rem .76rem .1rem}
 .up-fadhil-info-block{background:linear-gradient(180deg,#ff2a8b 0%,#ff3aa1 52%,#ff4fb0 100%);padding:.36rem .76rem .5rem;border-top:1px solid #39ff14}
 .up-fadhil-info-head{font-weight:700;margin:0 0 .35rem;font-size:14px;line-height:1.2;color:#fff}
+
+.up-fadhil-title-anim{display:inline-block;animation:upNeonShift 3.6s ease-in-out infinite alternate;will-change:filter}
+.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.75);animation-delay:0s}
+.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 7px rgba(247,255,0,.75);animation-delay:.24s}
+.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 8px rgba(255,79,216,.82);animation-delay:.48s}
+@keyframes upNeonShift{0%{filter:hue-rotate(0deg) brightness(1)}50%{filter:hue-rotate(-18deg) brightness(1.08)}100%{filter:hue-rotate(18deg) brightness(1.02)}}
+@media (prefers-reduced-motion: reduce){.up-fadhil-title-anim{animation:none}}
