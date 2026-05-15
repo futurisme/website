@@ -1,61 +1,84 @@
-
 .up-fadhil-root {
   --ink: #202122;
   --line: #a2a9b1;
   --link: #36c;
   --neon-divider: 1px solid #39ff14;
+
   display: flex;
   flex-direction: column;
   gap: 0;
   color: var(--ink);
-  font: normal 13px/1.38 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  font: normal 13px/1.38 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
 }
 
-.up-fadhil-root * { box-sizing: border-box; }
+.up-fadhil-root * {
+  box-sizing: border-box;
+}
 
 .up-fadhil-header {
   border: 1px solid var(--line);
   border-bottom: 4px solid #36c;
-  background: linear-gradient(135deg, #202122, #40464f);
-  color: #fff;
   border-radius: 2px;
-  padding: .72rem .86rem;
+  padding: 0.72rem 0.86rem;
+  color: #fff;
+  background: linear-gradient(135deg, #202122, #40464f);
 }
 
 .up-fadhil-title {
+  display: inline-block;
+  margin: 0;
   font-size: 1.72rem;
   font-weight: 800;
-  letter-spacing: -0.015em;
   line-height: 1.1;
-  margin: 0;
+  letter-spacing: -0.015em;
+  animation: upTitleSway 1.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.up-fadhil-title-anim {
+  display: inline;
+  animation: upNeonGlyph 1.5s linear infinite;
+  will-change: color, text-shadow;
+}
+
+.up-fadhil-title-anim--a {
+  animation-delay: 0s;
+}
+
+.up-fadhil-title-anim--b {
+  animation-delay: 0.25s;
+}
+
+.up-fadhil-title-anim--c {
+  animation-delay: 0.5s;
 }
 
 .up-fadhil-contact-row {
-  margin-top: .45rem;
   display: flex;
   flex-wrap: wrap;
-  gap: .3rem;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
 }
 
 .up-fadhil-contact-box,
 .up-fadhil-badge {
   display: inline-flex;
   align-items: center;
+  min-height: 20px;
+  padding: 1px 7px;
   border: 1px solid #a2a9b1;
-  background: #f8f9fa;
   color: #202122;
+  background: #f8f9fa;
   font-size: 11px;
   font-weight: 700;
-  padding: 1px 7px;
-  min-height: 20px;
   text-decoration: none;
 }
 
 .up-fadhil-badges {
-  margin-top: .28rem;
   display: flex;
   flex-wrap: wrap;
-  gap: .22rem;
+  gap: 0.22rem;
+  margin-top: 0.28rem;
 }
 
 .up-fadhil-grid {
@@ -66,28 +89,26 @@
 
 .up-fadhil-box {
   flex: 1 1 320px;
-  border: 1px solid var(--line);
-  border-left: 0;
-  border-top: 0;
-  background: #fff;
   padding: 0;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-left: 0;
+  background: #fff;
 }
 
-.up-fadhil-card-title {
-  font-size: 1.43rem;
-  line-height: 1.16;
-  margin: 0 0 .45rem;
-  font-family: Linux Libertine, Georgia, Times, serif;
-  border-bottom: 1px solid #c8ccd1;
-  padding-bottom: .2rem;
+.up-fadhil-metric {
+  margin: 0;
+  color: #f7ff00;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-shadow: 0 0 7px rgba(247, 255, 0, 0.72);
 }
 
-.up-fadhil-metric { font-size: 12.5px; font-weight: 700; margin: 0; color:#f7ff00; text-shadow:0 0 7px rgba(247,255,0,.72); }
 .up-fadhil-track {
   height: 9px;
+  margin: 0.2rem 0 0.55rem;
   border: 1px solid #a2a9b1;
   background: #eaecf0;
-  margin: .2rem 0 .55rem;
   overflow: hidden;
 }
 
@@ -99,61 +120,222 @@
   will-change: transform, background-position, filter;
 }
 
-.up-fadhil-sep { border-top: 1px solid #c8ccd1; margin: .5rem 0; }
+.up-fadhil-infobox {
+  border: 1px solid #a2a9b1;
+  border-radius: 0;
+  background: #f8f9fa;
+}
 
-.up-fadhil-infobox { border: 1px solid #a2a9b1; background: #f8f9fa; border-radius:0; }
-.up-fadhil-infobox::after{content:"";display:block;border-bottom:var(--neon-divider);margin:0}
+.up-fadhil-infobox::after {
+  content: '';
+  display: block;
+  margin: 0;
+  border-bottom: var(--neon-divider);
+}
+
 .up-fadhil-info-card {
   display: grid;
   grid-template-columns: 46px 1fr;
   min-height: 38px;
   border-top: 1px solid #c8ccd1;
 }
-.up-fadhil-info-card:first-child { border-top: 0; }
+
+.up-fadhil-info-card:first-child {
+  border-top: 0;
+}
+
 .up-fadhil-info-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   border-right: 1px solid #c8ccd1;
-  font-size: 18px;
   background: linear-gradient(180deg, #eaf3ff, #dbe8ff);
+  font-size: 18px;
 }
+
 .up-fadhil-info-text {
-  padding: .26rem .45rem;
+  padding: 0.26rem 0.45rem;
+  background: linear-gradient(180deg, #fff, #f8fbff);
   font-size: 12.8px;
   line-height: 1.28;
-  background: linear-gradient(180deg, #fff, #f8fbff);
 }
 
-.up-fadhil-root a { color: var(--link); }
-.up-fadhil-foot { text-align: center; font-size: 11px; color: #72777d; margin-top: .2rem; }
+.up-fadhil-root a {
+  color: var(--link);
+}
+
+.up-fadhil-foot {
+  margin-top: 0.2rem;
+  color: #72777d;
+  text-align: center;
+  font-size: 11px;
+}
+
+.up-fadhil-badge--pelajar {
+  color: #ff38c8 !important;
+  border-color: #ff38c8 !important;
+  background: #00f5ff !important;
+}
+
+.up-fadhil-badge--wikipedian {
+  color: #00f5ff !important;
+  border-color: #00f5ff !important;
+  background: #ff2a8b !important;
+}
+
+.up-fadhil-badge--pengembang {
+  color: #ff38c8 !important;
+  border-color: #ff38c8 !important;
+  background: #00f5ff !important;
+}
+
+.up-fadhil-skill-block {
+  padding: 0.38rem 0.76rem 0.24rem;
+  border-top: var(--neon-divider);
+  border-bottom: var(--neon-divider);
+  border-radius: 0;
+  background: linear-gradient(180deg, #00f5ff 0%, #1eefff 100%);
+}
+
+.up-fadhil-skill-title {
+  margin: 0 0 0.35rem;
+  color: #05262a;
+  font-family: Linux Libertine, Georgia, Times, serif;
+  font-size: 1.2rem;
+  line-height: 1.14;
+}
+
+.up-fadhil-skill-divider {
+  height: 0;
+  margin: 0.08rem 0 0.18rem;
+  border-top: 0;
+  border-radius: 0;
+}
+
+.up-fadhil-skill-inner {
+  padding: 0.35rem 0.76rem 0.1rem;
+  background: linear-gradient(180deg, #060606 0%, #141414 48%, #222 100%);
+}
+
+.up-fadhil-info-block {
+  padding: 0.36rem 0.76rem 0.5rem;
+  border-top: var(--neon-divider);
+  border-bottom: var(--neon-divider);
+  border-radius: 0;
+  background: linear-gradient(180deg, #ff2a8b 0%, #ff3aa1 52%, #ff4fb0 100%);
+}
+
+.up-fadhil-info-head {
+  margin: 0 0 0.35rem;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@keyframes upTitleSway {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(1px);
+  }
+  50% {
+    transform: translateX(-1px);
+  }
+  75% {
+    transform: translateX(0.6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes upNeonGlyph {
+  0% {
+    color: #20f6ff;
+    text-shadow: 0 0 7px rgba(32, 246, 255, 0.78);
+  }
+  33% {
+    color: #f7ff00;
+    text-shadow: 0 0 8px rgba(247, 255, 0, 0.86);
+  }
+  66% {
+    color: #ff4fd8;
+    text-shadow: 0 0 9px rgba(255, 79, 216, 0.9);
+  }
+  100% {
+    color: #20f6ff;
+    text-shadow: 0 0 7px rgba(32, 246, 255, 0.78);
+  }
+}
+
+@keyframes upBarSway {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(1px);
+  }
+  50% {
+    transform: translateX(-1px);
+  }
+  75% {
+    transform: translateX(0.6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes upBarHue {
+  0% {
+    filter: brightness(1);
+    background-position: 0% 50%;
+  }
+  50% {
+    filter: brightness(1.08);
+    background-position: 100% 50%;
+  }
+  100% {
+    filter: brightness(1);
+    background-position: 0% 50%;
+  }
+}
 
 @media (max-width: 720px) {
-  .up-fadhil-box { flex-basis: 100%; }
-  .up-fadhil-title { font-size: 1.46rem; }
-  .up-fadhil-card-title { font-size: 1.2rem; }
-  .up-fadhil-info-card { grid-template-columns: 40px 1fr; }
+  .up-fadhil-box {
+    flex-basis: 100%;
+  }
+
+  .up-fadhil-title {
+    font-size: 1.46rem;
+  }
+
+  .up-fadhil-info-card {
+    grid-template-columns: 40px 1fr;
+  }
 }
 
-.up-fadhil-badge--pelajar{color:#ff38c8!important;background:#00f5ff!important;border-color:#ff38c8!important}
-.up-fadhil-badge--wikipedian{color:#00f5ff!important;background:#ff2a8b!important;border-color:#00f5ff!important}
-.up-fadhil-badge--pengembang{color:#ff38c8!important;background:#00f5ff!important;border-color:#ff38c8!important}
+@media (prefers-reduced-motion: reduce) {
+  .up-fadhil-title,
+  .up-fadhil-title-anim,
+  .up-fadhil-fill {
+    animation: none;
+  }
 
-.up-fadhil-skill-block{background:linear-gradient(180deg,#00f5ff 0%,#1eefff 100%);padding:.38rem .76rem .24rem;border-top:var(--neon-divider);border-bottom:var(--neon-divider);border-radius:0}
-.up-fadhil-skill-title{margin:0 0 .35rem;font-size:1.2rem;line-height:1.14;font-family:Linux Libertine,Georgia,Times,serif;color:#05262a}
-.up-fadhil-skill-divider{border-top:0;margin:.08rem 0 .18rem;height:0;border-radius:0}
-.up-fadhil-skill-inner{background:linear-gradient(180deg,#060606 0%,#141414 48%,#222 100%);padding:.35rem .76rem .1rem}
-.up-fadhil-info-block{background:linear-gradient(180deg,#ff2a8b 0%,#ff3aa1 52%,#ff4fb0 100%);padding:.36rem .76rem .5rem;border-top:var(--neon-divider);border-bottom:var(--neon-divider);border-radius:0}
-.up-fadhil-info-head{font-weight:700;margin:0 0 .35rem;font-size:14px;line-height:1.2;color:#fff}
+  .up-fadhil-title-anim--a {
+    color: #20f6ff;
+    text-shadow: 0 0 7px rgba(32, 246, 255, 0.78);
+  }
 
-.up-fadhil-title{display:inline-block;animation:upTitleSway 1.5s ease-in-out infinite;will-change:transform}
-.up-fadhil-title-anim{display:inline;animation:upNeonGlyph 1.5s linear infinite;will-change:color,text-shadow}
-.up-fadhil-title-anim--a{animation-delay:0s}
-.up-fadhil-title-anim--b{animation-delay:.25s}
-.up-fadhil-title-anim--c{animation-delay:.5s}
-@keyframes upTitleSway{0%{transform:translateX(0)}25%{transform:translateX(1px)}50%{transform:translateX(-1px)}75%{transform:translateX(.6px)}100%{transform:translateX(0)}}
-@keyframes upNeonGlyph{0%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}33%{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}66%{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}100%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}}
-@media (prefers-reduced-motion: reduce){.up-fadhil-title{animation:none}.up-fadhil-title-anim{animation:none}.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}.up-fadhil-fill{animation:none}}
+  .up-fadhil-title-anim--b {
+    color: #f7ff00;
+    text-shadow: 0 0 8px rgba(247, 255, 0, 0.86);
+  }
 
-@keyframes upBarSway{0%{transform:translateX(0)}25%{transform:translateX(1px)}50%{transform:translateX(-1px)}75%{transform:translateX(.6px)}100%{transform:translateX(0)}}
-@keyframes upBarHue{0%{background-position:0% 50%;filter:brightness(1)}50%{background-position:100% 50%;filter:brightness(1.08)}100%{background-position:0% 50%;filter:brightness(1)}}
+  .up-fadhil-title-anim--c {
+    color: #ff4fd8;
+    text-shadow: 0 0 9px rgba(255, 79, 216, 0.9);
+  }
+}
