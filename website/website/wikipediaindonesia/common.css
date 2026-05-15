@@ -133,3 +133,10 @@
 .up-fadhil-badge--pelajar{color:#f7ff00!important;background:#00a85a!important;border-color:#ff38c8!important}
 .up-fadhil-badge--wikipedian{color:#00f5ff!important;background:#ff2a8b!important;border-color:#00f5ff!important}
 .up-fadhil-badge--pengembang{color:#ff38c8!important;background:#7fffd4!important;border-color:#f7ff00!important}
+
+.up-fadhil-skill-block{background:linear-gradient(180deg,#00f5ff 0%,#1eefff 100%);padding:.42rem .48rem .28rem;border-bottom:1px solid #39ff14}
+.up-fadhil-skill-title{margin:0 0 .35rem;font-size:1.2rem;line-height:1.14;font-family:Linux Libertine,Georgia,Times,serif;color:#05262a}
+.up-fadhil-skill-divider{border-top:1px solid #39ff14;margin:.3rem 0 .35rem}
+.up-fadhil-skill-inner{background:linear-gradient(180deg,#060606 0%,#141414 48%,#222 100%);padding:.35rem .4rem .1rem}
+.up-fadhil-info-block{background:linear-gradient(180deg,#ff2a8b 0%,#ff3aa1 52%,#ff4fb0 100%);padding:.36rem .48rem .5rem;border-top:1px solid #39ff14}
+.up-fadhil-info-head{font-weight:700;margin:0 0 .35rem;font-size:14px;line-height:1.2;color:#fff}
