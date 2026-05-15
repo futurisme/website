@@ -5,16 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Wikipedia Indonesia Profile Testing</title>
     <meta name="robots" content="noindex,nofollow" />
-    <link rel="stylesheet" href="/wikipediaindonesia/common.css" />
-    <style>body{margin:0;padding:1rem;background:#f8f9fa} .wrap{max-width:1100px;margin:0 auto}</style>
+    <link rel="stylesheet" href="/wikipediaindonesia/common.css?v=20260515a" />
+    <style>body{margin:0;padding:1rem;background:#f8f9fa;color:#202122}.wrap{max-width:1100px;margin:0 auto}.status{font:600 .82rem/1.4 system-ui;margin:.25rem 0 1rem;color:#54595d}.status.ok{color:#14866d}.status.err{color:#b32424}</style>
   </head>
   <body>
     <main class="wrap">
+      <p id="loader-status" class="status">Memuat modul profil…</p>
       <div id="profile-slot"></div>
     </main>
     <script>
-      fetch('/wikipediaindonesia/profile.html',{cache:'no-store'}).then(r=>r.text()).then(html=>{document.getElementById('profile-slot').innerHTML=html;window.dispatchEvent(new Event('fadhil-profile-ready'));});
+      (async()=>{
+        const status=document.getElementById('loader-status');
+        const slot=document.getElementById('profile-slot');
+        try{
+          const r=await fetch('/wikipediaindonesia/profile',{cache:'no-store'});
+          if(!r.ok) throw new Error('HTTP '+r.status);
+          const html=await r.text();
+          slot.innerHTML=html;
+          status.textContent='Modul profil aktif.';
+          status.className='status ok';
+          window.dispatchEvent(new Event('fadhil-profile-ready'));
+        }catch(err){
+          status.textContent='Gagal memuat modul profil: '+(err&&err.message?err.message:'unknown');
+          status.className='status err';
+        }
+      })();
     </script>
-    <script src="/wikipediaindonesia/common.js"></script>
+    <script src="/wikipediaindonesia/common.js?v=20260515a"></script>
   </body>
 </html>

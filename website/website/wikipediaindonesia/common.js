@@ -28,7 +28,8 @@
     setInterval(tick, 1000);
   };
 
-  const init = () => { renderRuntime(); startClock(); };
+  let started=false;
+  const init = () => { if(started) return; started=true; renderRuntime(); startClock(); };
   const hasMw = !!(window.mw && window.$);
   if (hasMw && ENABLED()) $(init);
   if (!hasMw) {

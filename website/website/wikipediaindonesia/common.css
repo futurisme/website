@@ -60,3 +60,5 @@
   .up-fadhil-box, .up-fadhil-console { flex: 1 1 100%; }
   .up-fadhil-header { padding: 1.5rem; }
 }
+
+.up-fadhil-root *{box-sizing:border-box}.up-fadhil-header{overflow:hidden}.up-fadhil-root a{color:#3366cc}
