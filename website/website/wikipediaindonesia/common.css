@@ -139,3 +139,7 @@
   .up-fadhil-card-title { font-size: 1.2rem; }
   .up-fadhil-info-card { grid-template-columns: 40px 1fr; }
 }
+
+.up-fadhil-badge--pelajar{color:#f7ff00!important;background:#00a85a!important;border-color:#ff38c8!important}
+.up-fadhil-badge--wikipedian{color:#00f5ff!important;background:#ff2a8b!important;border-color:#00f5ff!important}
+.up-fadhil-badge--pengembang{color:#ff38c8!important;background:#7fffd4!important;border-color:#f7ff00!important}
