@@ -2,6 +2,8 @@
   const PROFILE_TITLE = 'Fadhil Akbar Cariearsa';
   const ENABLED = () => mw.config.get('wgNamespaceNumber') === 2 && mw.config.get('wgTitle') === PROFILE_TITLE;
   const DAY0_UTC = Date.UTC(2026, 4, 15);
+  let started = false;
+  let clockTimer = null;
 
   const pad = (n) => String(n).padStart(2, '0');
   const nowWIB = () => {
@@ -19,22 +21,27 @@
 
   const startClock = () => {
     const clock = document.getElementById('fadhil-clock');
-    if (!clock) return;
+    if (!clock || clockTimer) return;
     const tick = () => {
       const d = nowWIB();
       clock.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} WIB`;
     };
     tick();
-    setInterval(tick, 1000);
+    clockTimer = setInterval(tick, 1000);
   };
 
-  let started=false;
-  const init = () => { if(started) return; started=true; renderRuntime(); startClock(); };
+  const init = () => {
+    if (started) return;
+    started = true;
+    renderRuntime();
+    startClock();
+  };
+
   const hasMw = !!(window.mw && window.$);
   if (hasMw && ENABLED()) $(init);
   if (!hasMw) {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
     else init();
-    window.addEventListener('fadhil-profile-ready', init);
+    window.addEventListener('fadhil-profile-ready', init, { once: true });
   }
 })();
