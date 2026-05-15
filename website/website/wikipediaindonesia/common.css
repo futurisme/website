@@ -1,20 +1,141 @@
 
-.up-fadhil-root{--ink:#202122;--muted:#54595d;--line:#a2a9b1;--panel:#f8f9fa;--blue:#36c;display:flex;flex-direction:column;gap:0;font:normal 14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;color:var(--ink)}
-.up-fadhil-root *{box-sizing:border-box}
-.up-fadhil-header{border:1px solid var(--line);background:linear-gradient(135deg,#202122,#40464f);color:#fff;border-bottom:5px solid #36c;border-radius:2px;padding:1rem 1.2rem}
-.up-fadhil-badge{display:inline-block;padding:1px 7px;border:1px solid #a2a9b1;background:#f8f9fa;color:#202122;font-size:11px;font-weight:700;margin:2px 4px 0 0}
-.up-fadhil-grid{display:flex;flex-wrap:wrap;gap:0}
-.up-fadhil-box,.up-fadhil-console{flex:1 1 320px;border:1px solid var(--line);border-left:0;border-top:0;background:#fff;padding:.9rem}
-.up-fadhil-card-title{font-size:26px;line-height:1.1;margin:0 0 .7rem;font-family:Linux Libertine,Georgia,Times,serif;border-bottom:1px solid #c8ccd1;padding-bottom:.3rem}.up-fadhil-card-title .tek-word{color:#0b2a5b}
-.up-fadhil-metric{font-size:13px;font-weight:600}
-.up-fadhil-track{height:10px;border:1px solid #a2a9b1;background:#eaecf0;margin:.35rem 0 .9rem;overflow:hidden}
-.up-fadhil-fill{height:100%;background:linear-gradient(90deg,#00f5ff 0%,#ff38c8 33%,#f7ff00 66%,#9b4dff 100%)}
-.up-fadhil-infobox{border:1px solid #a2a9b1;background:#f8f9fa}
-.up-fadhil-info-card{display:grid;grid-template-columns:52px 1fr;min-height:42px;border-top:1px solid #c8ccd1}
-.up-fadhil-info-card:first-child{border-top:0}
-.up-fadhil-info-icon{display:flex;align-items:center;justify-content:center;border-right:1px solid #c8ccd1;font-size:20px;background:linear-gradient(180deg,#eaf3ff,#dbe8ff)}
-.up-fadhil-info-text{padding:.42rem .55rem;font-size:13px;line-height:1.35;background:linear-gradient(180deg,#fff,#f8fbff)}
-.up-fadhil-console{background:#1f2228;color:#32d74b;border-color:#4a505d;font-family:Consolas,Menlo,monospace}
-.up-fadhil-sep{border-top:1px solid #c8ccd1;margin:.85rem 0}
-.up-fadhil-root a{color:#36c}
-@media (max-width:720px){.up-fadhil-box,.up-fadhil-console{flex-basis:100%}.up-fadhil-card-title{font-size:22px}.up-fadhil-info-card{grid-template-columns:44px 1fr}}
+.up-fadhil-root {
+  --ink: #202122;
+  --line: #a2a9b1;
+  --link: #36c;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: var(--ink);
+  font: normal 13px/1.38 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+}
+
+.up-fadhil-root * { box-sizing: border-box; }
+
+.up-fadhil-header {
+  border: 1px solid var(--line);
+  border-bottom: 4px solid #36c;
+  background: linear-gradient(135deg, #202122, #40464f);
+  color: #fff;
+  border-radius: 2px;
+  padding: .72rem .86rem;
+}
+
+.up-fadhil-title {
+  font-size: 1.72rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.up-fadhil-contact-row {
+  margin-top: .45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem;
+}
+
+.up-fadhil-contact-box,
+.up-fadhil-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #a2a9b1;
+  background: #f8f9fa;
+  color: #202122;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  min-height: 20px;
+  text-decoration: none;
+}
+
+.up-fadhil-badges {
+  margin-top: .28rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .22rem;
+}
+
+.up-fadhil-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.up-fadhil-box,
+.up-fadhil-console {
+  flex: 1 1 320px;
+  border: 1px solid var(--line);
+  border-left: 0;
+  border-top: 0;
+  background: #fff;
+  padding: .68rem .76rem;
+}
+
+.up-fadhil-card-title {
+  font-size: 1.43rem;
+  line-height: 1.16;
+  margin: 0 0 .45rem;
+  font-family: Linux Libertine, Georgia, Times, serif;
+  border-bottom: 1px solid #c8ccd1;
+  padding-bottom: .2rem;
+}
+
+.up-fadhil-metric { font-size: 12.5px; font-weight: 600; margin: 0; }
+.up-fadhil-track {
+  height: 9px;
+  border: 1px solid #a2a9b1;
+  background: #eaecf0;
+  margin: .2rem 0 .55rem;
+  overflow: hidden;
+}
+
+.up-fadhil-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f5ff 0%, #ff38c8 33%, #f7ff00 66%, #9b4dff 100%);
+}
+
+.up-fadhil-sep { border-top: 1px solid #c8ccd1; margin: .5rem 0; }
+
+.up-fadhil-infobox { border: 1px solid #a2a9b1; background: #f8f9fa; }
+.up-fadhil-info-card {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  min-height: 38px;
+  border-top: 1px solid #c8ccd1;
+}
+.up-fadhil-info-card:first-child { border-top: 0; }
+.up-fadhil-info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #c8ccd1;
+  font-size: 18px;
+  background: linear-gradient(180deg, #eaf3ff, #dbe8ff);
+}
+.up-fadhil-info-text {
+  padding: .26rem .45rem;
+  font-size: 12.8px;
+  line-height: 1.28;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+}
+
+.up-fadhil-console {
+  background: #1f2228;
+  color: #32d74b;
+  border-color: #4a505d;
+  font-family: Consolas, Menlo, monospace;
+  font-size: 12.5px;
+}
+
+.up-fadhil-root a { color: var(--link); }
+.up-fadhil-foot { text-align: center; font-size: 11px; color: #72777d; margin-top: .2rem; }
+
+@media (max-width: 720px) {
+  .up-fadhil-box,
+  .up-fadhil-console { flex-basis: 100%; }
+  .up-fadhil-title { font-size: 1.46rem; }
+  .up-fadhil-card-title { font-size: 1.2rem; }
+  .up-fadhil-info-card { grid-template-columns: 40px 1fr; }
+}
