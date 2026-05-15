@@ -29,5 +29,11 @@
   };
 
   const init = () => { renderRuntime(); startClock(); };
-  if (window.mw && window.$ && ENABLED()) $(init);
+  const hasMw = !!(window.mw && window.$);
+  if (hasMw && ENABLED()) $(init);
+  if (!hasMw) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+    else init();
+    window.addEventListener('fadhil-profile-ready', init);
+  }
 })();

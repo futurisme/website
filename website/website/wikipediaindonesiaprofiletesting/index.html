@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wikipedia Indonesia Profile Testing</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="stylesheet" href="/wikipediaindonesia/common.css" />
+    <style>body{margin:0;padding:1rem;background:#f8f9fa} .wrap{max-width:1100px;margin:0 auto}</style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div id="profile-slot"></div>
+    </main>
+    <script>
+      fetch('/wikipediaindonesia/profile.html',{cache:'no-store'}).then(r=>r.text()).then(html=>{document.getElementById('profile-slot').innerHTML=html;window.dispatchEvent(new Event('fadhil-profile-ready'));});
+    </script>
+    <script src="/wikipediaindonesia/common.js"></script>
+  </body>
+</html>

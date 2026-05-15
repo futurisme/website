@@ -197,7 +197,9 @@ const ROUTES = new Map([
   ['/daily-streak', '/website/daily-streak/index.html'],
   ['/hype', '/hype/index.html'],
   ['/dreambusiness', '/dreambusiness/index.html'],
-  ['/rpg', '/rpg/index.html']
+  ['/rpg', '/rpg/index.html'],
+  ['/wikipediaindonesiaprofiletesting', '/website/website/wikipediaindonesiaprofiletesting/index.html'],
+  ['/wikipediaindonesia', '/website/website/wikipediaindonesiaprofiletesting/index.html']
 ]);
 
 const STATIC_PREFIXES = [
@@ -212,7 +214,9 @@ const STATIC_PREFIXES = [
   ['/dreambusiness/', '/dreambusiness/'],
   ['/rpg/', '/rpg/'],
   ['/assets/public/', '/assets/public/'],
-  ['/portfolio/', '/website/portfolio/']
+  ['/portfolio/', '/website/portfolio/'],
+  ['/wikipediaindonesia/', '/website/website/wikipediaindonesia/'],
+  ['/wikipediaindonesiaprofiletesting/', '/website/website/wikipediaindonesiaprofiletesting/']
 ];
 
 const ROOT_ASSETS = Object.freeze({
