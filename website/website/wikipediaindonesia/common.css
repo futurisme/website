@@ -142,9 +142,10 @@
 .up-fadhil-info-head{font-weight:700;margin:0 0 .35rem;font-size:14px;line-height:1.2;color:#fff}
 
 .up-fadhil-title{display:inline-block;animation:upTitleSway 1.5s ease-in-out infinite;will-change:transform}
-.up-fadhil-title-anim{display:inline}
-.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}
-.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}
-.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}
+.up-fadhil-title-anim{display:inline;animation:upNeonGlyph 1.5s linear infinite;will-change:color,text-shadow}
+.up-fadhil-title-anim--a{animation-delay:0s}
+.up-fadhil-title-anim--b{animation-delay:.25s}
+.up-fadhil-title-anim--c{animation-delay:.5s}
 @keyframes upTitleSway{0%{transform:translateX(0)}25%{transform:translateX(1px)}50%{transform:translateX(-1px)}75%{transform:translateX(.6px)}100%{transform:translateX(0)}}
-@media (prefers-reduced-motion: reduce){.up-fadhil-title{animation:none}}
+@keyframes upNeonGlyph{0%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}33%{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}66%{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}100%{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}}
+@media (prefers-reduced-motion: reduce){.up-fadhil-title{animation:none}.up-fadhil-title-anim{animation:none}.up-fadhil-title-anim--a{color:#20f6ff;text-shadow:0 0 7px rgba(32,246,255,.78)}.up-fadhil-title-anim--b{color:#f7ff00;text-shadow:0 0 8px rgba(247,255,0,.86)}.up-fadhil-title-anim--c{color:#ff4fd8;text-shadow:0 0 9px rgba(255,79,216,.9)}}
