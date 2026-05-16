@@ -114,7 +114,7 @@
 
 .up-fadhil-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 20%, #f7ff00 40%, #39ff14 60%, #9b4dff 80%, #00f5ff 100%);
+  background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 16%, #9b4dff 33%, #f7ff00 50%, #39ff14 66%, #ff4fd8 83%, #00f5ff 100%);
   background-size: 200% 100%;
   animation: upBarSway 1.5s ease-in-out infinite, upBarHue 1.5s linear infinite;
   will-change: transform, background-position, filter;
@@ -172,21 +172,21 @@
 }
 
 .up-fadhil-badge--pelajar {
-  color: #ff38c8 !important;
-  border-color: #ff38c8 !important;
-  background: #00f5ff !important;
-}
-
-.up-fadhil-badge--wikipedian {
   color: #00f5ff !important;
   border-color: #00f5ff !important;
   background: #ff2a8b !important;
 }
 
-.up-fadhil-badge--pengembang {
+.up-fadhil-badge--wikipedian {
   color: #ff38c8 !important;
   border-color: #ff38c8 !important;
   background: #00f5ff !important;
+}
+
+.up-fadhil-badge--indonesia {
+  color: #00f5ff !important;
+  border-color: #00f5ff !important;
+  background: #ff2a8b !important;
 }
 
 .up-fadhil-skill-block {
