@@ -322,22 +322,34 @@
   .up-fadhil-title-anim,
   .up-fadhil-fill {
     animation: none;
-    background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 16.66%, #9b4dff 33.33%, #f7ff00 50%, #39ff14 66.66%, #ff4fd8 83.33%, #00f5ff 100%);
-    background-size: 100% 100%;
+  }
+
+  .up-fadhil-title,
+  .up-fadhil-title-anim {
+    transform: none;
+    filter: none;
+    will-change: auto;
+    background: transparent !important;
+    -webkit-text-fill-color: currentColor;
   }
 
   .up-fadhil-title-anim--a {
     color: #20f6ff;
-    text-shadow: 0 0 7px rgba(32, 246, 255, 0.78);
+    text-shadow: 0 0 6px rgba(32, 246, 255, 0.55);
   }
 
   .up-fadhil-title-anim--b {
     color: #f7ff00;
-    text-shadow: 0 0 8px rgba(247, 255, 0, 0.86);
+    text-shadow: 0 0 6px rgba(247, 255, 0, 0.55);
   }
 
   .up-fadhil-title-anim--c {
     color: #ff4fd8;
-    text-shadow: 0 0 9px rgba(255, 79, 216, 0.9);
+    text-shadow: 0 0 6px rgba(255, 79, 216, 0.55);
+  }
+
+  .up-fadhil-fill {
+    background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 16.66%, #9b4dff 33.33%, #f7ff00 50%, #39ff14 66.66%, #ff4fd8 83.33%, #00f5ff 100%);
+    background-size: 100% 100%;
   }
 }
