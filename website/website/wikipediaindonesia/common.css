@@ -322,6 +322,8 @@
   .up-fadhil-title-anim,
   .up-fadhil-fill {
     animation: none;
+    background: linear-gradient(90deg, #00f5ff 0%, #ff4fd8 16.66%, #9b4dff 33.33%, #f7ff00 50%, #39ff14 66.66%, #ff4fd8 83.33%, #00f5ff 100%);
+    background-size: 100% 100%;
   }
 
   .up-fadhil-title-anim--a {
